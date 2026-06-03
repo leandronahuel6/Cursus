@@ -1,9 +1,9 @@
 # 🎓 [Nombre de tu Proyecto]
 
 > **Universidad:** UTN
-> **Facultad/Escuela:** Regional Haedo 
-> **Asignatura:** Proyecto Final 
-> **Año Académico:** 2026 
+> **Facultad/Escuela:** Regional Haedo
+> **Asignatura:** Proyecto Final
+> **Año Académico:** 2026
 
 [![Estado del Proyecto](https://img.shields.io/badge/Estado-Completado-success)](#)
 [![Licencia](https://img.shields.io/badge/Licencia-MIT-blue)](#)
@@ -30,10 +30,10 @@
 
 ## 🛠 Tecnologías Utilizadas
 
-* **Frontend:** [React / Angular / Vue.js / HTML5 & CSS3]
-* **Backend:** [Node.js / Python - Django / Java - Spring Boot]
-* **Base de Datos:** [PostgreSQL / MySQL / MongoDB]
-* **Otras herramientas:** [Docker / Postman / Jest para pruebas]
+- **Frontend:** [React / Angular / Vue.js / HTML5 & CSS3]
+- **Backend:** [Node.js / Python - Django / Java - Spring Boot]
+- **Base de Datos:** [PostgreSQL / MySQL / MongoDB]
+- **Otras herramientas:** [Docker / Postman / Jest para pruebas]
 
 ## 🏗 Arquitectura del Sistema
 
@@ -46,3 +46,6 @@ graph TD;
     API_Gateway-->Servicio_Productos;
     Servicio_Usuarios-->Base_Datos;
     Servicio_Productos-->Base_Datos;
+```
+
+![Carpincha best moments 2026](../../Imágenes/imagenes%20random/capibara.png)
