@@ -49,3 +49,4 @@ graph TD;
 ```
 
 ![Carpincha best moments 2026](../../Imágenes/imagenes%20random/capibara.png)
+ASJDISJAIDAS.
