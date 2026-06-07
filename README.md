@@ -26,7 +26,7 @@
 
 - **Característica 1:** [Breve explicación, ej. Autenticación de usuarios basada en JWT].
 - **Característica 2:** [Breve explicación, ej. Integración con API externa de clima].
-- **Característica 3:** [Breve explicación, ej. Generación automática de reportes en PDF].
+- **Característica 3:** [Breve explicación, ej. 
 
 ## 🛠 Tecnologías Utilizadas
 
