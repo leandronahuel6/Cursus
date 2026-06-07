@@ -48,5 +48,3 @@ graph TD;
     Servicio_Productos-->Base_Datos;
 ```
 
-![Carpincha best moments 2026](../../Imágenes/imagenes%20random/capibara.png)
-ASJDISJAIDAS.
