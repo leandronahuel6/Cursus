@@ -31,7 +31,7 @@
 ## 🛠 Tecnologías Utilizadas
 
 - **Frontend:** [React / Angular / Vue.js / HTML5 & CSS3]
-- **Backend:** [Node.js / Python - Django / Java - Spring Boot]
+- **Backend:** [PHP / LARAVEL]
 - **Base de Datos:** [PostgreSQL / MySQL / MongoDB]
 - **Otras herramientas:** [Docker / Postman / Jest para pruebas]
 
