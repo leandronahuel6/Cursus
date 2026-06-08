@@ -26,7 +26,7 @@
 
 - **Característica 1:** [Breve explicación, ej. Autenticación de usuarios basada en JWT].
 - **Característica 2:** [Breve explicación, ej. Integración con API externa de clima].
-- **Característica 3:** [Breve explicación, ej. 
+- **Característica 3:** [Breve explicación, ej. A].
 
 ## 🛠 Tecnologías Utilizadas
 
@@ -47,4 +47,3 @@ graph TD;
     Servicio_Usuarios-->Base_Datos;
     Servicio_Productos-->Base_Datos;
 ```
-
