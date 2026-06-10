@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cursus - Área de Concentración</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+
+<body>
+<div class="app">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">📚</div>
+      <div class="sb-logo-text">UTN Study<small>Tec. en Programación</small></div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="nav-item" onclick="location.href='index.html'">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/></svg>
+        Inicio
+      </div>
+      <div class="nav-item" onclick="location.href='materias.html'">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M3 5h10M3 8h7M3 11h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Mis Materias
+      </div>
+      <div class="nav-item active" onclick="location.href='area-estudio.html'">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3.5L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Área de Estudio
+      </div>
+
+      <div class="nav-group">Académico</div>
+      <div class="nav-item" onclick="location.href='#'">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><circle cx="3" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="3" r="1.5" fill="currentColor"/><circle cx="8" cy="13" r="1.5" fill="currentColor"/><circle cx="13" cy="8" r="1.5" fill="currentColor"/><path d="M4.5 8h2M9.5 4l2.5 3M9.5 12l2.5-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Plan de Estudios
+      </div>
+      <div class="nav-item" onclick="location.href='horarios.html'">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 7h6M5 10h4M5 5h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Simulador de Horarios
+      </div>
+      <div class="nav-item" onclick="location.href='#'">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M2 12L5 8l3 2.5L11 5l3 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Calculadora de Promedio
+      </div>
+
+      <div class="nav-group">Personal</div>
+      <div class="nav-item" onclick="location.href='#'">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a4 4 0 014 4c0 2.5 1.2 3.5 1.5 4.5H2.5C2.8 9 4 8 4 5.5a4 4 0 014-4z" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 10c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+        Trámites
+        <span class="nav-badge">2</span>
+      </div>
+      <div class="nav-item" onclick="location.href='#'">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M8 3v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/></svg>
+        Métricas
+      </div>
+    </nav>
+
+    <div class="sb-user">
+      <div class="sb-av">JP</div>
+      <div>
+        <div class="sb-uname">Juan Pérez</div>
+        <div class="sb-uleg">Legajo 12345</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <div class="main">
+
+    <!-- Mobile header -->
+    <div class="mob-hdr">
+      <div class="mob-lbl">Área de Estudio</div>
+      <div class="mob-name">Programación II</div>
+      <div class="mob-row">
+        <span class="badge b-reg">Regular</span>
+        <span style="font-size:11px;color:#6b7280">2° año · 2024</span>
+      </div>
+    </div>
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="breadcrumb">
+        <a href="index.html">Inicio</a>
+        <span class="sep">›</span>
+        <span>Área de Estudio</span>
+        <span class="sep">›</span>
+        <span class="cur">Programación II</span>
+      </div>
+      <div class="tb-right">
+        <button class="focus-btn" onclick="toggleFocus()">⊙ Modo concentración</button>
+      </div>
+    </header>
+
+    <!-- Page -->
+    <div class="page">
+
+      <!-- Materia header -->
+      <div class="mat-hdr">
+        <div class="mat-ic">💻</div>
+        <div class="mat-info">
+          <div class="mat-name">Programación II</div>
+          <div class="mat-meta">
+            <span class="badge b-reg">Regular</span>
+            <span class="mat-yr">2° año · Cursada 2024</span>
+          </div>
+        </div>
+        <div class="mat-chips">
+          <div class="mat-chip"><div class="mat-chip-v">8h</div><div class="mat-chip-l">esta semana</div></div>
+          <div class="mat-chip"><div class="mat-chip-v">23</div><div class="mat-chip-l">🍅 totales</div></div>
+          <div class="mat-chip"><div class="mat-chip-v">4</div><div class="mat-chip-l">online ahora</div></div>
+        </div>
+      </div>
+
+      <!-- Split -->
+      <div class="split">
+
+        <!-- FOCUS CARD -->
+        <div class="focus-card">
+          <div class="ptabs">
+            <div class="ptab on"  onclick="setMode(25,this)">🍅 Pomodoro · 25 min</div>
+            <div class="ptab"     onclick="setMode(5,this)" >☕ Corto · 5 min</div>
+            <div class="ptab"     onclick="setMode(15,this)">🧘 Largo · 15 min</div>
+          </div>
+
+          <div class="focus-body">
+
+            <!-- Ring -->
+            <div class="ring-wrap" id="ring-wrap">
+              <svg width="176" height="176" viewBox="0 0 176 176">
+                <defs>
+                  <linearGradient id="grd" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%"   stop-color="#6366f1"/>
+                    <stop offset="100%" stop-color="#c4b5fd"/>
+                  </linearGradient>
+                </defs>
+                <circle class="r-bg"   cx="88" cy="88" r="70"/>
+                <circle class="r-prog" cx="88" cy="88" r="70" id="rp"/>
+              </svg>
+              <div class="ring-center">
+                <span class="ring-t" id="ptime">25:00</span>
+                <span class="ring-s" id="psub">Sesión 3 de 4</span>
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="pomo-ctrls">
+              <button class="ctrl" onclick="resetPomo()" title="Reiniciar">⟳</button>
+              <button class="ctrl play" id="play-btn" onclick="togglePomo()">▶</button>
+              <button class="ctrl" onclick="skipPomo()" title="Saltear">⏭</button>
+            </div>
+
+            <!-- Dots -->
+            <div class="dots" id="dots">
+              <div class="dot done"></div>
+              <div class="dot done"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+
+            <!-- Session log -->
+            <div class="slog">
+              <div class="slog-title">Sesiones completadas hoy</div>
+              <div class="slog-row">
+                <span class="slog-t">14:05</span>
+                <span class="slog-d">25:00</span>
+                <span class="slog-ok">✓ Completada</span>
+              </div>
+              <div class="slog-row">
+                <span class="slog-t">14:35</span>
+                <span class="slog-d">25:00</span>
+                <span class="slog-ok">✓ Completada</span>
+              </div>
+              <div id="log-extra"></div>
+            </div>
+
+          </div>
+        </div><!-- /focus-card -->
+
+        <!-- COMMUNITY -->
+        <div class="community">
+          <div class="cp-head">
+            <div class="cp-ttl">
+              <div class="live"></div>
+              Compañeros estudiando ahora
+            </div>
+            <div class="cp-sub">4 activos en Programación II</div>
+          </div>
+
+          <div class="cp-list">
+            <div class="cp-user">
+              <div class="cp-av" style="background:linear-gradient(135deg,#06b6d4,#0284c7)">LG</div>
+              <div class="cp-inf">
+                <div class="cp-name">Laura G.</div>
+                <div class="cp-time">Hace 45 min</div>
+              </div>
+              <div class="cp-pom">🍅 × 2</div>
+            </div>
+            <div class="cp-user">
+              <div class="cp-av" style="background:linear-gradient(135deg,#10b981,#059669)">MR</div>
+              <div class="cp-inf">
+                <div class="cp-name">Mateo R.</div>
+                <div class="cp-time">Hace 18 min</div>
+              </div>
+              <div class="cp-pom">🍅 × 1</div>
+            </div>
+            <div class="cp-user">
+              <div class="cp-av" style="background:linear-gradient(135deg,#f59e0b,#d97706)">AL</div>
+              <div class="cp-inf">
+                <div class="cp-name">Ana L.</div>
+                <div class="cp-time">Hace 1h 12 min</div>
+              </div>
+              <div class="cp-pom">🍅 × 3</div>
+            </div>
+            <div class="cp-user">
+              <div class="cp-av" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)">FM</div>
+              <div class="cp-inf">
+                <div class="cp-name">Franco M.</div>
+                <div class="cp-time">Hace 5 min</div>
+              </div>
+              <div class="cp-pom">🍅 × 0</div>
+            </div>
+          </div>
+
+          <div class="cp-foot">
+            💡 Todos están estudiando en silencio.<br>Tu concentración también los motiva.
+          </div>
+        </div>
+
+      </div><!-- /split -->
+
+      <!-- Kanban + Marcadores -->
+      <div>
+        <div class="stabs">
+          <div class="stab on" onclick="switchTab('kanban',this)">☑ Tareas de esta materia</div>
+          <div class="stab"    onclick="switchTab('marcadores',this)">🔗 Marcadores</div>
+        </div>
+
+        <!-- KANBAN -->
+        <div class="panel on" id="panel-kanban">
+          <div class="kanban">
+
+            <!-- Pendiente -->
+            <div class="kbcol" id="col-pending"
+              ondragover="allowDrop(event)"
+              ondrop="dropCard(event,'pending')"
+              ondragleave="leaveDrop(event)">
+              <div class="kbcol-hd">
+                <div class="kbcol-name"><div class="kbdot kd-p"></div>Pendiente</div>
+                <span class="kbcnt" id="cnt-pending">3</span>
+              </div>
+              <div class="kbcards" id="cards-pending">
+                <div class="kbcard" id="c1" draggable="true" ondragstart="dStart(event,'c1')" ondragend="dEnd(event)">
+                  <div class="kb-title">TP N°2 — Calculadora en C</div>
+                  <div class="kb-meta urg">⚠ Vence 5 jun</div>
+                  <button class="kb-del" onclick="delCard('c1')">✕</button>
+                </div>
+                <div class="kbcard" id="c2" draggable="true" ondragstart="dStart(event,'c2')" ondragend="dEnd(event)">
+                  <div class="kb-title">Práctica 4 — Recursividad</div>
+                  <div class="kb-meta">📅 Vence 15 jun</div>
+                  <button class="kb-del" onclick="delCard('c2')">✕</button>
+                </div>
+                <div class="kbcard" id="c3" draggable="true" ondragstart="dStart(event,'c3')" ondragend="dEnd(event)">
+                  <div class="kb-title">Leer cap. 7 — Punteros</div>
+                  <div class="kb-meta">Sin fecha</div>
+                  <button class="kb-del" onclick="delCard('c3')">✕</button>
+                </div>
+              </div>
+              <button class="kb-add" onclick="addCard('pending')">+ Agregar tarea</button>
+            </div>
+
+            <!-- En Curso -->
+            <div class="kbcol" id="col-progress"
+              ondragover="allowDrop(event)"
+              ondrop="dropCard(event,'progress')"
+              ondragleave="leaveDrop(event)">
+              <div class="kbcol-hd">
+                <div class="kbcol-name"><div class="kbdot kd-c"></div>En Curso</div>
+                <span class="kbcnt" id="cnt-progress">1</span>
+              </div>
+              <div class="kbcards" id="cards-progress">
+                <div class="kbcard" id="c4" draggable="true" ondragstart="dStart(event,'c4')" ondragend="dEnd(event)">
+                  <div class="kb-title">Ejercicios de repaso — Parcial 2</div>
+                  <div class="kb-meta">📅 Parcial el 20 jun</div>
+                  <button class="kb-del" onclick="delCard('c4')">✕</button>
+                </div>
+              </div>
+              <button class="kb-add" onclick="addCard('progress')">+ Agregar tarea</button>
+            </div>
+
+            <!-- Finalizado -->
+            <div class="kbcol" id="col-done"
+              ondragover="allowDrop(event)"
+              ondrop="dropCard(event,'done')"
+              ondragleave="leaveDrop(event)">
+              <div class="kbcol-hd">
+                <div class="kbcol-name"><div class="kbdot kd-f"></div>Finalizado</div>
+                <span class="kbcnt" id="cnt-done">2</span>
+              </div>
+              <div class="kbcards" id="cards-done">
+                <div class="kbcard" id="c5" draggable="true" ondragstart="dStart(event,'c5')" ondragend="dEnd(event)" style="opacity:.55">
+                  <div class="kb-title" style="text-decoration:line-through;color:var(--t3)">TP N°1 — Hola Mundo y variables</div>
+                  <div class="kb-meta">✓ Entregado 10 may</div>
+                  <button class="kb-del" onclick="delCard('c5')">✕</button>
+                </div>
+                <div class="kbcard" id="c6" draggable="true" ondragstart="dStart(event,'c6')" ondragend="dEnd(event)" style="opacity:.55">
+                  <div class="kb-title" style="text-decoration:line-through;color:var(--t3)">Prácticas 1, 2 y 3</div>
+                  <div class="kb-meta">✓ Completadas</div>
+                  <button class="kb-del" onclick="delCard('c6')">✕</button>
+                </div>
+              </div>
+              <button class="kb-add" onclick="addCard('done')">+ Agregar tarea</button>
+            </div>
+
+          </div>
+        </div><!-- /kanban -->
+
+        <!-- MARCADORES -->
+        <div class="panel" id="panel-marcadores">
+          <div class="bmwrap">
+            <div class="bm-form">
+              <div class="bm-form-title">Agregar marcador</div>
+              <div class="bm-row">
+                <input id="bm-url"   class="bm-inp url" type="url"  placeholder="https://...">
+                <input id="bm-title" class="bm-inp"     type="text" placeholder="Título (opcional)">
+                <button class="bm-save" onclick="addBookmark()">Guardar</button>
+              </div>
+            </div>
+            <div class="bm-list" id="bm-list">
+              <div class="bm-item">
+                <div class="bm-ic">🎥</div>
+                <div class="bm-inf">
+                  <div class="bm-name">Tutorial punteros en C — YouTube</div>
+                  <div class="bm-url">https://youtube.com/watch?v=zuegQmMdy8M</div>
+                </div>
+                <a href="https://youtube.com/watch?v=zuegQmMdy8M" target="_blank" rel="noopener" class="bm-open">↗</a>
+                <button class="bm-del" onclick="this.parentElement.remove()">✕</button>
+              </div>
+              <div class="bm-item">
+                <div class="bm-ic">💬</div>
+                <div class="bm-inf">
+                  <div class="bm-name">StackOverflow — diferencia malloc vs calloc</div>
+                  <div class="bm-url">https://stackoverflow.com/questions/1538420</div>
+                </div>
+                <a href="https://stackoverflow.com/questions/1538420" target="_blank" rel="noopener" class="bm-open">↗</a>
+                <button class="bm-del" onclick="this.parentElement.remove()">✕</button>
+              </div>
+              <div class="bm-item">
+                <div class="bm-ic">📄</div>
+                <div class="bm-inf">
+                  <div class="bm-name">Apunte cátedra — Estructuras y Uniones</div>
+                  <div class="bm-url">https://drive.google.com/file/d/1xBz...</div>
+                </div>
+                <a href="#" class="bm-open">↗</a>
+                <button class="bm-del" onclick="this.parentElement.remove()">✕</button>
+              </div>
+            </div>
+          </div>
+        </div><!-- /marcadores -->
+
+      </div><!-- /tabs wrapper -->
+
+    </div><!-- /page -->
+  </div><!-- /main -->
+
+  <!-- BOTTOM NAV (mobile) -->
+  <nav class="bnav">
+    <div class="bnav-row">
+      <div class="bn" onclick="location.href='index.html'"><span class="bn-ic">⊞</span>Inicio</div>
+      <div class="bn" onclick="location.href='materias.html'"><span class="bn-ic">📚</span>Materias</div>
+      <div class="bn on" onclick="location.href='area-estudio.html'"><span class="bn-ic">⏱</span>Estudio</div>
+      <div class="bn" onclick="location.href='#'"><span class="bn-ic">☑️</span>Tareas</div>
+      <div class="bn" onclick="location.href='#'"><span class="bn-ic">🔔</span>Trámites<span class="bn-bdg">2</span></div>
+    </div>
+  </nav>
+
+</div><!-- /app -->
+
+<!-- Scripts -->
+<script src="../assets/js/area-estudio.js"></script>
+</body>
+</html>
