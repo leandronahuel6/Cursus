@@ -5,7 +5,7 @@
 > **Asignatura:** Gestion de Desarrollo de Software
 > **Año Académico:** 2026
 
-[![Estado del Proyecto](![Estado](https://img.shields.io/badge/Estado-En%20Proceso-yellow))](#)
+[![Estado del Proyecto](https://img.shields.io/badge/Estado-En%20Proceso-yellow)](#)
 [![Licencia](https://img.shields.io/badge/Licencia-MIT-blue)](#)
 
 ## 📖 Descripción
