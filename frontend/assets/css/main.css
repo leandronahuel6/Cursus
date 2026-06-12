@@ -1317,7 +1317,11 @@ a { text-decoration: none; color: inherit; }
   .r-bg       { r: 56; }
   .kanban     { grid-template-columns: 1fr; }
   .bm-row     { flex-direction: column; }
-<<<<<<< HEAD
+
+  /* Alertas Mobile overrides */
+  .alertas-grid { grid-template-columns: 1fr; gap: 15px; }
+  .career-selector-wrap { width: 100%; margin-top: 10px; justify-content: space-between; }
+  .career-select { max-width: 100%; }
 }
 
 /* ==============================
@@ -1524,11 +1528,4 @@ a { text-decoration: none; color: inherit; }
   .login-visual-side { display: none; }
   .login-form-side { padding: 24px 20px; }
   .login-form-wrap { padding: 24px 0 40px; }
-=======
-
-  /* Alertas Mobile overrides */
-  .alertas-grid { grid-template-columns: 1fr; gap: 15px; }
-  .career-selector-wrap { width: 100%; margin-top: 10px; justify-content: space-between; }
-  .career-select { max-width: 100%; }
->>>>>>> origin/main
 }
