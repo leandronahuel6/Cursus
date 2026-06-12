@@ -49,10 +49,10 @@
       </div>
 
       <div class="nav-group">Personal</div>
-      <div class="nav-item {{ Request::routeIs('tramites') ? 'active' : '' }}" onclick="location.href='{{ route('tramites') }}'">
+      <div class="nav-item {{ Request::routeIs('alertas') ? 'active' : '' }}" onclick="location.href='{{ route('alertas') }}'">
         <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a4 4 0 014 4c0 2.5 1.2 3.5 1.5 4.5H2.5C2.8 9 4 8 4 5.5a4 4 0 014-4z" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 10c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5" stroke="currentColor" stroke-width="1.3"/></svg>
-        Trámites
-        <span class="nav-badge">2</span>
+        Alertas
+        <span class="nav-badge" id="nav-badge-count">2</span>
       </div>
       <div class="nav-item {{ Request::routeIs('metricas') ? 'active' : '' }}" onclick="location.href='{{ route('metricas') }}'">
         <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M8 3v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/></svg>
@@ -102,9 +102,9 @@
       <div class="bn {{ Request::routeIs('horarios') ? 'on' : '' }}" onclick="location.href='{{ route('horarios') }}'">
         <span class="bn-ic">☑️</span>Horarios
       </div>
-      <div class="bn {{ Request::routeIs('tramites') ? 'on' : '' }}" onclick="location.href='{{ route('tramites') }}'">
-        <span class="bn-ic">🔔</span>Trámites
-        <span class="bn-badge">2</span>
+      <div class="bn {{ Request::routeIs('alertas') ? 'on' : '' }}" onclick="location.href='{{ route('alertas') }}'">
+        <span class="bn-ic">🔔</span>Alertas
+        <span class="bn-badge" id="bnav-badge-count">2</span>
       </div>
     </div>
   </nav>
