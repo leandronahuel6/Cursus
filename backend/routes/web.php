@@ -32,9 +32,9 @@ Route::get('/promedio', function () {
     return view('placeholder', ['title' => 'Calculadora de Promedio']);
 })->name('promedio');
 
-Route::get('/tramites', function () {
-    return view('placeholder', ['title' => 'Trámites']);
-})->name('tramites');
+Route::get('/alertas', function () {
+    return view('alertas');
+})->name('alertas');
 
 Route::get('/metricas', function () {
     return view('placeholder', ['title' => 'Métricas']);
