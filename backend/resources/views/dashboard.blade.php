@@ -24,7 +24,7 @@
   <div class="alert" id="js-alert">
     <div class="alert-dot"></div>
     <div class="alert-txt">
-      <strong>Trámite próximo:</strong> Pago de cuota mensual vence en 3 días (15 de junio)
+      <strong>Alerta próxima:</strong> Pago de cuota de la carrera vence en 3 días (15 de junio). <a href="{{ route('alertas') }}" style="text-decoration: underline; font-weight: 600;">Ver alertas</a>
     </div>
     <button class="alert-x" onclick="document.getElementById('js-alert').remove()">✕</button>
   </div>
