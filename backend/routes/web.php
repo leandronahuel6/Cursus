@@ -28,14 +28,10 @@ Route::get('/horarios', function () {
     return view('horarios');
 })->name('horarios');
 
-Route::get('/promedio', function () {
-    return view('promedio');
-})->name('promedio');
+Route::get('/progreso', function () {
+    return view('progreso');
+})->name('progreso');
 
 Route::get('/alertas', function () {
     return view('alertas');
 })->name('alertas');
-
-Route::get('/metricas', function () {
-    return view('placeholder', ['title' => 'Métricas']);
-})->name('metricas');
