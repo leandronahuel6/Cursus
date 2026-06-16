@@ -89,12 +89,38 @@
         </div>
       </nav>
 
-      <div class="sb-user">
+      <!-- Menú de perfil (aparece hacia arriba al hacer clic) -->
+      <div class="profile-menu" id="profile-menu">
+        <button class="profile-menu-item" onclick="location.href='#'">
+          <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M8 1v1M8 14v1M1 8h1M14 8h1M2.9 2.9l.7.7M12.4 12.4l.7.7M2.9 13.1l.7-.7M12.4 3.6l.7-.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          Configuración
+        </button>
+        <button class="profile-menu-item" onclick="window.openContactModal()">
+          <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
+            <path d="M2 3h12v8H9l-3 2.5V11H2V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          </svg>
+          Contacto
+        </button>
+        <div class="profile-menu-divider"></div>
+        <button class="profile-menu-item danger" onclick="location.href='login.html'">
+          <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
+            <path d="M6 3H3v10h3M10 5l3 3-3 3M13 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Cerrar Sesión
+        </button>
+      </div>
+      <div class="sb-user" onclick="window.toggleProfileMenu(event)">
         <div class="sb-av">JP</div>
         <div>
           <div class="sb-uname">Juan Pérez</div>
           <div class="sb-uleg">Legajo 12345</div>
         </div>
+        <svg class="sb-user-caret" viewBox="0 0 10 6" fill="currentColor" width="10" height="10">
+          <path d="M0 5l5-5 5 5H0z"/>
+        </svg>
       </div>
     </aside>
 
@@ -322,6 +348,47 @@
 
 </div><!-- /app -->
 
+<!-- Modal de Contacto -->
+<div class="contact-overlay" id="contact-overlay">
+  <div class="contact-box">
+    <div class="contact-header">
+      <div class="contact-title">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M2 3h12v8H9l-3 2.5V11H2V3z" stroke="var(--brand)" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        Contacto
+      </div>
+      <button class="contact-close" onclick="window.closeContactModal()">✕</button>
+    </div>
+    <div class="contact-body">
+      <p class="contact-subtitle">¿Encontraste un bug o tenés una sugerencia? Contanos y lo mejoramos.</p>
+      <form id="contact-form" onsubmit="window.handleContactSubmit(event)">
+        <div class="contact-field">
+          <label for="contact-type">Tipo</label>
+          <select id="contact-type" class="contact-input">
+            <option value="bug">🐛 Bug / Error</option>
+            <option value="mejora">💡 Sugerencia de mejora</option>
+            <option value="otro">💬 Otro</option>
+          </select>
+        </div>
+        <div class="contact-field">
+          <label for="contact-subject">Asunto</label>
+          <input type="text" id="contact-subject" class="contact-input" placeholder="Ej: El calendario no muestra el mes correcto" required>
+        </div>
+        <div class="contact-field">
+          <label for="contact-body-msg">Descripción</label>
+          <textarea id="contact-body-msg" class="contact-input contact-textarea" placeholder="Describí el problema o tu sugerencia con detalle..." required></textarea>
+        </div>
+        <div class="contact-footer">
+          <button type="button" class="contact-btn-cancel" onclick="window.closeContactModal()">Cancelar</button>
+          <button type="submit" class="contact-btn-send">Enviar mensaje</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script src="../assets/js/horarios.js"></script>
+<script src="../assets/js/profile.js"></script>
 </body>
 </html>
