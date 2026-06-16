@@ -3213,15 +3213,15 @@ a { text-decoration: none; color: inherit; }
 .contact-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,.45);
-  backdrop-filter: blur(4px);
+  background: rgba(0,0,0,.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2000;
   opacity: 0;
   pointer-events: none;
-  transition: opacity .2s;
+  will-change: opacity;
+  transition: opacity .22s ease;
 }
 .contact-overlay.open { opacity: 1; pointer-events: auto; }
 .contact-box {
@@ -3230,11 +3230,16 @@ a { text-decoration: none; color: inherit; }
   width: 90%;
   max-width: 460px;
   box-shadow: 0 20px 60px rgba(0,0,0,.2);
-  transform: translateY(-16px) scale(.98);
-  transition: transform .25s cubic-bezier(.34,1.2,.64,1);
+  opacity: 0;
+  transform: translateY(-10px) scale(.95);
+  will-change: transform, opacity;
+  transition: transform .28s cubic-bezier(0.22, 1, 0.36, 1), opacity .22s ease;
   overflow: hidden;
 }
-.contact-overlay.open .contact-box { transform: translateY(0) scale(1); }
+.contact-overlay.open .contact-box {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
 .contact-header {
   display: flex;
   align-items: center;
