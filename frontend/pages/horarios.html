@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cursus - Simulador de Horarios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+
+<body>
+<div class="app">
+
+    <!-- Barra lateral -->
+    <aside class="sidebar">
+      <div class="sb-logo">
+        <div class="sb-logo-icon">📚</div>
+        <div class="sb-logo-text">
+          UTN Estudio
+          <small>Tec. en Programación</small>
+        </div>
+      </div>
+
+      <nav class="sb-nav">
+        <div class="nav-item" onclick="location.href='index.html'">
+          <svg class="nav-ic" viewBox="0 0 16 16" fill="none">
+            <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/>
+            <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/>
+            <rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/>
+            <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/>
+          </svg>
+          Inicio
+        </div>
+        <div class="nav-item" onclick="location.href='materias.html'">
+          <svg class="nav-ic" viewBox="0 0 16 16" fill="none">
+            <path d="M3 5h10M3 8h7M3 11h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          Mis Materias
+        </div>
+        <div class="nav-item" onclick="location.href='area-estudio.html'">
+          <svg class="nav-ic" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 5v3.5L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Área de Estudio
+        </div>
+
+        <div class="nav-group">Académico</div>
+        <div class="nav-item" onclick="location.href='#'">
+          <svg class="nav-ic" viewBox="0 0 16 16" fill="none">
+            <circle cx="3" cy="8" r="1.5" fill="currentColor"/>
+            <circle cx="8" cy="3" r="1.5" fill="currentColor"/>
+            <circle cx="8" cy="13" r="1.5" fill="currentColor"/>
+            <circle cx="13" cy="8" r="1.5" fill="currentColor"/>
+            <path d="M4.5 8h2M9.5 4l2.5 3M9.5 12l2.5-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          Plan de Estudios
+        </div>
+        <div class="nav-item active" onclick="location.href='horarios.html'">
+          <svg class="nav-ic" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M5 7h6M5 10h4M5 5h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          Simulador de Horarios
+        </div>
+        <div class="nav-item" onclick="location.href='promedio.html'">
+          <svg class="nav-ic" viewBox="0 0 16 16" fill="none">
+            <path d="M2 12L5 8l3 2.5L11 5l3 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Calculadora de Promedio
+        </div>
+
+        <div class="nav-group">Personal</div>
+        <div class="nav-item" onclick="location.href='alertas.html'">
+          <svg class="nav-ic" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1.5a4 4 0 014 4c0 2.5 1.2 3.5 1.5 4.5H2.5C2.8 9 4 8 4 5.5a4 4 0 014-4z" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M6.5 10c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5" stroke="currentColor" stroke-width="1.3"/>
+          </svg>
+          Alertas
+          <span class="nav-badge">2</span>
+        </div>
+        <div class="nav-item" onclick="location.href='#'">
+          <svg class="nav-ic" viewBox="0 0 16 16" fill="none">
+            <path d="M8 3v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          Métricas
+        </div>
+      </nav>
+
+      <div class="sb-user">
+        <div class="sb-av">JP</div>
+        <div>
+          <div class="sb-uname">Juan Pérez</div>
+          <div class="sb-uleg">Legajo 12345</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ======== MAIN ======== -->
+    <div class="main">
+
+      <!-- Mobile header -->
+      <div class="mob-hdr">
+        <div class="mob-lbl">Académico</div>
+        <div class="mob-row">
+          <div class="mob-name">Simulador de Horarios</div>
+          <div class="mob-tb-actions">
+            <button class="btn-secondary btn-mob-action" onclick="document.getElementById('btn-clear-grid').click()">♻ Limpiar</button>
+            <button class="btn-primary btn-mob-action" onclick="document.getElementById('btn-save-schedule').click()">💾 Guardar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Topbar (desktop) -->
+      <header class="topbar">
+        <div class="breadcrumb">
+          <a href="index.html">Inicio</a>
+          <span class="sep">›</span>
+          <span class="cur">Simulador de Horarios</span>
+        </div>
+        <div class="tb-actions">
+          <button class="btn-secondary" id="btn-clear-grid">♻ Limpiar Grilla</button>
+          <button class="btn-primary" id="btn-save-schedule">💾 Guardar Horario</button>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <div class="page sched-page-layout">
+
+        <!-- Double Column Area -->
+        <div class="sched-main-split">
+          
+          <!-- LEFT SIDE: Available Elements (30% width) -->
+          <div class="sched-sidebar-panel">
+            <div class="sched-panel-section">
+              <div class="sched-section-hd">
+                <span>Materias Disponibles (A cursar)</span>
+                <span class="sched-badge-count" id="count-available-subjects">6</span>
+              </div>
+              <div class="sched-draggable-list" id="list-available-subjects">
+                <!-- Se poblará dinámicamente con JS -->
+              </div>
+            </div>
+
+            <div class="sched-panel-section">
+              <div class="sched-section-hd">
+                <span>Mis Actividades Personales</span>
+                <button class="btn-add-act" id="btn-add-activity">+ Nueva</button>
+              </div>
+              <div class="sched-draggable-list" id="list-available-activities">
+                <!-- Se poblará dinámicamente con JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT SIDE: Weekly Grid (70% width) -->
+          <div class="sched-timeline-container">
+            <div class="sched-canvas-card">
+              <div class="sched-weekly-grid">
+                
+                <!-- Grid Header (Days) -->
+                <div class="grid-header-row">
+                  <div class="grid-hdr-cell time-col-hdr">Hora</div>
+                  <div class="grid-hdr-cell">Lunes</div>
+                  <div class="grid-hdr-cell">Martes</div>
+                  <div class="grid-hdr-cell">Miércoles</div>
+                  <div class="grid-hdr-cell">Jueves</div>
+                  <div class="grid-hdr-cell">Viernes</div>
+                  <div class="grid-hdr-cell">Sábado</div>
+                </div>
+
+                <!-- Grid Body (Time column and day columns) -->
+                <div class="grid-body-row">
+                  
+                  <!-- Time Axis labels (08:00 to 22:00) -->
+                  <div class="grid-time-axis" id="grid-time-axis-labels">
+                    <!-- Se generará con JS -->
+                  </div>
+
+                  <!-- Day Columns (Lunes to Sábado) -->
+                  <div class="grid-day-cols-wrap">
+                    <!-- Columnas de fondo para las líneas de la grilla -->
+                    <div class="grid-bg-lines-container" id="grid-bg-lines">
+                      <!-- Grid lines horizontales -->
+                    </div>
+
+                    <!-- Columnas reales donde se soltarán los bloques -->
+                    <div class="grid-cols-interactive">
+                      <div class="grid-day-col" data-day-id="1" id="col-day-1"></div>
+                      <div class="grid-day-col" data-day-id="2" id="col-day-2"></div>
+                      <div class="grid-day-col" data-day-id="3" id="col-day-3"></div>
+                      <div class="grid-day-col" data-day-id="4" id="col-day-4"></div>
+                      <div class="grid-day-col" data-day-id="5" id="col-day-5"></div>
+                      <div class="grid-day-col" data-day-id="6" id="col-day-6"></div>
+                    </div>
+                  </div>
+
+                </div><!-- /grid-body-row -->
+
+              </div><!-- /sched-weekly-grid -->
+            </div><!-- /sched-canvas-card -->
+
+            <!-- Overlap Warning Banner (edit-time, persistent but hidden by default) -->
+            <div class="sched-alert-banner" id="overlap-warning-banner" style="display: none;">
+              <span class="alert-icon">⚠️</span>
+              <span class="alert-text">Superposición horaria detectada: Revisa tus bloques rojos.</span>
+            </div>
+
+            <!-- Contextual Floating Manual Editor Bar -->
+            <div class="sched-editor-bar" id="sched-manual-editor" style="display: none;">
+              <div class="editor-left">
+                <span class="editor-block-title" id="editor-selected-title">Selección: Ninguno</span>
+                <span class="editor-block-type-badge" id="editor-selected-type">MATERIA</span>
+              </div>
+              <div class="editor-center">
+                <label class="editor-time-lbl">
+                  Inicio:
+                  <input type="time" class="editor-time-input" id="editor-start-time">
+                </label>
+                <label class="editor-time-lbl">
+                  Fin:
+                  <input type="time" class="editor-time-input" id="editor-end-time">
+                </label>
+                <button class="editor-btn-delete" id="editor-btn-delete-block" title="Eliminar bloque">🗑️ Eliminar</button>
+              </div>
+              <div class="editor-right" id="editor-notification-area">
+                <!-- Zona dinámica para errores locales -->
+              </div>
+            </div>
+
+          </div><!-- /timeline-container -->
+
+        </div><!-- /sched-main-split -->
+
+      </div><!-- /page -->
+    </div><!-- /main -->
+
+    <!-- Modal emergente para añadir bloque con precisión (cuando se hace clic en "+") -->
+    <div class="sched-modal-backdrop" id="add-block-modal" style="display: none;">
+      <div class="sched-modal-card">
+        <div class="sched-modal-hd">
+          <span class="sched-modal-title">Añadir a Horarios</span>
+          <button class="sched-modal-close" onclick="closeAddModal()">✕</button>
+        </div>
+        <div class="sched-modal-body">
+          <input type="hidden" id="modal-item-id">
+          <input type="hidden" id="modal-item-type">
+          
+          <div class="modal-field">
+            <label class="modal-lbl">Asignatura / Actividad:</label>
+            <input type="text" class="modal-inp-readonly" id="modal-item-name" readonly>
+          </div>
+
+          <div class="modal-field-row">
+            <div class="modal-field">
+              <label class="modal-lbl">Día:</label>
+              <select class="modal-select" id="modal-day-select">
+                <option value="1">Lunes</option>
+                <option value="2">Martes</option>
+                <option value="3">Miércoles</option>
+                <option value="4">Jueves</option>
+                <option value="5">Viernes</option>
+                <option value="6">Sábado</option>
+              </select>
+            </div>
+            <div class="modal-field">
+              <label class="modal-lbl" id="modal-comm-lbl">Comisión:</label>
+              <select class="modal-select" id="modal-commission-select">
+                <option value="Comisión 1 (Noche)">Comisión 1 (Noche)</option>
+                <option value="Comisión 2 (Tarde)">Comisión 2 (Tarde)</option>
+                <option value="Comisión 3 (Mañana)">Comisión 3 (Mañana)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-field-row">
+            <div class="modal-field">
+              <label class="modal-lbl">Hora Inicio:</label>
+              <select class="modal-select" id="modal-start-time-select">
+                <!-- Se poblará con JS -->
+              </select>
+            </div>
+            <div class="modal-field">
+              <label class="modal-lbl">Hora Fin:</label>
+              <select class="modal-select" id="modal-end-time-select">
+                <!-- Se poblará con JS -->
+              </select>
+            </div>
+          </div>
+
+          <div class="sched-modal-ft">
+            <button class="btn-secondary" onclick="closeAddModal()">Cancelar</button>
+            <button class="btn-primary" onclick="submitAddModal()">Agregar a grilla</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <!-- ======== BOTTOM NAV (mobile) ======== -->
+  <nav class="bnav">
+    <div class="bnav-row">
+      <div class="bn" onclick="location.href='index.html'">
+        <span class="bn-ic">⊞</span>Inicio
+      </div>
+      <div class="bn" onclick="location.href='materias.html'">
+        <span class="bn-ic">📚</span>Materias
+      </div>
+      <div class="bn" onclick="location.href='area-estudio.html'">
+        <span class="bn-ic">⏱</span>Estudio
+      </div>
+      <div class="bn on" onclick="location.href='horarios.html'">
+        <span class="bn-ic">📅</span>Horarios
+      </div>
+      <div class="bn" onclick="location.href='alertas.html'">
+        <span class="bn-ic">🔔</span>Alertas
+        <span class="bn-badge">2</span>
+      </div>
+    </div>
+  </nav>
+
+</div><!-- /app -->
+
+<script src="../assets/js/horarios.js"></script>
+</body>
+</html>

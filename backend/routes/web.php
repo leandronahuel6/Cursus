@@ -25,11 +25,11 @@ Route::get('/plan-estudios', function () {
 })->name('plan-estudios');
 
 Route::get('/horarios', function () {
-    return view('placeholder', ['title' => 'Simulador de Horarios']);
+    return view('horarios');
 })->name('horarios');
 
 Route::get('/promedio', function () {
-    return view('placeholder', ['title' => 'Calculadora de Promedio']);
+    return view('promedio');
 })->name('promedio');
 
 Route::get('/alertas', function () {
