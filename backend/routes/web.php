@@ -17,11 +17,11 @@ Route::get('/area-estudio', function () {
 
 // Rutas placeholders para las demás secciones
 Route::get('/materias', function () {
-    return view('placeholder', ['title' => 'Mis Materias']);
+    return view('materias');
 })->name('materias');
 
 Route::get('/plan-estudios', function () {
-    return view('placeholder', ['title' => 'Plan de Estudios']);
+    return view('materias');
 })->name('plan-estudios');
 
 Route::get('/horarios', function () {
