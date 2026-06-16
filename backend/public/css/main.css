@@ -2181,7 +2181,8 @@ a { text-decoration: none; color: inherit; }
 
 /* ==========================================
    CALCULADORA DE PROMEDIO
-========================================== */
+============================== */
+
 .avg-stats {
   margin-bottom: 20px;
 }
@@ -2648,7 +2649,7 @@ a { text-decoration: none; color: inherit; }
 
 /* ==========================================
    SIMULADOR DE HORARIOS
-========================================== */
+============================== */
 .sched-page-layout {
   display: flex;
   flex-direction: column;

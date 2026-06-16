@@ -2112,6 +2112,10 @@ a { text-decoration: none; color: inherit; }
   cursor: pointer;
 }
 
+.error-message{
+  color: red;
+}
+
 .login-forgot {
   font-size: 13px;
   font-weight: 500;
