@@ -37,3 +37,6 @@ Route::get('/alertas', function () {
     return view('alertas');
 })->name('alertas');
 
+Route::view('/login', 'login')->name('login');
+Route::view('/register', 'register')->name('register');
+
