@@ -6,7 +6,7 @@
     <title>Cursus - Iniciar sesión</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
 </head>
 <body>
     <main class="login-page">
@@ -67,6 +67,6 @@
             </div>
         </div>
     </main>
-    <script src="../assets/js/login.js"></script>
+    <script src="{{ asset('js/login.js') }}"></script>
 </body>
 </html>

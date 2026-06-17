@@ -93,7 +93,13 @@ function updateAlertsBadge() {
 // Inicialización de la vista
 document.addEventListener('DOMContentLoaded', () => {
   loadSubjectsState();
-  updateUI();
+  
+  // Si la URL tiene el hash '#plan', cambiar automáticamente a la pestaña del plan
+  if (window.location.hash === '#plan' || window.location.search.includes('tab=plan')) {
+    switchToTab('plan');
+  } else {
+    updateUI();
+  }
 });
 
 // Comprobar si una materia está bloqueada por correlativas
