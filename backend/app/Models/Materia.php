@@ -12,11 +12,8 @@ class Materia extends Model
         'nivel'
     ];
 
-    public function materias(){
-        return $this->hasMany(Materia::class);
-    }
-
     public function carrera(){
         return $this->belongsTo(Carrera::class);
     }
 }
+

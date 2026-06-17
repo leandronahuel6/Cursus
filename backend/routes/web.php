@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
@@ -35,3 +36,4 @@ Route::get('/progreso', function () {
 Route::get('/alertas', function () {
     return view('alertas');
 })->name('alertas');
+
