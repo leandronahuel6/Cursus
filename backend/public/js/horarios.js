@@ -826,6 +826,7 @@ function checkOverlaps() {
 
 // Limpiar bloques del día activo
 document.getElementById('btn-clear-grid').addEventListener('click', () => {
+  // Para limpiar de forma lógica: limpia todos los bloques de la grilla
   const userConfirm = confirm('¿Seguro que deseas vaciar toda tu grilla horaria semanal?');
   if (userConfirm) {
     schedState.blocks = [];
@@ -838,6 +839,7 @@ document.getElementById('btn-clear-grid').addEventListener('click', () => {
 // Guardar Horario completo
 document.getElementById('btn-save-schedule').addEventListener('click', () => {
   // 1. Validación estricta semanal
+  // Buscamos cualquier conflicto en los 6 días
   let conflicts = [];
   for (let d = 1; d <= 6; d++) {
     const dayBlocks = schedState.blocks.filter(b => b.dia === d);
@@ -870,6 +872,7 @@ document.getElementById('btn-save-schedule').addEventListener('click', () => {
     const c = conflicts[0];
     const errorMsg = `No se puede guardar el horario. Superposición horaria detectada el día ${c.diaName}: '${c.n1}' se cruza con '${c.n2}' entre las ${c.h1} y las ${c.h2}.`;
     
+    // Mostrar en la barra del editor
     const editor = document.getElementById('sched-manual-editor');
     editor.style.display = 'flex';
     document.getElementById('editor-selected-title').textContent = '⚠️ Superposición horaria';
@@ -882,9 +885,11 @@ document.getElementById('btn-save-schedule').addEventListener('click', () => {
     return;
   }
 
+  // 2. Advertencia de actividades huérfanas en el panel lateral
   const userConfirm = confirm('Atención: Tienes actividades en el panel inferior que no fueron ubicadas en ninguna pista. No se guardarán en tu cronograma. ¿Deseas continuar?');
   if (!userConfirm) return;
 
+  // 3. Guardar en localStorage
   saveScheduleState();
   showToastConflict('¡Horario semanal guardado con éxito!');
   deselectBlock();
