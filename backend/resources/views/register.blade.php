@@ -13,13 +13,13 @@
         <div class="login-layout">
             <!-- Columna izquierda: formulario -->
             <div class="login-form-side">
-                <a href="index.html" class="login-logo">
-                    <div class="login-logo-icon">📚</div>
+                <div class="login-logo">
+                    <div class="login-logo-icon"><img src="{{ asset('img/Cursus logo.png') }}" alt="Cursus"></div>
                     <div class="login-logo-text">
-                        UTN Estudio
+                        Cursus
                         <small>Tec. en Programación</small>
                     </div>
-                </a>
+                </div>
     
                 <div class="login-form-wrap">
                     <div class="login-form-header">
@@ -27,12 +27,17 @@
                         <p>Registrate con tu correo institucional</p>
                     </div>
     
-                    <form id="RegisterForm" class="login-form" action="#" method="post" onsubmit="handleSubmit(event)" novalidate>
+                    <form id="RegisterForm" class="login-form" action="#" method="post" novalidate>
                         @csrf
                         <div class="login-field">
                             <label for="nombre">Nombre</label>
                             <input type="text" id="nombre" name="nombre" placeholder="Jhon Doe" autocomplete="username" required>
                             <span id="nombre-error" class="error-message"></span>
+                        </div>
+                        <div class="login-field">
+                            <label for="legajo">Legajo</label>
+                            <input type="text" id="legajo" name="legajo" placeholder="Ej: 12345" required>
+                            <span id="legajo-error" class="error-message"></span>
                         </div>
                         <div class="login-field">
                             <label for="email">Email</label>
@@ -52,7 +57,7 @@
     
                     <p class="login-signup">
                         ¿Ya tenés una cuenta?
-                        <a href="./login.html">Iniciar sesión</a>
+                        <a href="{{ route('login') }}">Iniciar sesión</a>
                     </p>
                 </div>
             </div>

@@ -5,7 +5,7 @@
 @section('mobile-header')
   <div class="mob-hdr">
     <div class="mob-lbl">Área de Estudio</div>
-    <div class="mob-name">Programación II</div>
+    <div class="mob-name">Área de Estudio</div>
     <div class="mob-row">
       <span class="badge b-reg">Regular</span>
       <span style="font-size:11px;color:#6b7280">2° año · 2024</span>
@@ -17,9 +17,7 @@
   <div class="breadcrumb">
     <a href="{{ route('dashboard') }}">Inicio</a>
     <span class="sep">›</span>
-    <span>Área de Estudio</span>
-    <span class="sep">›</span>
-    <span class="cur">Programación II</span>
+    <span class="cur">Área de Estudio</span>
   </div>
   <div class="tb-right">
     <button class="focus-btn" onclick="toggleFocus()">⊙ Modo concentración</button>

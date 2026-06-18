@@ -27,36 +27,73 @@ const passwordValidation = (password) =>{
 }
 
 
-const handleSubmit = (e) =>{
+const legajoValidation = (legajo) =>{
+    if(!legajo){
+        return 'Ingrese su número de legajo';
+    }
+    return null;
+}
+
+const handleSubmit = async (e) =>{
     e.preventDefault();
-    
+
     const nombreInput = document.querySelector('#nombre');
+    const legajoInput = document.querySelector('#legajo');
     const emailInput = document.querySelector('#email');
     const passwordInput = document.querySelector('#password');
 
     const nombreError = document.querySelector('#nombre-error');
+    const legajoError = document.querySelector('#legajo-error');
     const emailError = document.querySelector('#email-error');
     const passwordError = document.querySelector('#password-error');
 
     nombreError.textContent = nameValidation(nombreInput.value);
+    legajoError.textContent = legajoValidation(legajoInput.value);
     emailError.textContent = emailValidation(emailInput.value);
     passwordError.textContent = passwordValidation(passwordInput.value);
 
-    if(nombreError.textContent || emailError.textContent || passwordError.textContent){
+    if(nombreError.textContent || legajoError.textContent || emailError.textContent || passwordError.textContent){
         return;
     }
 
-    //TODO: Aca se debe enviar el formulario a la API
-    //TODO: Si la respuesta es exitosa, se debe redirigir a la pagina principal
-    //TODO: Si la respuesta es erronea, se debe mostrar el mensaje de error
+    try {
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                nombre: nombreInput.value,
+                legajo: legajoInput.value,
+                email: emailInput.value,
+                password: passwordInput.value
+            })
+        });
 
+        const data = await response.json();
 
-    console.log('Formulario enviado', nombreInput.value, emailInput.value, passwordInput.value);
-    nombreInput.value = '';
-    emailInput.value = '';
-    passwordInput.value = '';
+        if (!response.ok) {
+            nombreError.textContent = data.errors?.nombre?.[0] || nombreError.textContent;
+            legajoError.textContent = data.errors?.legajo?.[0] || legajoError.textContent;
+            emailError.textContent = data.errors?.email?.[0] || emailError.textContent;
+            passwordError.textContent = data.errors?.password?.[0] || passwordError.textContent;
+            return;
+        }
 
-    return true;
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        nombreInput.value = '';
+        legajoInput.value = '';
+        emailInput.value = '';
+        passwordInput.value = '';
+
+        window.location.href = 'index.html';
+    } catch (error) {
+        console.error('Error en registro:', error);
+        emailError.textContent = 'No se pudo completar el registro. Intentá nuevamente.';
+    }
 }
 
 form.addEventListener('submit', handleSubmit);
