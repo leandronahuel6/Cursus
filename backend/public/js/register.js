@@ -6,6 +6,11 @@ const nameValidation = (name) => {
     return null;
 }
 
+const legajoValidation = (legajo) => {
+    if (!legajo) return 'Ingrese su número de legajo';
+    return null;
+}
+
 const emailValidation = (email) => {
     const emailRegex = /^[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) return 'El email debe tener un formato válido';
@@ -21,18 +26,21 @@ const handleSubmit = async (e) => {
     e.preventDefault();
 
     const nombreInput = document.querySelector('#nombre');
+    const legajoInput = document.querySelector('#legajo');
     const emailInput = document.querySelector('#email');
     const passwordInput = document.querySelector('#password');
 
     const nombreError = document.querySelector('#nombre-error');
+    const legajoError = document.querySelector('#legajo-error');
     const emailError = document.querySelector('#email-error');
     const passwordError = document.querySelector('#password-error');
 
     nombreError.textContent = nameValidation(nombreInput.value) || '';
+    legajoError.textContent = legajoValidation(legajoInput.value) || '';
     emailError.textContent = emailValidation(emailInput.value) || '';
     passwordError.textContent = passwordValidation(passwordInput.value) || '';
 
-    if (nombreError.textContent || emailError.textContent || passwordError.textContent) {
+    if (nombreError.textContent || legajoError.textContent || emailError.textContent || passwordError.textContent) {
         return;
     }
 
@@ -46,6 +54,7 @@ const handleSubmit = async (e) => {
             },
             body: JSON.stringify({
                 nombre: nombreInput.value,
+                legajo: legajoInput.value,
                 email: emailInput.value,
                 password: passwordInput.value
             })
@@ -57,6 +66,7 @@ const handleSubmit = async (e) => {
             // errores de Laravel
             if (data.errors) {
                 nombreError.textContent = data.errors.nombre?.[0] || '';
+                legajoError.textContent = data.errors.legajo?.[0] || '';
                 emailError.textContent = data.errors.email?.[0] || '';
                 passwordError.textContent = data.errors.password?.[0] || '';
             }
@@ -70,6 +80,7 @@ const handleSubmit = async (e) => {
 
         // limpiar inputs
         nombreInput.value = '';
+        legajoInput.value = '';
         emailInput.value = '';
         passwordInput.value = '';
 

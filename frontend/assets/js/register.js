@@ -27,22 +27,32 @@ const passwordValidation = (password) =>{
 }
 
 
+const legajoValidation = (legajo) =>{
+    if(!legajo){
+        return 'Ingrese su número de legajo';
+    }
+    return null;
+}
+
 const handleSubmit = (e) =>{
     e.preventDefault();
-    
+
     const nombreInput = document.querySelector('#nombre');
+    const legajoInput = document.querySelector('#legajo');
     const emailInput = document.querySelector('#email');
     const passwordInput = document.querySelector('#password');
 
     const nombreError = document.querySelector('#nombre-error');
+    const legajoError = document.querySelector('#legajo-error');
     const emailError = document.querySelector('#email-error');
     const passwordError = document.querySelector('#password-error');
 
     nombreError.textContent = nameValidation(nombreInput.value);
+    legajoError.textContent = legajoValidation(legajoInput.value);
     emailError.textContent = emailValidation(emailInput.value);
     passwordError.textContent = passwordValidation(passwordInput.value);
 
-    if(nombreError.textContent || emailError.textContent || passwordError.textContent){
+    if(nombreError.textContent || legajoError.textContent || emailError.textContent || passwordError.textContent){
         return;
     }
 
@@ -51,8 +61,9 @@ const handleSubmit = (e) =>{
     //TODO: Si la respuesta es erronea, se debe mostrar el mensaje de error
 
 
-    console.log('Formulario enviado', nombreInput.value, emailInput.value, passwordInput.value);
+    console.log('Formulario enviado', nombreInput.value, legajoInput.value, emailInput.value, passwordInput.value);
     nombreInput.value = '';
+    legajoInput.value = '';
     emailInput.value = '';
     passwordInput.value = '';
 

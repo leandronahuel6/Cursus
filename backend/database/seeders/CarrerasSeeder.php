@@ -16,9 +16,5 @@ class CarrerasSeeder extends Seeder
         Carrera::create([
             'nombre' => 'Tecnicatura Universitaria en Programación'
         ]);
-
-        Carrera::create([
-            'nombre' => 'Ingenieria Industrial'
-        ]);
     }
 }

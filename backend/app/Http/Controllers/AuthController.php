@@ -40,12 +40,14 @@ class AuthController extends Controller
         //(los admin no se registran solos,hay que cargarlos a mano)
         $request->validate([
             'nombre' => 'required|string|max:255',
+            'legajo' => 'required|string|max:255|unique:users,legajo',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8',
         ]);
 
         $user = User::create([
             'nombre' => $request->nombre,
+            'legajo' => $request->legajo,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'general',

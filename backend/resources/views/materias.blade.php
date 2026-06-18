@@ -46,29 +46,11 @@
   <!-- Selector de Subpestañas (Gestión vs Árbol) -->
   <div class="stabs" style="margin-bottom: 20px;">
     <div class="stab on" id="tab-manage" onclick="window.switchToTab('manage')">🎛️ Gestión de Cursada</div>
-    <div class="stab" id="tab-plan" onclick="window.switchToTab('plan')">🗺️ Plan de Estudios (Árbol)</div>
+    <div class="stab" id="tab-plan" onclick="window.switchToTab('plan')">🗺️ Plan de Estudios</div>
   </div>
 
-  <!-- ================= PESTAÑA: GESTIÓN DE CURSADA ================= -->
+  <!-- ================= PESTAÑA: GESTIÓN DE CURSADA (árbol editable) ================= -->
   <div id="panel-manage-view">
-    
-    <!-- Filtros Rápidos -->
-    <div class="filters-bar">
-      <button class="filter-chip active" id="filter-all" onclick="window.setFilter('all')">Todas</button>
-      <button class="filter-chip" id="filter-cursando" onclick="window.setFilter('cursando')">Cursando actualmente</button>
-      <button class="filter-chip" id="filter-regular" onclick="window.setFilter('regular')">Regulares (Final Pendiente)</button>
-      <button class="filter-chip" id="filter-aprobada" onclick="window.setFilter('aprobada')">Aprobadas</button>
-    </div>
-
-    <!-- Listado Agrupado por Niveles -->
-    <div id="subjects-grouped-container">
-      <!-- Cargado dinámicamente desde materias.js -->
-    </div>
-
-  </div>
-
-  <!-- ================= PESTAÑA: ÁRBOL / PLAN DE ESTUDIOS ================= -->
-  <div id="panel-plan-view" style="display: none;">
     <div class="tree-container">
       <div class="tree-legend">
         <div class="legend-item"><div class="legend-color disponible"></div> Disponible / Cursar</div>
@@ -82,6 +64,25 @@
         <!-- Renderizado dinámicamente -->
       </div>
     </div>
+  </div>
+
+  <!-- ================= PESTAÑA: PLAN DE ESTUDIOS (solo lectura) ================= -->
+  <div id="panel-plan-view" style="display: none;">
+
+    <!-- Filtros Rápidos -->
+    <div class="filters-bar">
+      <button class="filter-chip active" id="filter-all" onclick="window.setFilter('all')">Todas</button>
+      <button class="filter-chip" id="filter-cursando" onclick="window.setFilter('cursando')">Cursando actualmente</button>
+      <button class="filter-chip" id="filter-regular" onclick="window.setFilter('regular')">Regulares (Final Pendiente)</button>
+      <button class="filter-chip" id="filter-aprobada" onclick="window.setFilter('aprobada')">Aprobadas</button>
+      <button class="filter-chip" id="filter-bloqueada" onclick="window.setFilter('bloqueada')">Faltantes (Bloqueadas)</button>
+    </div>
+
+    <!-- Listado Agrupado por Niveles -->
+    <div id="subjects-grouped-container">
+      <!-- Cargado dinámicamente desde materias.js -->
+    </div>
+
   </div>
 
   <!-- ===================== MODAL DE CALIFICACIONES ===================== -->

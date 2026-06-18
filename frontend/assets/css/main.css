@@ -195,6 +195,8 @@ a { text-decoration: none; color: inherit; }
   flex: 1; font-size: 15.5px; font-weight: 600; color: var(--t1);
 }
 .topbar-title span { font-weight: 300; color: var(--t3); }
+.topbar-title .greeting-name,
+.mob-greet .greeting-name { font-weight: 700; color: inherit; }
 .streak-chip {
   display: flex; align-items: center; gap: 5px;
   background: #fff7ed; border: 1px solid #fed7aa;
@@ -1387,6 +1389,13 @@ a { text-decoration: none; color: inherit; }
   display: flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+.level-header-arrow {
+  font-size: 10px;
+  display: inline-block;
+  width: 10px;
 }
 .level-header-title::after {
   content: '';
@@ -1397,6 +1406,7 @@ a { text-decoration: none; color: inherit; }
 .subjects-layout-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  align-items: start;
   gap: 15px;
 }
 
@@ -1410,9 +1420,13 @@ a { text-decoration: none; color: inherit; }
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 140px;
+  justify-content: flex-start;
+  height: 200px;
   transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+.subject-item-card--tall {
+  height: auto;
+  min-height: 200px;
 }
 .subject-item-card:hover:not(.locked) {
   transform: translateY(-2px);
@@ -1653,6 +1667,16 @@ a { text-decoration: none; color: inherit; }
   color: var(--tm);
   text-transform: uppercase;
   letter-spacing: .05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+.tree-level-arrow {
+  font-size: 10px;
+  display: inline-block;
+  width: 10px;
 }
 .tree-nodes-list {
   display: grid;
@@ -1668,12 +1692,11 @@ a { text-decoration: none; color: inherit; }
   font-weight: 500;
   color: var(--t2);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 8px;
   box-shadow: var(--sh);
   position: relative;
   transition: all .2s;
-  cursor: pointer;
 }
 .tree-node-card:hover {
   transform: translateY(-1px);
@@ -1687,6 +1710,7 @@ a { text-decoration: none; color: inherit; }
 .tree-node-info {
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 }
 .tree-node-code {
   font-size: 9px;

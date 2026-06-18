@@ -14,9 +14,9 @@
     <!-- ===================== SIDEBAR ===================== -->
     <aside class="sidebar">
       <div class="sb-logo">
-        <div class="sb-logo-icon">📚</div>
+        <div class="sb-logo-icon"><img src="../img/Cursus logo.png" alt="Cursus"></div>
         <div class="sb-logo-text">
-          UTN Estudio
+          Cursus
           <small>Tec. en Programación</small>
         </div>
       </div>
@@ -77,7 +77,7 @@
             <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4"/>
             <path d="M8 1v1M8 14v1M1 8h1M14 8h1M2.9 2.9l.7.7M12.4 12.4l.7.7M2.9 13.1l.7-.7M12.4 3.6l.7-.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
           </svg>
-          Configuración
+          Perfil
         </button>
         <button class="profile-menu-item" onclick="window.openContactModal()">
           <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
@@ -94,10 +94,10 @@
         </button>
       </div>
       <div class="sb-user" onclick="window.toggleProfileMenu(event)">
-        <div class="sb-av">JP</div>
+        <div class="sb-av" id="sb-av">JP</div>
         <div>
-          <div class="sb-uname">Juan Pérez</div>
-          <div class="sb-uleg">Legajo 12345</div>
+          <div class="sb-uname" id="sb-uname">Juan Pérez</div>
+          <div class="sb-uleg" id="sb-uleg">Legajo 12345</div>
         </div>
         <svg class="sb-user-caret" viewBox="0 0 10 6" fill="currentColor" width="10" height="10">
           <path d="M0 5l5-5 5 5H0z"/>
@@ -153,29 +153,11 @@
         <!-- Selector de Subpestañas (Gestión vs Árbol) -->
         <div class="stabs" style="margin-bottom: 20px;">
           <div class="stab on" id="tab-manage" onclick="window.switchToTab('manage')">🎛️ Gestión de Cursada</div>
-          <div class="stab" id="tab-plan" onclick="window.switchToTab('plan')">🗺️ Plan de Estudios (Árbol)</div>
+          <div class="stab" id="tab-plan" onclick="window.switchToTab('plan')">🗺️ Plan de Estudios</div>
         </div>
 
-        <!-- ================= PESTAÑA: GESTIÓN DE CURSADA ================= -->
+        <!-- ================= PESTAÑA: GESTIÓN DE CURSADA (árbol editable) ================= -->
         <div id="panel-manage-view">
-          
-          <!-- Filtros Rápidos -->
-          <div class="filters-bar">
-            <button class="filter-chip active" id="filter-all" onclick="window.setFilter('all')">Todas</button>
-            <button class="filter-chip" id="filter-cursando" onclick="window.setFilter('cursando')">Cursando actualmente</button>
-            <button class="filter-chip" id="filter-regular" onclick="window.setFilter('regular')">Regulares (Final Pendiente)</button>
-            <button class="filter-chip" id="filter-aprobada" onclick="window.setFilter('aprobada')">Aprobadas</button>
-          </div>
-
-          <!-- Listado Agrupado por Niveles -->
-          <div id="subjects-grouped-container">
-            <!-- Cargado dinámicamente desde materias.js -->
-          </div>
-
-        </div>
-
-        <!-- ================= PESTAÑA: ÁRBOL / PLAN DE ESTUDIOS ================= -->
-        <div id="panel-plan-view" style="display: none;">
           <div class="tree-container">
             <div class="tree-legend">
               <div class="legend-item"><div class="legend-color disponible"></div> Disponible / Cursar</div>
@@ -189,6 +171,25 @@
               <!-- Renderizado dinámicamente -->
             </div>
           </div>
+        </div>
+
+        <!-- ================= PESTAÑA: PLAN DE ESTUDIOS (solo lectura) ================= -->
+        <div id="panel-plan-view" style="display: none;">
+
+          <!-- Filtros Rápidos -->
+          <div class="filters-bar">
+            <button class="filter-chip active" id="filter-all" onclick="window.setFilter('all')">Todas</button>
+            <button class="filter-chip" id="filter-cursando" onclick="window.setFilter('cursando')">Cursando actualmente</button>
+            <button class="filter-chip" id="filter-regular" onclick="window.setFilter('regular')">Regulares (Final Pendiente)</button>
+            <button class="filter-chip" id="filter-aprobada" onclick="window.setFilter('aprobada')">Aprobadas</button>
+            <button class="filter-chip" id="filter-bloqueada" onclick="window.setFilter('bloqueada')">Faltantes (Bloqueadas)</button>
+          </div>
+
+          <!-- Listado Agrupado por Niveles -->
+          <div id="subjects-grouped-container">
+            <!-- Cargado dinámicamente desde materias.js -->
+          </div>
+
         </div>
 
       </div><!-- /page -->
