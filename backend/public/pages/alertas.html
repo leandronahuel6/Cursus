@@ -14,9 +14,9 @@
     <!-- ===================== SIDEBAR ===================== -->
     <aside class="sidebar">
       <div class="sb-logo">
-        <div class="sb-logo-icon">📚</div>
+        <div class="sb-logo-icon"><img src="../img/Cursus logo.png" alt="Cursus"></div>
         <div class="sb-logo-text">
-          UTN Estudio
+          Cursus
           <small>Tec. en Programación</small>
         </div>
       </div>
@@ -46,16 +46,6 @@
         </div>
 
         <div class="nav-group">Académico</div>
-        <div class="nav-item" onclick="location.href='materias.html#plan'">
-          <svg class="nav-ic" viewBox="0 0 16 16" fill="none">
-            <circle cx="3" cy="8" r="1.5" fill="currentColor"/>
-            <circle cx="8" cy="3" r="1.5" fill="currentColor"/>
-            <circle cx="8" cy="13" r="1.5" fill="currentColor"/>
-            <circle cx="13" cy="8" r="1.5" fill="currentColor"/>
-            <path d="M4.5 8h2M9.5 4l2.5 3M9.5 12l2.5-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-          </svg>
-          Plan de Estudios
-        </div>
         <div class="nav-item" onclick="location.href='horarios.html'">
           <svg class="nav-ic" viewBox="0 0 16 16" fill="none">
             <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
@@ -88,7 +78,7 @@
             <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4"/>
             <path d="M8 1v1M8 14v1M1 8h1M14 8h1M2.9 2.9l.7.7M12.4 12.4l.7.7M2.9 13.1l.7-.7M12.4 3.6l.7-.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
           </svg>
-          Configuración
+          Perfil
         </button>
         <button class="profile-menu-item" onclick="window.openContactModal()">
           <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
@@ -105,10 +95,10 @@
         </button>
       </div>
       <div class="sb-user" onclick="window.toggleProfileMenu(event)">
-        <div class="sb-av">JP</div>
+        <div class="sb-av" id="sb-av">JP</div>
         <div>
-          <div class="sb-uname">Juan Pérez</div>
-          <div class="sb-uleg">Legajo 12345</div>
+          <div class="sb-uname" id="sb-uname">Juan Pérez</div>
+          <div class="sb-uleg" id="sb-uleg">Legajo 12345</div>
         </div>
         <svg class="sb-user-caret" viewBox="0 0 10 6" fill="currentColor" width="10" height="10">
           <path d="M0 5l5-5 5 5H0z"/>

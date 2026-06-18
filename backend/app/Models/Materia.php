@@ -15,5 +15,9 @@ class Materia extends Model
     public function carrera(){
         return $this->belongsTo(Carrera::class);
     }
+
+    public function correlatividades(){
+        return $this->hasMany(Correlatividad::class, 'materia_id');
+    }
 }
 

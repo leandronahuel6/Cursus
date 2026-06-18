@@ -13,13 +13,13 @@
         <div class="login-layout">
             <!-- Columna izquierda: formulario -->
             <div class="login-form-side">
-                <a href="index.html" class="login-logo">
-                    <div class="login-logo-icon">📚</div>
+                <div class="login-logo">
+                    <div class="login-logo-icon"><img src="{{ asset('img/Cursus logo.png') }}" alt="Cursus"></div>
                     <div class="login-logo-text">
-                        UTN Estudio
+                        Cursus
                         <small>Tec. en Programación</small>
                     </div>
-                </a>
+                </div>
     
                 <div class="login-form-wrap">
                     <div class="login-form-header">
@@ -56,7 +56,11 @@
     
                     <p class="login-signup">
                         ¿No tenés cuenta?
-                        <a href="#">Registrate</a>
+                        <a href="{{ route('register') }}">Registrate</a>
+                    </p>
+
+                    <p class="login-signup" style="margin-top: 8px;">
+                        <a href="{{ route('dashboard') }}" style="color: var(--t3); font-weight: 400;">Entrar sin iniciar sesión (modo desarrollo) →</a>
                     </p>
                 </div>
             </div>

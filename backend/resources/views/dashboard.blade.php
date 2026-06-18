@@ -5,7 +5,7 @@
 @section('mobile-header')
   <!-- Mobile header -->
   <div class="mob-hdr">
-    <div class="mob-greet">Buen día, Tiago 👋</div>
+    <div class="mob-greet">Buen día, <span class="greeting-name">Tiago</span> 👋</div>
     <div class="mob-sub">
       Miércoles 3 de junio
       <span class="mob-stk">🔥 8 días</span>
@@ -14,7 +14,7 @@
 @endsection
 
 @section('topbar-content')
-  <div class="topbar-title">Buen día, Tiago <span>👋</span></div>
+  <div class="topbar-title">Buen día, <span class="greeting-name">Tiago</span> <span>👋</span></div>
   <div class="streak-chip">🔥 8 días de racha</div>
   <button class="btn-primary" onclick="location.href='{{ route('area-estudio') }}'">▶ Empezar sesión</button>
 @endsection

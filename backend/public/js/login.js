@@ -1,5 +1,14 @@
+const form = document.querySelector('#LoginForm');
+const emailRegex = /^[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
+
 const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const emailInput = document.querySelector('#email');
+    const passwordInput = document.querySelector('#password');
+
+    const emailError = document.querySelector('#email-error');
+    const passwordError = document.querySelector('#password-error');
 
     emailError.textContent = '';
     passwordError.textContent = '';
@@ -61,3 +70,5 @@ const handleSubmit = async (e) => {
         console.error("Error en login:", error);
     }
 };
+
+form.addEventListener('submit', handleSubmit);
