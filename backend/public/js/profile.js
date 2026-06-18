@@ -1,4 +1,13 @@
 (function () {
+  function getStoredToken() {
+    return localStorage.getItem('token');
+  }
+
+  function clearStoredSession() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  }
+
   function toggleProfileMenu(e) {
     e.stopPropagation();
     const menu = document.getElementById('profile-menu');
@@ -74,10 +83,60 @@
   document.addEventListener('DOMContentLoaded', updateAlertsBadge);
 
   // Datos del usuario logueado: saludo ("Buen día, {nombre}") y bloque de perfil del sidebar
-  async function loadUserProfile() {
-    const token = localStorage.getItem('token');
-    if (!token) return; // sin sesión (ej: "modo desarrollo"), se deja todo por defecto
+  function applyUserToDOM(user) {
+    if (!user) return;
 
+    const greetingTargets = document.querySelectorAll('.greeting-name');
+    const firstName = (user.nombre || '').split(' ')[0];
+    if (firstName) {
+      greetingTargets.forEach(el => el.textContent = firstName);
+    }
+
+    const unameEl = document.getElementById('sb-uname');
+    const ulegEl = document.getElementById('sb-uleg');
+    const avEl = document.getElementById('sb-av');
+
+    if (unameEl && user.nombre) unameEl.textContent = user.nombre;
+    if (ulegEl) ulegEl.textContent = user.legajo ? `Legajo ${user.legajo}` : '';
+    if (avEl && user.nombre) {
+      const parts = user.nombre.trim().split(' ');
+      avEl.textContent = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
+    }
+  }
+
+  async function handleLogout() {
+    const token = getStoredToken();
+
+    try {
+      if (token) {
+        await fetch('/api/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Accept': 'application/json'
+          }
+        });
+      }
+    } catch (error) {
+      console.error('No se pudo cerrar la sesión remota', error);
+    } finally {
+      clearStoredSession();
+      window.location.href = '/login';
+    }
+  }
+
+  async function loadUserProfile() {
+    // 1. Pintar al instante con lo que ya tengamos guardado (sin esperar la red,
+    //    así no se ve por un instante el usuario hardcodeado del HTML).
+    const cached = localStorage.getItem('user');
+    if (cached) {
+      try { applyUserToDOM(JSON.parse(cached)); } catch (e) { /* cache corrupto, se ignora */ }
+    }
+
+    const token = getStoredToken();
+    if (!token) return;
+
+    // 2. Refrescar contra la API por si los datos cambiaron.
     try {
       const response = await fetch('/api/user', {
         headers: {
@@ -88,33 +147,20 @@
       if (!response.ok) return;
 
       const user = await response.json();
-
-      const greetingTargets = document.querySelectorAll('.greeting-name');
-      const firstName = (user.nombre || '').split(' ')[0];
-      if (firstName) {
-        greetingTargets.forEach(el => el.textContent = firstName);
-      }
-
-      const unameEl = document.getElementById('sb-uname');
-      const ulegEl = document.getElementById('sb-uleg');
-      const avEl = document.getElementById('sb-av');
-
-      if (unameEl && user.nombre) unameEl.textContent = user.nombre;
-      if (ulegEl) ulegEl.textContent = user.legajo ? `Legajo ${user.legajo}` : '';
-      if (avEl && user.nombre) {
-        const parts = user.nombre.trim().split(' ');
-        avEl.textContent = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
-      }
+      localStorage.setItem('user', JSON.stringify(user));
+      applyUserToDOM(user);
     } catch (error) {
       console.error('No se pudo cargar el usuario logueado', error);
     }
   }
 
+  loadUserProfile();
   document.addEventListener('DOMContentLoaded', loadUserProfile);
 
   window.toggleProfileMenu  = toggleProfileMenu;
   window.openContactModal   = openContactModal;
   window.closeContactModal  = closeContactModal;
   window.handleContactSubmit = handleContactSubmit;
+  window.handleLogout = handleLogout;
   window.updateAlertsBadge  = updateAlertsBadge;
 })();

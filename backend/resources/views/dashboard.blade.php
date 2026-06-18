@@ -2,19 +2,30 @@
 
 @section('title', 'Cursus - Inicio')
 
+@php
+  $dashboardNow = now()->locale('es');
+  $userName = $viewerFirstName ?? 'Estudiante';
+  $greeting = match (true) {
+      (int) $dashboardNow->format('G') < 12 => 'Buen día',
+      (int) $dashboardNow->format('G') < 20 => 'Buenas tardes',
+      default => 'Buenas noches',
+  };
+  $formattedDate = ucfirst($dashboardNow->translatedFormat('l j \\d\\e F'));
+@endphp
+
 @section('mobile-header')
   <!-- Mobile header -->
   <div class="mob-hdr">
-    <div class="mob-greet">Buen día, <span class="greeting-name">Tiago</span> 👋</div>
+    <div class="mob-greet">{{ $greeting }}, <span class="greeting-name">{{ $userName }}</span> 👋</div>
     <div class="mob-sub">
-      Miércoles 3 de junio
+      {{ $formattedDate }}
       <span class="mob-stk">🔥 8 días</span>
     </div>
   </div>
 @endsection
 
 @section('topbar-content')
-  <div class="topbar-title">Buen día, <span class="greeting-name">Tiago</span> <span>👋</span></div>
+  <div class="topbar-title">{{ $greeting }}, <span class="greeting-name">{{ $userName }}</span> <span>👋</span></div>
   <div class="streak-chip">🔥 8 días de racha</div>
   <button class="btn-primary" onclick="location.href='{{ route('area-estudio') }}'">▶ Empezar sesión</button>
 @endsection

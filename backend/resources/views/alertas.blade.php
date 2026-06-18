@@ -13,14 +13,7 @@
     <div class="career-selector-wrap" style="margin-top: 10px;">
       <span>Carrera:</span>
       <select class="career-select" id="career-select-mob" onchange="window.handleCareerChange(this.value)">
-        <option value="TUP">Tec. en Programación (Paga)</option>
-        <option value="TUSI">Tec. en Sistemas (Paga)</option>
-        <option value="AERO">Ing. Aeronáutica (Gratuita)</option>
-        <option value="MECA">Ing. Mecánica (Gratuita)</option>
-        <option value="ELEC">Ing. Electrónica (Gratuita)</option>
-        <option value="IND">Ing. Industrial (Gratuita)</option>
-        <option value="FERRO">Ing. Ferroviaria (Gratuita)</option>
-        <option value="LGT">Lic. en Gestión Tecnológica (Gratuita)</option>
+        <option value="TUP">Tecnicatura en Programación</option>
       </select>
     </div>
   </div>
@@ -31,14 +24,7 @@
   <div class="career-selector-wrap">
     <span>Carrera:</span>
     <select class="career-select" id="career-select-desk" onchange="window.handleCareerChange(this.value)">
-      <option value="TUP">Tecnicatura en Programación (Paga)</option>
-      <option value="TUSI">Tecnicatura en Sistemas (Paga)</option>
-      <option value="AERO">Ingeniería Aeronáutica (Gratuita)</option>
-      <option value="MECA">Ingeniería Mecánica (Gratuita)</option>
-      <option value="ELEC">Ingeniería Electrónica (Gratuita)</option>
-      <option value="IND">Ingeniería Industrial (Gratuita)</option>
-      <option value="FERRO">Ingeniería Ferroviaria (Gratuita)</option>
-      <option value="LGT">Licenciatura en Gestión Tecnológica (Gratuita)</option>
+      <option value="TUP">Tecnicatura en Programación</option>
     </select>
   </div>
   <div class="streak-chip">🔥 8 días de racha</div>
