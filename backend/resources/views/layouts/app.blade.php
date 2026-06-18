@@ -67,7 +67,7 @@
         Contacto
       </button>
       <div class="profile-menu-divider"></div>
-      <button class="profile-menu-item danger" onclick="location.href='{{ route('login') }}'">
+      <button class="profile-menu-item danger" onclick="window.handleLogout()">
         <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
           <path d="M6 3H3v10h3M10 5l3 3-3 3M13 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -75,10 +75,10 @@
       </button>
     </div>
     <div class="sb-user" onclick="window.toggleProfileMenu(event)">
-      <div class="sb-av" id="sb-av">JP</div>
+      <div class="sb-av" id="sb-av">{{ $viewerInitials ?? '' }}</div>
       <div>
-        <div class="sb-uname" id="sb-uname">Juan Pérez</div>
-        <div class="sb-uleg" id="sb-uleg">Legajo 12345</div>
+        <div class="sb-uname" id="sb-uname">{{ $viewerFullName ?? '' }}</div>
+        <div class="sb-uleg" id="sb-uleg">{{ $viewerLegajo ? 'Legajo ' . $viewerLegajo : '' }}</div>
       </div>
       <svg class="sb-user-caret" viewBox="0 0 10 6" fill="currentColor" width="10" height="10">
         <path d="M0 5l5-5 5 5H0z"/>

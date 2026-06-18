@@ -75,8 +75,9 @@ const handleSubmit = async (e) => {
 
         console.log("REGISTER OK:", data);
 
-        // guardar token
+        // guardar token y datos del usuario (para pintar el perfil sin esperar a la API)
         localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
 
         // limpiar inputs
         nombreInput.value = '';

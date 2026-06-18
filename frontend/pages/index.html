@@ -88,7 +88,7 @@
         Contacto
       </button>
       <div class="profile-menu-divider"></div>
-      <button class="profile-menu-item danger" onclick="location.href='login.html'">
+      <button class="profile-menu-item danger" onclick="window.handleLogout()">
         <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
           <path d="M6 3H3v10h3M10 5l3 3-3 3M13 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -96,10 +96,10 @@
       </button>
     </div>
     <div class="sb-user" onclick="window.toggleProfileMenu(event)">
-      <div class="sb-av" id="sb-av">JP</div>
+      <div class="sb-av" id="sb-av"></div>
       <div>
-        <div class="sb-uname" id="sb-uname">Juan Pérez</div>
-        <div class="sb-uleg" id="sb-uleg">Legajo 12345</div>
+        <div class="sb-uname" id="sb-uname"></div>
+        <div class="sb-uleg" id="sb-uleg"></div>
       </div>
       <svg class="sb-user-caret" viewBox="0 0 10 6" fill="currentColor" width="10" height="10">
         <path d="M0 5l5-5 5 5H0z"/>
@@ -112,7 +112,7 @@
 
     <!-- Mobile header -->
     <div class="mob-hdr">
-      <div class="mob-greet">Buen día, <span class="greeting-name">Tiago</span> 👋</div>
+      <div class="mob-greet">Buen día, <span class="greeting-name">Estudiante</span> 👋</div>
       <div class="mob-sub">
         Miércoles 3 de junio
         <span class="mob-stk">🔥 8 días</span>
@@ -121,7 +121,7 @@
 
     <!-- Topbar (desktop) -->
     <header class="topbar">
-      <div class="topbar-title">Buen día, <span class="greeting-name">Tiago</span> <span>👋</span></div>
+      <div class="topbar-title">Buen día, <span class="greeting-name">Estudiante</span> <span>👋</span></div>
       <div class="streak-chip">🔥 8 días de racha</div>
       <button class="btn-primary" onclick="location.href='area-estudio.html'">▶ Empezar sesión</button>
     </header>

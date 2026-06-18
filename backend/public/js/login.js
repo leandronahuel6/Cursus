@@ -56,8 +56,9 @@ const handleSubmit = async (e) => {
 
         console.log("LOGIN OK:", data);
 
-        // guardar token Sanctum
+        // guardar token Sanctum y datos del usuario (para pintar el perfil sin esperar a la API)
         localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
 
         // limpiar inputs
         emailInput.value = '';
