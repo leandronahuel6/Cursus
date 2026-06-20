@@ -24,7 +24,7 @@ const handleSubmit = async (e) => {
         return;
     }
 
-    if (passwordInput.value.length <= 8) {
+    if (passwordInput.value.length < 8) {
         passwordError.textContent = 'La contraseña debe tener al menos 8 caracteres';
         passwordInput.focus();
         return;
