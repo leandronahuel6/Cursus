@@ -12,7 +12,6 @@ class MateriaUsuario extends Model
         'usuario_id',
         'materia_id',
         'estado_historico',
-        'cursando_actualmente',
     ];
 
     public function usuario()
