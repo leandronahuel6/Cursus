@@ -14,8 +14,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('materia_id')->constrained('materias')->onDelete('cascade');
-            $table->enum('estado_historico', ['libre', 'regular', 'aprobada'])->default('libre');
-            $table->boolean('cursando_actualmente')->default(false);
+            $table->enum('estado_historico', ['libre', 'regular', 'aprobada','cursando'])->default('libre');
             $table->unique(['usuario_id', 'materia_id']);
             $table->timestamps();
         });
