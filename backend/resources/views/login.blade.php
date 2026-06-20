@@ -46,7 +46,7 @@
                                 <input type="checkbox" name="remember">
                                 <span>Recordarme</span>
                             </label>
-                            <a href="#" class="login-forgot">¿Olvidaste tu contraseña?</a>
+                            <a href="{{ route('password.request') }}" class="login-forgot">¿Olvidaste tu contraseña?</a>
                         </div>
     
                         <button type="submit" class="login-submit">Iniciar sesión</button>
