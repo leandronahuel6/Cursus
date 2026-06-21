@@ -1339,7 +1339,7 @@
     <!-- MENÚ DE NAVEGACIÓN -->
     <header class="landing-header" id="js-header">
         <a href="#" class="logo-wrap">
-            <img src="{{ asset('assets/img/Cursus logo.png') }}" alt="Cursus" style="height: 38px; width: auto; border-radius: 8px;">
+            <img src="{{ asset('assets/icons/cursus-logo.svg') }}" alt="Cursus" style="height: 38px; width: auto; border-radius: 8px;">
             <div class="logo-tx">
                 Cursus
                 <small>UTN Haedo</small>
@@ -1917,7 +1917,7 @@
     <footer class="landing-footer">
         <div class="footer-layout">
             <a href="#" class="footer-logo">
-                <img src="{{ asset('assets/img/Cursus logo.png') }}" alt="Cursus" style="height: 30px; width: auto; border-radius: 6px;">
+                <img src="{{ asset('assets/icons/cursus-logo.svg') }}" alt="Cursus" style="height: 30px; width: auto; border-radius: 6px;">
                 <div class="footer-logo-tx">
                     Cursus
                     <small>UTN Haedo</small>

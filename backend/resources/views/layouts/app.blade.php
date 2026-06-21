@@ -16,7 +16,7 @@
   <!-- ===================== SIDEBAR ===================== -->
   <aside class="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-icon"><img src="{{ asset('assets/img/Cursus logo.png') }}" alt="Cursus"></div>
+      <div class="sb-logo-icon"><img src="{{ asset('assets/icons/cursus-logo.svg') }}" alt="Cursus"></div>
       <div class="sb-logo-text">Cursus<small>Tec. en Programación</small></div>
     </div>
 
