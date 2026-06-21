@@ -40,3 +40,8 @@ Route::get('/alertas', function () {
 Route::view('/login', 'login')->name('login');
 Route::view('/register', 'register')->name('register');
 
+Route::view('/forgot-password', 'forgot-password')->name('password.request');
+Route::get('/reset-password/{token}', function (string $token) {
+    return view('reset-password', ['token' => $token]);
+})->name('password.reset');
+
