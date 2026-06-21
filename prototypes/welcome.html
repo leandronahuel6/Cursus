@@ -6,9 +6,9 @@
     <title>Cursus - Tu Asistente Universitario UTN Haedo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+    <link rel="stylesheet" href="../assets/css/main.css">
     <script src="https://unpkg.com/lucide@latest"></script>
-     <style>
+    <style>
         /* Estilos específicos para la Landing Page de Cursus */
         :root {
             /* Light theme variables */
@@ -319,7 +319,7 @@
             gap: 16px;
             margin-top: 10px;
         }
-        .btn-hero-primary {
+         .btn-hero-primary {
             background: var(--brand-gradient);
             background-size: 200% 100%;
             background-position: left center;
@@ -1339,7 +1339,7 @@
     <!-- MENÚ DE NAVEGACIÓN -->
     <header class="landing-header" id="js-header">
         <a href="#" class="logo-wrap">
-            <img src="{{ asset('img/Cursus logo.png') }}" alt="Cursus" style="height: 38px; width: auto; border-radius: 8px;">
+            <img src="../assets/img/Cursus logo.png" alt="Cursus" style="height: 38px; width: auto; border-radius: 8px;">
             <div class="logo-tx">
                 Cursus
                 <small>UTN Haedo</small>
@@ -1359,16 +1359,8 @@
                 <i data-lucide="sun" class="icon-sun" style="width: 18px; height: 18px; stroke-width: 2.25;"></i>
                 <i data-lucide="moon" class="icon-moon" style="width: 18px; height: 18px; stroke-width: 2.25;"></i>
             </button>
-            @if (Route::has('login'))
-                @auth
-                    <a href="{{ url('/dashboard') }}" class="btn-register">Ir al Dashboard</a>
-                @else
-                    <a href="{{ route('login') }}" class="btn-login">Iniciar sesión</a>
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="btn-register">Registrarse</a>
-                    @endif
-                @endauth
-            @endif
+            <a href="login.html" class="btn-login">Iniciar sesión</a>
+            <a href="register.html" class="btn-register">Registrarse</a>
         </div>
     </header>
 
@@ -1381,11 +1373,7 @@
                 Diseñado especialmente para la UTN Regional Haedo. Controlá tus materias, hacé seguimiento de tus correlativas, medí tu tiempo de estudio y visualizá tu fecha de egreso.
             </p>
             <div class="hero-btns">
-                @auth
-                    <a href="{{ url('/dashboard') }}" class="btn-hero-primary">Ir al Dashboard</a>
-                @else
-                    <a href="{{ route('register') }}" class="btn-hero-primary">Empezar gratis</a>
-                @endauth
+                <a href="register.html" class="btn-hero-primary">Empezar gratis</a>
                 <a href="#que-es" class="btn-hero-secondary">Ver funciones</a>
             </div>
         </div>
@@ -1564,7 +1552,7 @@
     <section class="section" id="que-es">
         <div class="purpose-section">
             <div class="purpose-visual" style="padding: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; border: none; background: transparent; box-shadow: none;">
-                <img src="{{ asset('img/lnicio.webp') }}" alt="Cursus Inicio" style="width: 100%; height: auto; border-radius: var(--r); box-shadow: 0 10px 25px rgba(0,0,0,0.03);">
+                <img src="../assets/img/lnicio.webp" alt="Cursus Inicio" style="width: 100%; height: auto; border-radius: var(--r); box-shadow: 0 10px 25px rgba(0,0,0,0.03);">
             </div>
             <div class="purpose-text">
                 <span class="section-lbl">Quiénes Somos</span>
@@ -1917,7 +1905,7 @@
     <footer class="landing-footer">
         <div class="footer-layout">
             <a href="#" class="footer-logo">
-                <img src="{{ asset('img/Cursus logo.png') }}" alt="Cursus" style="height: 30px; width: auto; border-radius: 6px;">
+                <img src="../assets/img/Cursus logo.png" alt="Cursus" style="height: 30px; width: auto; border-radius: 6px;">
                 <div class="footer-logo-tx">
                     Cursus
                     <small>UTN Haedo</small>
@@ -1951,6 +1939,6 @@
     </div>
 
     <!-- SCRIPT DE LOGICA INTERACTIVA -->
-    <script src="{{ asset('js/welcome.js') }}"></script>
+    <script src="../assets/js/welcome.js"></script>
 </body>
 </html>
