@@ -1339,7 +1339,7 @@
     <!-- MENÚ DE NAVEGACIÓN -->
     <header class="landing-header" id="js-header">
         <a href="#" class="logo-wrap">
-            <img src="{{ asset('img/Cursus logo.png') }}" alt="Cursus" style="height: 38px; width: auto; border-radius: 8px;">
+            <img src="{{ asset('assets/img/Cursus logo.png') }}" alt="Cursus" style="height: 38px; width: auto; border-radius: 8px;">
             <div class="logo-tx">
                 Cursus
                 <small>UTN Haedo</small>
@@ -1564,7 +1564,7 @@
     <section class="section" id="que-es">
         <div class="purpose-section">
             <div class="purpose-visual" style="padding: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; border: none; background: transparent; box-shadow: none;">
-                <img src="{{ asset('img/lnicio.webp') }}" alt="Cursus Inicio" style="width: 100%; height: auto; border-radius: var(--r); box-shadow: 0 10px 25px rgba(0,0,0,0.03);">
+                <img src="{{ asset('assets/img/lnicio.webp') }}" alt="Cursus Inicio" style="width: 100%; height: auto; border-radius: var(--r); box-shadow: 0 10px 25px rgba(0,0,0,0.03);">
             </div>
             <div class="purpose-text">
                 <span class="section-lbl">Quiénes Somos</span>
@@ -1917,7 +1917,7 @@
     <footer class="landing-footer">
         <div class="footer-layout">
             <a href="#" class="footer-logo">
-                <img src="{{ asset('img/Cursus logo.png') }}" alt="Cursus" style="height: 30px; width: auto; border-radius: 6px;">
+                <img src="{{ asset('assets/img/Cursus logo.png') }}" alt="Cursus" style="height: 30px; width: auto; border-radius: 6px;">
                 <div class="footer-logo-tx">
                     Cursus
                     <small>UTN Haedo</small>

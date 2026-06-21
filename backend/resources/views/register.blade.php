@@ -14,7 +14,7 @@
             <!-- Columna izquierda: formulario -->
             <div class="login-form-side">
                 <div class="login-logo">
-                    <div class="login-logo-icon"><img src="{{ asset('img/Cursus logo.png') }}" alt="Cursus"></div>
+                    <div class="login-logo-icon"><img src="{{ asset('assets/img/Cursus logo.png') }}" alt="Cursus"></div>
                     <div class="login-logo-text">
                         Cursus
                         <small>Tec. en Programación</small>
