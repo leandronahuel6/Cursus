@@ -2039,6 +2039,7 @@ a { text-decoration: none; color: inherit; }
   font-size: 18px;
   flex-shrink: 0;
   border-radius: 12px;
+  overflow: hidden;
 }
 .login-logo-icon img {
   height: 100%;
