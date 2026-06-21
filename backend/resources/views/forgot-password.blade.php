@@ -4,61 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cursus - Olvidé mi contraseña</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
 </head>
 <body>
-    <main style="max-width: 400px; margin: 60px auto; font-family: sans-serif;">
-        <h1>Olvidé mi contraseña</h1>
-        <p>Ingresá tu email y te mandamos un link para restablecer tu contraseña.</p>
+    <main class="login-page">
+        <div class="login-layout">
+            <div class="login-form-side">
+                <div class="login-logo">
+                    <div class="login-logo-icon"><img src="{{ asset('img/Cursus logo.png') }}" alt="Cursus"></div>
+                    <div class="login-logo-text">
+                        Cursus
+                        <small>Tec. en Programación</small>
+                    </div>
+                </div>
 
-        <form id="ForgotForm">
-            <div>
-                <label for="email">Email</label><br>
-                <input type="email" id="email" name="email" required>
-                <span id="email-error" style="color: red; display: block;"></span>
+                <div class="login-form-wrap">
+                    <div class="login-form-header">
+                        <h1>Olvidé mi contraseña</h1>
+                        <p>Ingresá tu email y te mandamos un link para restablecer tu contraseña.</p>
+                    </div>
+
+                    <form id="ForgotForm" class="login-form">
+                        <div class="login-field">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="nombre@ejemplo.com" autocomplete="email" required>
+                            <span id="email-error" class="error-message"></span>
+                        </div>
+
+                        <button type="submit" class="login-submit">Enviar link</button>
+                    </form>
+
+                    <p id="success-message" class="login-success-message" hidden></p>
+
+                    <div class="login-divider"></div>
+
+                    <p class="login-signup">
+                        ¿Recordaste tu contraseña?
+                        <a href="{{ route('login') }}">Volver al inicio de sesión</a>
+                    </p>
+                </div>
             </div>
-            <br>
-            <button type="submit">Enviar link</button>
-        </form>
 
-        <p id="success-message" style="color: green;"></p>
+            <div class="login-visual-side">
+                <div class="login-visual-placeholder" aria-hidden="true"></div>
+            </div>
+        </div>
     </main>
-
-    <script>
-        const form = document.querySelector('#ForgotForm');
-        const emailInput = document.querySelector('#email');
-        const emailError = document.querySelector('#email-error');
-        const successMessage = document.querySelector('#success-message');
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            emailError.textContent = '';
-            successMessage.textContent = '';
-
-            try {
-                const response = await fetch('/api/forgot-password', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ email: emailInput.value })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    emailError.textContent = data.errors?.email?.[0] || data.message || 'Ocurrió un error';
-                    return;
-                }
-
-                successMessage.textContent = data.message;
-                emailInput.value = '';
-
-            } catch (error) {
-                console.error('Error:', error);
-                emailError.textContent = 'Error de conexión';
-            }
-        });
-    </script>
+    <script src="{{ asset('js/forgot-password.js') }}"></script>
 </body>
 </html>

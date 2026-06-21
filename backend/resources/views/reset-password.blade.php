@@ -4,91 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cursus - Restablecer contraseña</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
 </head>
 <body>
-    <main style="max-width: 400px; margin: 60px auto; font-family: sans-serif;">
-        <h1>Restablecer contraseña</h1>
-        <p>Ingresá tu nueva contraseña.</p>
+    <main class="login-page">
+        <div class="login-layout">
+            <div class="login-form-side">
+                <div class="login-logo">
+                    <div class="login-logo-icon"><img src="{{ asset('img/Cursus logo.png') }}" alt="Cursus"></div>
+                    <div class="login-logo-text">
+                        Cursus
+                        <small>Tec. en Programación</small>
+                    </div>
+                </div>
 
-        <form id="ResetForm">
-            <div>
-                <label for="password">Nueva contraseña</label><br>
-                <input type="password" id="password" name="password" required>
-                <span id="password-error" style="color: red; display: block;"></span>
-            </div>
-            <br>
-            <div>
-                <label for="password_confirmation">Confirmar contraseña</label><br>
-                <input type="password" id="password_confirmation" name="password_confirmation" required>
-            </div>
-            <br>
-            <button type="submit">Cambiar contraseña</button>
-        </form>
+                <div class="login-form-wrap">
+                    <div class="login-form-header">
+                        <h1>Restablecer contraseña</h1>
+                        <p>Ingresá tu nueva contraseña para recuperar el acceso a tu cuenta.</p>
+                    </div>
 
-        <p id="success-message" style="color: green;"></p>
+                    <form id="ResetForm" class="login-form" data-token="{{ $token }}" data-login-url="{{ route('login') }}">
+                        <div class="login-field">
+                            <label for="password">Nueva contraseña</label>
+                            <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="new-password" required>
+                            <span id="password-error" class="error-message"></span>
+                        </div>
+
+                        <div class="login-field">
+                            <label for="password_confirmation">Confirmar contraseña</label>
+                            <input type="password" id="password_confirmation" name="password_confirmation" placeholder="••••••••" autocomplete="new-password" required>
+                            <span id="password-confirmation-error" class="error-message"></span>
+                        </div>
+
+                        <button type="submit" class="login-submit">Cambiar contraseña</button>
+                    </form>
+
+                    <p id="success-message" class="login-success-message" hidden></p>
+
+                    <div class="login-divider"></div>
+
+                    <p class="login-signup">
+                        ¿Recordaste tu contraseña?
+                        <a href="{{ route('login') }}">Volver al inicio de sesión</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="login-visual-side">
+                <div class="login-visual-placeholder" aria-hidden="true"></div>
+            </div>
+        </div>
     </main>
-
-    <script>
-        const form = document.querySelector('#ResetForm');
-        const passwordInput = document.querySelector('#password');
-        const passwordConfirmInput = document.querySelector('#password_confirmation');
-        const passwordError = document.querySelector('#password-error');
-        const successMessage = document.querySelector('#success-message');
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const email = urlParams.get('email');
-        const pathParts = window.location.pathname.split('/');
-        const token = pathParts[pathParts.length - 1];
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            passwordError.textContent = '';
-            successMessage.textContent = '';
-
-            if (passwordInput.value.length < 8) {
-                passwordError.textContent = 'La contraseña debe tener al menos 8 caracteres';
-                return;
-            }
-
-            if (passwordInput.value !== passwordConfirmInput.value) {
-                passwordError.textContent = 'Las contraseñas no coinciden';
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/reset-password', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        token: token,
-                        email: email,
-                        password: passwordInput.value,
-                        password_confirmation: passwordConfirmInput.value
-                    })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    passwordError.textContent = data.errors?.email?.[0] || data.message || 'Ocurrió un error';
-                    return;
-                }
-
-                successMessage.textContent = data.message + ' Te llevamos al login...';
-                form.style.display = 'none';
-
-                setTimeout(() => {
-                    window.location.href = "{{ route('login') }}";
-                }, 2000);
-
-            } catch (error) {
-                console.error('Error:', error);
-                passwordError.textContent = 'Error de conexión';
-            }
-        });
-    </script>
+    <script src="{{ asset('js/reset-password.js') }}"></script>
 </body>
 </html>

@@ -2149,6 +2149,14 @@ a { text-decoration: none; color: inherit; }
   color: red;
 }
 
+.login-success-message {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #059669;
+  text-align: center;
+}
+
 .login-forgot {
   font-size: 13px;
   font-weight: 500;
