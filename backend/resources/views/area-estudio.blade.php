@@ -28,16 +28,21 @@
   <!-- Materia header -->
   <div class="mat-hdr">
     <div class="mat-ic">💻</div>
-    <div class="mat-info">
-      <div class="mat-name">Programación II</div>
-      <div class="mat-meta">
-        <span class="badge b-reg">Regular</span>
-        <span class="mat-yr">2° año · Cursada 2024</span>
+    <div class="mat-info mat-dropdown-wrap" id="mat-dropdown-wrap">
+      <div class="mat-name mat-dropdown-trigger" id="mat-dropdown-trigger" onclick="toggleMateriaDropdown(event)">
+        <span id="mat-selector-name">—</span>
+        <span class="mat-dropdown-caret">▾</span>
       </div>
+      <div class="mat-meta">
+        <span class="badge b-cur" id="mat-selector-badge">Cursando</span>
+        <span class="mat-yr">Tocá el nombre para cambiar de materia</span>
+      </div>
+      <!-- Selector de materia (solo las que estoy cursando) -->
+      <div class="mat-dropdown" id="materia-dropdown"></div>
     </div>
     <div class="mat-chips">
-      <div class="mat-chip"><div class="mat-chip-v">8h</div><div class="mat-chip-l">esta semana</div></div>
-      <div class="mat-chip"><div class="mat-chip-v">23</div><div class="mat-chip-l">🍅 totales</div></div>
+      <div class="mat-chip"><div class="mat-chip-v" id="chip-horas-semana">0h</div><div class="mat-chip-l">esta semana</div></div>
+      <div class="mat-chip"><div class="mat-chip-v" id="chip-sesiones-totales">0</div><div class="mat-chip-l">🍅 totales</div></div>
       <div class="mat-chip"><div class="mat-chip-v">4</div><div class="mat-chip-l">online ahora</div></div>
     </div>
   </div>
@@ -91,16 +96,6 @@
         <!-- Session log -->
         <div class="slog">
           <div class="slog-title">Sesiones completadas hoy</div>
-          <div class="slog-row">
-            <span class="slog-t">14:05</span>
-            <span class="slog-d">25:00</span>
-            <span class="slog-ok">✓ Completada</span>
-          </div>
-          <div class="slog-row">
-            <span class="slog-t">14:35</span>
-            <span class="slog-d">25:00</span>
-            <span class="slog-ok">✓ Completada</span>
-          </div>
           <div id="log-extra"></div>
         </div>
 
@@ -179,23 +174,7 @@
             <div class="kbcol-name"><div class="kbdot kd-p"></div>Pendiente</div>
             <span class="kbcnt" id="cnt-pending">3</span>
           </div>
-          <div class="kbcards" id="cards-pending">
-            <div class="kbcard" id="c1" draggable="true" ondragstart="dStart(event,'c1')" ondragend="dEnd(event)">
-              <div class="kb-title">TP N°2 — Calculadora en C</div>
-              <div class="kb-meta urg">⚠ Vence 5 jun</div>
-              <button class="kb-del" onclick="delCard('c1')">✕</button>
-            </div>
-            <div class="kbcard" id="c2" draggable="true" ondragstart="dStart(event,'c2')" ondragend="dEnd(event)">
-              <div class="kb-title">Práctica 4 — Recursividad</div>
-              <div class="kb-meta">📅 Vence 15 jun</div>
-              <button class="kb-del" onclick="delCard('c2')">✕</button>
-            </div>
-            <div class="kbcard" id="c3" draggable="true" ondragstart="dStart(event,'c3')" ondragend="dEnd(event)">
-              <div class="kb-title">Leer cap. 7 — Punteros</div>
-              <div class="kb-meta">Sin fecha</div>
-              <button class="kb-del" onclick="delCard('c3')">✕</button>
-            </div>
-          </div>
+          <div class="kbcards" id="cards-pending"></div>
           <button class="kb-add" onclick="addCard('pending')">+ Agregar tarea</button>
         </div>
 
@@ -208,13 +187,7 @@
             <div class="kbcol-name"><div class="kbdot kd-c"></div>En Curso</div>
             <span class="kbcnt" id="cnt-progress">1</span>
           </div>
-          <div class="kbcards" id="cards-progress">
-            <div class="kbcard" id="c4" draggable="true" ondragstart="dStart(event,'c4')" ondragend="dEnd(event)">
-              <div class="kb-title">Ejercicios de repaso — Parcial 2</div>
-              <div class="kb-meta">📅 Parcial el 20 jun</div>
-              <button class="kb-del" onclick="delCard('c4')">✕</button>
-            </div>
-          </div>
+          <div class="kbcards" id="cards-progress"></div>
           <button class="kb-add" onclick="addCard('progress')">+ Agregar tarea</button>
         </div>
 
@@ -227,18 +200,7 @@
             <div class="kbcol-name"><div class="kbdot kd-f"></div>Finalizado</div>
             <span class="kbcnt" id="cnt-done">2</span>
           </div>
-          <div class="kbcards" id="cards-done">
-            <div class="kbcard" id="c5" draggable="true" ondragstart="dStart(event,'c5')" ondragend="dEnd(event)" style="opacity:.55">
-              <div class="kb-title" style="text-decoration:line-through;color:var(--t3)">TP N°1 — Hola Mundo y variables</div>
-              <div class="kb-meta">✓ Entregado 10 may</div>
-              <button class="kb-del" onclick="delCard('c5')">✕</button>
-            </div>
-            <div class="kbcard" id="c6" draggable="true" ondragstart="dStart(event,'c6')" ondragend="dEnd(event)" style="opacity:.55">
-              <div class="kb-title" style="text-decoration:line-through;color:var(--t3)">Prácticas 1, 2 y 3</div>
-              <div class="kb-meta">✓ Completadas</div>
-              <button class="kb-del" onclick="delCard('c6')">✕</button>
-            </div>
-          </div>
+          <div class="kbcards" id="cards-done"></div>
           <button class="kb-add" onclick="addCard('done')">+ Agregar tarea</button>
         </div>
 
@@ -256,35 +218,7 @@
             <button class="bm-save" onclick="addBookmark()">Guardar</button>
           </div>
         </div>
-        <div class="bm-list" id="bm-list">
-          <div class="bm-item">
-            <div class="bm-ic">🎥</div>
-            <div class="bm-inf">
-              <div class="bm-name">Tutorial punteros en C — YouTube</div>
-              <div class="bm-url">https://youtube.com/watch?v=zuegQmMdy8M</div>
-            </div>
-            <a href="https://youtube.com/watch?v=zuegQmMdy8M" target="_blank" rel="noopener" class="bm-open">↗</a>
-            <button class="bm-del" onclick="this.parentElement.remove()">✕</button>
-          </div>
-          <div class="bm-item">
-            <div class="bm-ic">💬</div>
-            <div class="bm-inf">
-              <div class="bm-name">StackOverflow — diferencia malloc vs calloc</div>
-              <div class="bm-url">https://stackoverflow.com/questions/1538420</div>
-            </div>
-            <a href="https://stackoverflow.com/questions/1538420" target="_blank" rel="noopener" class="bm-open">↗</a>
-            <button class="bm-del" onclick="this.parentElement.remove()">✕</button>
-          </div>
-          <div class="bm-item">
-            <div class="bm-ic">📄</div>
-            <div class="bm-inf">
-              <div class="bm-name">Apunte cátedra — Estructuras y Uniones</div>
-              <div class="bm-url">https://drive.google.com/file/d/1xBz...</div>
-            </div>
-            <a href="#" class="bm-open">↗</a>
-            <button class="bm-del" onclick="this.parentElement.remove()">✕</button>
-          </div>
-        </div>
+        <div class="bm-list" id="bm-list"></div>
       </div>
     </div><!-- /marcadores -->
 

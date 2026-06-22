@@ -643,6 +643,34 @@ h1, h2, h3, h4, h5, h6, .display-text {
 .mat-chip-v { font-size: 16px; font-weight: 700; color: var(--t1); letter-spacing: -.02em; }
 .mat-chip-l { font-size: 11px; color: var(--t3); }
 
+/* Selector de materia (dropdown vertical) */
+.mat-dropdown-wrap { position: relative; }
+.mat-dropdown-trigger {
+  display: inline-flex; align-items: center; gap: 6px;
+  cursor: pointer; user-select: none;
+}
+.mat-dropdown-caret { font-size: 11px; color: var(--t3); transition: transform .15s; }
+.mat-dropdown-trigger.open .mat-dropdown-caret { transform: rotate(180deg); }
+.mat-dropdown {
+  position: absolute; top: calc(100% + 8px); left: 0;
+  min-width: 240px; max-height: 280px; overflow-y: auto;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); box-shadow: var(--sh-md);
+  padding: 6px; z-index: 50;
+  opacity: 0; transform: translateY(-6px);
+  pointer-events: none; transition: opacity .15s, transform .15s;
+}
+.mat-dropdown.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.mat-dropdown-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  width: 100%; padding: 9px 10px; border-radius: var(--r-sm);
+  font-size: 13px; font-weight: 500; color: var(--t2);
+  cursor: pointer; text-align: left; transition: background .15s, color .15s;
+}
+.mat-dropdown-item:hover { background: var(--brand-light); color: var(--brand); }
+.mat-dropdown-item.active { background: var(--brand-light); color: var(--brand); font-weight: 700; }
+.mat-dropdown-empty { padding: 10px; font-size: 13px; color: var(--t3); }
+
 /* SPLIT LAYOUT */
 .split { display: grid; grid-template-columns: 1fr 272px; gap: 16px; align-items: start; }
 
@@ -1080,30 +1108,30 @@ h1, h2, h3, h4, h5, h6, .display-text {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
-  padding: 20px;
+  padding: 14px;
   box-shadow: var(--sh);
 }
 .calendar-nav-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 10px;
 }
 .calendar-month-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--t1);
 }
 .calendar-nav-btn {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--t2);
-  font-size: 12px;
+  font-size: 11px;
   transition: background .15s;
   background: var(--surface);
   cursor: pointer;
@@ -1115,26 +1143,26 @@ h1, h2, h3, h4, h5, h6, .display-text {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   color: var(--tm);
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 .calendar-days-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: 3px;
 }
 .calendar-day-cell {
-  aspect-ratio: 1;
+  aspect-ratio: 1.5;
   border-radius: var(--r-sm);
   border: 1px solid transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--t2);
   cursor: pointer;
@@ -1165,7 +1193,7 @@ h1, h2, h3, h4, h5, h6, .display-text {
   display: flex;
   gap: 3px;
   position: absolute;
-  bottom: 4px;
+  bottom: 3px;
 }
 .calendar-dots-row .dot {
   width: 4px;
@@ -1173,24 +1201,49 @@ h1, h2, h3, h4, h5, h6, .display-text {
   border-radius: 50%;
 }
 
-/* Detalle del día seleccionado en el Calendario */
-.day-detail-box {
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px solid var(--border);
+/* Popover de detalle del día: se abre anclado a la celda tocada, en vez de
+   un cuadro fijo debajo de todo el calendario. */
+.calendar-day-popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--sh-md);
+  padding: 8px;
+  z-index: 80;
+  cursor: default;
+  text-align: left;
+  white-space: normal;
 }
-.day-detail-title {
+.calendar-day-popover-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--t1);
+  margin-bottom: 6px;
+  padding: 0 2px;
+}
+.calendar-day-popover-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  border-radius: var(--r-sm);
+}
+.calendar-day-popover-item:hover { background: var(--border-light); }
+.calendar-day-popover-info { flex: 1; min-width: 0; }
+.calendar-day-popover-titulo {
   font-size: 12px;
   font-weight: 600;
-  color: var(--t2);
-  margin-bottom: 10px;
-}
-.day-detail-empty {
-  font-size: 12px;
-  color: var(--tm);
-  font-style: italic;
-  text-align: center;
-  padding: 10px;
+  color: var(--t1);
+  white-space: normal;
+  word-break: break-word;
+  margin-bottom: 3px;
 }
 
 /* Tarjeta de Pago de Cuota */
@@ -1331,6 +1384,22 @@ h1, h2, h3, h4, h5, h6, .display-text {
 }
 .alert-form-input:focus {
   border-color: var(--brand);
+}
+.currency-input-wrap {
+  position: relative;
+}
+.currency-input-sign {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t3);
+  pointer-events: none;
+}
+.currency-input-wrap .currency-input {
+  padding-left: 24px;
 }
 .btn-alert-submit {
   width: 100%;

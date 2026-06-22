@@ -47,7 +47,6 @@ function init() {
 
   // Inicializar vistas y gráficos
   updateUI();
-  updateAlertsBadge();
 }
 
 function loadSubjectsState() {
@@ -850,24 +849,6 @@ function renderHeatmap() {
 }
 
 // ================= UTILIDADES =================
-
-function updateAlertsBadge() {
-  const savedAlertsState = localStorage.getItem('cursus_alerts_state');
-  if (savedAlertsState) {
-    const alertsState = JSON.parse(savedAlertsState);
-    let isPaid = alertsState.career === 'TUP' || alertsState.career === 'TUSI';
-    let filteredAlerts = alertsState.alerts.filter(alert => !alert.completed);
-    if (!isPaid) {
-      filteredAlerts = filteredAlerts.filter(alert => alert.category !== 'payment' || !alert.title.includes('Cuota'));
-    }
-    const count = filteredAlerts.length;
-    
-    const countBadge = document.getElementById('nav-badge-count');
-    const countBnav = document.getElementById('bnav-badge-count');
-    if (countBadge) countBadge.innerText = count;
-    if (countBnav) countBnav.innerText = count;
-  }
-}
 
 function showToast(message) {
   let toast = document.getElementById('avg-toast');

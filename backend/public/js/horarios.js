@@ -18,25 +18,43 @@ const DAYS = [
   { id: 6, name: 'Sábado' }
 ];
 
-// Materias disponibles (cursando actualmente)
-const AVAILABLE_SUBJECTS = [
-  { id: 'prog2', nombre: 'Programación II', codigo: 'PROG2', nivel: '1° Año' },
-  { id: 'bd1', nombre: 'Base de Datos I', codigo: 'BD1', nivel: '1° Año' },
-  { id: 'sist_op', nombre: 'Sistemas Operativos', codigo: 'SIST_OP', nivel: '2° Año' },
-  { id: 'lab2', nombre: 'Laboratorio II', codigo: 'LAB2', nivel: '2° Año' },
-  { id: 'mat2', nombre: 'Matemática II', codigo: 'MAT2', nivel: '1° Año' },
-  { id: 'ing2', nombre: 'Inglés Técnico II', codigo: 'ING2', nivel: '1° Año' }
-];
+const API_BASE = '/api';
+
+// Materias disponibles para agendar: se cargan desde la BD (ver loadAvailableSubjects()),
+// filtradas a las que el usuario está cursando actualmente.
+let AVAILABLE_SUBJECTS = [];
 
 // Estado global
 let schedState = {
-  blocks: [], // [{ id, tipo, nombre, codigo, dia, inicio, fin, comision }]
+  blocks: [], // [{ id, tipo, nombre, codigo, materia_id, dia, inicio, fin, comision }]
   personalActivities: [
     { id: 'p_work', nombre: 'Trabajo' },
     { id: 'p_gym', nombre: 'Gimnasio' }
   ],
   selectedBlockId: null
 };
+
+// Headers de autenticación (token Sanctum guardado por login.js, en
+// localStorage si se marcó "Recordarme" o en sessionStorage si no)
+function getAuthHeaders() {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': 'Bearer ' + token
+  };
+}
+
+// Código corto para mostrar en las tarjetas, derivado del nombre real de la materia
+// (no es un dato de la BD, es solo una transformación visual del nombre).
+function buildCodigo(nombre) {
+  return nombre
+    .split(' ')
+    .filter(palabra => palabra.length > 2)
+    .map(palabra => palabra.slice(0, 3).toUpperCase())
+    .join('')
+    .slice(0, 8);
+}
 
 // Conversiones
 function minToTime(minutes) {
@@ -61,33 +79,58 @@ function getCommissionByTime(startVal) {
   }
 }
 
-// Cargar de localStorage o mocks por defecto (iguales a la maqueta SVG)
-function loadScheduleState() {
-  const saved = localStorage.getItem('cursus_weekly_schedule_blocks');
-  if (saved) {
+// Trae del backend las materias que el usuario está cursando actualmente
+// (estado_historico = 'cursando'), únicas habilitadas para agendar en la grilla.
+async function loadAvailableSubjects() {
+  try {
+    const response = await fetch(`${API_BASE}/mis-materias`, { headers: getAuthHeaders() });
+    if (!response.ok) throw new Error('No se pudieron cargar las materias');
+    const data = await response.json();
+    AVAILABLE_SUBJECTS = data
+      .filter(m => m.estado === 'cursando')
+      .map(m => ({ id: m.id, nombre: m.nombre, codigo: buildCodigo(m.nombre), nivel: `${m.nivel}° Año` }));
+  } catch (e) {
+    console.error(e);
+    AVAILABLE_SUBJECTS = [];
+  }
+}
+
+// Trae del backend la grilla horaria ya guardada del usuario. Las plantillas de
+// actividades personales (no son materias) siguen viviendo en localStorage.
+async function loadScheduleState() {
+  const savedActivities = localStorage.getItem('cursus_personal_activities');
+  if (savedActivities) {
     try {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed.blocks)) schedState.blocks = parsed.blocks;
-      if (Array.isArray(parsed.personalActivities)) schedState.personalActivities = parsed.personalActivities;
+      const parsed = JSON.parse(savedActivities);
+      if (Array.isArray(parsed)) schedState.personalActivities = parsed;
     } catch (e) {
       console.error(e);
     }
-  } else {
-    // Blocks iniciales idénticos a los de la maqueta
-    schedState.blocks = [
-      { id: 'b_prog2', tipo: 'materia', nombre: 'Programación II', codigo: 'PROG2', dia: 2, inicio: '18:30', fin: '21:30', comision: 'Comisión 1 (Noche)' },
-      { id: 'b_sist_op', tipo: 'materia', nombre: 'Sistemas Operativos', codigo: 'SIST_OP', dia: 4, inicio: '14:00', fin: '17:30', comision: 'Comisión 3 (Tarde)' },
-      { id: 'b_sist_op_conflict', tipo: 'materia', nombre: 'Sistemas Operativos', codigo: 'SIST_OP', dia: 5, inicio: '18:30', fin: '21:30', comision: 'Comisión 3 (Tarde)' },
-      { id: 'b_bd1_conflict', tipo: 'materia', nombre: 'Base de Datos I', codigo: 'BD1', dia: 5, inicio: '18:00', fin: '20:30', comision: 'Comisión 2' }
-    ];
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/horarios`, { headers: getAuthHeaders() });
+    if (!response.ok) throw new Error('No se pudo cargar el horario guardado');
+    const data = await response.json();
+    schedState.blocks = data.map(b => ({
+      id: `b_${b.id}`,
+      tipo: b.tipo,
+      nombre: b.nombre,
+      codigo: b.tipo === 'materia' ? buildCodigo(b.nombre) : null,
+      materia_id: b.materia_id,
+      dia: b.dia,
+      inicio: b.inicio,
+      fin: b.fin,
+      comision: b.tipo === 'materia' ? getCommissionByTime(b.inicio) : 'Actividad Personal'
+    }));
+  } catch (e) {
+    console.error(e);
+    schedState.blocks = [];
   }
 }
 
 function saveScheduleState() {
-  localStorage.setItem('cursus_weekly_schedule_blocks', JSON.stringify({
-    blocks: schedState.blocks,
-    personalActivities: schedState.personalActivities
-  }));
+  localStorage.setItem('cursus_personal_activities', JSON.stringify(schedState.personalActivities));
 }
 
 // Generar etiquetas de la columna de Horas (08:00 a 23:00 con intervalos de 30 min)
@@ -253,6 +296,7 @@ function setupDropZones() {
         tipo: dragData.tipo,
         nombre: dragData.nombre,
         codigo: dragData.codigo,
+        materia_id: dragData.tipo === 'materia' ? dragData.itemId : null,
         dia: dayId,
         inicio: inicioStr,
         fin: finStr,
@@ -285,7 +329,7 @@ window.openAddModal = function(itemId, tipo) {
 
   let nombre = '';
   if (tipo === 'materia') {
-    const sub = AVAILABLE_SUBJECTS.find(s => s.id === itemId);
+    const sub = AVAILABLE_SUBJECTS.find(s => String(s.id) === String(itemId));
     nombre = sub ? sub.nombre : '';
     document.getElementById('modal-item-name').readOnly = true;
     document.getElementById('modal-item-name').className = 'modal-inp-readonly';
@@ -409,11 +453,13 @@ window.submitAddModal = function() {
   }
 
   let codigo = null;
+  let materiaId = null;
   let comision = 'Actividad Personal';
 
   if (tipo === 'materia') {
-    const sub = AVAILABLE_SUBJECTS.find(s => s.id === itemId);
+    const sub = AVAILABLE_SUBJECTS.find(s => String(s.id) === String(itemId));
     codigo = sub ? sub.codigo : null;
+    materiaId = sub ? sub.id : null;
     comision = document.getElementById('modal-commission-select').value;
   } else {
     // Si es actividad personal, renombrar la plantilla en la barra lateral
@@ -428,6 +474,7 @@ window.submitAddModal = function() {
     tipo: tipo,
     nombre: nombre,
     codigo: codigo,
+    materia_id: materiaId,
     dia: dayId,
     inicio: startVal,
     fin: endVal,
@@ -837,7 +884,7 @@ document.getElementById('btn-clear-grid').addEventListener('click', () => {
 });
 
 // Guardar Horario completo
-document.getElementById('btn-save-schedule').addEventListener('click', () => {
+document.getElementById('btn-save-schedule').addEventListener('click', async () => {
   // 1. Validación estricta semanal
   // Buscamos cualquier conflicto en los 6 días
   let conflicts = [];
@@ -889,10 +936,41 @@ document.getElementById('btn-save-schedule').addEventListener('click', () => {
   const userConfirm = confirm('Atención: Tienes actividades en el panel inferior que no fueron ubicadas en ninguna pista. No se guardarán en tu cronograma. ¿Deseas continuar?');
   if (!userConfirm) return;
 
-  // 3. Guardar en localStorage
-  saveScheduleState();
-  showToastConflict('¡Horario semanal guardado con éxito!');
-  deselectBlock();
+  // 3. Guardar la grilla en la base de datos (reemplaza todo el horario anterior)
+  try {
+    const response = await fetch(`${API_BASE}/horarios/sync`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        blocks: schedState.blocks.map(b => ({
+          tipo: b.tipo,
+          materia_id: b.tipo === 'materia' ? b.materia_id : null,
+          titulo_actividad: b.tipo === 'actividad' ? b.nombre : null,
+          dia_semana: b.dia,
+          hora_inicio: b.inicio,
+          hora_fin: b.fin
+        }))
+      })
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      const editor = document.getElementById('sched-manual-editor');
+      editor.style.display = 'flex';
+      document.getElementById('editor-selected-title').textContent = '⚠️ No se pudo guardar';
+      document.getElementById('editor-selected-type').textContent = 'ERROR';
+      document.getElementById('editor-selected-type').className = 'editor-block-type-badge error';
+      const notif = document.getElementById('editor-notification-area');
+      notif.textContent = data.message || 'No se pudo guardar el horario.';
+      notif.style.color = '#dc2626';
+      return;
+    }
+
+    showToastConflict('¡Horario semanal guardado con éxito!');
+    deselectBlock();
+  } catch (e) {
+    console.error('No se pudo guardar el horario', e);
+  }
 });
 
 // Toast notification helper
@@ -914,8 +992,8 @@ function showToastConflict(message) {
 }
 
 // Inicialización de la página
-document.addEventListener('DOMContentLoaded', () => {
-  loadScheduleState();
+document.addEventListener('DOMContentLoaded', async () => {
+  await Promise.all([loadAvailableSubjects(), loadScheduleState()]);
   renderTimeLabels();
   renderGridLines();
   renderAvailablePanels();
