@@ -34,6 +34,9 @@ Actúa como un Desarrollador Frontend Senior experto en Vanilla JS y optimizaci�
   - Se prefiere fuertemente consumir la iconografía localmente desde un archivo sprite SVG unificado mediante la etiqueta de referencia (`<svg><use href="/ruta/assets/sprite.svg#id-icono"></use></svg>` o equivalente).
   - Está permitido usar CDNs externos y código SVG limpio integrado (inline) siempre y cuando el código no sea extenso ni redundante.
 
-- **Tipografía Local:**
-  - Usa la directiva `@font-face` con formato optimizado `.woff2` y el atributo `font-display: swap`.
-  - Mantén lógica la separación tipográfica (ej. Display fonts para Títulos, tipografías geométricas o sans-serif legibles para el Body).
+- **Arquitectura Tipográfica Local:**
+  - **Unificada o Dual:** Se permite el uso de una arquitectura tipográfica unificada (ej. usar solo Outfit) o dual, siempre que respete el estilo minimalista del proyecto.
+  - **Usa variables semánticas en `:root`:** Mantén `--font-display` (para encabezados) y `--font-body` (para párrafos) para asegurar flexibilidad, incluso si ambas apuntan a la misma fuente.
+  - **Usa la directiva `@font-face`** con formato optimizado `.woff2` alojado localmente.
+  - **PROHIBIDO** importar fuentes desde CDNs externos (`fonts.googleapis.com`).
+  - **Atributo Obligatorio:** Agrega `font-display: swap;` a todos los `@font-face` para evitar FOIT.
