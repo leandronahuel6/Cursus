@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>@yield('title', 'Cursus - Asistente de Estudiantes')</title>
   <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+  <link rel="icon" href="{{ asset('assets/icons/cursus-logo.svg') }}" type="image/svg+xml">
   @stack('styles')
 </head>
 

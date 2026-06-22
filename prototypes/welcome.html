@@ -3,8 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cursus es el organizador académico y asistente de productividad definitivo para estudiantes de la UTN Regional Haedo. Controlá tu promedio, correlatividades, cronómetro Pomodoro y cuotas en un solo lugar.">
+    <meta name="keywords" content="Cursus, UTN Haedo, UTN, TUP, Tecnicatura Programación, Estudiantes, Pomodoro, Correlatividades, SIU Guaraní, Universidad">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Cursus - Tu Asistente Universitario UTN Haedo">
+    <meta property="og:description" content="Organizá tu cursada, simulá tu promedio, planificá tus correlativas y gestioná tus tiempos con el Pomodoro integrado. Diseñado por y para alumnos de la UTN.">
+    <meta property="og:image" content="../backend/public/img/landing_hero.png">
+    
     <title>Cursus - Tu Asistente Universitario UTN Haedo</title>
     <link rel="stylesheet" href="../backend/public/css/main.css">
+    <link rel="icon" href="../backend/public/assets/icons/cursus-logo.svg" type="image/svg+xml">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         /* Estilos específicos para la Landing Page de Cursus */
@@ -1325,6 +1335,107 @@
         .theme-toggle-btn .icon-moon { display: block; color: #6366f1; }
         body.dark-mode .theme-toggle-btn .icon-sun { display: block; }
         body.dark-mode .theme-toggle-btn .icon-moon { display: none; }
+
+        /* Botón Volver Arriba */
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-heading);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.9);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px var(--card-shadow);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            outline: none;
+        }
+        .scroll-top-btn:hover {
+            background: var(--brand-gradient);
+            color: #ffffff;
+            border-color: transparent;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+        }
+        .scroll-top-btn.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Tooltips para la Tabla Comparativa */
+        .tooltip-trigger {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tooltip-trigger::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            background: var(--mock-bg);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+            padding: 8px 12px;
+            border-radius: var(--r-sm);
+            font-size: 11px;
+            font-weight: 500;
+            line-height: 1.4;
+            width: 220px;
+            white-space: normal;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            pointer-events: none;
+            text-align: center;
+        }
+        .tooltip-trigger::before {
+            content: '';
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            border-width: 6px 6px 0;
+            border-style: solid;
+            border-color: var(--card-border) transparent transparent;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            pointer-events: none;
+        }
+        .tooltip-trigger:hover::after,
+        .tooltip-trigger:hover::before {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+        /* Ajuste de tooltip en modo oscuro */
+        body.dark-mode .tooltip-trigger::after {
+            background: #1e293b;
+            border-color: #334155;
+            color: #f8fafc;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        body.dark-mode .tooltip-trigger::before {
+            border-color: #334155 transparent transparent;
+        }
     </style>
 </head>
 <body>
@@ -1411,7 +1522,7 @@
                     <div class="mock-main" style="padding: 12px; gap: 10px; overflow-y: auto;">
                         <!-- Mock App Topbar -->
                         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 8px;">
-                            <span style="font-size: 10px; font-weight: 800; color: #0f172a;" id="mock-user-welcome">Hola, Estudiante! 👋</span>
+                            <span style="font-size: 10px; font-weight: 800; color: var(--text-heading);" id="mock-user-welcome">Hola, Estudiante! 👋</span>
                             <span style="font-size: 8px; background: rgba(99, 102, 241, 0.1); color: var(--brand); padding: 2px 6px; border-radius: 10px; font-weight: 700;">TUP 2024</span>
                         </div>
 
@@ -1428,14 +1539,14 @@
                                             <div style="flex: 1; height: 4px; background: #e2e8f0; border-radius: 2px;">
                                                 <div style="width: 35%; height: 100%; background: var(--brand); border-radius: 2px;" id="mock-dash-progress-bar"></div>
                                             </div>
-                                            <div style="font-size: 8px; font-weight: 700; color: #334155;" id="mock-dash-progress-text">35%</div>
+                                            <div style="font-size: 8px; font-weight: 700; color: var(--text-muted);" id="mock-dash-progress-text">35%</div>
                                         </div>
                                     </div>
                                     <!-- Widget Pomodoro -->
                                     <div class="mock-widget" style="padding: 8px; display: flex; align-items: center; justify-content: space-between;">
                                         <div>
                                             <div class="widget-title" style="font-size: 7px; margin-bottom: 2px;">⏱️ Enfoque Pomodoro</div>
-                                            <div style="font-size: 13px; font-weight: 800; color: #0f172a;" id="mock-dash-pomodoro-timer">25:00</div>
+                                            <div style="font-size: 13px; font-weight: 800; color: var(--text-heading);" id="mock-dash-pomodoro-timer">25:00</div>
                                         </div>
                                         <div style="font-size: 8px; background: #10b981; color: #fff; padding: 2px 6px; border-radius: 10px; font-weight: 700;" id="mock-dash-pomodoro-status">Estudiando</div>
                                     </div>
@@ -1702,32 +1813,74 @@
                 </thead>
                 <tbody>
                     <tr style="border-bottom: 1px solid var(--gray-card-border);">
-                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">Inscripción oficial a cursadas y exámenes</td>
+                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">
+                            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                Inscripción oficial a cursadas y exámenes
+                                <span class="tooltip-trigger" data-tooltip="El SIU Guaraní registra legalmente tus actas de materias. Cursus no reemplaza este registro, sino que te ayuda a planificarlo.">
+                                    <i data-lucide="help-circle" style="width: 14px; height: 14px; color: var(--text-desc); cursor: help;"></i>
+                                </span>
+                            </div>
+                        </td>
                         <td style="padding: 16px 20px; color: #10b981; background: var(--table-td-bg-siu);">Sí (Es obligatorio y legal)</td>
                         <td style="padding: 16px 20px; color: var(--text-desc); background: var(--table-td-bg-cursus);">No (Debes inscribirte en el SIU)</td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--gray-card-border);">
-                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">Árbol visual de correlatividades</td>
+                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">
+                            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                Árbol visual de correlatividades
+                                <span class="tooltip-trigger" data-tooltip="Visualiza de forma interactiva el mapa de materias aprobadas y disponibles según el plan oficial TUP 2024.">
+                                    <i data-lucide="help-circle" style="width: 14px; height: 14px; color: var(--text-desc); cursor: help;"></i>
+                                </span>
+                            </div>
+                        </td>
                         <td style="padding: 16px 20px; color: #ef4444; background: var(--table-td-bg-siu);">No (Solo listado de texto plano)</td>
                         <td style="padding: 16px 20px; color: #10b981; font-weight: 600; background: var(--table-td-bg-cursus);">Sí (Interactivo y en cascada)</td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--gray-card-border);">
-                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">Simulador de promedio y egreso</td>
+                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">
+                            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                Simulador de promedio y egreso
+                                <span class="tooltip-trigger" data-tooltip="Calcula cómo afectará tu próxima nota a tu promedio y proyecta la fecha estimada en la que te graduarás.">
+                                    <i data-lucide="help-circle" style="width: 14px; height: 14px; color: var(--text-desc); cursor: help;"></i>
+                                </span>
+                            </div>
+                        </td>
                         <td style="padding: 16px 20px; color: #ef4444; background: var(--table-td-bg-siu);">No (No calcula proyecciones)</td>
                         <td style="padding: 16px 20px; color: #10b981; font-weight: 600; background: var(--table-td-bg-cursus);">Sí (Simula finales y fecha de egreso)</td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--gray-card-border);">
-                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">Cronómetro Pomodoro y tareas Kanban</td>
+                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">
+                            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                Cronómetro Pomodoro y tareas Kanban
+                                <span class="tooltip-trigger" data-tooltip="Un espacio de estudio enfocado con temporizador y un tablero para organizar tus entregas de trabajos prácticos.">
+                                    <i data-lucide="help-circle" style="width: 14px; height: 14px; color: var(--text-desc); cursor: help;"></i>
+                                </span>
+                            </div>
+                        </td>
                         <td style="padding: 16px 20px; color: #ef4444; background: var(--table-td-bg-siu);">No (Es ajeno al estudio diario)</td>
                         <td style="padding: 16px 20px; color: #10b981; font-weight: 600; background: var(--table-td-bg-cursus);">Sí (Temporizador integrado con logs)</td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--gray-card-border);">
-                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">Controlador de cuotas y alertas</td>
+                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">
+                            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                Controlador de cuotas y alertas
+                                <span class="tooltip-trigger" data-tooltip="Lleva el control de tus cuotas arancelarias de la TUP y recibe notificaciones de vencimiento al instante.">
+                                    <i data-lucide="help-circle" style="width: 14px; height: 14px; color: var(--text-desc); cursor: help;"></i>
+                                </span>
+                            </div>
+                        </td>
                         <td style="padding: 16px 20px; color: #ef4444; background: var(--table-td-bg-siu);">No (No avisa aranceles ni vencimientos)</td>
-                        <td style="padding: 16px 20px; color: #10b981; font-weight: 600; background: var(--table-td-bg-cursus);">Sí (Simulador de cuotas TUP/TUSI)</td>
+                        <td style="padding: 16px 20px; color: #10b981; font-weight: 600; background: var(--table-td-bg-cursus);">Sí (Simulador de cuotas TUP)</td>
                     </tr>
                     <tr>
-                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">Diseño moderno e inmediato</td>
+                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">
+                            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                Diseño moderno e inmediato
+                                <span class="tooltip-trigger" data-tooltip="Accede de forma instantánea a tu información académica con una interfaz moderna, rápida y responsiva.">
+                                    <i data-lucide="help-circle" style="width: 14px; height: 14px; color: var(--text-desc); cursor: help;"></i>
+                                </span>
+                            </div>
+                        </td>
                         <td style="padding: 16px 20px; color: #f59e0b; background: var(--table-td-bg-siu);">No (Lento y requiere recaptcha)</td>
                         <td style="padding: 16px 20px; color: #10b981; font-weight: 600; background: var(--table-td-bg-cursus);">Sí (Carga instantánea, responsivo)</td>
                     </tr>
@@ -1768,7 +1921,7 @@
                     <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px;">SF</div>
                     <div>
                         <h5 style="font-size: 13.5px; font-weight: 700; color: var(--text-heading); margin: 0;">Sofía Fernández</h5>
-                        <p style="font-size: 11.5px; color: var(--text-desc); margin: 0;">Ing. Industrial (4° Año)</p>
+                        <p style="font-size: 11.5px; color: var(--text-desc); margin: 0;">Estudiante de TUP (3° Año)</p>
                     </div>
                 </div>
             </div>
@@ -1776,13 +1929,13 @@
             <div class="testimonial-card reveal">
                 <div>
                     <div style="color: #f59e0b; font-size: 16px; margin-bottom: 12px;">★★★★★</div>
-                    <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; font-style: italic; margin: 0 0 20px 0;">"Las alertas de vencimientos de cuotas y finales son geniales. Si cursás tecnicaturas con cuota como TUP/TUSI, te avisa los aumentos del arancel al instante. Muy práctico."</p>
+                    <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; font-style: italic; margin: 0 0 20px 0;">"Las alertas de vencimientos de cuotas y finales son geniales. Si cursás la tecnicatura con cuota como la TUP, te avisa los aumentos del arancel al instante. Muy práctico."</p>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px; border-top: 1px solid var(--card-border); padding-top: 16px;">
                     <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #ea580c, #d97706); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px;">TG</div>
                     <div>
                         <h5 style="font-size: 13.5px; font-weight: 700; color: var(--text-heading); margin: 0;">Tomás Gómez</h5>
-                        <p style="font-size: 11.5px; color: var(--text-desc); margin: 0;">Estudiante de TUSI (1° Año)</p>
+                        <p style="font-size: 11.5px; color: var(--text-desc); margin: 0;">Estudiante de TUP (1° Año)</p>
                     </div>
                 </div>
             </div>
@@ -1935,6 +2088,11 @@
             <button class="btn-modal-close" onclick="closeSuccessModal()">Cerrar</button>
         </div>
     </div>
+
+    <!-- BOTÓN VOLVER ARRIBA -->
+    <button id="scroll-top-btn" class="scroll-top-btn" aria-label="Volver arriba">
+        <i data-lucide="arrow-up"></i>
+    </button>
 
     <!-- SCRIPT DE LOGICA INTERACTIVA -->
     <script src="../backend/public/js/welcome.js"></script>
