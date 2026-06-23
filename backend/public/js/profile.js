@@ -5,6 +5,11 @@
     return localStorage.getItem('token') || sessionStorage.getItem('token');
   }
 
+  if (!getStoredToken()) {
+    window.location.replace('/login');
+    return;
+  }
+
   function getStoredUser() {
     return localStorage.getItem('user') || sessionStorage.getItem('user');
   }
@@ -66,6 +71,11 @@
     const profileOverlay = document.getElementById('profile-edit-overlay');
     if (profileOverlay && profileOverlay.classList.contains('open') && e.target === profileOverlay) {
       closeProfileModal();
+      return;
+    }
+    const cpOverlay = document.getElementById('change-password-overlay');
+    if (cpOverlay && cpOverlay.classList.contains('open') && e.target === cpOverlay) {
+      closeChangePasswordModal();
       return;
     }
     closeProfileMenu();
@@ -264,13 +274,117 @@
   loadUserProfile();
   document.addEventListener('DOMContentLoaded', loadUserProfile);
 
-  window.toggleProfileMenu  = toggleProfileMenu;
-  window.openContactModal   = openContactModal;
-  window.closeContactModal  = closeContactModal;
-  window.handleContactSubmit = handleContactSubmit;
-  window.openProfileModal   = openProfileModal;
-  window.closeProfileModal  = closeProfileModal;
-  window.handleProfileSubmit = handleProfileSubmit;
-  window.handleLogout = handleLogout;
-  window.updateAlertsBadge  = updateAlertsBadge;
+  function openChangePasswordModal() {
+    closeProfileModal();
+    document.getElementById('change-password-form').reset();
+    ['cp-current-error', 'cp-new-error', 'cp-confirm-error'].forEach(id => {
+      document.getElementById(id).textContent = '';
+    });
+    const success = document.getElementById('cp-success');
+    success.hidden = true;
+    success.textContent = '';
+    document.getElementById('cp-submit').disabled = false;
+    document.getElementById('change-password-overlay').classList.add('open');
+  }
+
+  function closeChangePasswordModal() {
+    document.getElementById('change-password-overlay').classList.remove('open');
+  }
+
+  async function handleChangePasswordSubmit(e) {
+    e.preventDefault();
+
+    const current      = document.getElementById('cp-current');
+    const newPwd       = document.getElementById('cp-new');
+    const confirm      = document.getElementById('cp-confirm');
+    const currentError = document.getElementById('cp-current-error');
+    const newError     = document.getElementById('cp-new-error');
+    const confirmError = document.getElementById('cp-confirm-error');
+    const successEl    = document.getElementById('cp-success');
+    const submitBtn    = document.getElementById('cp-submit');
+
+    currentError.textContent = '';
+    newError.textContent = '';
+    confirmError.textContent = '';
+    successEl.hidden = true;
+
+    if (!current.value) {
+      currentError.textContent = 'Ingresá tu contraseña actual';
+      current.focus();
+      return;
+    }
+    if (newPwd.value.length < 8) {
+      newError.textContent = 'La nueva contraseña debe tener al menos 8 caracteres';
+      newPwd.focus();
+      return;
+    }
+    if (newPwd.value !== confirm.value) {
+      confirmError.textContent = 'Las contraseñas no coinciden';
+      confirm.focus();
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Guardando...';
+
+    try {
+      const response = await fetch('/api/change-password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ' + getStoredToken()
+        },
+        body: JSON.stringify({
+          current_password: current.value,
+          password: newPwd.value,
+          password_confirmation: confirm.value
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.errors?.current_password) {
+          currentError.textContent = data.errors.current_password[0];
+        } else if (data.errors?.password) {
+          newError.textContent = data.errors.password[0];
+        } else {
+          currentError.textContent = data.message || 'Ocurrió un error';
+        }
+        return;
+      }
+
+      successEl.textContent = data.message;
+      successEl.hidden = false;
+      document.getElementById('change-password-form').reset();
+      setTimeout(closeChangePasswordModal, 2000);
+
+    } catch (err) {
+      currentError.textContent = 'Error de conexión';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Guardar cambios';
+    }
+  }
+
+  function toggleMobileProfileMenu(e) {
+    e.stopPropagation();
+    const menu = document.getElementById('profile-menu');
+    menu.classList.toggle('open');
+  }
+
+  window.toggleProfileMenu         = toggleProfileMenu;
+  window.toggleMobileProfileMenu   = toggleMobileProfileMenu;
+  window.openContactModal          = openContactModal;
+  window.closeContactModal         = closeContactModal;
+  window.handleContactSubmit       = handleContactSubmit;
+  window.openProfileModal          = openProfileModal;
+  window.closeProfileModal         = closeProfileModal;
+  window.handleProfileSubmit       = handleProfileSubmit;
+  window.handleLogout              = handleLogout;
+  window.updateAlertsBadge         = updateAlertsBadge;
+  window.openChangePasswordModal   = openChangePasswordModal;
+  window.closeChangePasswordModal  = closeChangePasswordModal;
+  window.handleChangePasswordSubmit = handleChangePasswordSubmit;
 })();

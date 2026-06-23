@@ -144,6 +144,8 @@ class AuthController extends Controller
 
         $user->update(['password' => Hash::make($request->password)]);
 
+        $user->tokens()->where('id', '!=', $request->user()->currentAccessToken()->id)->delete();
+
         return response()->json(['message' => 'Contraseña actualizada correctamente.']);
     }
 }
