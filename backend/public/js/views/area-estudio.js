@@ -151,7 +151,7 @@
               id: String(t.id),
               column: COLUMNA_DB_TO_UI[t.columna] || 'pending',
               title: t.titulo,
-              dueDate: t.fecha_vencimiento || "",
+              dueDate: t.fecha_vencimiento ? t.fecha_vencimiento.split('T')[0] : "",
               description: localMatches ? localMatches.description : "",
               subtasks: localMatches ? localMatches.subtasks : [] // [MOCK API]
           };
@@ -747,7 +747,8 @@
         // Crear meta indicators
         let metaHtml = '';
         if (task.dueDate) {
-          const date = new Date(task.dueDate);
+          const [y, m, d] = task.dueDate.split('-');
+          const date = new Date(y, m - 1, d);
           const currentYear = new Date().getFullYear();
           let dateStr = date.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
           if (date.getFullYear() !== currentYear) {
@@ -755,7 +756,9 @@
           }
           
           // Urgencia si vence hoy/antes y no está finalizado
-          const isOverdue = new Date(task.dueDate) < new Date() && task.column !== 'done';
+          const today = new Date();
+          today.setHours(0,0,0,0);
+          const isOverdue = date < today && task.column !== 'done';
           metaHtml += `
             <div class="kb-meta ${isOverdue ? 'urg' : ''}">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 1v2M11 1v2M2 6h12"/></svg>
@@ -866,58 +869,38 @@
       return;
     }
 
-    const newTaskId = `c${Date.now()}`;
-    const newTask = {
-      id: newTaskId,
-      column: col,
-      title: title,
-      dueDate: "",
-      description: "",
-      subtasks: []
-    };
-
-    // Agregar al estado optimísticamente
-    tasks.push(newTask);
-    saveTasksToLocal();
-    renderKanban();
+    // [REAL API] Crear tarea
+    if (!selectedMateriaId) { showToast("Elegí una materia primero", "warn"); return; }
+    
     cancelInlineAddCard(col);
-
-    // Simular API
-    mockFetch('/api/tareas', {
+    
+    fetch(`${API_BASE}/tareas`, {
       method: 'POST',
-      body: JSON.stringify(newTask)
-    })
-    .then(() => showToast("Tarea agregada exitosamente", "success"))
-    .catch(err => {
-      // Rollback
-      tasks = tasks.filter(t => t.id !== newTaskId);
-      saveTasksToLocal();
-      renderKanban();
-      showToast(err.message, "error");
-    });
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ materia_id: selectedMateriaId, titulo: title })
+    }).then(async (res) => {
+      if (!res.ok) throw new Error();
+      await loadAppState(); // Recargar desde BD para tener el ID real
+      showToast("Tarea agregada exitosamente", "success");
+    }).catch(e => showToast("Error creando tarea", "error"));
   }
 
   function deleteTask(id) {
     const taskToDelete = tasks.find(t => t.id === id);
     if (!taskToDelete) return;
 
-    // Guardar copia para rollback
-    const index = tasks.indexOf(taskToDelete);
-    
-    // Remover optimísticamente
-    tasks.splice(index, 1);
+    // Optimista
+    tasks = tasks.filter(t => t.id !== id);
     saveTasksToLocal();
     renderKanban();
 
-    mockFetch(`/api/tareas/${id}`, { method: 'DELETE' })
-      .then(() => showToast("Tarea eliminada", "success"))
-      .catch(err => {
-        // Rollback
-        tasks.splice(index, 0, taskToDelete);
-        saveTasksToLocal();
-        renderKanban();
-        showToast(err.message, "error");
-      });
+    // [REAL API] Eliminar tarea
+    fetch(`${API_BASE}/tareas/${id}`, { method: 'DELETE', headers: getAuthHeaders() })
+      .then(async (res) => {
+          if (!res.ok) throw new Error();
+          showToast("Tarea eliminada", "success");
+      })
+      .catch(err => showToast("Error al eliminar", "error"));
   }
 
   /* ==========================================================================
@@ -969,16 +952,17 @@
     taskObj.column = col;
     updateCounts();
 
-    // Simular API
-    mockFetch('/api/tareas/mover', {
+    // [REAL API] Actualizar columna
+    const currentDragId = dragId;
+    fetch(`${API_BASE}/tareas/${currentDragId}`, {
       method: 'PUT',
-      body: JSON.stringify({ id: dragId, estado: col })
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ columna: COLUMNA_UI_TO_DB[col] })
     })
-    .then(() => {
-      // Éxito: persistir
+    .then(async (res) => {
+      if (!res.ok) throw new Error();
       saveTasksToLocal();
       renderKanban(); // Re-renderizar para limpiar orden, etc.
-      showToast("Posición de tarea guardada", "success");
     })
     .catch(err => {
       // Rollback visual
@@ -997,7 +981,7 @@
       card.classList.add('kb-error-shake');
       setTimeout(() => card.classList.remove('kb-error-shake'), 350);
 
-      showToast(err.message, "error");
+      showToast("Error moviendo tarea", "error");
     });
 
     dragId = null;
@@ -1023,7 +1007,13 @@
 
     document.getElementById('task-modal-col-name').textContent = translateCol(task.column);
     document.getElementById('task-modal-title').value = task.title;
-    document.getElementById('task-modal-due').value = task.dueDate || "";
+    
+    let dueStr = "";
+    if (task.dueDate) {
+      dueStr = task.dueDate.length === 10 ? task.dueDate + "T00:00" : task.dueDate.substring(0, 16);
+    }
+    document.getElementById('task-modal-due').value = dueStr;
+    
     document.getElementById('task-modal-desc').value = task.description || "";
     
     // Clonar subtareas para edición local en el modal
@@ -1198,11 +1188,16 @@
     renderKanban();
     closeTaskModal();
 
-    mockFetch(`/api/tareas/${task.id}`, {
+    fetch(`${API_BASE}/tareas/${task.id}`, {
       method: 'PUT',
-      body: JSON.stringify(task)
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ titulo: task.title, fecha_vencimiento: task.dueDate || null })
     })
-    .then(() => showToast("Tarea actualizada exitosamente", "success"))
+    .then(async (res) => {
+      if (!res.ok) throw new Error();
+      await loadAppState();
+      showToast("Tarea actualizada exitosamente", "success");
+    })
     .catch(err => {
       // Rollback
       task.title = oldTitle;
@@ -1210,7 +1205,7 @@
       task.description = oldDesc;
       saveTasksToLocal();
       renderKanban();
-      showToast(err.message, "error");
+      showToast("Error actualizando tarea", "error");
     });
   }
 
@@ -1298,41 +1293,23 @@
     btnSave.disabled = true;
     btnSave.textContent = "Guardando...";
 
-    const newBmId = `b_${Date.now()}`;
+    // [REAL API] Crear marcador
+    if (!selectedMateriaId) { showToast("Elegí una materia primero", "warn"); return; }
     
-    // Simular retraso de Open Graph del Backend
-    mockFetch('/api/marcadores', {
+    fetch(`${API_BASE}/marcadores`, {
       method: 'POST',
-      body: JSON.stringify({ url: url, title: title })
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ materia_id: selectedMateriaId, url: url, titulo: title || null })
     })
-    .then(() => {
-      // Simular un fallback de título si llega vacío
-      let resolvedTitle = title;
-      if (!resolvedTitle) {
-        try {
-          resolvedTitle = new URL(url).hostname;
-        } catch(_) {
-          resolvedTitle = "Enlace Web";
-        }
-      }
-
-      const newBm = {
-        id: newBmId,
-        url: url,
-        title: resolvedTitle
-      };
-
-      bookmarks.unshift(newBm);
-      saveBookmarksToLocal();
-      renderBookmarks();
-      
-      // Reset inputs
+    .then(async (res) => {
+      if (!res.ok) throw new Error();
+      await loadAppState();
       urlInput.value = '';
       titleInput.value = '';
       showToast("Marcador agregado con éxito", "success");
     })
     .catch(err => {
-      showToast(err.message, "error");
+      showToast("Error al guardar marcador", "error");
     })
     .finally(() => {
       btnSave.disabled = false;
@@ -1373,11 +1350,14 @@
     saveBookmarksToLocal();
     renderBookmarks();
 
-    mockFetch(`/api/marcadores/${id}`, {
+    fetch(`${API_BASE}/marcadores/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(bm)
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ url: newUrl, titulo: newTitle })
     })
-    .then(() => {
+    .then(async (res) => {
+      if (!res.ok) throw new Error();
+      await loadAppState();
       showToast("Marcador actualizado", "success");
     })
     .catch(err => {
@@ -1386,7 +1366,7 @@
       bm.url = oldUrl;
       saveBookmarksToLocal();
       renderBookmarks();
-      showToast(err.message, "error");
+      showToast("Error al actualizar", "error");
     });
   }
 
@@ -1401,14 +1381,18 @@
     saveBookmarksToLocal();
     renderBookmarks();
 
-    mockFetch(`/api/marcadores/${id}`, { method: 'DELETE' })
-      .then(() => showToast("Marcador eliminado", "success"))
+    fetch(`${API_BASE}/marcadores/${id}`, { method: 'DELETE', headers: getAuthHeaders() })
+      .then(async (res) => {
+        if (!res.ok) throw new Error();
+        await loadAppState();
+        showToast("Marcador eliminado", "success");
+      })
       .catch(err => {
         // Rollback
         bookmarks.splice(index, 0, bmToDelete);
         saveBookmarksToLocal();
         renderBookmarks();
-        showToast(err.message, "error");
+        showToast("Error al eliminar", "error");
       });
   }
 
@@ -1503,7 +1487,7 @@
      INICIO DE LA APLICACIÓN
      ========================================================================== */
   window.addEventListener('DOMContentLoaded', async () => {
-    await loadAppState();
+    await loadMateriasCursando();
     initPomodoro();
     renderSocial();
   });
