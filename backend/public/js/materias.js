@@ -5,9 +5,32 @@ const API_BASE = '/api';
 // Plan de materias de la carrera, traído desde la base de datos (ver loadPlan())
 let TUP_PLAN = [];
 
-// Trae el plan de materias y correlatividades desde el backend
+// Headers de autenticación (token Sanctum guardado por login.js, en
+// localStorage si se marcó "Recordarme" o en sessionStorage si no)
+function getAuthHeaders() {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': 'Bearer ' + token
+  };
+}
+
+// Mapeo entre el estado que usa la UI ('disponible') y el que guarda la BD ('libre')
+function estadoUiToDb(estadoUi) {
+  return estadoUi === 'disponible' ? 'libre' : estadoUi;
+}
+
+function estadoDbToUi(estadoDb) {
+  return estadoDb === 'libre' ? 'disponible' : estadoDb;
+}
+
+// Trae el plan de materias, correlatividades y el estado de cursada real del
+// usuario autenticado desde el backend
 async function loadPlan() {
-  const response = await fetch(`${API_BASE}/materias?carrera=${encodeURIComponent('Tecnicatura Universitaria en Programación')}`);
+  const response = await fetch(`${API_BASE}/mis-materias?carrera=${encodeURIComponent('Tecnicatura Universitaria en Programación')}`, {
+    headers: getAuthHeaders()
+  });
   if (!response.ok) {
     throw new Error('No se pudo cargar el plan de materias');
   }
@@ -18,6 +41,27 @@ async function loadPlan() {
     name: m.nombre,
     prereq: { cursadas: m.prereq.cursadas, aprobadas: m.prereq.aprobadas }
   }));
+
+  state.subjects = {};
+  data.forEach(m => {
+    state.subjects[m.id] = {
+      status: estadoDbToUi(m.estado),
+      grade: m.nota ?? null
+    };
+  });
+}
+
+// Persiste en la BD el estado de cursada de una materia para el usuario actual
+async function persistSubjectStatus(id, statusUi, grade) {
+  try {
+    await fetch(`${API_BASE}/materias/${id}/estado`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ estado: estadoUiToDb(statusUi), nota: grade ?? null })
+    });
+  } catch (e) {
+    console.error('No se pudo guardar el estado de la materia', e);
+  }
 }
 
 // Estado del módulo
@@ -31,45 +75,9 @@ let state = {
 // Guardar nota temporalmente mientras se abre el modal
 let activeModalSubjectId = null;
 
-// Cargar o inicializar el estado en LocalStorage
-function loadSubjectsState() {
-  const saved = localStorage.getItem('cursus_subjects_state');
-  if (saved) {
-    state.subjects = JSON.parse(saved);
-  } else {
-    // Inicializar perfil simulado de estudiante de 2° año:
-    // Aprobó varias de 1° año e hizo regular algunas otras. Está cursando de 2° año.
-    TUP_PLAN.forEach(sub => {
-      let status = 'disponible';
-      let grade = null;
-      
-      if (sub.id === 1) { status = 'aprobada'; grade = 9; }
-      else if (sub.id === 2) { status = 'aprobada'; grade = 8; }
-      else if (sub.id === 3) { status = 'aprobada'; grade = 7; }
-      else if (sub.id === 4) { status = 'aprobada'; grade = 8; }
-      else if (sub.id === 8) { status = 'aprobada'; grade = 9; }
-      else if (sub.id === 5) { status = 'regular'; }
-      else if (sub.id === 6) { status = 'regular'; }
-      else if (sub.id === 7) { status = 'regular'; }
-      else if (sub.id === 9) { status = 'cursando'; }
-      else if (sub.id === 10) { status = 'cursando'; }
-      else if (sub.id === 11) { status = 'cursando'; }
-      else if (sub.id === 12) { status = 'cursando'; }
-      
-      state.subjects[sub.id] = { status, grade };
-    });
-    saveSubjectsState();
-  }
-}
-
-function saveSubjectsState() {
-  localStorage.setItem('cursus_subjects_state', JSON.stringify(state.subjects));
-}
-
 // Inicialización de la vista
 document.addEventListener('DOMContentLoaded', async () => {
   await loadPlan();
-  loadSubjectsState();
 
   // Si la URL tiene el hash '#plan', cambiar automáticamente a la pestaña del plan
   if (window.location.hash === '#plan' || window.location.search.includes('tab=plan')) {
@@ -127,10 +135,10 @@ window.changeSubjectStatus = function(id, newStatus) {
     // Cambiar estado directamente
     state.subjects[id].status = newStatus;
     state.subjects[id].grade = null;
-    
+    persistSubjectStatus(id, newStatus, null);
+
     // Ejecutar verificación en cascada para bloquear materias que dependían de esta
     cascadeVerifications();
-    saveSubjectsState();
     updateUI();
   }
 };
@@ -139,15 +147,15 @@ window.changeSubjectStatus = function(id, newStatus) {
 window.closeGradeModal = function(shouldSave) {
   const modal = document.getElementById('grade-modal');
   modal.classList.remove('open');
-  
+
   if (shouldSave && activeModalSubjectId !== null) {
     const gradeVal = parseInt(document.getElementById('grade-select').value);
-    
+
     state.subjects[activeModalSubjectId].status = 'aprobada';
     state.subjects[activeModalSubjectId].grade = gradeVal;
-    
+    persistSubjectStatus(activeModalSubjectId, 'aprobada', gradeVal);
+
     cascadeVerifications();
-    saveSubjectsState();
     updateUI();
   }
   activeModalSubjectId = null;
@@ -165,6 +173,7 @@ function cascadeVerifications() {
         // La materia ya no cumple sus correlativas, bajar a disponible
         subState.status = 'disponible';
         subState.grade = null;
+        persistSubjectStatus(sub.id, 'disponible', null);
         changed = true;
       }
     });

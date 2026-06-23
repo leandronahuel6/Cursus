@@ -113,6 +113,21 @@ class AuthController extends Controller
             'email' => [__($status)],
         ]);
     }
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $data = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'legajo' => 'nullable|string|max:255|unique:users,legajo,' . $user->id,
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ]);
+
+        $user->update($data);
+
+        return response()->json($user);
+    }
+
     public function changePassword(Request $request){
         $request->validate([
         'current_password' => 'required',

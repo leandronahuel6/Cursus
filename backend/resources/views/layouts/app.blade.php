@@ -59,7 +59,7 @@
 
     <!-- Menú de perfil (aparece hacia arriba al hacer clic) -->
     <div class="profile-menu" id="profile-menu">
-      <button class="profile-menu-item" onclick="location.href='#'">
+      <button class="profile-menu-item" onclick="window.openProfileModal()">
         <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
           <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4"/>
           <path d="M8 1v1M8 14v1M1 8h1M14 8h1M2.9 2.9l.7.7M12.4 12.4l.7.7M2.9 13.1l.7-.7M12.4 3.6l.7-.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
@@ -168,6 +168,46 @@
         <div class="contact-footer">
           <button type="button" class="contact-btn-cancel" onclick="window.closeContactModal()">Cancelar</button>
           <button type="submit" class="contact-btn-send">Enviar mensaje</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Perfil -->
+<div class="contact-overlay" id="profile-edit-overlay">
+  <div class="contact-box">
+    <div class="contact-header">
+      <div class="contact-title">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="3" stroke="var(--brand)" stroke-width="1.4"/>
+          <path d="M8 1v1M8 14v1M1 8h1M14 8h1M2.9 2.9l.7.7M12.4 12.4l.7.7M2.9 13.1l.7-.7M12.4 3.6l.7-.7" stroke="var(--brand)" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        Editar perfil
+      </div>
+      <button class="contact-close" onclick="window.closeProfileModal()">✕</button>
+    </div>
+    <div class="contact-body">
+      <p class="contact-subtitle">Actualizá tus datos personales.</p>
+      <form id="profile-edit-form" onsubmit="window.handleProfileSubmit(event)">
+        <div class="contact-field">
+          <label for="profile-nombre">Nombre completo</label>
+          <input type="text" id="profile-nombre" class="contact-input" placeholder="Ej: Juan Pérez" required>
+          <span id="profile-nombre-error" class="error-message"></span>
+        </div>
+        <div class="contact-field">
+          <label for="profile-legajo">Legajo</label>
+          <input type="text" id="profile-legajo" class="contact-input" placeholder="Ej: 12345">
+          <span id="profile-legajo-error" class="error-message"></span>
+        </div>
+        <div class="contact-field">
+          <label for="profile-email">Email</label>
+          <input type="email" id="profile-email" class="contact-input" placeholder="nombre@ejemplo.com" required>
+          <span id="profile-email-error" class="error-message"></span>
+        </div>
+        <div class="contact-footer">
+          <button type="button" class="contact-btn-cancel" onclick="window.closeProfileModal()">Cancelar</button>
+          <button type="submit" class="contact-btn-send">Guardar cambios</button>
         </div>
       </form>
     </div>
