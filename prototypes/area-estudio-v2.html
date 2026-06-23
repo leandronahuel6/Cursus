@@ -890,10 +890,19 @@
     .mob-row { display: flex; align-items: center; gap: 8px; }
 
     .bnav { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: #fff; border-top: 1px solid var(--border); z-index: 100; }
-    .bnav-row { display: flex; height: 100%; }
-    .bn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9.5px; color: var(--t3); gap: 2px; }
+    .bnav-row { display: flex; height: 100%; max-width: 500px; margin: 0 auto; gap: 12px; padding: 0 16px; }
+    .bn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9.5px; color: var(--t3); gap: 2px; cursor: pointer; position: relative; }
     .bn.on { color: var(--brand); font-weight: 600; }
-    .bn-ic { font-size: 16px; line-height: 1; }
+    .bn-ic { width: 16px; height: 16px; display: block; opacity: 0.45; transition: opacity .15s; }
+    .bn.on .bn-ic { opacity: 1; }
+    .bn:hover:not(.on) .bn-ic { opacity: 0.8; }
+    .bn-badge {
+      position: absolute; top: 5px; right: calc(50% - 15px);
+      background: #ef4444; color: #fff;
+      font-size: 8px; font-weight: 700;
+      padding: 0 4px; border-radius: 10px;
+      line-height: 1.6;
+    }
 
     /* ==========================================================================
        RESPONSIVE DESIGN (MEDIA QUERIES)
@@ -1242,11 +1251,39 @@
   <!-- BOTTOM NAV (mobile) -->
   <nav class="bnav">
     <div class="bnav-row">
-      <div class="bn" onclick="location.href='index.html'"><span class="bn-ic">⊞</span>Inicio</div>
-      <div class="bn" onclick="location.href='materias.html'"><span class="bn-ic">📚</span>Materias</div>
-      <div class="bn on" onclick="location.href='area-estudio-v2.html'"><span class="bn-ic">⏱</span>Estudio</div>
-      <div class="bn" onclick="location.href='horarios.html'"><span class="bn-ic">📅</span>Horarios</div>
-      <div class="bn" onclick="location.href='alertas.html'"><span class="bn-ic">🔔</span>Alertas<span class="bn-bdg">2</span></div>
+      <div class="bn" onclick="location.href='index.html'">
+        <img class="bn-ic" src="../backend/resources/icons/layout-dashboard.svg" alt="Inicio">
+        Inicio
+      </div>
+      <div class="bn" onclick="location.href='materias.html'">
+        <img class="bn-ic" src="../backend/resources/icons/book-copy.svg" alt="Materias">
+        Materias
+      </div>
+      <div class="bn on" onclick="location.href='area-estudio-v2.html'">
+        <img class="bn-ic" src="../backend/resources/icons/timer.svg" alt="Estudio">
+        Estudio
+      </div>
+      <div class="bn" onclick="location.href='horarios.html'">
+        <img class="bn-ic" src="../backend/resources/icons/calendar.svg" alt="Horarios">
+        Horarios
+      </div>
+      <div class="bn" onclick="location.href='beneficios.html'">
+        <img class="bn-ic" src="../backend/resources/icons/wallet.svg" alt="Beneficios">
+        Beneficios
+      </div>
+      <div class="bn" onclick="location.href='alertas.html'">
+        <img class="bn-ic" src="../backend/resources/icons/bell.svg" alt="Alertas">
+        Alertas
+        <span class="bn-badge">2</span>
+      </div>
+      <div class="bn" onclick="location.href='progreso.html'">
+        <img class="bn-ic" src="../backend/resources/icons/chart-line.svg" alt="Progreso">
+        Progreso
+      </div>
+      <div class="bn" id="bn-profile" onclick="window.toggleMobileProfileMenu(event)">
+        <img class="bn-ic" src="../backend/resources/icons/user.svg" alt="Perfil">
+        Perfil
+      </div>
     </div>
   </nav>
 

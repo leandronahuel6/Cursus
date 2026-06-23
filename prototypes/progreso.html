@@ -546,20 +546,37 @@
   <nav class="bnav">
     <div class="bnav-row">
       <div class="bn" onclick="location.href='index.html'">
-        <span class="bn-ic">⊞</span>Inicio
+        <img class="bn-ic" src="../backend/resources/icons/layout-dashboard.svg" alt="Inicio">
+        Inicio
       </div>
       <div class="bn" onclick="location.href='materias.html'">
-        <span class="bn-ic">📚</span>Materias
+        <img class="bn-ic" src="../backend/resources/icons/book-copy.svg" alt="Materias">
+        Materias
       </div>
       <div class="bn" onclick="location.href='area-estudio.html'">
-        <span class="bn-ic">⏱</span>Estudio
+        <img class="bn-ic" src="../backend/resources/icons/timer.svg" alt="Estudio">
+        Estudio
       </div>
       <div class="bn" onclick="location.href='horarios.html'">
-        <span class="bn-ic">📅</span>Horarios
+        <img class="bn-ic" src="../backend/resources/icons/calendar.svg" alt="Horarios">
+        Horarios
+      </div>
+      <div class="bn" onclick="location.href='beneficios.html'">
+        <img class="bn-ic" src="../backend/resources/icons/wallet.svg" alt="Beneficios">
+        Beneficios
       </div>
       <div class="bn" onclick="location.href='alertas.html'">
-        <span class="bn-ic">🔔</span>Alertas
+        <img class="bn-ic" src="../backend/resources/icons/bell.svg" alt="Alertas">
+        Alertas
         <span class="bn-badge" id="bnav-badge-count">0</span>
+      </div>
+      <div class="bn on" onclick="location.href='progreso.html'">
+        <img class="bn-ic" src="../backend/resources/icons/chart-line.svg" alt="Progreso">
+        Progreso
+      </div>
+      <div class="bn" id="bn-profile" onclick="window.toggleMobileProfileMenu(event)">
+        <img class="bn-ic" src="../backend/resources/icons/user.svg" alt="Perfil">
+        Perfil
       </div>
     </div>
   </nav>

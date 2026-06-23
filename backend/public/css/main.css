@@ -708,13 +708,20 @@ h1, h2, h3, h4, h5, h6, .display-text {
 .bnav {
   display: none;
   position: fixed; bottom: 0; left: 0; right: 0;
-  height: 60px;
+  height: 50px;
   background: rgba(255,255,255,.93);
   backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
   z-index: 100;
 }
-.bnav-row { display: flex; height: 100%; }
+.bnav-row {
+  display: flex;
+  height: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  gap: 12px;
+  padding: 0 16px;
+}
 .bn {
   flex: 1;
   display: flex; flex-direction: column;
@@ -723,8 +730,16 @@ h1, h2, h3, h4, h5, h6, .display-text {
   cursor: pointer; transition: color .15s; position: relative;
 }
 .bn.on { color: var(--brand); }
+.bn.on .bn-ic { opacity: 1; }
 .bn:hover:not(.on) { color: var(--t3); }
-.bn-ic { font-size: 19px; line-height: 1; }
+.bn:hover:not(.on) .bn-ic { opacity: 0.8; }
+.bn-ic {
+  width: 16px;
+  height: 16px;
+  display: block;
+  opacity: 0.45;
+  transition: opacity 0.15s;
+}
 .bn-badge {
   position: absolute; top: 5px; right: calc(50% - 15px);
   background: #ef4444; color: #fff;
@@ -2275,13 +2290,13 @@ h1, h2, h3, h4, h5, h6, .display-text {
   }
 
   .page  { padding: 13px 12px 76px; gap: 13px; }
-  .stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stats { grid-template-columns: 1fr !important; gap: 8px; }
   .dash  { grid-template-columns: 1fr; gap: 13px; }
   .col.right { order: -1; }
   .mats-grid { grid-template-columns: 1fr; }
 
-  .bnav { display: flex; }
-  .bn-ic { font-size: 20px; }
+  .bnav { display: block; }
+  .bn-ic { font-size: 16px; }
   .bn-lbl {
     display: block;
     font-size: 9px;
@@ -2316,6 +2331,35 @@ h1, h2, h3, h4, h5, h6, .display-text {
   .progression-grid { grid-template-columns: 1fr; gap: 10px; }
   .subjects-layout-grid { grid-template-columns: 1fr; }
   .tree-nodes-list { grid-template-columns: 1fr; }
+
+  /* Mi Progreso Mobile overrides */
+  .svg-chart {
+    width: 100% !important;
+    height: auto !important;
+  }
+  .formula-hd {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .bar-legend {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+  .sim-row {
+    padding: 12px 14px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .sim-subject-name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    font-size: 13px;
+    line-height: 1.3;
+  }
+  .chart-container {
+    height: auto !important;
+  }
 }
 
 /* ==============================
@@ -3194,11 +3238,16 @@ h1, h2, h3, h4, h5, h6, .display-text {
 }
 .time-col-hdr {
   width: 60px;
-  flex-grow: 0;
-  flex-shrink: 0;
+  flex: 0 0 60px;
   text-align: center;
   padding-right: 0;
   color: var(--tm);
+  position: -webkit-sticky;
+  position: sticky;
+  left: -1px;
+  z-index: 10;
+  background: #f9fafb;
+  border-right: 1px solid var(--border);
 }
 
 /* Grid Body */
@@ -3209,9 +3258,13 @@ h1, h2, h3, h4, h5, h6, .display-text {
 }
 .grid-time-axis {
   width: 60px;
-  flex-shrink: 0;
-  flex-grow: 0;
+  flex: 0 0 60px;
   background: #f9fafb;
+  position: -webkit-sticky;
+  position: sticky;
+  left: -1px;
+  z-index: 10;
+  border-right: 1px solid var(--border);
 }
 .grid-time-lbl-cell {
   text-align: right;
@@ -3221,7 +3274,7 @@ h1, h2, h3, h4, h5, h6, .display-text {
   font-weight: 700;
   display: flex;
   align-items: flex-start;
-  justify-content: flex-end;
+  justify-content: center;
 }
 .grid-time-lbl-cell span {
   transform: translateY(-50%); /* Alinear con las líneas horizontales */
@@ -3632,16 +3685,33 @@ h1, h2, h3, h4, h5, h6, .display-text {
     max-width: 100% !important;
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
-    padding: 12px 10px !important;
+    padding: 12px 0 !important;
     box-sizing: border-box !important;
+    transform: rotateX(180deg);
+  }
+  /* Estilos para que el scrollbar quede visible e interactivo arriba */
+  .sched-canvas-card::-webkit-scrollbar {
+    height: 6px;
+  }
+  .sched-canvas-card::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 10px;
+  }
+  .sched-canvas-card::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+  }
+  .sched-canvas-card::-webkit-scrollbar-thumb:hover {
+    background: var(--brand);
   }
   .sched-weekly-grid {
     min-width: 800px !important;
+    transform: rotateX(180deg);
   }
 
   /* Overlap conflict banner styling on mobile/tablet */
   .sched-alert-banner {
-    display: flex !important;
+    display: flex;
     align-items: flex-start !important;
     gap: 8px !important;
     padding: 10px 14px !important;
@@ -3924,4 +3994,9 @@ h1, h2, h3, h4, h5, h6, .display-text {
   .sched-drag-card {
     width: calc(50% - 4px) !important; /* 2 columns on mobile */
   }
+}
+
+/* Dark Mode Navigation Icons Override */
+body.dark-mode .bn-ic {
+  filter: invert(1);
 }

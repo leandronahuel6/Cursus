@@ -641,7 +641,7 @@
     .mob-row { display: flex; align-items: center; gap: 8px; }
 
     .bnav { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: #fff; border-top: 1px solid var(--border); z-index: 100; }
-    .bnav-row { display: flex; height: 100%; }
+    .bnav-row { display: flex; height: 100%; max-width: 500px; margin: 0 auto; gap: 12px; padding: 0 16px; }
     .bn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9.5px; color: var(--t3); gap: 2px; }
     .bn.on { color: var(--brand); font-weight: 600; }
     .bn-ic { font-size: 16px; line-height: 1; }
