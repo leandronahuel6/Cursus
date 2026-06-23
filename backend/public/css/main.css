@@ -810,7 +810,7 @@ h1, h2, h3, h4, h5, h6, .display-text {
 .panel.on { display: block; }
 
 /* KANBAN */
-.kanban { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; padding: 16px 0 0; }
+.kanban { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
 .kbcol {
   background: var(--bg); border: 1px solid var(--border);
   border-radius: var(--r-lg); padding: 12px;
@@ -856,11 +856,11 @@ h1, h2, h3, h4, h5, h6, .display-text {
 .kb-add:hover { border-color: var(--brand-dim); color: var(--brand); background: var(--brand-light); }
 
 /* MARCADORES */
-.bmwrap { padding: 16px 0 0; }
+.bmwrap { }
 .bm-form {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--r-lg); padding: 13px 15px;
-  margin-bottom: 12px; box-shadow: var(--sh);
+  box-shadow: var(--sh);
 }
 .bm-form-title { font-size: 12px; font-weight: 600; color: var(--t1); margin-bottom: 10px; }
 .bm-row { display: flex; gap: 8px; }
