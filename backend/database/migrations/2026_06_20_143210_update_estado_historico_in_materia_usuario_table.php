@@ -14,9 +14,11 @@ return new class extends Migration
     {
         DB::statement("ALTER TABLE materia_usuario MODIFY estado_historico ENUM('libre', 'regular', 'aprobada', 'cursando') NOT NULL DEFAULT 'libre'");
 
-        Schema::table('materia_usuario', function (Blueprint $table) {
-            $table->dropColumn('cursando_actualmente');
-        });
+        if (Schema::hasColumn('materia_usuario', 'cursando_actualmente')) {
+            Schema::table('materia_usuario', function (Blueprint $table) {
+                $table->dropColumn('cursando_actualmente');
+            });
+        }
     }
 
     /**
@@ -24,9 +26,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('materia_usuario', function (Blueprint $table) {
-            $table->boolean('cursando_actualmente')->default(false);
-        });
+        if (!Schema::hasColumn('materia_usuario', 'cursando_actualmente')) {
+            Schema::table('materia_usuario', function (Blueprint $table) {
+                $table->boolean('cursando_actualmente')->default(false);
+            });
+        }
 
         DB::statement("ALTER TABLE materia_usuario MODIFY estado_historico ENUM('libre', 'regular', 'aprobada') NOT NULL DEFAULT 'libre'");
     }
