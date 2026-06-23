@@ -36,7 +36,7 @@
       <div class="sched-panel-section">
         <div class="sched-section-hd">
           <span>Materias Disponibles (A cursar)</span>
-          <span class="sched-badge-count" id="count-available-subjects">6</span>
+          <span class="sched-badge-count" id="count-available-subjects">0</span>
         </div>
         <div class="sched-draggable-list" id="list-available-subjects">
           <!-- Se poblará dinámicamente con JS -->

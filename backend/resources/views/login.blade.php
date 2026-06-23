@@ -11,13 +11,13 @@
         <div class="login-layout">
             <!-- Columna izquierda: formulario -->
             <div class="login-form-side">
-                <div class="login-logo">
+                <a href="{{ route('welcome') }}" class="login-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
                     <div class="login-logo-icon"><img src="{{ asset('assets/icons/cursus-logo.svg') }}" alt="Cursus"></div>
                     <div class="login-logo-text">
                         Cursus
                         <small>Tec. en Programación</small>
                     </div>
-                </div>
+                </a>
     
                 <div class="login-form-wrap">
                     <div class="login-form-header">

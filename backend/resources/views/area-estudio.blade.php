@@ -9,10 +9,10 @@
 @section('mobile-header')
 <div class="mob-hdr">
 <div class="mob-lbl">Área de Estudio</div>
-      <div class="mob-name" id="mob-materia-name">Programación II</div>
+      <div class="mob-name" id="mob-materia-name">—</div>
       <div class="mob-row">
         <span class="badge b-reg" id="mob-materia-badge">Regular</span>
-        <span style="font-size:11px;color:#6b7280" id="mob-materia-meta">2° año · 2024</span>
+        <span style="font-size:11px;color:#6b7280" id="mob-materia-meta">Cargando...</span>
       </div>
 </div>
 @endsection
@@ -21,9 +21,7 @@
 <div class="breadcrumb">
         <a href="index.html">Inicio</a>
         <span class="sep">›</span>
-        <span>Área de Estudio</span>
-        <span class="sep">›</span>
-        <span class="cur" id="tb-materia-name">Programación II</span>
+        <span class="cur">Área de Estudio</span>
       </div>
       <div class="tb-right">
       </div>
@@ -47,11 +45,11 @@
         </div>
         <div class="mat-chips">
           <div class="mat-chip">
-            <div class="mat-chip-v" id="chip-stat-hours">8h</div>
+            <div class="mat-chip-v" id="chip-stat-hours">—</div>
             <div class="mat-chip-l">esta semana</div>
           </div>
           <div class="mat-chip">
-            <div class="mat-chip-v" id="chip-stat-pomos">23</div>
+            <div class="mat-chip-v" id="chip-stat-pomos">—</div>
             <div class="mat-chip-l">🍅 totales</div>
           </div>
           <div class="mat-chip">

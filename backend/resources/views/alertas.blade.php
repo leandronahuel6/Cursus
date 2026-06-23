@@ -140,6 +140,23 @@
           </div>
 
           <div class="alert-form-group">
+            <label for="alert-color">Color para pintar el día en calendario</label>
+            <input type="hidden" id="alert-color" value="#2563eb">
+            <div class="alert-color-palette" id="alert-color-palette" role="radiogroup" aria-label="Selector de color de alerta">
+              <button type="button" class="alert-color-swatch selected" data-color="#2563eb" aria-label="Azul" title="Azul"></button>
+              <button type="button" class="alert-color-swatch" data-color="#0ea5e9" aria-label="Celeste" title="Celeste"></button>
+              <button type="button" class="alert-color-swatch" data-color="#14b8a6" aria-label="Turquesa" title="Turquesa"></button>
+              <button type="button" class="alert-color-swatch" data-color="#22c55e" aria-label="Verde" title="Verde"></button>
+              <button type="button" class="alert-color-swatch" data-color="#84cc16" aria-label="Lima" title="Lima"></button>
+              <button type="button" class="alert-color-swatch" data-color="#eab308" aria-label="Amarillo" title="Amarillo"></button>
+              <button type="button" class="alert-color-swatch" data-color="#f97316" aria-label="Naranja" title="Naranja"></button>
+              <button type="button" class="alert-color-swatch" data-color="#ef4444" aria-label="Rojo" title="Rojo"></button>
+              <button type="button" class="alert-color-swatch" data-color="#ec4899" aria-label="Rosa" title="Rosa"></button>
+              <button type="button" class="alert-color-swatch" data-color="#8b5cf6" aria-label="Violeta" title="Violeta"></button>
+            </div>
+          </div>
+
+          <div class="alert-form-group">
             <label for="alert-date">Fecha de Vencimiento</label>
             <input type="date" id="alert-date" class="alert-form-input" required>
           </div>

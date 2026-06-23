@@ -373,12 +373,7 @@
       logList.appendChild(div);
     });
 
-    // Actualizar chips superiores
-    document.getElementById('chip-stat-pomos').textContent = pomoCycles.sesiones_completadas_hoy;
-    // Simular horas (1 pomo completo son 25 min, etc.)
-    const totalMinutes = pomoCycles.sesiones_completadas_hoy * pomoSettings.focusTime;
-    const hours = (totalMinutes / 60).toFixed(1);
-    document.getElementById('chip-stat-hours').textContent = `${hours}h`;
+    // Las estadísticas superiores se actualizan con datos reales del backend (loadMateriaResumen).
   }
 
   function startTicker() {
@@ -1536,12 +1531,7 @@ let selectedMateriaId = null;
 
 async function loadMateriasCursando() {
   try {
-    const response = await fetch('/api/mis-materias', { 
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer ' + localStorage.getItem('token')
-      }
-    });
+    const response = await fetch('/api/mis-materias', { headers: getAuthHeaders() });
     if (!response.ok) throw new Error('No se pudieron cargar las materias');
     const data = await response.json();
     materiasCursando = data.filter(m => m.estado === 'cursando');
@@ -1628,6 +1618,12 @@ function selectMateria(id) {
 
   const materia = materiasCursando.find(m => m.id === id);
   document.getElementById('mat-selector-name').textContent = materia ? materia.nombre : '—';
+  document.getElementById('mob-materia-name').textContent = materia ? materia.nombre : '—';
+  document.getElementById('mob-materia-meta').textContent = materia ? `Nivel ${materia.nivel ?? '—'}` : '—';
+
+  // Evita mostrar datos viejos mientras llega el resumen real de la materia seleccionada.
+  document.getElementById('chip-stat-hours').textContent = '—';
+  document.getElementById('chip-stat-pomos').textContent = '—';
 
   renderMateriaDropdown();
   closeMateriaDropdown();
