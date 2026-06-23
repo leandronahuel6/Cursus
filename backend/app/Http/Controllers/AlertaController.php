@@ -23,8 +23,13 @@ class AlertaController extends Controller
             'titulo' => 'required|string|max:255',
             'descripcion' => 'nullable|string|max:255',
             'fecha' => 'required|date',
+            'color' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'prioridad' => 'required|in:baja,media,alta',
         ]);
+
+        if (isset($data['color'])) {
+            $data['color'] = strtolower($data['color']);
+        }
 
         $alerta = Alerta::create([
             ...$data,
@@ -43,8 +48,13 @@ class AlertaController extends Controller
             'titulo' => 'sometimes|string|max:255',
             'descripcion' => 'sometimes|nullable|string|max:255',
             'fecha' => 'sometimes|date',
+            'color' => ['sometimes', 'nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'prioridad' => 'sometimes|in:baja,media,alta',
         ]);
+
+        if (array_key_exists('color', $data) && $data['color'] !== null) {
+            $data['color'] = strtolower($data['color']);
+        }
 
         $alerta->update($data);
 

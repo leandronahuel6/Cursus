@@ -185,6 +185,18 @@ function renderAvailablePanels() {
   const subjectsList = document.getElementById('list-available-subjects');
   subjectsList.innerHTML = '';
 
+  const countBadge = document.getElementById('count-available-subjects');
+  if (countBadge) {
+    countBadge.textContent = String(AVAILABLE_SUBJECTS.length);
+  }
+
+  if (AVAILABLE_SUBJECTS.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'sched-empty-note';
+    empty.textContent = 'No tenes materias en estado cursando. Cambialas desde Mis Materias para poder agregarlas al horario.';
+    subjectsList.appendChild(empty);
+  }
+
   AVAILABLE_SUBJECTS.forEach(sub => {
     const card = document.createElement('div');
     card.className = 'sched-drag-card';

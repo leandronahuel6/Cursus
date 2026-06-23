@@ -12,6 +12,7 @@ class Alerta extends Model
         'titulo',
         'descripcion',
         'fecha',
+        'color',
         'prioridad',
         'completada',
     ];

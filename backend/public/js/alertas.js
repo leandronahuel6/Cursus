@@ -16,6 +16,49 @@ function todayDateStr() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+const CATEGORY_DEFAULT_COLOR = {
+  academic: '#2563eb',
+  administrative: '#f97316',
+  personal: '#10b981'
+};
+
+const ALERT_COLOR_PALETTE = [
+  '#2563eb',
+  '#0ea5e9',
+  '#14b8a6',
+  '#22c55e',
+  '#84cc16',
+  '#eab308',
+  '#f97316',
+  '#ef4444',
+  '#ec4899',
+  '#8b5cf6'
+];
+
+let alertPopupTimer = null;
+
+function showAlertPopup(message, type = 'success') {
+  let popup = document.getElementById('alert-popup-notification');
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'alert-popup-notification';
+    popup.className = 'alert-popup-notification';
+    document.body.appendChild(popup);
+  }
+
+  popup.className = `alert-popup-notification ${type}`;
+  popup.textContent = message;
+  popup.classList.add('show');
+
+  if (alertPopupTimer) {
+    clearTimeout(alertPopupTimer);
+  }
+
+  alertPopupTimer = setTimeout(() => {
+    popup.classList.remove('show');
+  }, 2600);
+}
+
 // Estado global de la aplicación
 let state = {
   view: 'list', // list or calendar
@@ -36,7 +79,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const dateInput = document.getElementById('alert-date');
   if (dateInput) dateInput.value = todayDateStr();
+
+  const colorInput = document.getElementById('alert-color');
+  if (colorInput) colorInput.value = ALERT_COLOR_PALETTE[0];
+
+  setupColorPalette();
 });
+
+function setupColorPalette() {
+  const colorInput = document.getElementById('alert-color');
+  const swatches = Array.from(document.querySelectorAll('.alert-color-swatch'));
+  if (!colorInput || swatches.length === 0) return;
+
+  const selectColor = (color) => {
+    const normalized = (color || '').toLowerCase();
+    colorInput.value = normalized;
+
+    swatches.forEach((swatch) => {
+      const isSelected = swatch.dataset.color.toLowerCase() === normalized;
+      swatch.classList.toggle('selected', isSelected);
+      swatch.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+    });
+  };
+
+  swatches.forEach((swatch) => {
+    swatch.setAttribute('role', 'radio');
+    swatch.setAttribute('aria-checked', 'false');
+
+    swatch.addEventListener('click', () => {
+      selectColor(swatch.dataset.color);
+    });
+  });
+
+  selectColor(colorInput.value || ALERT_COLOR_PALETTE[0]);
+}
 
 async function loadAlertas() {
   try {
@@ -79,10 +155,10 @@ window.handleCuotaSubmit = async function(event) {
     });
     if (!response.ok) throw new Error('No se pudo guardar el monto');
 
-    alert('¡Monto de la cuota actualizado!');
+    showAlertPopup('Monto de cuota actualizado con éxito.', 'success');
   } catch (e) {
     console.error(e);
-    alert('No se pudo guardar el monto. Intentá de nuevo.');
+    showAlertPopup('No se pudo guardar el monto. Intentá de nuevo.', 'error');
   }
 };
 
@@ -153,7 +229,7 @@ window.closePagoModal = function() {
 window.confirmarPago = async function() {
   const fecha = document.getElementById('pago-fecha').value;
   if (!fecha) {
-    alert('Elegí una fecha de pago.');
+    showAlertPopup('Elegí una fecha de pago.', 'info');
     return;
   }
 
@@ -168,10 +244,10 @@ window.confirmarPago = async function() {
     const estado = await response.json();
     renderEstadoPagoCuota(estado);
     window.closePagoModal();
-    alert('¡Pago registrado con éxito!');
+    showAlertPopup('Pago registrado con éxito.', 'success');
   } catch (e) {
     console.error(e);
-    alert('No se pudo registrar el pago. Intentá de nuevo.');
+    showAlertPopup('No se pudo registrar el pago. Intentá de nuevo.', 'error');
   }
 };
 
@@ -210,8 +286,10 @@ window.completeAlert = async function(id) {
       headers: getAuthHeaders(),
       body: JSON.stringify({ completada: true })
     });
+    showAlertPopup('Alerta marcada como completada.', 'success');
   } catch (e) {
     console.error('No se pudo marcar la alerta como completada', e);
+    showAlertPopup('No se pudo completar la alerta.', 'error');
   }
 };
 
@@ -222,8 +300,10 @@ window.deleteAlert = async function(id) {
 
   try {
     await fetch(`${API_BASE}/alertas/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+    showAlertPopup('Alerta eliminada.', 'success');
   } catch (e) {
     console.error('No se pudo eliminar la alerta', e);
+    showAlertPopup('No se pudo eliminar la alerta.', 'error');
   }
 };
 
@@ -235,6 +315,7 @@ window.handleAlertSubmit = async function(event) {
   const categoria = document.getElementById('alert-type').value;
   const prioridad = document.getElementById('alert-priority').value;
   const fecha = document.getElementById('alert-date').value;
+  const color = (document.getElementById('alert-color').value || '').trim();
   if (!titulo || !fecha) return;
 
   try {
@@ -246,6 +327,7 @@ window.handleAlertSubmit = async function(event) {
         categoria,
         prioridad,
         fecha,
+        color,
         descripcion: `Cargada manualmente para la fecha límite ${formatDateStr(fecha)}.`
       })
     });
@@ -258,11 +340,14 @@ window.handleAlertSubmit = async function(event) {
     document.getElementById('alert-type').value = 'academic';
     document.getElementById('alert-priority').value = 'alta';
     document.getElementById('alert-date').value = todayDateStr();
+    const colorInput = document.getElementById('alert-color');
+    if (colorInput) colorInput.value = ALERT_COLOR_PALETTE[0];
+    setupColorPalette();
 
-    alert('¡Alerta programada con éxito!');
+    showAlertPopup('Alerta creada con éxito.', 'success');
   } catch (e) {
     console.error(e);
-    alert('No se pudo guardar la alerta. Intentá de nuevo.');
+    showAlertPopup('No se pudo guardar la alerta. Intentá de nuevo.', 'error');
   }
 };
 
@@ -371,6 +456,7 @@ function categoriaIcon(categoria) {
 function createAlertCardHTML(alerta, diffDays) {
   const card = document.createElement('div');
   card.className = 'alert-item-card';
+  const resolvedColor = resolveAlertColor(alerta);
 
   let dateText = '';
   let dateClass = '';
@@ -396,6 +482,7 @@ function createAlertCardHTML(alerta, diffDays) {
       <div class="alert-item-title">${alerta.titulo}</div>
       <div class="alert-item-desc">${alerta.descripcion || ''}</div>
       <div class="alert-item-meta">
+        <span class="alert-color-chip" style="background: ${resolvedColor};" title="Color de la alerta"></span>
         <span class="alert-priority-badge alert-priority-${alerta.prioridad}">${alerta.prioridad}</span>
         <span class="alert-date-badge" ${dateClass}>
           ⏱️ ${dateText}
@@ -477,16 +564,10 @@ function renderCalendar() {
     if (dayAlerts.length > 0) {
       cell.classList.add('has-alerts');
 
-      const dotsRow = document.createElement('div');
-      dotsRow.className = 'calendar-dots-row';
-
-      const categorias = [...new Set(dayAlerts.map(a => a.categoria))].slice(0, 3);
-      categorias.forEach(cat => {
-        const dot = document.createElement('div');
-        dot.className = `dot dot-${cat}`;
-        dotsRow.appendChild(dot);
-      });
-      cell.appendChild(dotsRow);
+      const colors = dayAlerts.map(resolveAlertColor);
+      const dayPaint = buildDaySplitBackground(colors);
+      // Capa blanca suave para que el número del día se siga leyendo aunque el color sea intenso.
+      cell.style.backgroundImage = `linear-gradient(rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.38)), ${dayPaint}`;
     }
 
     cell.onclick = (e) => {
@@ -511,6 +592,27 @@ function renderCalendar() {
     cell.innerText = i;
     container.appendChild(cell);
   }
+}
+
+function resolveAlertColor(alerta) {
+  return alerta.color || CATEGORY_DEFAULT_COLOR[alerta.categoria] || '#2563eb';
+}
+
+function buildDaySplitBackground(colors) {
+  if (colors.length === 1) {
+    return `linear-gradient(${colors[0]}, ${colors[0]})`;
+  }
+
+  const step = 100 / colors.length;
+  const stops = colors
+    .map((color, index) => {
+      const start = (index * step).toFixed(3);
+      const end = ((index + 1) * step).toFixed(3);
+      return `${color} ${start}% ${end}%`;
+    })
+    .join(', ');
+
+  return `conic-gradient(${stops})`;
 }
 
 // Al tocar un día con alertas, se abre un detalle anclado a esa misma celda

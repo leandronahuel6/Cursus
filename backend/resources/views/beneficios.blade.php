@@ -459,13 +459,7 @@
 @section('mobile-header')
   <!-- Mobile Header -->
   <div class="mob-hdr">
-    <div class="mob-greet" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-      <span>Beneficios Estudiantiles 🎁</span>
-      <button id="theme-toggle-mob" class="theme-toggle-btn" title="Cambiar tema" style="width: 32px; height: 32px;">
-        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-      </button>
-    </div>
+    <div class="mob-greet">Beneficios Estudiantiles 🎁</div>
     <div class="mob-sub">Tus herramientas y becas universitarias</div>
   </div>
 @endsection
@@ -473,10 +467,6 @@
 @section('topbar-content')
   <div class="topbar-title">Beneficios Estudiantiles <span>🎁</span></div>
   <div class="tb-actions" style="display: flex; align-items: center; gap: 12px;">
-    <button id="theme-toggle" class="theme-toggle-btn" title="Cambiar tema">
-      <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-      <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-    </button>
     <div class="streak-chip">🔥 8 días de racha</div>
   </div>
 @endsection
@@ -930,37 +920,6 @@
             });
         });
 
-        // ================= CONTROL DEL MODO OSCURO (THEME SWITCHER) =================
-        const toggleBtn = document.getElementById('theme-toggle');
-        const toggleBtnMob = document.getElementById('theme-toggle-mob');
-
-        function setTheme(theme) {
-            if (theme === 'dark') {
-                document.body.classList.add('dark-mode');
-            } else {
-                document.body.classList.remove('dark-mode');
-            }
-            localStorage.setItem('theme', theme);
-        }
-
-        // Inicializar tema al cargar la página
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-            setTheme('dark');
-        } else {
-            setTheme('light');
-        }
-
-        // Event Listeners para los botones de cambio de tema
-        function toggleTheme() {
-            const isDark = document.body.classList.contains('dark-mode');
-            setTheme(isDark ? 'light' : 'dark');
-        }
-
-        if (toggleBtn) toggleBtn.addEventListener('click', toggleTheme);
-        if (toggleBtnMob) toggleBtnMob.addEventListener('click', toggleTheme);
     });
 </script>
 @endpush
