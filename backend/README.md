@@ -1,50 +1,64 @@
-# 🎓 Cursus
+# ⚙️ Cursus - Backend (Laravel)
 
-> **Universidad:** UTN
-> **Facultad/Escuela:** Regional Haedo
-> **Asignatura:** Gestion de Desarrollo de Software
-> **Año Académico:** 2026
+Este directorio contiene la aplicación principal del proyecto **Cursus**, desarrollada utilizando el framework Laravel.
 
-[![Estado del Proyecto](https://img.shields.io/badge/Estado-En%20Proceso-yellow)](#)
-[![Licencia](https://img.shields.io/badge/Licencia-MIT-blue)](#)
+## 🛠 Requisitos Previos
 
-## 📖 Descripción
+- PHP >= 8.2
+- Composer
+- MySQL o MariaDB
+- Node.js y npm (Opcional, para empaquetado de assets de Vite si se usa)
 
-Muchos estudiantes universitarios enfrentan dificultades para sostener una rutina de estudio, priorizar materias, cumplir plazos y medir su desempeño de forma ordenada. En la práctica, suelen combinar varias herramientas separadas o depender solo de recordatorios informales, lo que aumenta la desorganización y reduce la constancia.
+## 🚀 Instalación y Configuración
 
-Como respuesta a esa situación, el proyecto desarrolla un asistente estudiantil que centraliza funciones clave de planificación y seguimiento. El sistema está pensado para ofrecer una experiencia clara, enfocada en las necesidades reales del estudiante: saber qué estudiar, cuándo hacerlo, cuánto avanzó y qué decisiones debe tomar para mejorar su rendimiento.
+1. **Clonar el repositorio y acceder al directorio backend:**
 
-## 📋 Tabla de Contenidos
+    ```bash
+    cd backend
+    ```
 
-- [Características Principales](#-características-principales)
-- [Tecnologías Utilizadas] Front-end: HTMML, CSS y JS
-- [Arquitectura del Sistema](#-arquitectura-del-sistema)
-- [Instalación y Configuración](#-instalación-y-configuración)
-- [Uso](#-uso)
-- [Estructura del Proyecto](#-estructura-del-proyecto)
-- [Autores](#-autores)
+2. **Instalar las dependencias de PHP:**
 
-## ✨ Características Principales
+    ```bash
+    composer install
+    ```
 
-- **Característica 1:** [Breve explicación, ej. Autenticación de usuarios basada en JWT].
-- **Característica 2:** [Breve explicación, ej. Integración con API externa de clima].
-- **Característica 3:** [Breve explicación, ej. A].
+3. **Configurar las variables de entorno:**
+   Copia el archivo de ejemplo para crear tu `.env` local.
 
-## 🛠 Tecnologías Utilizadas
+    ```bash
+    cp .env.example .env
+    ```
 
-- **Frontend:** [HTML, CSS y JS]
-- **Backend:** [PHP / LARAVEL]
-- **Base de Datos:** [ MySQL ]
+    Abre el archivo `.env` y configura los datos de acceso a tu base de datos local (principalmente `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`).
 
-## 🏗 Arquitectura del Sistema
+4. **Generar la clave de la aplicación:**
 
-[Opcional: Puedes incluir una breve descripción del patrón de diseño utilizado (ej. MVC, Microservicios) o incrustar un diagrama si tienes uno.]
+    ```bash
+    php artisan key:generate
+    ```
 
-```mermaid
-graph TD;
-    Cliente-->API_Gateway;
-    API_Gateway-->Servicio_Usuarios;
-    API_Gateway-->Servicio_Productos;
-    Servicio_Usuarios-->Base_Datos;
-    Servicio_Productos-->Base_Datos;
-```
+5. **Ejecutar las migraciones y seeders:**
+   _(Para crear la estructura de la base de datos y cargar datos iniciales)_
+
+    ```bash
+    php artisan migrate --seed
+    ```
+
+6. **Levantar el servidor de desarrollo:**
+    ```bash
+    php artisan serve
+    ```
+    El sitio estará disponible en `http://localhost:8000`.
+
+## 📁 Estructura Principal del Framework
+
+- `app/` - Contiene la lógica central (Modelos, Controladores).
+- `routes/` - Definición de rutas (`web.php`, `api.php`).
+- `resources/views/` - Vistas construidas con el motor de plantillas Blade.
+- `public/` - Archivos accesibles por el navegador. Particularmente `public/js/` contiene los scripts Javascript Vanilla que otorgan la interactividad al frontend.
+- `database/` - Definiciones de base de datos (Migraciones, Seeders y Factories).
+
+## 🔗 Relación Frontend/Backend
+
+La aplicación renderiza las vistas iniciales de manera tradicional mediante **Blade**. Sin embargo, para brindar una experiencia fluida, modular y sin recargas de página constantes, el cliente web utiliza **JavaScript Vanilla** para actualizar el DOM localmente y realizar peticiones asíncronas (`fetch`) a las rutas de Laravel (tanto web como API).

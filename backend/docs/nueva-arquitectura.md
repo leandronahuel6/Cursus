@@ -1,0 +1,123 @@
+# Nueva Arquitectura del Proyecto Cursus
+
+## 1. Decisión de Assets: `public/` vs `resources/`
+
+Se ha decidido **MANTENER los assets (CSS y JS) en el directorio `public/`** y servirlos de manera estática, en lugar de migrarlos a `resources/` para ser procesados por Vite.
+
+**Justificación técnica:**
+
+1. **Preservación de Lógica Global:** Gran parte de los scripts JS actuales (14 archivos) utilizan funciones expuestas globalmente (`window.handleCareerChange()`, `window.openContactModal()`, etc.). Migrar a módulos ES6 bajo el pipeline de Vite requeriría una reescritura masiva de la lógica y la forma en que se comunican las funciones, lo cual incrementa exponencialmente el riesgo de romper la funcionalidad actual.
+2. **Compatibilidad con Prototipos:** Los prototipos estáticos en `prototypes/` dependen de la estructura relativa en `public/`. Si los assets se mueven y compilan, los prototipos estáticos se romperán o requerirán una configuración especial no deseada.
+3. **Simplicidad del Stack:** El proyecto utiliza Vanilla JS y CSS nativo sin preprocesadores pesados ni dependencias complejas. La sobrecarga de usar un empaquetador como Vite no ofrece beneficios tangibles inmediatos en este contexto.
+4. **Adopción Inmediata:** Fragmentar el código en `public/` mediante múltiples archivos `<link>` y `<script>` aprovecha las capacidades nativas de los navegadores modernos y permite una modularización efectiva sin cambiar las reglas del juego para el equipo de desarrollo.
+
+---
+
+## 2. Árbol de Directorios Modular
+
+A continuación se detalla la nueva estructura propuesta, diseñada para respetar el Principio de Responsabilidad Única (SRP) y facilitar la colaboración.
+
+### Estructura de Assets Públicos (`public/`)
+
+```text
+public/
+├── css/
+│   ├── base/               # Estilos fundamentales y reseteos
+│   │   ├── fonts.css       # Declaraciones @font-face
+│   │   ├── variables.css   # Variables globales de color, espaciado, sombras (:root)
+│   │   └── reset.css       # Reseteo estándar de márgenes, box-sizing y estilos base de HTML/body
+│   ├── layout/             # Estructura macro de la aplicación
+│   │   ├── app.css         # Contenedores principales (.app, .main, .page)
+│   │   ├── sidebar.css     # Barra lateral de navegación
+│   │   ├── topbar.css      # Barra superior (breadcrumb, acciones rápidas)
+│   │   └── mobile-nav.css  # Barra de navegación inferior para móviles
+│   ├── components/         # Elementos de UI reutilizables
+│   │   ├── buttons.css     # Estilos base de todos los botones
+│   │   ├── cards.css       # Tarjetas de contenido, estadísticas
+│   │   ├── modals.css      # Estilos compartidos para modales/overlays
+│   │   ├── tabs.css        # Sistema de pestañas
+│   │   ├── toast.css       # Notificaciones flotantes
+│   │   ├── filters.css     # Chips de filtrado y selectores
+│   │   └── forms.css       # Switches, inputs, textareas
+│   └── views/              # Estilos ESPECÍFICOS para cada página
+│       ├── welcome.css     # Estilos exclusivos de la landing page
+│       ├── dashboard.css   # Panel principal (Inicio)
+│       ├── area-estudio.css# Pomodoro, Kanban
+│       ├── materias.css    # Árbol de correlatividades
+│       ├── alertas.css     # Lista y calendario de alertas
+│       ├── horarios.css    # Grilla del simulador de horarios
+│       ├── progreso.css    # Gráficos (donut, heatmap)
+│       └── auth.css        # Pantallas de login, registro, recuperación de contraseña
+│
+├── js/
+│   ├── shared/             # Scripts transversales a toda la app
+│   │   ├── api.js          # Utilidades para llamadas fetch al backend
+│   │   ├── router.js       # Manejo de navegación/historial
+│   │   ├── utils.js        # Funciones auxiliares (fechas, toasts, cálculo de alertas)
+│   │   └── profile.js      # Lógica del menú de perfil de usuario
+│   └── views/              # Lógica específica por página
+│       ├── welcome.js      # Animaciones de la landing
+│       ├── dashboard.js    # Lógica del panel de inicio
+│       ├── area-estudio.js # Pomodoro, gestión de tableros Kanban
+│       ├── materias.js     # Interacciones del árbol de materias
+│       ├── alertas/        # Lógica compleja de la página de alertas dividida
+│       │   ├── alertas-data.js     # Manejo de datos y mocks
+│       │   ├── alertas-render.js   # Pintado de HTML en DOM
+│       │   ├── alertas-calendar.js # Renderizado del calendario visual
+│       │   └── alertas-main.js     # Orquestación e inicialización
+│       ├── horarios/       # Lógica del simulador
+│       │   ├── horarios-data.js    # Datos de materias disponibles
+│       │   ├── horarios-grid.js    # Construcción de la grilla
+│       │   ├── horarios-drag.js    # Funcionalidad Drag & Drop
+│       │   └── horarios-main.js    # Orquestación
+│       ├── progreso/       # Gráficos y proyecciones
+│       │   ├── progreso-data.js    # Obtención de datos simulados/reales
+│       │   ├── progreso-charts.js  # Renderizado de SVG Donut y Heatmap
+│       │   ├── progreso-projection.js# Fórmulas de proyección
+│       │   └── progreso-main.js    # Orquestación
+│       ├── login.js
+│       ├── register.js
+│       ├── forgot-password.js
+│       └── reset-password.js
+```
+
+### Estructura de Vistas Blade (`resources/views/`)
+
+```text
+resources/views/
+├── layouts/
+│   └── app.blade.php           # Plantilla base. Ahora solo orquesta la carga de CSS modular y partials.
+├── partials/                   # Fragmentos reutilizables de UI general
+│   ├── sidebar.blade.php       # Navegación izquierda
+│   ├── mobile-nav.blade.php    # Navegación inferior
+│   ├── contact-modal.blade.php # Formulario de feedback
+│   └── topbar/
+│       ├── breadcrumb.blade.php
+│       └── career-selector.blade.php
+├── welcome/                    # La landing page descompuesta
+│   ├── welcome.blade.php       # Layout principal de la landing + Hero
+│   ├── _header.blade.php       # Barra superior de la landing
+│   ├── _features.blade.php     # Cards de beneficios
+│   ├── _demo-dashboard.blade.php # Demo visual de la interfaz
+│   ├── _pricing.blade.php      # Tabla de precios
+│   ├── _testimonials.blade.php # Reseñas
+│   └── _footer.blade.php       # Enlaces al pie
+├── dashboard.blade.php
+├── area-estudio.blade.php
+├── materias.blade.php
+└── ... (resto de vistas)
+```
+
+---
+
+## 3. Reglas de Oro Post-Refactorización
+
+Para el equipo de desarrollo, estas son las nuevas normativas a cumplir al agregar código:
+
+1. **PROHIBIDO el CSS Monolítico:** No agregues clases indiscriminadamente a `main.css`. Busca la capa correspondiente (`components/`, `layout/` o `views/`). Si es un estilo genérico de un botón, va en `buttons.css`. Si es un padding raro de la página "Materias", va en `materias.css`.
+2. **Carga Bajo Demanda:** Las hojas de estilo de las vistas (`views/*.css`) y los scripts específicos (`views/*.js`) **SOLO** deben cargarse en el Blade de esa vista usando las directivas `@push('styles')` y `@push('scripts')`. No las coloques globalmente en el layout `app.blade.php`.
+3. **JS Desacoplado:** Si un script supera las 200-300 líneas, es un síntoma de que mezcla responsabilidades. Separa la obtención de datos (API/Mocks), la manipulación del DOM (Render) y la inicialización (Main).
+4. **Vistas Ligeras:** Ningún archivo `.blade.php` debe superar las 300 líneas. Si una vista tiene una sección muy larga (como un modal gigante o un bloque informativo denso), extráela a un componente o partial usando `@include('partials.nombre')`.
+5. **Cero Lógica en Plantillas:** Evita incrustar `<style>` o `<script>` directamente dentro de un archivo `.blade.php`. Esto impide el cacheo de los navegadores y fomenta el "spaghetti code".
+
+¡Adherirse a estas reglas mantendrá el código limpio, veloz y fácil de escalar a largo plazo!
