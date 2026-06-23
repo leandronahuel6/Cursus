@@ -29,6 +29,10 @@ Route::get('/horarios', function () {
     return view('horarios');
 })->name('horarios');
 
+Route::get('/beneficios', function () {
+    return view('beneficios');
+})->name('beneficios');
+
 Route::get('/progreso', function () {
     return view('progreso');
 })->name('progreso');
