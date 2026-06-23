@@ -37,6 +37,23 @@ class MarcadorController extends Controller
         return response()->json($marcador, 201);
     }
 
+    public function update(Request $request, Marcador $marcador)
+    {
+        abort_unless($marcador->usuario_id === $request->user()->id, 403);
+
+        $data = $request->validate([
+            'url' => 'required|url|max:2048',
+            'titulo' => 'nullable|string|max:255',
+        ]);
+
+        $marcador->update([
+            'url' => $data['url'],
+            'titulo' => $data['titulo'] ?? null,
+        ]);
+
+        return response()->json($marcador);
+    }
+
     public function destroy(Request $request, Marcador $marcador)
     {
         abort_unless($marcador->usuario_id === $request->user()->id, 403);

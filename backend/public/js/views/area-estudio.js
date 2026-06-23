@@ -1229,7 +1229,7 @@
     bookmarks.forEach(bm => {
       const card = document.createElement('div');
       card.className = 'bm-item';
-      card.id = bm.id;
+      card.id = 'bm-item-' + bm.id;
 
       // Extraer favicon oficial de Google API
       let hostname = '';
@@ -1319,12 +1319,12 @@
 
   // Inline Edición de Marcadores
   function startBookmarkInlineEdit(id) {
-    const item = document.getElementById(id);
+    const item = document.getElementById('bm-item-' + id);
     if (item) item.classList.add('editing');
   }
 
   function cancelBookmarkInlineEdit(id) {
-    const item = document.getElementById(id);
+    const item = document.getElementById('bm-item-' + id);
     if (item) item.classList.remove('editing');
   }
 
