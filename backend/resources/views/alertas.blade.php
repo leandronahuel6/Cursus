@@ -9,35 +9,21 @@
     <div class="mob-sub">
       UTN Haedo · Agenda académica
     </div>
-    <!-- Selector carrera mobile -->
-    <div class="career-selector-wrap" style="margin-top: 10px;">
-      <span>Carrera:</span>
-      <select class="career-select" id="career-select-mob" onchange="window.handleCareerChange(this.value)">
-        <option value="TUP">Tecnicatura en Programación</option>
-      </select>
-    </div>
   </div>
 @endsection
 
 @section('topbar-content')
   <div class="topbar-title">Alertas y Vencimientos <span>🔔</span></div>
-  <div class="career-selector-wrap">
-    <span>Carrera:</span>
-    <select class="career-select" id="career-select-desk" onchange="window.handleCareerChange(this.value)">
-      <option value="TUP">Tecnicatura en Programación</option>
-    </select>
-  </div>
-  <div class="streak-chip">🔥 8 días de racha</div>
 @endsection
 
 @section('content')
-  <!-- AVISO DE AUMENTO DE CUOTA (Simulado vía email) -->
-  <div class="alert" id="fee-increase-alert" style="display: none; background: #fffbeb; border: 1px solid #fef3c7;">
-    <div class="alert-dot" style="background: var(--yellow);"></div>
-    <div class="alert-txt" style="color: #92400e;">
-      <strong>Aviso de la administración (Vía Email):</strong> Se informa que a partir del próximo mes, la cuota de las carreras aranceladas se reajustará a <strong>$95.000</strong>.
+  <!-- AVISO DE CUOTA SIN PAGAR (a partir del 1° de cada mes, hasta que se registre el pago) -->
+  <div class="alert" id="cuota-pago-alert" style="display: none;">
+    <div class="alert-dot" id="cuota-pago-alert-dot"></div>
+    <div class="alert-txt">
+      <strong id="cuota-pago-alert-title">Alerta de pago:</strong> <span id="cuota-pago-alert-text"></span>
     </div>
-    <button class="alert-x" onclick="document.getElementById('fee-increase-alert').remove()" style="color: #b45309;">✕</button>
+    <button class="alert-x" onclick="document.getElementById('cuota-pago-alert').style.display='none'">✕</button>
   </div>
 
   <div class="alertas-grid">
@@ -83,15 +69,8 @@
           </div>
           
           <div class="calendar-days-grid" id="calendar-days-container">
-            <!-- Días renderizados dinámicamente -->
-          </div>
-
-          <!-- Detalles del día seleccionado -->
-          <div class="day-detail-box">
-            <div class="day-detail-title" id="selected-day-label">Selecciona un día para ver sus alertas</div>
-            <div id="day-detail-alerts-list">
-              <div class="day-detail-empty">Ninguna alerta programada para este día.</div>
-            </div>
+            <!-- Días renderizados dinámicamente. Si un día tiene alertas, al
+                 tocarlo se abre un detalle anclado a la celda misma. -->
           </div>
 
         </div>
@@ -99,43 +78,35 @@
 
     </div>
 
-    <!-- COLUMNA DERECHA: Pagos y Formularios -->
+    <!-- COLUMNA DERECHA: Formulario -->
     <div class="col-right">
-      
-      <!-- TARJETA DE CUOTA (Solo para Tecnicaturas) -->
-      <div class="payment-card-box pending" id="tuition-payment-card" style="display: block;">
-        <div class="pay-tag" id="tuition-status-badge">Cuota Pendiente</div>
-        <div class="pay-amount" id="tuition-amount-label">$80.000</div>
-        <div class="pay-due" id="tuition-due-label">Vence el 15 de este mes · Quedan 3 días</div>
-        <button class="btn-pay-action" id="btn-pay-tuition" onclick="window.simulatePayment()">
-          💳 Realizar Pago Directo
-        </button>
-      </div>
 
-      <!-- Mensaje para Ingenierías gratuitas -->
-      <div class="card" id="free-career-card" style="display: none; padding: 20px; border-left: 4px solid var(--green); margin-bottom: 20px;">
-        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--green);">Carrera No Arancelada</h3>
-        <p style="font-size: 12px; color: var(--t3);">
-          Estás cursando una Ingeniería o Licenciatura en la UTN Regional Haedo. Estas carreras son completamente gratuitas y no registran cuotas mensuales.
+      <!-- RECORDATORIO DE CUOTA UNIVERSITARIA -->
+      <div class="alert-form-card">
+        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--t1); display: flex; align-items: center; gap: 6px;">
+          <span>🎓</span> Cuota de la Universidad
+        </h3>
+        <p style="font-size: 11.5px; color: var(--t3); margin-bottom: 14px;">
+          Recordatorio personal del monto vigente. Actualizalo solo cuando la universidad informe un aumento — no hace falta crear una alerta nueva cada mes.
         </p>
-      </div>
-
-      <!-- HISTORIAL DE PAGOS (Solo para Tecnicaturas) -->
-      <div class="card payment-history-card" id="payment-history-card" style="display: block;">
-        <div class="card-hd">
-          <div class="card-title">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path d="M1 8a7 7 0 1114 0A7 7 0 011 8z" stroke="var(--brand)" stroke-width="1.5"/>
-              <path d="M8 4v4l2.5 1.5" stroke="var(--brand)" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            Historial de Pagos
+        <form id="cuota-form" onsubmit="window.handleCuotaSubmit(event)">
+          <div class="alert-form-group">
+            <label for="cuota-monto">Monto actual de la cuota</label>
+            <div class="currency-input-wrap">
+              <span class="currency-input-sign">$</span>
+              <input type="number" id="cuota-monto" class="alert-form-input currency-input" placeholder="80000" min="0" step="0.01" required>
+            </div>
           </div>
-        </div>
-        <div class="card-body">
-          <div class="payment-history-container" id="payments-history-list">
-            <!-- Cargado dinámicamente -->
+          <div style="display: flex; gap: 8px;">
+            <button type="submit" class="btn-alert-submit" style="flex: 1;">
+              💾 Guardar Monto
+            </button>
+            <button type="button" class="btn-alert-submit" id="btn-abrir-pago" style="flex: 1; background: var(--green);" onclick="window.openPagoModal()">
+              💳 Pagar
+            </button>
           </div>
-        </div>
+        </form>
+        <div id="cuota-pago-info" style="margin-top: 10px; font-size: 11.5px; color: var(--t3);"></div>
       </div>
 
       <!-- FORMULARIO DE CARGA DE ALERTA -->
@@ -155,7 +126,6 @@
               <select id="alert-type" class="alert-form-input" style="height: 35px;">
                 <option value="academic">Académica</option>
                 <option value="administrative">Administrativa</option>
-                <option value="payment">Pago</option>
                 <option value="personal">Personal</option>
               </select>
             </div>
@@ -182,6 +152,26 @@
 
     </div>
 
+  </div>
+
+  <!-- MODAL: REGISTRAR PAGO DE LA CUOTA -->
+  <div class="grade-modal-overlay" id="pago-cuota-modal">
+    <div class="grade-modal-box">
+      <div class="grade-modal-header">Registrar pago de la cuota</div>
+      <div class="grade-modal-body">
+        <p style="font-size: 12px; color: var(--t3); line-height: 1.4;">
+          ¿En qué fecha abonaste la cuota de este mes?
+        </p>
+        <div class="grade-select-wrapper">
+          <label for="pago-fecha" style="font-size: 11px; font-weight: 600; color: var(--t2);">Fecha de pago:</label>
+          <input type="date" id="pago-fecha" class="grade-input-select" style="margin-top: 5px;">
+        </div>
+      </div>
+      <div class="grade-modal-footer">
+        <button class="btn-modal-action cancel" onclick="window.closePagoModal()">Cancelar</button>
+        <button class="btn-modal-action save" onclick="window.confirmarPago()">Confirmar Pago</button>
+      </div>
+    </div>
   </div>
 @endsection
 

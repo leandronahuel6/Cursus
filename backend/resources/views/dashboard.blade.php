@@ -19,23 +19,23 @@
     <div class="mob-greet">{{ $greeting }}, <span class="greeting-name">{{ $userName }}</span> 👋</div>
     <div class="mob-sub">
       {{ $formattedDate }}
-      <span class="mob-stk">🔥 8 días</span>
+      <span class="mob-stk" id="mob-racha">🔥 0 días</span>
     </div>
   </div>
 @endsection
 
 @section('topbar-content')
   <div class="topbar-title">{{ $greeting }}, <span class="greeting-name">{{ $userName }}</span> <span>👋</span></div>
-  <div class="streak-chip">🔥 8 días de racha</div>
+  <div class="streak-chip" id="topbar-racha">🔥 0 días de racha</div>
   <button class="btn-primary" onclick="location.href='{{ route('area-estudio') }}'">▶ Empezar sesión</button>
 @endsection
 
 @section('content')
   <!-- Alert -->
-  <div class="alert" id="js-alert">
+  <div class="alert" id="js-alert" style="display:none;">
     <div class="alert-dot"></div>
     <div class="alert-txt">
-      <strong>Alerta próxima:</strong> Pago de cuota de la carrera vence en 3 días (15 de junio). <a href="{{ route('alertas') }}" style="text-decoration: underline; font-weight: 600;">Ver alertas</a>
+      <strong>Alerta próxima:</strong> <span id="js-alert-text"></span> <a href="{{ route('alertas') }}" style="text-decoration: underline; font-weight: 600;">Ver alertas</a>
     </div>
     <button class="alert-x" onclick="document.getElementById('js-alert').remove()">✕</button>
   </div>
@@ -44,17 +44,17 @@
   <div class="stats">
     <div class="stat">
       <span class="stat-ic">⏱️</span>
-      <div class="stat-val">12h 40m</div>
+      <div class="stat-val" id="stat-horas-semana">0h</div>
       <div class="stat-lbl">Horas esta semana</div>
     </div>
     <div class="stat">
       <span class="stat-ic">🔥</span>
-      <div class="stat-val">8 días</div>
+      <div class="stat-val" id="stat-racha">0 días</div>
       <div class="stat-lbl">Racha actual</div>
     </div>
     <div class="stat">
       <span class="stat-ic">📚</span>
-      <div class="stat-val">4</div>
+      <div class="stat-val" id="stat-materias-activas">0</div>
       <div class="stat-lbl">Materias activas</div>
     </div>
     <div class="stat">
@@ -83,56 +83,7 @@
           <div class="card-link" onclick="location.href='{{ route('materias') }}'">Ver todas →</div>
         </div>
         <div class="card-body">
-          <div class="mats-grid">
-
-            <div class="mat" onclick="location.href='{{ route('area-estudio') }}'">
-              <div class="mat-top">
-                <div class="mat-name">Programación II</div>
-                <span class="badge b-reg">Regular</span>
-              </div>
-              <div class="mat-bar"><div class="mat-fill" style="width:65%"></div></div>
-              <div class="mat-ft">
-                <span class="mat-h">8h esta semana</span>
-                <span class="mat-ar">→</span>
-              </div>
-            </div>
-
-            <div class="mat" onclick="location.href='{{ route('area-estudio') }}'">
-              <div class="mat-top">
-                <div class="mat-name">Análisis Matemático I</div>
-                <span class="badge b-apr">Aprobada</span>
-              </div>
-              <div class="mat-bar"><div class="mat-fill" style="width:100%"></div></div>
-              <div class="mat-ft">
-                <span class="mat-h">Final rendido ✓</span>
-                <span class="mat-ar">→</span>
-              </div>
-            </div>
-
-            <div class="mat" onclick="location.href='{{ route('area-estudio') }}'">
-              <div class="mat-top">
-                <div class="mat-name">Laboratorio I</div>
-                <span class="badge b-reg">Regular</span>
-              </div>
-              <div class="mat-bar"><div class="mat-fill" style="width:80%"></div></div>
-              <div class="mat-ft">
-                <span class="mat-h">3h esta semana</span>
-                <span class="mat-ar">→</span>
-              </div>
-            </div>
-
-            <div class="mat dim" onclick="location.href='{{ route('area-estudio') }}'">
-              <div class="mat-top">
-                <div class="mat-name">Estadística</div>
-                <span class="badge b-cur">Cursando</span>
-              </div>
-              <div class="mat-bar"><div class="mat-fill" style="width:20%"></div></div>
-              <div class="mat-ft">
-                <span class="mat-h">1h esta semana</span>
-              </div>
-            </div>
-
-          </div>
+          <div class="mats-grid" id="mats-grid"></div>
         </div>
       </div>
 
@@ -149,45 +100,7 @@
           </div>
           <div class="card-link" onclick="location.href='{{ route('area-estudio') }}'">Ver Kanban →</div>
         </div>
-        <div class="card-body">
-
-          <div class="task" onclick="location.href='{{ route('area-estudio') }}'">
-            <div class="task-dot d-red"></div>
-            <div class="task-inf">
-              <div class="task-name">TP N°2 — Calculadora en C</div>
-              <div class="task-sub">Programación II</div>
-            </div>
-            <div class="task-due urg">En 2 días</div>
-          </div>
-
-          <div class="task" onclick="location.href='{{ route('area-estudio') }}'">
-            <div class="task-dot d-org"></div>
-            <div class="task-inf">
-              <div class="task-name">Informe de Laboratorio</div>
-              <div class="task-sub">Laboratorio I</div>
-            </div>
-            <div class="task-due mid">En 5 días</div>
-          </div>
-
-          <div class="task" onclick="location.href='{{ route('area-estudio') }}'">
-            <div class="task-dot d-ylw"></div>
-            <div class="task-inf">
-              <div class="task-name">Parcial domiciliario</div>
-              <div class="task-sub">Estadística</div>
-            </div>
-            <div class="task-due">En 8 días</div>
-          </div>
-
-          <div class="task" onclick="location.href='{{ route('area-estudio') }}'">
-            <div class="task-dot d-grn"></div>
-            <div class="task-inf">
-              <div class="task-name">Práctica 4 — Recursividad</div>
-              <div class="task-sub">Programación II</div>
-            </div>
-            <div class="task-due">En 12 días</div>
-          </div>
-
-        </div>
+        <div class="card-body" id="tareas-proximas-body"></div>
       </div>
 
     </div><!-- /left -->
@@ -202,7 +115,7 @@
         <div class="study-hero">
           <div class="study-hero-icon">💻</div>
           <div>
-            <div class="study-subject">Programación II</div>
+            <div class="study-subject" id="study-hero-subject">—</div>
             <div class="study-sub">Última sesión: hoy, 14:35 · 2 sesiones hoy</div>
           </div>
         </div>
@@ -243,15 +156,7 @@
         <!-- Estudiar otra materia -->
         <div class="study-others">
           <div class="so-hdr">Estudiar otra materia</div>
-          <div class="so-item" onclick="location.href='{{ route('area-estudio') }}'">
-            <span>📐 Análisis Matemático I</span><span>→</span>
-          </div>
-          <div class="so-item" onclick="location.href='{{ route('area-estudio') }}'">
-            <span>🔬 Laboratorio I</span><span>→</span>
-          </div>
-          <div class="so-item" onclick="location.href='{{ route('area-estudio') }}'">
-            <span>📊 Estadística</span><span>→</span>
-          </div>
+          <div id="study-others-list"></div>
         </div>
 
       </div>
@@ -261,7 +166,7 @@
         <div class="hm-wrap">
           <div class="hm-top">
             <div class="hm-title">🗓️ Actividad — 13 semanas</div>
-            <div class="hm-streak">🔥 8 días</div>
+            <div class="hm-streak" id="hm-racha">🔥 0 días</div>
           </div>
           <div class="hm-grid" id="hm"></div>
           <div class="hm-leg">
@@ -278,3 +183,7 @@
     </div><!-- /right -->
   </div><!-- /dash -->
 @endsection
+
+@push('scripts')
+  <script src="{{ asset('js/dashboard.js') }}"></script>
+@endpush

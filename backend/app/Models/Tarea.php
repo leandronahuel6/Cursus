@@ -4,18 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class HorarioUsuario extends Model
+class Tarea extends Model
 {
-    protected $table = 'horarios_usuarios';
-
     protected $fillable = [
         'usuario_id',
-        'tipo',
         'materia_id',
-        'titulo_actividad',
-        'dia_semana',
-        'hora_inicio',
-        'hora_fin',
+        'titulo',
+        'columna',
+        'fecha_vencimiento',
+    ];
+
+    protected $casts = [
+        'fecha_vencimiento' => 'date:Y-m-d',
     ];
 
     public function usuario()

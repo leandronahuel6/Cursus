@@ -1,11 +1,24 @@
 (function () {
+  // El token vive en localStorage si se marcó "Recordarme" al iniciar sesión,
+  // o en sessionStorage si no (se pierde al cerrar el navegador).
   function getStoredToken() {
-    return localStorage.getItem('token');
+    return localStorage.getItem('token') || sessionStorage.getItem('token');
+  }
+
+  if (!getStoredToken()) {
+    window.location.replace('/login');
+    return;
+  }
+
+  function getStoredUser() {
+    return localStorage.getItem('user') || sessionStorage.getItem('user');
   }
 
   function clearStoredSession() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
   }
 
   function toggleProfileMenu(e) {
@@ -55,29 +68,49 @@
       closeContactModal();
       return;
     }
+    const profileOverlay = document.getElementById('profile-edit-overlay');
+    if (profileOverlay && profileOverlay.classList.contains('open') && e.target === profileOverlay) {
+      closeProfileModal();
+      return;
+    }
+    const cpOverlay = document.getElementById('change-password-overlay');
+    if (cpOverlay && cpOverlay.classList.contains('open') && e.target === cpOverlay) {
+      closeChangePasswordModal();
+      return;
+    }
     closeProfileMenu();
   });
 
   // Badge de alertas pendientes en el sidebar/bottom nav, compartido por todas las páginas.
-  // Lee el mismo estado que guarda alertas.js en localStorage.
-  function updateAlertsBadge() {
-    const saved = localStorage.getItem('cursus_alerts_state');
-    let count = 0;
+  // Cuenta solo las alertas de los próximos 7 días (las de mayor prioridad), traídas de la BD.
+  function diasHastaAlerta(fechaStr) {
+    const hoy = new Date();
+    const fecha = new Date(fechaStr + 'T00:00:00');
+    const dHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    const dFecha = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+    return Math.ceil((dFecha - dHoy) / (1000 * 60 * 60 * 24));
+  }
 
-    if (saved) {
-      const alertsState = JSON.parse(saved);
-      const isPaid = alertsState.career === 'TUP' || alertsState.career === 'TUSI';
-      let filtered = (alertsState.alerts || []).filter(a => !a.completed);
-      if (!isPaid) {
-        filtered = filtered.filter(a => a.category !== 'payment' || !a.title.includes('Cuota'));
-      }
-      count = filtered.length;
-    }
-
+  async function updateAlertsBadge() {
+    const token = getStoredToken();
     const navBadge = document.getElementById('nav-badge-count');
     const bnavBadge = document.getElementById('bnav-badge-count');
-    if (navBadge) navBadge.innerText = count;
-    if (bnavBadge) bnavBadge.innerText = count;
+    if (!token || (!navBadge && !bnavBadge)) return;
+
+    try {
+      const response = await fetch('/api/alertas', {
+        headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+      });
+      if (!response.ok) return;
+
+      const alertas = await response.json();
+      const count = alertas.filter(a => !a.completada && diasHastaAlerta(a.fecha) <= 7).length;
+
+      if (navBadge) navBadge.innerText = count;
+      if (bnavBadge) bnavBadge.innerText = count;
+    } catch (error) {
+      console.error('No se pudo cargar el contador de alertas', error);
+    }
   }
 
   document.addEventListener('DOMContentLoaded', updateAlertsBadge);
@@ -101,6 +134,88 @@
     if (avEl && user.nombre) {
       const parts = user.nombre.trim().split(' ');
       avEl.textContent = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
+    }
+  }
+
+  // Pop up para editar los datos de perfil (nombre, legajo, email)
+  function clearProfileFormErrors() {
+    ['profile-nombre-error', 'profile-legajo-error', 'profile-email-error'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '';
+    });
+  }
+
+  function openProfileModal() {
+    closeProfileMenu();
+    clearProfileFormErrors();
+
+    const cached = getStoredUser();
+    if (cached) {
+      try {
+        const user = JSON.parse(cached);
+        document.getElementById('profile-nombre').value = user.nombre || '';
+        document.getElementById('profile-legajo').value = user.legajo || '';
+        document.getElementById('profile-email').value = user.email || '';
+      } catch (e) { /* cache corrupto, se ignora */ }
+    }
+
+    document.getElementById('profile-edit-overlay').classList.add('open');
+  }
+
+  function closeProfileModal() {
+    document.getElementById('profile-edit-overlay').classList.remove('open');
+  }
+
+  async function handleProfileSubmit(e) {
+    e.preventDefault();
+    clearProfileFormErrors();
+
+    const token = getStoredToken();
+    if (!token) return;
+
+    const nombre = document.getElementById('profile-nombre').value.trim();
+    const legajo = document.getElementById('profile-legajo').value.trim();
+    const email = document.getElementById('profile-email').value.trim();
+
+    const btn = document.querySelector('#profile-edit-form .contact-btn-send');
+    const original = btn.textContent;
+    btn.disabled = true;
+
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ nombre, legajo: legajo || null, email })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.errors?.nombre) document.getElementById('profile-nombre-error').textContent = data.errors.nombre[0];
+        if (data.errors?.legajo) document.getElementById('profile-legajo-error').textContent = data.errors.legajo[0];
+        if (data.errors?.email) document.getElementById('profile-email-error').textContent = data.errors.email[0];
+        btn.disabled = false;
+        return;
+      }
+
+      // Guardar en el mismo storage donde ya vive el token y refrescar la UI.
+      const storage = localStorage.getItem('token') ? localStorage : sessionStorage;
+      storage.setItem('user', JSON.stringify(data));
+      applyUserToDOM(data);
+
+      btn.textContent = '✓ Guardado';
+      setTimeout(() => {
+        closeProfileModal();
+        btn.textContent = original;
+        btn.disabled = false;
+      }, 900);
+    } catch (error) {
+      console.error('No se pudo actualizar el perfil', error);
+      btn.disabled = false;
     }
   }
 
@@ -128,7 +243,7 @@
   async function loadUserProfile() {
     // 1. Pintar al instante con lo que ya tengamos guardado (sin esperar la red,
     //    así no se ve por un instante el usuario hardcodeado del HTML).
-    const cached = localStorage.getItem('user');
+    const cached = getStoredUser();
     if (cached) {
       try { applyUserToDOM(JSON.parse(cached)); } catch (e) { /* cache corrupto, se ignora */ }
     }
@@ -147,7 +262,9 @@
       if (!response.ok) return;
 
       const user = await response.json();
-      localStorage.setItem('user', JSON.stringify(user));
+      // Guardar el refresh en el mismo storage donde ya vive el token.
+      const storage = localStorage.getItem('token') ? localStorage : sessionStorage;
+      storage.setItem('user', JSON.stringify(user));
       applyUserToDOM(user);
     } catch (error) {
       console.error('No se pudo cargar el usuario logueado', error);
@@ -157,10 +274,117 @@
   loadUserProfile();
   document.addEventListener('DOMContentLoaded', loadUserProfile);
 
-  window.toggleProfileMenu  = toggleProfileMenu;
-  window.openContactModal   = openContactModal;
-  window.closeContactModal  = closeContactModal;
-  window.handleContactSubmit = handleContactSubmit;
-  window.handleLogout = handleLogout;
-  window.updateAlertsBadge  = updateAlertsBadge;
+  function openChangePasswordModal() {
+    closeProfileModal();
+    document.getElementById('change-password-form').reset();
+    ['cp-current-error', 'cp-new-error', 'cp-confirm-error'].forEach(id => {
+      document.getElementById(id).textContent = '';
+    });
+    const success = document.getElementById('cp-success');
+    success.hidden = true;
+    success.textContent = '';
+    document.getElementById('cp-submit').disabled = false;
+    document.getElementById('change-password-overlay').classList.add('open');
+  }
+
+  function closeChangePasswordModal() {
+    document.getElementById('change-password-overlay').classList.remove('open');
+  }
+
+  async function handleChangePasswordSubmit(e) {
+    e.preventDefault();
+
+    const current      = document.getElementById('cp-current');
+    const newPwd       = document.getElementById('cp-new');
+    const confirm      = document.getElementById('cp-confirm');
+    const currentError = document.getElementById('cp-current-error');
+    const newError     = document.getElementById('cp-new-error');
+    const confirmError = document.getElementById('cp-confirm-error');
+    const successEl    = document.getElementById('cp-success');
+    const submitBtn    = document.getElementById('cp-submit');
+
+    currentError.textContent = '';
+    newError.textContent = '';
+    confirmError.textContent = '';
+    successEl.hidden = true;
+
+    if (!current.value) {
+      currentError.textContent = 'Ingresá tu contraseña actual';
+      current.focus();
+      return;
+    }
+    if (newPwd.value.length < 8) {
+      newError.textContent = 'La nueva contraseña debe tener al menos 8 caracteres';
+      newPwd.focus();
+      return;
+    }
+    if (newPwd.value !== confirm.value) {
+      confirmError.textContent = 'Las contraseñas no coinciden';
+      confirm.focus();
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Guardando...';
+
+    try {
+      const response = await fetch('/api/change-password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ' + getStoredToken()
+        },
+        body: JSON.stringify({
+          current_password: current.value,
+          password: newPwd.value,
+          password_confirmation: confirm.value
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.errors?.current_password) {
+          currentError.textContent = data.errors.current_password[0];
+        } else if (data.errors?.password) {
+          newError.textContent = data.errors.password[0];
+        } else {
+          currentError.textContent = data.message || 'Ocurrió un error';
+        }
+        return;
+      }
+
+      successEl.textContent = data.message;
+      successEl.hidden = false;
+      document.getElementById('change-password-form').reset();
+      setTimeout(closeChangePasswordModal, 2000);
+
+    } catch (err) {
+      currentError.textContent = 'Error de conexión';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Guardar cambios';
+    }
+  }
+
+  function toggleMobileProfileMenu(e) {
+    e.stopPropagation();
+    const menu = document.getElementById('profile-menu');
+    menu.classList.toggle('open');
+  }
+
+  window.toggleProfileMenu         = toggleProfileMenu;
+  window.toggleMobileProfileMenu   = toggleMobileProfileMenu;
+  window.openContactModal          = openContactModal;
+  window.closeContactModal         = closeContactModal;
+  window.handleContactSubmit       = handleContactSubmit;
+  window.openProfileModal          = openProfileModal;
+  window.closeProfileModal         = closeProfileModal;
+  window.handleProfileSubmit       = handleProfileSubmit;
+  window.handleLogout              = handleLogout;
+  window.updateAlertsBadge         = updateAlertsBadge;
+  window.openChangePasswordModal   = openChangePasswordModal;
+  window.closeChangePasswordModal  = closeChangePasswordModal;
+  window.handleChangePasswordSubmit = handleChangePasswordSubmit;
 })();

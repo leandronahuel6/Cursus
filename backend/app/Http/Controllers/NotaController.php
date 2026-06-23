@@ -15,6 +15,9 @@ class NotaController extends Controller
             'materia_usuario_id' => 'required|exists:materia_usuario,id',
         ]);
 
+        $materiaUsuario = MateriaUsuario::findOrFail($request->materia_usuario_id);
+        abort_unless($materiaUsuario->usuario_id === $request->user()->id, 403);
+
         $notas = Nota::where('materia_usuario_id', $request->materia_usuario_id)
             ->orderBy('fecha')
             ->get();
@@ -25,7 +28,7 @@ class NotaController extends Controller
     // Cargar una nota nueva
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'materia_usuario_id' => 'required|exists:materia_usuario,id',
             'tipo' => 'required|in:parcial,recuperatorio,tp,final',
             'numero' => 'required|integer|min:1',
@@ -33,7 +36,10 @@ class NotaController extends Controller
             'fecha' => 'required|date',
         ]);
 
-        $nota = Nota::create($request->all());
+        $materiaUsuario = MateriaUsuario::findOrFail($data['materia_usuario_id']);
+        abort_unless($materiaUsuario->usuario_id === $request->user()->id, 403);
+
+        $nota = Nota::create($data);
 
         return response()->json($nota, 201);
     }
@@ -41,19 +47,23 @@ class NotaController extends Controller
     // Editar una nota existente
     public function update(Request $request, Nota $nota)
     {
-        $request->validate([
+        abort_unless($nota->materiaUsuario->usuario_id === $request->user()->id, 403);
+
+        $data = $request->validate([
             'valor' => 'sometimes|numeric|min:0|max:10',
             'fecha' => 'sometimes|date',
         ]);
 
-        $nota->update($request->all());
+        $nota->update($data);
 
         return response()->json($nota);
     }
 
     // Borrar una nota
-    public function destroy(Nota $nota)
+    public function destroy(Request $request, Nota $nota)
     {
+        abort_unless($nota->materiaUsuario->usuario_id === $request->user()->id, 403);
+
         $nota->delete();
 
         return response()->json(['message' => 'Nota eliminada correctamente']);

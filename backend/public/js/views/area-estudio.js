@@ -1,6 +1,19 @@
   /* ==========================================================================
      CONFIGURACIONES GENERALES & MOCK NETWORK
      ========================================================================== */
+  const API_BASE = '/api';
+  function getAuthHeaders() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    return {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer ' + token
+    };
+  }
+
+  const COLUMNA_DB_TO_UI = { pendiente: 'pending', progreso: 'progress', finalizado: 'done' };
+  const COLUMNA_UI_TO_DB = { pending: 'pendiente', progress: 'progreso', done: 'finalizado' };
+
   // Simulación de Fetch asíncrono
   function mockFetch(url, options = {}) {
     return new Promise((resolve, reject) => {
@@ -114,22 +127,58 @@
     { id: "b2", url: "https://stackoverflow.com/questions/1538420", title: "StackOverflow — diferencia malloc vs calloc" }
   ];
 
-  function loadAppState() {
-    const localTasks = localStorage.getItem('cursus_tasks_v2');
-    if (localTasks) {
-      tasks = JSON.parse(localTasks);
-    } else {
-      tasks = defaultTasks;
-      saveTasksToLocal();
+  async function loadAppState() {
+    if (!selectedMateriaId) {
+      tasks = [];
+      bookmarks = [];
+      renderKanban();
+      renderBookmarks();
+      return;
     }
 
-    const localBookmarks = localStorage.getItem('cursus_bookmarks_v2');
-    if (localBookmarks) {
-      bookmarks = JSON.parse(localBookmarks);
-    } else {
-      bookmarks = defaultBookmarks;
-      saveBookmarksToLocal();
+    const localTasks = localStorage.getItem('cursus_tasks_v2');
+    const savedLocalTasks = localTasks ? JSON.parse(localTasks) : [];
+    
+    // [REAL API] Cargar tareas desde la Base de Datos
+    try {
+      const response = await fetch(`${API_BASE}/tareas?materia_id=${selectedMateriaId}`, { headers: getAuthHeaders() });
+      if (!response.ok) throw new Error();
+      const dbTasks = await response.json();
+      
+      tasks = dbTasks.map(t => {
+          const localMatches = savedLocalTasks.find(lt => lt.id == t.id);
+          return {
+              id: String(t.id),
+              column: COLUMNA_DB_TO_UI[t.columna] || 'pending',
+              title: t.titulo,
+              dueDate: t.fecha_vencimiento || "",
+              description: localMatches ? localMatches.description : "",
+              subtasks: localMatches ? localMatches.subtasks : [] // [MOCK API]
+          };
+      });
+    } catch (e) {
+      console.error("Error cargando tareas DB", e);
+      tasks = [];
     }
+
+    // [REAL API] Cargar marcadores desde la Base de Datos
+    try {
+      const response = await fetch(`${API_BASE}/marcadores?materia_id=${selectedMateriaId}`, { headers: getAuthHeaders() });
+      if (!response.ok) throw new Error();
+      const dbBookmarks = await response.json();
+      
+      bookmarks = dbBookmarks.map(b => ({
+          id: String(b.id),
+          url: b.url,
+          title: b.titulo || b.url
+      }));
+    } catch (e) {
+      console.error("Error cargando marcadores DB", e);
+      bookmarks = [];
+    }
+    
+    renderKanban();
+    renderBookmarks();
   }
 
   function saveTasksToLocal() {
@@ -405,10 +454,14 @@
 
       showToast("¡Buen trabajo! Sesión de enfoque completada. Hora de descansar.", "success");
       
-      mockFetch('/api/sesiones/finalizar', { 
-        method: 'POST', 
-        body: JSON.stringify({ estado: 'completada', duracion: pomoSettings.focusTime }) 
-      });
+      // [REAL API] Registrar sesión completada
+      if (selectedMateriaId) {
+          fetch(`${API_BASE}/pomodoro/sesiones`, { 
+            method: 'POST', 
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ materia_id: selectedMateriaId, duracion_segundos: pomoSettings.focusTime * 60 }) 
+          }).then(() => loadMateriaResumen()).catch(e => console.error(e));
+      }
 
     } else {
       // Completó descanso
@@ -1032,6 +1085,7 @@
     saveTaskSubtasksStateOnly();
   }
 
+  // [MOCK API] Subtareas simuladas
   function saveSubtaskText(index, element) {
     const newText = element.textContent.trim();
     if (newText) {
@@ -1368,6 +1422,7 @@
     { name: "Mateo R.", initials: "MR", state: "estudiando", time: "Hace 18 min", pomodoros: 0, bg: "linear-gradient(135deg,#10b981,#059669)" }
   ];
 
+  // [MOCK API] Panel social simulado
   function renderSocial() {
     const list = document.getElementById('social-list');
     list.innerHTML = '';
@@ -1447,10 +1502,8 @@
   /* ==========================================================================
      INICIO DE LA APLICACIÓN
      ========================================================================== */
-  window.addEventListener('DOMContentLoaded', () => {
-    loadAppState();
-    renderKanban();
-    renderBookmarks();
+  window.addEventListener('DOMContentLoaded', async () => {
+    await loadAppState();
     initPomodoro();
     renderSocial();
   });
@@ -1490,3 +1543,114 @@ window.toggleSubtaskStatus = toggleSubtaskStatus;
 window.saveSubtaskText = saveSubtaskText;
 window.handleSubtaskEnter = handleSubtaskEnter;
 window.deleteSubtask = deleteSubtask;
+
+/* ==================
+   SELECTOR DE MATERIA
+================== */
+let materiasCursando = [];
+let selectedMateriaId = null;
+
+async function loadMateriasCursando() {
+  try {
+    const response = await fetch('/api/mis-materias', { 
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
+    });
+    if (!response.ok) throw new Error('No se pudieron cargar las materias');
+    const data = await response.json();
+    materiasCursando = data.filter(m => m.estado === 'cursando');
+  } catch (e) {
+    console.error(e);
+    materiasCursando = [];
+  }
+
+  renderMateriaDropdown();
+
+  if (materiasCursando.length === 0) {
+    document.getElementById('mat-selector-name').textContent = 'Sin materias en curso';
+    document.getElementById('mat-selector-badge').textContent = '—';
+    return;
+  }
+
+  const saved = parseInt(localStorage.getItem('cursus_selected_materia'), 10);
+  const savedValida = materiasCursando.find(m => m.id === saved);
+  selectMateria(savedValida ? saved : materiasCursando[0].id);
+}
+
+function renderMateriaDropdown() {
+  const dropdown = document.getElementById('materia-dropdown');
+  dropdown.innerHTML = '';
+
+  if (materiasCursando.length === 0) {
+    dropdown.innerHTML = `<div class="mat-dropdown-empty">No estás cursando ninguna materia. Anotate desde "Mis Materias" para poder estudiar acá.</div>`;
+    return;
+  }
+
+  materiasCursando.forEach(m => {
+    const item = document.createElement('div');
+    item.className = `mat-dropdown-item ${m.id === selectedMateriaId ? 'active' : ''}`;
+    item.innerHTML = `<span>${m.nombre}</span>${m.id === selectedMateriaId ? '<span>✓</span>' : ''}`;
+    item.onclick = () => selectMateria(m.id);
+    dropdown.appendChild(item);
+  });
+}
+
+function toggleMateriaDropdown(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('materia-dropdown').classList.toggle('open');
+  document.getElementById('mat-dropdown-trigger').classList.toggle('open');
+}
+
+async function loadMateriaResumen() {
+  if (!selectedMateriaId) return;
+  try {
+    const response = await fetch(`${API_BASE}/materias/${selectedMateriaId}/pomodoro-resumen`, { headers: getAuthHeaders() });
+    if (!response.ok) throw new Error();
+    const data = await response.json();
+    
+    document.getElementById('chip-stat-hours').textContent = `${data.horas_semana}h`;
+    document.getElementById('chip-stat-pomos').textContent = data.sesiones_totales;
+
+    // Actualizar historial local de la sesión
+    pomoCycles.sesiones_completadas_hoy = data.sesiones_hoy.length;
+    pomoCycles.log = data.sesiones_hoy.map(s => ({
+        time: s.hora,
+        duration: `${Math.floor(s.duracion_segundos / 60)}:00`,
+        status: "✓ Completada"
+    }));
+    updatePomoUI();
+  } catch (e) {
+    console.error("Error resumen", e);
+  }
+}
+
+function closeMateriaDropdown() {
+  document.getElementById('materia-dropdown').classList.remove('open');
+  document.getElementById('mat-dropdown-trigger').classList.remove('open');
+}
+
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('mat-dropdown-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    closeMateriaDropdown();
+  }
+});
+
+function selectMateria(id) {
+  selectedMateriaId = id;
+  localStorage.setItem('cursus_selected_materia', String(id));
+
+  const materia = materiasCursando.find(m => m.id === id);
+  document.getElementById('mat-selector-name').textContent = materia ? materia.nombre : '—';
+
+  renderMateriaDropdown();
+  closeMateriaDropdown();
+  
+  // [REAL API] Recargar todo al seleccionar materia
+  loadAppState();
+  loadMateriaResumen();
+}
+
+window.toggleMateriaDropdown = toggleMateriaDropdown;

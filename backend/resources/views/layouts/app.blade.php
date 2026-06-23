@@ -38,6 +38,13 @@
         <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 7h6M5 10h4M5 5h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         Simulador de Horarios
       </div>
+      <div class="nav-item {{ Request::routeIs('beneficios') ? 'active' : '' }}" onclick="location.href='{{ route('beneficios') }}'">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="none">
+          <path d="M2.5 5.5h11v2H2.5v-2zm1.5-3h8v3h-8v-3zm-1 5h10v6a1 1 0 01-1 1h-8a1 1 0 01-1-1v-6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          <path d="M8 5.5v8.5" stroke="currentColor" stroke-width="1.4"/>
+        </svg>
+        Beneficios
+      </div>
       <div class="nav-group">Personal</div>
       <div class="nav-item {{ Request::routeIs('alertas') ? 'active' : '' }}" onclick="location.href='{{ route('alertas') }}'">
         <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a4 4 0 014 4c0 2.5 1.2 3.5 1.5 4.5H2.5C2.8 9 4 8 4 5.5a4 4 0 014-4z" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 10c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5" stroke="currentColor" stroke-width="1.3"/></svg>
@@ -50,29 +57,6 @@
       </div>
     </nav>
 
-    <!-- Menú de perfil (aparece hacia arriba al hacer clic) -->
-    <div class="profile-menu" id="profile-menu">
-      <button class="profile-menu-item" onclick="location.href='#'">
-        <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4"/>
-          <path d="M8 1v1M8 14v1M1 8h1M14 8h1M2.9 2.9l.7.7M12.4 12.4l.7.7M2.9 13.1l.7-.7M12.4 3.6l.7-.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-        </svg>
-        Perfil
-      </button>
-      <button class="profile-menu-item" onclick="window.openContactModal()">
-        <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
-          <path d="M2 3h12v8H9l-3 2.5V11H2V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-        </svg>
-        Contacto
-      </button>
-      <div class="profile-menu-divider"></div>
-      <button class="profile-menu-item danger" onclick="window.handleLogout()">
-        <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
-          <path d="M6 3H3v10h3M10 5l3 3-3 3M13 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Cerrar Sesión
-      </button>
-    </div>
     <div class="sb-user" onclick="window.toggleProfileMenu(event)">
       <div class="sb-av" id="sb-av">{{ $viewerInitials ?? '' }}</div>
       <div>
@@ -84,6 +68,30 @@
       </svg>
     </div>
   </aside>
+
+  <!-- Menú de perfil — fuera del sidebar para que sea visible en mobile -->
+  <div class="profile-menu" id="profile-menu">
+    <button class="profile-menu-item" onclick="window.openProfileModal()">
+      <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M8 1v1M8 14v1M1 8h1M14 8h1M2.9 2.9l.7.7M12.4 12.4l.7.7M2.9 13.1l.7-.7M12.4 3.6l.7-.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Perfil
+    </button>
+    <button class="profile-menu-item" onclick="window.openContactModal()">
+      <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
+        <path d="M2 3h12v8H9l-3 2.5V11H2V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+      </svg>
+      Contacto
+    </button>
+    <div class="profile-menu-divider"></div>
+    <button class="profile-menu-item danger" onclick="window.handleLogout()">
+      <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
+        <path d="M6 3H3v10h3M10 5l3 3-3 3M13 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Cerrar Sesión
+    </button>
+  </div>
 
   <!-- ===================== MAIN ===================== -->
   <div class="main">
@@ -107,20 +115,27 @@
   <nav class="bnav">
     <div class="bnav-row">
       <div class="bn {{ Request::routeIs('dashboard') ? 'on' : '' }}" onclick="location.href='{{ route('dashboard') }}'">
-        <span class="bn-ic">⊞</span>Inicio
+        <span class="bn-ic">⊞</span><span class="bn-lbl">Inicio</span>
       </div>
       <div class="bn {{ Request::routeIs('materias') ? 'on' : '' }}" onclick="location.href='{{ route('materias') }}'">
-        <span class="bn-ic">📚</span>Materias
+        <span class="bn-ic">📚</span><span class="bn-lbl">Materias</span>
       </div>
       <div class="bn {{ Request::routeIs('area-estudio') ? 'on' : '' }}" onclick="location.href='{{ route('area-estudio') }}'">
-        <span class="bn-ic">⏱</span>Estudio
+        <span class="bn-ic">⏱</span><span class="bn-lbl">Estudio</span>
       </div>
       <div class="bn {{ Request::routeIs('horarios') ? 'on' : '' }}" onclick="location.href='{{ route('horarios') }}'">
-        <span class="bn-ic">☑️</span>Horarios
+        <span class="bn-ic">☑️</span><span class="bn-lbl">Horarios</span>
       </div>
       <div class="bn {{ Request::routeIs('alertas') ? 'on' : '' }}" onclick="location.href='{{ route('alertas') }}'">
-        <span class="bn-ic">🔔</span>Alertas
+        <span class="bn-ic">🔔</span><span class="bn-lbl">Alertas</span>
         <span class="bn-badge" id="bnav-badge-count">0</span>
+      </div>
+      <div class="bn" id="bn-profile" onclick="window.toggleMobileProfileMenu(event)">
+        <svg class="bn-ic" width="20" height="20" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M2.5 13.5c0-2.761 2.462-5 5.5-5s5.5 2.239 5.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <span class="bn-lbl">Perfil</span>
       </div>
     </div>
   </nav>
@@ -161,6 +176,95 @@
         <div class="contact-footer">
           <button type="button" class="contact-btn-cancel" onclick="window.closeContactModal()">Cancelar</button>
           <button type="submit" class="contact-btn-send">Enviar mensaje</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Perfil -->
+<div class="contact-overlay" id="profile-edit-overlay">
+  <div class="contact-box">
+    <div class="contact-header">
+      <div class="contact-title">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="3" stroke="var(--brand)" stroke-width="1.4"/>
+          <path d="M8 1v1M8 14v1M1 8h1M14 8h1M2.9 2.9l.7.7M12.4 12.4l.7.7M2.9 13.1l.7-.7M12.4 3.6l.7-.7" stroke="var(--brand)" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        Editar perfil
+      </div>
+      <button class="contact-close" onclick="window.closeProfileModal()">✕</button>
+    </div>
+    <div class="contact-body">
+      <p class="contact-subtitle">Actualizá tus datos personales.</p>
+      <form id="profile-edit-form" onsubmit="window.handleProfileSubmit(event)">
+        <div class="contact-field">
+          <label for="profile-nombre">Nombre completo</label>
+          <input type="text" id="profile-nombre" class="contact-input" placeholder="Ej: Juan Pérez" required>
+          <span id="profile-nombre-error" class="error-message"></span>
+        </div>
+        <div class="contact-field">
+          <label for="profile-legajo">Legajo</label>
+          <input type="text" id="profile-legajo" class="contact-input" placeholder="Ej: 12345">
+          <span id="profile-legajo-error" class="error-message"></span>
+        </div>
+        <div class="contact-field">
+          <label for="profile-email">Email</label>
+          <input type="email" id="profile-email" class="contact-input" placeholder="nombre@ejemplo.com" required>
+          <span id="profile-email-error" class="error-message"></span>
+        </div>
+        <div class="contact-footer">
+          <button type="button" class="contact-btn-cancel" onclick="window.closeProfileModal()">Cancelar</button>
+          <button type="submit" class="contact-btn-send">Guardar cambios</button>
+        </div>
+        <button type="button" class="btn-change-pwd" onclick="window.openChangePasswordModal()">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+            <rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="8" cy="10.5" r="1" fill="currentColor"/>
+          </svg>
+          Cambiar contraseña
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Cambiar Contraseña -->
+<div class="contact-overlay" id="change-password-overlay">
+  <div class="contact-box">
+    <div class="contact-header">
+      <div class="contact-title">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="3" y="7" width="10" height="7" rx="1.5" stroke="var(--brand)" stroke-width="1.4"/>
+          <path d="M5 7V5a3 3 0 016 0v2" stroke="var(--brand)" stroke-width="1.4" stroke-linecap="round"/>
+          <circle cx="8" cy="10.5" r="1" fill="var(--brand)"/>
+        </svg>
+        Cambiar contraseña
+      </div>
+      <button class="contact-close" onclick="window.closeChangePasswordModal()">✕</button>
+    </div>
+    <div class="contact-body">
+      <form id="change-password-form" onsubmit="window.handleChangePasswordSubmit(event)">
+        <div class="contact-field">
+          <label for="cp-current">Contraseña actual</label>
+          <input type="password" id="cp-current" class="contact-input" placeholder="••••••••" autocomplete="current-password">
+          <span id="cp-current-error" class="error-message"></span>
+        </div>
+        <div class="contact-field">
+          <label for="cp-new">Nueva contraseña</label>
+          <input type="password" id="cp-new" class="contact-input" placeholder="••••••••" autocomplete="new-password">
+          <span id="cp-new-error" class="error-message"></span>
+        </div>
+        <div class="contact-field">
+          <label for="cp-confirm">Confirmar nueva contraseña</label>
+          <input type="password" id="cp-confirm" class="contact-input" placeholder="••••••••" autocomplete="new-password">
+          <span id="cp-confirm-error" class="error-message"></span>
+        </div>
+        <p id="cp-success" class="login-success-message" hidden></p>
+        <div class="contact-footer">
+          <button type="button" class="contact-btn-cancel" onclick="window.closeChangePasswordModal()">Cancelar</button>
+          <button type="submit" class="contact-btn-send" id="cp-submit">Guardar cambios</button>
         </div>
       </form>
     </div>

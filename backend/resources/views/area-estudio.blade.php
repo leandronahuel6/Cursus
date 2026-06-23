@@ -33,12 +33,17 @@
 <!-- Materia Header -->
       <div class="mat-hdr">
         <div class="mat-ic">💻</div>
-        <div class="mat-info">
-          <div class="mat-name" id="materia-name">Programación II</div>
-          <div class="mat-meta">
-            <span class="badge b-reg" id="materia-badge">Regular</span>
-            <span class="mat-yr" id="materia-meta">2° año · Cursada 2024</span>
+        <div class="mat-info mat-dropdown-wrap" id="mat-dropdown-wrap">
+          <div class="mat-name mat-dropdown-trigger" id="mat-dropdown-trigger" onclick="toggleMateriaDropdown(event)">
+            <span id="mat-selector-name">—</span>
+            <span class="mat-dropdown-caret">▾</span>
           </div>
+          <div class="mat-meta">
+            <span class="badge b-cur" id="mat-selector-badge">Cursando</span>
+            <span class="mat-yr">Tocá el nombre para cambiar de materia</span>
+          </div>
+          <!-- Selector de materia -->
+          <div class="mat-dropdown" id="materia-dropdown"></div>
         </div>
         <div class="mat-chips">
           <div class="mat-chip">

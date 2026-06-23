@@ -57,9 +57,6 @@
                         <a href="{{ route('register') }}">Registrate</a>
                     </p>
 
-                    <p class="login-signup" style="margin-top: 8px;">
-                        <a href="{{ route('dashboard') }}" style="color: var(--t3); font-weight: 400;">Entrar sin iniciar sesión (modo desarrollo) →</a>
-                    </p>
                 </div>
             </div>
     

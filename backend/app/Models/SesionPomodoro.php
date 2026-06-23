@@ -4,18 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class HorarioUsuario extends Model
+class SesionPomodoro extends Model
 {
-    protected $table = 'horarios_usuarios';
+    protected $table = 'sesiones_pomodoro';
 
     protected $fillable = [
         'usuario_id',
-        'tipo',
         'materia_id',
-        'titulo_actividad',
-        'dia_semana',
-        'hora_inicio',
-        'hora_fin',
+        'duracion_segundos',
+        'completada_en',
+    ];
+
+    protected $casts = [
+        'completada_en' => 'datetime',
     ];
 
     public function usuario()
