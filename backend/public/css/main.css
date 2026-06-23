@@ -643,34 +643,6 @@ h1, h2, h3, h4, h5, h6, .display-text {
 .mat-chip-v { font-size: 16px; font-weight: 700; color: var(--t1); letter-spacing: -.02em; }
 .mat-chip-l { font-size: 11px; color: var(--t3); }
 
-/* Selector de materia (dropdown vertical) */
-.mat-dropdown-wrap { position: relative; }
-.mat-dropdown-trigger {
-  display: inline-flex; align-items: center; gap: 6px;
-  cursor: pointer; user-select: none;
-}
-.mat-dropdown-caret { font-size: 11px; color: var(--t3); transition: transform .15s; }
-.mat-dropdown-trigger.open .mat-dropdown-caret { transform: rotate(180deg); }
-.mat-dropdown {
-  position: absolute; top: calc(100% + 8px); left: 0;
-  min-width: 240px; max-height: 280px; overflow-y: auto;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--r); box-shadow: var(--sh-md);
-  padding: 6px; z-index: 50;
-  opacity: 0; transform: translateY(-6px);
-  pointer-events: none; transition: opacity .15s, transform .15s;
-}
-.mat-dropdown.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
-.mat-dropdown-item {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  width: 100%; padding: 9px 10px; border-radius: var(--r-sm);
-  font-size: 13px; font-weight: 500; color: var(--t2);
-  cursor: pointer; text-align: left; transition: background .15s, color .15s;
-}
-.mat-dropdown-item:hover { background: var(--brand-light); color: var(--brand); }
-.mat-dropdown-item.active { background: var(--brand-light); color: var(--brand); font-weight: 700; }
-.mat-dropdown-empty { padding: 10px; font-size: 13px; color: var(--t3); }
-
 /* SPLIT LAYOUT */
 .split { display: grid; grid-template-columns: 1fr 272px; gap: 16px; align-items: start; }
 
@@ -838,7 +810,7 @@ h1, h2, h3, h4, h5, h6, .display-text {
 .panel.on { display: block; }
 
 /* KANBAN */
-.kanban { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; padding: 16px 0 0; }
+.kanban { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
 .kbcol {
   background: var(--bg); border: 1px solid var(--border);
   border-radius: var(--r-lg); padding: 12px;
@@ -884,11 +856,11 @@ h1, h2, h3, h4, h5, h6, .display-text {
 .kb-add:hover { border-color: var(--brand-dim); color: var(--brand); background: var(--brand-light); }
 
 /* MARCADORES */
-.bmwrap { padding: 16px 0 0; }
+.bmwrap { }
 .bm-form {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--r-lg); padding: 13px 15px;
-  margin-bottom: 12px; box-shadow: var(--sh);
+  box-shadow: var(--sh);
 }
 .bm-form-title { font-size: 12px; font-weight: 600; color: var(--t1); margin-bottom: 10px; }
 .bm-row { display: flex; gap: 8px; }

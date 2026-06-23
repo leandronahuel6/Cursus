@@ -54,6 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/marcadores', [MarcadorController::class, 'index']);
     Route::post('/marcadores', [MarcadorController::class, 'store']);
+    Route::put('/marcadores/{marcador}', [MarcadorController::class, 'update']);
     Route::delete('/marcadores/{marcador}', [MarcadorController::class, 'destroy']);
 
     Route::get('/alertas', [AlertaController::class, 'index']);
