@@ -39,31 +39,7 @@
         100% { background-position: 100% 100%, 0% 0%; }
     }
 
-    /* Overrides del Layout en Modo Oscuro (Exclusivo en esta página) */
-    body.dark-mode .sidebar {
-        background: #0b0f19;
-        border-right: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    body.dark-mode .sb-logo {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    body.dark-mode .sb-user {
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    body.dark-mode .nav-group {
-        color: #4b5563;
-    }
-    body.dark-mode .nav-item {
-        color: #9ca3af;
-    }
-    body.dark-mode .nav-item:hover {
-        background: rgba(255, 255, 255, 0.05);
-        color: #f3f4f6;
-    }
-    body.dark-mode .nav-item.active {
-        background: rgba(79, 70, 229, 0.22);
-        color: #a5b4fc;
-    }
+    /* Overrides del sidebar en dark mode → ver css/layout/sidebar.css */
 
     body.dark-mode .topbar {
         background: rgba(7, 10, 19, 0.8) !important;
