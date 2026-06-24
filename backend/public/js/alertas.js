@@ -545,14 +545,17 @@ function renderCalendar() {
   for (let day = 1; day <= totalDays; day++) {
     const cell = document.createElement('div');
     cell.className = 'calendar-day-cell';
-    cell.innerText = day;
 
     const paddedMonth = String(month + 1).padStart(2, '0');
     const paddedDay = String(day).padStart(2, '0');
     const dateStr = `${year}-${paddedMonth}-${paddedDay}`;
 
-    if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
+    const esHoy = year === today.getFullYear() && month === today.getMonth() && day === today.getDate();
+    if (esHoy) {
       cell.classList.add('today');
+      cell.innerHTML = `${day}<span class="calendar-day-today-tag">Hoy</span>`;
+    } else {
+      cell.innerText = day;
     }
 
     if (state.calendar.selectedDate === dateStr) {

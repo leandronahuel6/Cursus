@@ -26,7 +26,6 @@
 
 @section('topbar-content')
   <div class="topbar-title">{{ $greeting }}, <span class="greeting-name">{{ $userName }}</span> <span>👋</span></div>
-  <div class="streak-chip" id="topbar-racha">🔥 0 días de racha</div>
   <button class="btn-primary" onclick="location.href='{{ route('area-estudio') }}'">▶ Empezar sesión</button>
 @endsection
 
@@ -116,7 +115,7 @@
           <div class="study-hero-icon">💻</div>
           <div>
             <div class="study-subject" id="study-hero-subject">—</div>
-            <div class="study-sub">Última sesión: hoy, 14:35 · 2 sesiones hoy</div>
+            <div class="study-sub" id="study-hero-sub">Sin sesiones hoy</div>
           </div>
         </div>
 
@@ -125,32 +124,14 @@
           <button class="study-cta" onclick="location.href='{{ route('area-estudio') }}'">
             ▶ Continuar estudiando →
           </button>
-          <div class="study-cta-meta">
-            <div class="study-live-dot"></div>
-            4 compañeros activos en esta materia ahora
-          </div>
         </div>
 
         <!-- Sesiones de hoy -->
-        <div class="study-sessions">
+        <div class="study-sessions" id="study-sessions">
           <div class="ss-hdr">Sesiones de hoy</div>
-          <div class="ss-item">
-            <div class="ss-dot"></div>
-            <div class="ss-info">
-              <div class="ss-mat">Programación II</div>
-              <div class="ss-time">14:05 — 14:30</div>
-            </div>
-            <div class="ss-dur">🍅 25 min</div>
+          <div id="study-sessions-list">
+            <div class="ss-empty" style="padding:10px 0;color:var(--t3);font-size:13px">Todavía no estudiaste hoy.</div>
           </div>
-          <div class="ss-item">
-            <div class="ss-dot"></div>
-            <div class="ss-info">
-              <div class="ss-mat">Programación II</div>
-              <div class="ss-time">14:35 — 15:00</div>
-            </div>
-            <div class="ss-dur">🍅 25 min</div>
-          </div>
-          <div class="ss-total">Total hoy: 50 min · 🍅 × 2</div>
         </div>
 
         <!-- Estudiar otra materia -->

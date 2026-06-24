@@ -12,7 +12,6 @@
 
 @section('topbar-content')
   <div class="topbar-title">Mis Materias <span>📚</span></div>
-  <div class="streak-chip">🔥 Plan de Estudios 2024</div>
 @endsection
 
 @section('content')
