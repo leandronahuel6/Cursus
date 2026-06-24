@@ -28,6 +28,7 @@
   text-decoration: none;
   flex: 1;
   overflow: hidden;
+  cursor: pointer;
 }
 .sb-logo-icon-wrapper {
   height: 42px; width: 42px;

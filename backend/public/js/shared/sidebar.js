@@ -6,12 +6,20 @@
 
     if (!sidebar || !toggleBtn) return;
 
+    // Guardar href original
+    if (logoLink && logoLink.hasAttribute('href')) {
+      logoLink.dataset.href = logoLink.getAttribute('href');
+    }
+
     // Load state from localStorage
     const isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
     if (isCollapsed) {
       sidebar.classList.add('collapsed');
       document.body.classList.add('sidebar-collapsed');
-      if (logoLink) logoLink.title = 'Abrir barra lateral';
+      if (logoLink) {
+        logoLink.title = 'Abrir barra lateral';
+        logoLink.removeAttribute('href');
+      }
     }
 
     // Toggle click
@@ -23,7 +31,13 @@
       localStorage.setItem('sidebar_collapsed', collapsing);
       
       if (logoLink) {
-        logoLink.title = collapsing ? 'Abrir barra lateral' : 'Ir al inicio';
+        if (collapsing) {
+          logoLink.title = 'Abrir barra lateral';
+          logoLink.removeAttribute('href');
+        } else {
+          logoLink.title = 'Ir al inicio';
+          if (logoLink.dataset.href) logoLink.setAttribute('href', logoLink.dataset.href);
+        }
       }
 
       // Close profile menu if it was open
