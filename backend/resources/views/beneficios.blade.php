@@ -466,9 +466,6 @@
 
 @section('topbar-content')
   <div class="topbar-title">Beneficios Estudiantiles <span>🎁</span></div>
-  <div class="tb-actions" style="display: flex; align-items: center; gap: 12px;">
-    <div class="streak-chip">🔥 8 días de racha</div>
-  </div>
 @endsection
 
 @section('content')

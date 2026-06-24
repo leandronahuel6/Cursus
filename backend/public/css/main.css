@@ -1314,6 +1314,16 @@ h1, h2, h3, h4, h5, h6, .display-text {
   color: var(--brand);
   font-weight: 700;
 }
+.calendar-day-today-tag {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  line-height: 1;
+}
+.calendar-day-cell.today.selected .calendar-day-today-tag {
+  color: #ffffff;
+}
 .calendar-day-cell.selected {
   background: var(--brand) !important;
   color: #ffffff !important;

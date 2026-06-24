@@ -51,16 +51,76 @@ function renderStudyPanel(materiasCursando) {
   }
 
   const list = document.getElementById('study-others-list');
-  if (!list) return;
-  list.innerHTML = '';
+  if (list) {
+    list.innerHTML = '';
+    materiasCursando.slice(1).forEach(m => {
+      const item = document.createElement('div');
+      item.className = 'so-item';
+      item.onclick = () => { window.location.href = '/area-estudio'; };
+      item.innerHTML = `<span>📖 ${m.nombre}</span><span>→</span>`;
+      list.appendChild(item);
+    });
+  }
 
-  materiasCursando.slice(1).forEach(m => {
+  if (materiasCursando[0]) {
+    loadSesionesHoy(materiasCursando[0]);
+  }
+}
+
+function renderSesionesHoy(sesionesHoy) {
+  const sub = document.getElementById('study-hero-sub');
+  const listEl = document.getElementById('study-sessions-list');
+  if (!listEl) return;
+
+  if (sesionesHoy.length === 0) {
+    if (sub) sub.textContent = 'Sin sesiones hoy';
+    listEl.innerHTML = '<div class="ss-empty" style="padding:10px 0;color:var(--t3);font-size:13px">Todavía no estudiaste hoy.</div>';
+    return;
+  }
+
+  const totalSegundos = sesionesHoy.reduce((acc, s) => acc + s.duracion_segundos, 0);
+  const totalMin = Math.round(totalSegundos / 60);
+  const ultima = sesionesHoy[sesionesHoy.length - 1];
+
+  if (sub) {
+    sub.textContent = `Última sesión: hoy, ${ultima.hora} · ${sesionesHoy.length} sesión${sesionesHoy.length !== 1 ? 'es' : ''} hoy`;
+  }
+
+  listEl.innerHTML = '';
+  sesionesHoy.forEach(s => {
+    const dur = Math.round(s.duracion_segundos / 60);
     const item = document.createElement('div');
-    item.className = 'so-item';
-    item.onclick = () => { window.location.href = '/area-estudio'; };
-    item.innerHTML = `<span>📖 ${m.nombre}</span><span>→</span>`;
-    list.appendChild(item);
+    item.className = 'ss-item';
+    item.innerHTML = `
+      <div class="ss-dot"></div>
+      <div class="ss-info">
+        <div class="ss-mat">${s.materia_nombre || ''}</div>
+        <div class="ss-time">${s.hora}</div>
+      </div>
+      <div class="ss-dur">🍅 ${dur} min</div>
+    `;
+    listEl.appendChild(item);
   });
+
+  const total = document.createElement('div');
+  total.className = 'ss-total';
+  total.textContent = `Total hoy: ${totalMin} min · 🍅 × ${sesionesHoy.length}`;
+  listEl.appendChild(total);
+}
+
+async function loadSesionesHoy(materia) {
+  const token = getStoredToken();
+  if (!token) return;
+
+  try {
+    const response = await fetch(`/api/materias/${materia.id}/pomodoro-resumen`, { headers: getAuthHeaders() });
+    if (!response.ok) throw new Error('No se pudo cargar el resumen de la materia');
+    const data = await response.json();
+    const sesionesHoy = (data.sesiones_hoy || []).map(s => ({ ...s, materia_nombre: materia.nombre }));
+    renderSesionesHoy(sesionesHoy);
+  } catch (e) {
+    console.error('No se pudieron cargar las sesiones de hoy', e);
+  }
 }
 
 async function loadDashboardMaterias() {
@@ -118,7 +178,7 @@ function renderHeatmap(actividad) {
   }
 }
 
-// La racha se muestra en 4 lugares de la página (header móvil, topbar, stat
+// La racha se muestra en 3 lugares de la página (header móvil, stat
 // principal y el widget de actividad): todos deben reflejar el mismo número.
 function setRachaText(dias) {
   const corto = `🔥 ${dias} día${dias !== 1 ? 's' : ''}`;
@@ -128,9 +188,6 @@ function setRachaText(dias) {
 
   const mobRacha = document.getElementById('mob-racha');
   if (mobRacha) mobRacha.textContent = corto;
-
-  const topbarRacha = document.getElementById('topbar-racha');
-  if (topbarRacha) topbarRacha.textContent = `🔥 ${dias} día${dias !== 1 ? 's' : ''} de racha`;
 
   const hmRacha = document.getElementById('hm-racha');
   if (hmRacha) hmRacha.textContent = corto;
