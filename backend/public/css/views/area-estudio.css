@@ -635,16 +635,51 @@
     /* ==========================================================================
        MOBILE HEADER & BOTTOM NAV
        ========================================================================== */
-    .mob-hdr { display: none; background: var(--surface); padding: 12px 16px; border-bottom: 1px solid var(--border); }
-    .mob-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--brand); }
-    .mob-name { font-size: 16px; font-weight: 700; color: var(--t1); margin: 2px 0; }
-    .mob-row { display: flex; align-items: center; gap: 8px; }
+    .mob-hdr {
+      display: none;
+      background: var(--sidebar-bg);
+      height: 74px;
+      padding: 0 16px;
+      box-sizing: border-box;
+      border-bottom: 1px solid var(--border);
+    }
+    .mob-lbl {
+      font-size: 16px;
+      font-weight: 600;
+      color: #f9fafb;
+      margin-bottom: 4px;
+      text-transform: none;
+    }
+    .mob-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #6b7280;
+      font-weight: normal;
+      margin: 0;
+    }
 
-    .bnav { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: #fff; border-top: 1px solid var(--border); z-index: 100; }
+    .bnav {
+      display: none;
+      position: fixed;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: calc(51px + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      box-sizing: border-box;
+      background: rgba(11, 15, 25, 0.96);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 100;
+    }
     .bnav-row { display: flex; height: 100%; max-width: 500px; margin: 0 auto; gap: 12px; padding: 0 16px; }
-    .bn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9.5px; color: var(--t3); gap: 2px; }
-    .bn.on { color: var(--brand); font-weight: 600; }
-    .bn-ic { font-size: 16px; line-height: 1; }
+    .bn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9.5px; color: #94a3b8; gap: 2px; }
+    .bn.on { color: #a5b4fc; font-weight: 600; }
+    .bn-ic { font-size: 16px; line-height: 1; filter: invert(1); opacity: 0.45; transition: opacity .15s; }
+    .bn.on .bn-ic { opacity: 1; }
+    .bn:hover:not(.on) .bn-ic { opacity: 0.8; }
 
     /* ==========================================================================
        RESPONSIVE DESIGN (MEDIA QUERIES)
@@ -659,7 +694,7 @@
       .sidebar.open { transform: translateX(0); }
       .main { margin-left: 0; max-width: 100%; }
       .topbar { display: none; }
-      .mob-hdr { display: block; }
+      .mob-hdr { display: flex; flex-direction: column; justify-content: center; }
       .page { padding: 12px; }
       .mat-hdr { flex-direction: column; align-items: flex-start; gap: 12px; }
       .mat-chips { width: 100%; justify-content: space-between; }

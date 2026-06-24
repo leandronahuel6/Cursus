@@ -148,6 +148,10 @@ body.dark-mode .contact-title {
   color: #f9fafb;
 }
 
+body.dark-mode .contact-title img {
+  filter: invert(1);
+}
+
 body.dark-mode .contact-input {
   background: #1f2937;
   border-color: rgba(255, 255, 255, 0.12);
@@ -219,7 +223,7 @@ body.dark-mode .theme-toggle-btn .icon-moon { display: none; }
   margin-left: auto;
 }
 
-.theme-toggle-mobile {
+.theme-toggle-btn.theme-toggle-mobile {
   display: none;
   position: fixed;
   right: 16px;
@@ -701,17 +705,21 @@ h1, h2, h3, h4, h5, h6, .display-text {
    MOBILE HEADER
 ============================== */
 .mob-hdr { display: none; }
+.pmenu { position: fixed; bottom: 16px; right: 16px; z-index: 101; }
+.pmenu-ic { filter: invert(1); }
 
 /* ==============================
-   BOTTOM NAV
-============================== */
+   BARRA DE NAVEGACIÓN INFERIOR (MÓVIL)
+   ============================== */
 .bnav {
   display: none;
-  position: fixed; bottom: 0; left: 0; right: 0;
-  height: 50px;
-  background: rgba(255,255,255,.93);
+  position: fixed; bottom: -1px; left: 0; right: 0; /* Solapa 1px abajo del viewport */
+  height: calc(51px + env(safe-area-inset-bottom, 0px)); /* Soporte para área segura móvil */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+  background: rgba(11, 15, 25, 0.96); /* Fondo oscuro permanente */
   backdrop-filter: blur(16px);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(255, 255, 255, 0.08); /* Borde superior claro permanente */
   z-index: 100;
 }
 .bnav-row {
@@ -726,18 +734,19 @@ h1, h2, h3, h4, h5, h6, .display-text {
   flex: 1;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 3px;
-  font-size: 10px; font-weight: 500; color: var(--tm);
+  font-size: 10px; font-weight: 500; color: #94a3b8; /* Texto gris de modo oscuro */
   cursor: pointer; transition: color .15s; position: relative;
 }
-.bn.on { color: var(--brand); }
+.bn.on { color: #a5b4fc; } /* Color de elemento activo (indigo claro) */
 .bn.on .bn-ic { opacity: 1; }
-.bn:hover:not(.on) { color: var(--t3); }
+.bn:hover:not(.on) { color: #e2e8f0; } /* Hover gris claro */
 .bn:hover:not(.on) .bn-ic { opacity: 0.8; }
 .bn-ic {
   width: 16px;
   height: 16px;
   display: block;
   opacity: 0.45;
+  filter: invert(1); /* Iconos claros permanentes */
   transition: opacity 0.15s;
 }
 .bn-badge {
@@ -2274,12 +2283,16 @@ h1, h2, h3, h4, h5, h6, .display-text {
   .main    { margin-left: 0; }
 
   .theme-toggle-desktop { display: none; }
-  .theme-toggle-mobile { display: inline-flex; }
+  .theme-toggle-btn.theme-toggle-mobile { display: inline-flex; }
 
   .mob-hdr {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     background: var(--sidebar-bg);
-    padding: 18px 15px 16px;
+    height: 74px;
+    padding: 0 16px;
+    box-sizing: border-box;
   }
   .mob-greet { font-size: 16px; font-weight: 600; color: #f9fafb; margin-bottom: 4px; }
   .mob-sub   { font-size: 12px; color: #6b7280; display: flex; align-items: center; gap: 8px; }
@@ -2296,10 +2309,11 @@ h1, h2, h3, h4, h5, h6, .display-text {
   .mats-grid { grid-template-columns: 1fr; }
 
   .bnav { display: block; }
-  .bn-ic { font-size: 16px; }
+  .bn { font-size: 11px; }
+  .bn-ic { width: 19px !important; height: 19px !important; }
   .bn-lbl {
     display: block;
-    font-size: 9px;
+    font-size: 10px;
     width: 100%;
     text-align: center;
     overflow: hidden;
@@ -2311,6 +2325,38 @@ h1, h2, h3, h4, h5, h6, .display-text {
   .mob-lbl  { font-size: 12px; color: #6b7280; margin-bottom: 2px; }
   .mob-name { font-size: 18px; font-weight: 700; color: #f9fafb; }
   .mob-row  { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+
+  /* Intercambio de tamaños para cabeceras de Progreso y Horarios */
+  .mob-hdr-swapped .mob-lbl {
+    font-size: 16px;
+    font-weight: 600;
+    color: #f9fafb;
+    margin-bottom: 4px;
+    text-transform: none;
+  }
+  .mob-hdr-swapped .mob-name {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: normal;
+    margin: 0;
+  }
+  .mob-hdr-swapped .mob-row {
+    height: 15px !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 4px;
+  }
+  .mob-hdr-swapped .btn-mob-action {
+    height: 15px !important;
+    padding: 0 6px;
+    font-size: 9.5px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
 
   .split { grid-template-columns: 1fr; }
   .community { display: none; }
@@ -3807,12 +3853,6 @@ h1, h2, h3, h4, h5, h6, .display-text {
     opacity: 0.8;
   }
 
-  .profile-menu {
-    bottom: 60px;
-    left: 8px;
-    right: 8px;
-    width: auto;
-  }
 }
 
 /* ==============================
@@ -3859,6 +3899,10 @@ h1, h2, h3, h4, h5, h6, .display-text {
 .profile-menu-item.danger:hover { background: rgba(239,68,68,.12); color: #fca5a5; }
 .pmenu-ic { width: 15px; height: 15px; flex-shrink: 0; opacity: .75; }
 .profile-menu-item:hover .pmenu-ic { opacity: 1; }
+/* Invertir color para imagen del menú de perfil */
+img.pmenu-ic {
+  filter: invert(1);
+}
 .profile-menu-divider { height: 1px; background: rgba(255,255,255,.07); margin: 4px 4px; }
 
 .sb-user-caret {
@@ -3999,4 +4043,14 @@ h1, h2, h3, h4, h5, h6, .display-text {
 /* Dark Mode Navigation Icons Override */
 body.dark-mode .bn-ic {
   filter: invert(1);
+}
+
+/* Posicionamiento móvil del menú de perfil (al final para ganancia de cascada) */
+@media (max-width: 768px) {
+  .profile-menu {
+    bottom: 60px;
+    right: 8px; /* Alinear a la derecha del todo */
+    left: auto;
+    width: 200px;
+  }
 }

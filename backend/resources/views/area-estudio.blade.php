@@ -8,12 +8,12 @@
 
 @section('mobile-header')
 <div class="mob-hdr">
-<div class="mob-lbl">Área de Estudio</div>
-      <div class="mob-name" id="mob-materia-name">—</div>
-      <div class="mob-row">
-        <span class="badge b-reg" id="mob-materia-badge">Regular</span>
-        <span style="font-size:11px;color:#6b7280" id="mob-materia-meta">Cargando...</span>
-      </div>
+  <div class="mob-lbl">Área de Estudio 💻</div>
+  <div class="mob-name">
+    <span id="mob-materia-name">—</span>
+    <span class="badge b-reg" id="mob-materia-badge">Regular</span>
+    <span style="font-size:11px;color:#6b7280" id="mob-materia-meta">Cargando...</span>
+  </div>
 </div>
 @endsection
 

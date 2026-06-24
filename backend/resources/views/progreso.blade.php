@@ -165,9 +165,9 @@
 
 @section('mobile-header')
   <!-- Mobile Header -->
-  <div class="mob-hdr">
-    <div class="mob-lbl">Estadísticas</div>
-    <div class="mob-name">Mi Progreso</div>
+  <div class="mob-hdr mob-hdr-swapped">
+    <div class="mob-lbl">Mi Progreso</div>
+    <div class="mob-name">Estadísticas</div>
   </div>
 @endsection
 

@@ -72,16 +72,11 @@
   <!-- Menú de perfil — fuera del sidebar para que sea visible en mobile -->
   <div class="profile-menu" id="profile-menu">
     <button class="profile-menu-item" onclick="window.openProfileModal()">
-      <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
-        <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4"/>
-        <path d="M8 1v1M8 14v1M1 8h1M14 8h1M2.9 2.9l.7.7M12.4 12.4l.7.7M2.9 13.1l.7-.7M12.4 3.6l.7-.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-      </svg>
+      <img class="pmenu-ic" src="{{ asset('assets/icons/user.svg') }}" alt="Perfil">
       Perfil
     </button>
     <button class="profile-menu-item" onclick="window.openContactModal()">
-      <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
-        <path d="M2 3h12v8H9l-3 2.5V11H2V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-      </svg>
+      <img class="pmenu-ic" src="{{ asset('assets/icons/message-square.svg') }}" alt="Contacto">
       Contacto
     </button>
     <div class="profile-menu-divider"></div>
@@ -207,10 +202,7 @@
   <div class="contact-box">
     <div class="contact-header">
       <div class="contact-title">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="3" stroke="var(--brand)" stroke-width="1.4"/>
-          <path d="M8 1v1M8 14v1M1 8h1M14 8h1M2.9 2.9l.7.7M12.4 12.4l.7.7M2.9 13.1l.7-.7M12.4 3.6l.7-.7" stroke="var(--brand)" stroke-width="1.2" stroke-linecap="round"/>
-        </svg>
+        <img class="contact-title-ic" src="{{ asset('assets/icons/user.svg') }}" alt="Perfil" style="width: 16px; height: 16px; opacity: 0.9;">
         Editar perfil
       </div>
       <button class="contact-close" onclick="window.closeProfileModal()">✕</button>
