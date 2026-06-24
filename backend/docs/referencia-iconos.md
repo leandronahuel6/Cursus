@@ -27,6 +27,7 @@ Este documento contiene la especificación clara, mejorada y ordenada de dónde 
 - `library.svg`: Icono para enlace "Mis Materias" (Sidebar).
 - `clock.svg`: Icono para enlace "Área de Estudio" (Sidebar) y para el "Historial de Pagos" (`/alertas`).
 - `calendar.svg`: Icono para enlace "Simulador de Horarios" (Sidebar) y para indicador "Vence [fecha]" (`/area-estudio`).
+- `gift.svg`: Icono para enlace "Beneficios" (Sidebar).
 - `bell.svg`: Icono para enlace "Alertas" (Sidebar) y en el título "Alertas y Vencimientos" (`/alertas`).
 - `trending-up.svg`: Icono para enlace "Mi Progreso" (Sidebar).
 - `user.svg`: Icono para enlace "Perfil" (se muestra al cliquear el bloque de perfil en el Sidebar), y en Alerta categoría "Personal" (`/alertas`).

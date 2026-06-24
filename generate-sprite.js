@@ -17,7 +17,7 @@ if (!fs.existsSync(destIconsDir)) {
 
 const files = fs.readdirSync(srcIconsDir).filter(f => f.endsWith('.svg'));
 
-let spriteContent = '<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">\n';
+let spriteContent = '<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">\n';
 
 files.forEach(file => {
     const id = file.replace('.svg', '');
@@ -30,7 +30,7 @@ files.forEach(file => {
     // Extract inner content (everything inside <svg ...> ... </svg>)
     let innerContent = content.replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '').trim();
     
-    spriteContent += `  <symbol id="${id}" viewBox="${viewBox}">\n    ${innerContent}\n  </symbol>\n`;
+    spriteContent += `  <symbol id="${id}" viewBox="${viewBox}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n    ${innerContent}\n  </symbol>\n`;
 });
 
 spriteContent += '</svg>';
