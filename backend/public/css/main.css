@@ -900,7 +900,6 @@ h1, h2, h3, h4, h5, h6, .display-text {
   height: 16px;
   display: block;
   opacity: 0.45;
-  filter: invert(1); /* Iconos claros permanentes */
   transition: opacity 0.15s;
 }
 .bn-badge {
@@ -4255,7 +4254,7 @@ body.no-animations *::after {
 
 /* Dark Mode Navigation Icons Override */
 body.dark-mode .bn-ic {
-  filter: invert(1);
+  /* No filter needed for SVG sprite */
 }
 
 /* Dark Mode: ajustes generales de contraste

@@ -75,38 +75,38 @@
   <nav class="bnav">
     <div class="bnav-row">
       <div class="bn {{ Request::routeIs('dashboard') ? 'on' : '' }}" onclick="location.href='{{ route('dashboard') }}'">
-        <img class="bn-ic" src="{{ asset('assets/icons/layout-dashboard.svg') }}" alt="Inicio">
+        <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#layout-dashboard') }}"></use></svg>
         <span class="bn-lbl">Inicio</span>
       </div>
       <div class="bn {{ Request::routeIs('materias') ? 'on' : '' }}" onclick="location.href='{{ route('materias') }}'">
-        <img class="bn-ic" src="{{ asset('assets/icons/book-copy.svg') }}" alt="Materias">
+        <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#library') }}"></use></svg>
         <span class="bn-lbl">Materias</span>
       </div>
       <div class="bn {{ Request::routeIs('area-estudio') ? 'on' : '' }}" onclick="location.href='{{ route('area-estudio') }}'">
-        <img class="bn-ic" src="{{ asset('assets/icons/timer.svg') }}" alt="Estudio">
+        <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#clock') }}"></use></svg>
         <span class="bn-lbl">Estudio</span>
       </div>
       <div class="bn {{ Request::routeIs('horarios') ? 'on' : '' }}" onclick="location.href='{{ route('horarios') }}'">
-        <img class="bn-ic" src="{{ asset('assets/icons/calendar.svg') }}" alt="Horarios">
+        <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#calendar') }}"></use></svg>
         <span class="bn-lbl">Horarios</span>
       </div>
       <div class="bn {{ Request::routeIs('beneficios') ? 'on' : '' }}" onclick="location.href='{{ route('beneficios') }}'">
-        <img class="bn-ic" src="{{ asset('assets/icons/wallet.svg') }}" alt="Beneficios">
+        <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#gift') }}"></use></svg>
         <span class="bn-lbl">Beneficios</span>
       </div>
       <div class="bn {{ Request::routeIs('alertas') ? 'on' : '' }}" onclick="location.href='{{ route('alertas') }}'">
         <span class="bnav-icon-wrapper" style="position: relative; display: flex; align-items: center; justify-content: center;">
-          <img class="bn-ic" src="{{ asset('assets/icons/bell.svg') }}" alt="Alertas">
+          <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#bell') }}"></use></svg>
           <span class="bn-badge" id="bnav-badge-count">0</span>
         </span>
         <span class="bn-lbl">Alertas</span>
       </div>
       <div class="bn {{ Request::routeIs('progreso') ? 'on' : '' }}" onclick="location.href='{{ route('progreso') }}'">
-        <img class="bn-ic" src="{{ asset('assets/icons/chart-line.svg') }}" alt="Progreso">
+        <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#trending-up') }}"></use></svg>
         <span class="bn-lbl">Progreso</span>
       </div>
       <div class="bn" id="bn-profile" onclick="window.toggleMobileProfileMenu(event)">
-        <img class="bn-ic" src="{{ asset('assets/icons/user.svg') }}" alt="Perfil">
+        <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#user') }}"></use></svg>
         <span class="bn-lbl">Perfil</span>
       </div>
     </div>
