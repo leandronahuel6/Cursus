@@ -62,7 +62,7 @@
     
             <!-- Columna derecha: imagen decorativa -->
             <div class="login-visual-side">
-                <div class="login-visual-placeholder" aria-hidden="true"></div>
+                <img class="login-visual-img" src="{{ asset('assets/img/utn-haedo.jpg') }}" alt="UTN Facultad Regional Haedo">
             </div>
         </div>
     </main>

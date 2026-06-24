@@ -278,9 +278,15 @@ function calculateStats() {
   const progressPct = Math.round((approvedCount / totalSubjects) * 100);
   const avg = approvedCount > 0 ? (gradesSum / approvedCount).toFixed(2) : '0.00';
   
-  document.getElementById('career-progress-pct').innerText = `${progressPct}%`;
-  document.getElementById('career-average').innerText = avg;
-  document.getElementById('career-approved-count').innerText = `${approvedCount} / ${totalSubjects}`;
+  const progressPctEl = document.getElementById('career-progress-pct');
+  const averageEl = document.getElementById('career-average');
+  const approvedCountEl = document.getElementById('career-approved-count');
+  progressPctEl.innerText = `${progressPct}%`;
+  averageEl.innerText = avg;
+  approvedCountEl.innerText = `${approvedCount} / ${totalSubjects}`;
+  progressPctEl.classList.remove('skel');
+  averageEl.classList.remove('skel');
+  approvedCountEl.classList.remove('skel');
 
   // Festejo único cuando se completa el 100% del plan (se vuelve a habilitar
   // si alguna materia se demueve y luego se vuelve a aprobar todo de nuevo).
