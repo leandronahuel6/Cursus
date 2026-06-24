@@ -10,61 +10,83 @@
 </head>
 
 <body>
+  <script>
+    if (localStorage.getItem('sidebar_collapsed') === 'true') {
+      document.body.classList.add('sidebar-collapsed');
+    }
+  </script>
 <div class="app">
 
   <!-- ===================== SIDEBAR ===================== -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
+    <script>
+      if (localStorage.getItem('sidebar_collapsed') === 'true') {
+        document.getElementById('sidebar').classList.add('collapsed');
+      }
+    </script>
     <div class="sb-logo">
-      <div class="sb-logo-icon"><img src="{{ asset('assets/icons/cursus-logo.svg') }}" alt="Cursus"></div>
-      <div class="sb-logo-text">Cursus<small>Tec. en Programación</small></div>
+      <a href="{{ route('dashboard') }}" class="sb-logo-link" id="sb-logo-link" title="Ir al inicio" aria-label="Ir al inicio">
+        <div class="sb-logo-icon-wrapper">
+          <img src="{{ asset('assets/icons/cursus-logo.svg') }}" alt="Cursus" class="sb-logo-img-default" id="sb-logo-img">
+          <svg class="sb-logo-img-hover" aria-hidden="true" width="20" height="20">
+            <use href="{{ asset('assets/icons/sprite.svg#panel-left-open') }}"></use>
+          </svg>
+        </div>
+        <div class="sb-logo-text" id="sb-logo-text">Cursus<small>Tec. en Programación</small></div>
+      </a>
+      <button type="button" class="sb-toggle-btn" id="sb-toggle-btn" onclick="window.toggleSidebar(event)" aria-label="Cerrar barra lateral" title="Cerrar barra lateral">
+        <svg class="sb-toggle-ic-default" aria-hidden="true" width="20" height="20">
+          <use href="{{ asset('assets/icons/sprite.svg#panel-left') }}"></use>
+        </svg>
+        <svg class="sb-toggle-ic-hover" aria-hidden="true" width="20" height="20">
+          <use href="{{ asset('assets/icons/sprite.svg#panel-left-close') }}"></use>
+        </svg>
+      </button>
     </div>
 
-    <nav class="sb-nav">
-      <div class="nav-item {{ Request::routeIs('dashboard') ? 'active' : '' }}" onclick="location.href='{{ route('dashboard') }}'">
-        <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/></svg>
-        Inicio
+    <nav class="sb-nav" id="sb-nav">
+      <div class="nav-item {{ Request::routeIs('dashboard') ? 'active' : '' }}" onclick="location.href='{{ route('dashboard') }}'" title="Inicio">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#layout-dashboard') }}"></use></svg>
+        <span class="nav-text">Inicio</span>
       </div>
-      <div class="nav-item {{ Request::routeIs('materias') ? 'active' : '' }}" onclick="location.href='{{ route('materias') }}'">
-        <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M3 5h10M3 8h7M3 11h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        Mis Materias
+      <div class="nav-item {{ Request::routeIs('materias') ? 'active' : '' }}" onclick="location.href='{{ route('materias') }}'" title="Mis Materias">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#library') }}"></use></svg>
+        <span class="nav-text">Mis Materias</span>
       </div>
-      <div class="nav-item {{ Request::routeIs('area-estudio') ? 'active' : '' }}" onclick="location.href='{{ route('area-estudio') }}'">
-        <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3.5L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Área de Estudio
+      <div class="nav-item {{ Request::routeIs('area-estudio') ? 'active' : '' }}" onclick="location.href='{{ route('area-estudio') }}'" title="Área de Estudio">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#clock') }}"></use></svg>
+        <span class="nav-text">Área de Estudio</span>
       </div>
 
       <div class="nav-group">Académico</div>
-      <div class="nav-item {{ Request::routeIs('horarios') ? 'active' : '' }}" onclick="location.href='{{ route('horarios') }}'">
-        <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 7h6M5 10h4M5 5h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-        Simulador de Horarios
+      <div class="nav-item {{ Request::routeIs('horarios') ? 'active' : '' }}" onclick="location.href='{{ route('horarios') }}'" title="Simulador de Horarios">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#calendar') }}"></use></svg>
+        <span class="nav-text">Simulador de Horarios</span>
       </div>
-      <div class="nav-item {{ Request::routeIs('beneficios') ? 'active' : '' }}" onclick="location.href='{{ route('beneficios') }}'">
-        <svg class="nav-ic" viewBox="0 0 16 16" fill="none">
-          <path d="M2.5 5.5h11v2H2.5v-2zm1.5-3h8v3h-8v-3zm-1 5h10v6a1 1 0 01-1 1h-8a1 1 0 01-1-1v-6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-          <path d="M8 5.5v8.5" stroke="currentColor" stroke-width="1.4"/>
-        </svg>
-        Beneficios
+      <div class="nav-item {{ Request::routeIs('beneficios') ? 'active' : '' }}" onclick="location.href='{{ route('beneficios') }}'" title="Beneficios">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#gift') }}"></use></svg>
+        <span class="nav-text">Beneficios</span>
       </div>
       <div class="nav-group">Personal</div>
-      <div class="nav-item {{ Request::routeIs('alertas') ? 'active' : '' }}" onclick="location.href='{{ route('alertas') }}'">
-        <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a4 4 0 014 4c0 2.5 1.2 3.5 1.5 4.5H2.5C2.8 9 4 8 4 5.5a4 4 0 014-4z" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 10c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5" stroke="currentColor" stroke-width="1.3"/></svg>
-        Alertas
+      <div class="nav-item {{ Request::routeIs('alertas') ? 'active' : '' }}" onclick="location.href='{{ route('alertas') }}'" title="Alertas">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#bell') }}"></use></svg>
+        <span class="nav-text">Alertas</span>
         <span class="nav-badge" id="nav-badge-count">0</span>
       </div>
-      <div class="nav-item {{ Request::routeIs('progreso') ? 'active' : '' }}" onclick="location.href='{{ route('progreso') }}'">
-        <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M2 12L5 8l3 2.5L11 5l3 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Mi Progreso
+      <div class="nav-item {{ Request::routeIs('progreso') ? 'active' : '' }}" onclick="location.href='{{ route('progreso') }}'" title="Mi Progreso">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#trending-up') }}"></use></svg>
+        <span class="nav-text">Mi Progreso</span>
       </div>
     </nav>
 
-    <div class="sb-user" onclick="window.toggleProfileMenu(event)">
+    <div class="sb-user" onclick="window.toggleProfileMenu(event)" title="Opciones de perfil">
       <div class="sb-av" id="sb-av">{{ $viewerInitials ?? '' }}</div>
-      <div>
+      <div class="sb-user-info">
         <div class="sb-uname" id="sb-uname">{{ $viewerFullName ?? '' }}</div>
         <div class="sb-uleg" id="sb-uleg">{{ $viewerLegajo ? 'Legajo ' . $viewerLegajo : '' }}</div>
       </div>
-      <svg class="sb-user-caret" viewBox="0 0 10 6" fill="currentColor" width="10" height="10">
-        <path d="M0 5l5-5 5 5H0z"/>
+      <svg class="sb-user-caret" aria-hidden="true" width="16" height="16">
+        <use href="{{ asset('assets/icons/sprite.svg#chevron-up') }}"></use>
       </svg>
     </div>
   </aside>
@@ -72,11 +94,11 @@
   <!-- Menú de perfil — fuera del sidebar para que sea visible en mobile -->
   <div class="profile-menu" id="profile-menu">
     <button class="profile-menu-item" onclick="window.openProfileModal()">
-      <img class="pmenu-ic" src="{{ asset('assets/icons/user.svg') }}" alt="Perfil">
+      <svg class="pmenu-ic" aria-hidden="true" width="16" height="16"><use href="{{ asset('assets/icons/sprite.svg#user') }}"></use></svg>
       Perfil
     </button>
     <button class="profile-menu-item" onclick="window.openContactModal()">
-      <img class="pmenu-ic" src="{{ asset('assets/icons/message-square.svg') }}" alt="Contacto">
+      <svg class="pmenu-ic" aria-hidden="true" width="16" height="16"><use href="{{ asset('assets/icons/sprite.svg#message-square') }}"></use></svg>
       Contacto
     </button>
     <div class="profile-menu-divider"></div>
@@ -88,10 +110,8 @@
       </label>
     </div>
     <div class="profile-menu-divider"></div>
-    <button class="profile-menu-item danger" onclick="window.handleLogout()">
-      <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
-        <path d="M6 3H3v10h3M10 5l3 3-3 3M13 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+    <button class="profile-menu-item" onclick="window.handleLogout()">
+      <svg class="pmenu-ic" aria-hidden="true" width="16" height="16"><use href="{{ asset('assets/icons/sprite.svg#log-out') }}"></use></svg>
       Cerrar Sesión
     </button>
   </div>
@@ -295,6 +315,7 @@
 <script src="{{ asset('js/theme.js') }}"></script>
 <script src="{{ asset('js/animations.js') }}"></script>
 <script src="{{ asset('js/celebracion.js') }}"></script>
+<script src="{{ asset('js/sidebar.js') }}"></script>
 <script src="{{ asset('js/script.js') }}"></script>
 <script src="{{ asset('js/profile.js') }}"></script>
 @stack('scripts')

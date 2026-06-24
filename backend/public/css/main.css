@@ -538,20 +538,26 @@ h1, h2, h3, h4, h5, h6, .display-text {
   padding: 18px 14px 14px;
   border-bottom: 1px solid rgba(255,255,255,.07);
 }
-.sb-logo-icon {
-  height: 42px; width: auto;
+.sb-logo-icon-wrapper {
+  height: 42px; width: 42px;
   display: flex; align-items: center; justify-content: center;
   font-size: 16px; flex-shrink: 0;
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
+  color: #9ca3af;
+  transition: background 0.2s, color 0.2s;
 }
-.sb-logo-icon img {
+.sb-logo-img-default {
   height: 100%; width: auto;
   object-fit: contain;
+}
+.sb-logo-img-hover {
+  display: none;
 }
 .sb-logo-text {
   font-size: 16px; font-weight: 600;
   color: #f9fafb; letter-spacing: -.01em; line-height: 1.2;
+  white-space: nowrap;
 }
 .sb-logo-text small {
   display: block; font-size: 12px; font-weight: 400;
@@ -627,6 +633,111 @@ h1, h2, h3, h4, h5, h6, .display-text {
 /* ==============================
    MAIN
 ============================== */
+:root {
+  --sidebar-w-collapsed: 72px;
+}
+.sidebar {
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-x: hidden;
+}
+.main {
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sb-toggle-btn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+.sb-toggle-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+.sb-toggle-ic-hover {
+  display: none;
+}
+.sb-toggle-btn:hover .sb-toggle-ic-default {
+  display: none;
+}
+.sb-toggle-btn:hover .sb-toggle-ic-hover {
+  display: block;
+}
+.sb-logo {
+  justify-content: space-between;
+}
+.sb-logo-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex: 1;
+  overflow: hidden;
+}
+.sb-user-info {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.nav-item {
+  white-space: nowrap;
+}
+
+/* COLLAPSED STATE */
+.sidebar.collapsed {
+  width: var(--sidebar-w-collapsed);
+}
+body.sidebar-collapsed .main {
+  margin-left: var(--sidebar-w-collapsed);
+  max-width: calc(100% - var(--sidebar-w-collapsed));
+}
+.sidebar.collapsed .sb-logo-text,
+.sidebar.collapsed .nav-text,
+.sidebar.collapsed .nav-group,
+.sidebar.collapsed .nav-badge,
+.sidebar.collapsed .sb-user-info,
+.sidebar.collapsed .sb-user-caret,
+.sidebar.collapsed .sb-toggle-btn {
+  display: none;
+  opacity: 0;
+}
+.sidebar.collapsed .sb-logo {
+  padding: 18px 15px 14px 15px;
+}
+.sidebar.collapsed .sb-logo-link {
+  flex: 0 0 auto;
+}
+.sidebar.collapsed .sb-logo-link:hover .sb-logo-icon-wrapper {
+  background: rgba(255,255,255,0.1);
+}
+.sidebar.collapsed .sb-logo-link:hover .sb-logo-img-default {
+  display: none;
+}
+.sidebar.collapsed .sb-logo-link:hover .sb-logo-img-hover {
+  display: block;
+  color: #fff;
+}
+.sidebar.collapsed .nav-item {
+  width: 44px;
+  height: 44px;
+  justify-content: center;
+  padding: 0;
+  margin-left: 6px;
+}
+.sidebar.collapsed .sb-user {
+  padding: 14px 21px;
+}
+body.sidebar-collapsed .profile-menu {
+  width: 220px;
+  left: calc(var(--sidebar-w-collapsed) + 8px);
+}
+
 .main {
   flex: 1;
   margin-left: var(--sidebar-w);
@@ -988,7 +1099,6 @@ h1, h2, h3, h4, h5, h6, .display-text {
 ============================== */
 .mob-hdr { display: none; }
 .pmenu { position: fixed; bottom: 16px; right: 16px; z-index: 101; }
-.pmenu-ic { filter: invert(1); }
 
 /* ==============================
    BARRA DE NAVEGACIÓN INFERIOR (MÓVIL)
@@ -4209,14 +4319,9 @@ h1, h2, h3, h4, h5, h6, .display-text {
   font-family: inherit;
 }
 .profile-menu-item:hover { background: rgba(255,255,255,.07); color: #f9fafb; }
-.profile-menu-item.danger { color: #f87171; }
-.profile-menu-item.danger:hover { background: rgba(239,68,68,.12); color: #fca5a5; }
+
 .pmenu-ic { width: 15px; height: 15px; flex-shrink: 0; opacity: .75; }
 .profile-menu-item:hover .pmenu-ic { opacity: 1; }
-/* Invertir color para imagen del menú de perfil */
-img.pmenu-ic {
-  filter: invert(1);
-}
 .profile-menu-divider { height: 1px; background: rgba(255,255,255,.07); margin: 4px 4px; }
 .profile-menu-switch-row { justify-content: space-between; cursor: default; }
 .profile-menu-switch-row:hover { background: none; color: #d1d5db; }
