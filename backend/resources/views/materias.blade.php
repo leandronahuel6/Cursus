@@ -95,8 +95,6 @@
         <div class="grade-select-wrapper">
           <label for="grade-select" style="font-size: 11px; font-weight: 600; color: var(--t2);">Calificación Final:</label>
           <select id="grade-select" class="grade-input-select" style="margin-top: 5px;">
-            <option value="4">4 (Cuatro)</option>
-            <option value="5">5 (Cinco)</option>
             <option value="6">6 (Seis)</option>
             <option value="7">7 (Siete)</option>
             <option value="8" selected>8 (Ocho)</option>

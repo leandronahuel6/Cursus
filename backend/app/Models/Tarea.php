@@ -15,7 +15,7 @@ class Tarea extends Model
     ];
 
     protected $casts = [
-        'fecha_vencimiento' => 'date:Y-m-d',
+        'fecha_vencimiento' => 'datetime',
     ];
 
     public function usuario()

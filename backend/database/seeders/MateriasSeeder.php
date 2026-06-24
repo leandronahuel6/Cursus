@@ -68,9 +68,13 @@ class MateriasSeeder extends Seeder
             15 => ['regular' => [10], 'aprobada' => [6, 7]],
             16 => ['regular' => [7], 'aprobada' => [4]],
             17 => ['regular' => [9, 10], 'aprobada' => [5, 7]],
-            // Para iniciar el TFI piden cursadas 8, 9, 10, 11 y 12, pero como para acreditarlo
-            // se exigen las 17 materias aprobadas, esa condición (más estricta) absorbe a la anterior.
-            18 => ['aprobada' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]],
+            // Según la ordenanza: para INICIAR el TFI hay que tener cursadas (regulares)
+            // las materias 8, 9, 10, 11 y 12; para ACREDITARLO (aprobarlo) hay que tener
+            // aprobadas las 17 materias restantes del plan.
+            18 => [
+                'regular' => [8, 9, 10, 11, 12],
+                'aprobada' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+            ],
         ];
 
         foreach ($correlatividades as $materiaNumero => $condiciones) {

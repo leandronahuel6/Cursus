@@ -16,7 +16,7 @@
 @section('mobile-header')
   <!-- Mobile header -->
   <div class="mob-hdr">
-    <div class="mob-greet">{{ $greeting }}, <span class="greeting-name">{{ $userName }}</span> 👋</div>
+    <div class="mob-greet"><span id="greet-text-mob">{{ $greeting }}</span>, <span class="greeting-name">{{ $userName }}</span> 👋</div>
     <div class="mob-sub">
       {{ $formattedDate }}
       <span class="mob-stk" id="mob-racha">🔥 0 días</span>
@@ -25,7 +25,7 @@
 @endsection
 
 @section('topbar-content')
-  <div class="topbar-title">{{ $greeting }}, <span class="greeting-name">{{ $userName }}</span> <span>👋</span></div>
+  <div class="topbar-title"><span id="greet-text-topbar">{{ $greeting }}</span>, <span class="greeting-name">{{ $userName }}</span> <span>👋</span></div>
   <button class="btn-primary" onclick="location.href='{{ route('area-estudio') }}'">▶ Empezar sesión</button>
 @endsection
 
@@ -58,7 +58,7 @@
     </div>
     <div class="stat">
       <span class="stat-ic">⚠️</span>
-      <div class="stat-val">5</div>
+      <div class="stat-val" id="stat-tareas-pendientes">0</div>
       <div class="stat-lbl">Tareas pendientes</div>
     </div>
   </div>

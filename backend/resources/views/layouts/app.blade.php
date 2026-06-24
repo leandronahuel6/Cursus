@@ -80,6 +80,14 @@
       Contacto
     </button>
     <div class="profile-menu-divider"></div>
+    <div class="profile-menu-item profile-menu-switch-row" onclick="event.stopPropagation()">
+      <span>Animaciones</span>
+      <label class="ios-switch">
+        <input type="checkbox" id="animaciones-toggle" data-animaciones-toggle>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="profile-menu-divider"></div>
     <button class="profile-menu-item danger" onclick="window.handleLogout()">
       <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
         <path d="M6 3H3v10h3M10 5l3 3-3 3M13 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -285,6 +293,8 @@
 
 <!-- Scripts -->
 <script src="{{ asset('js/theme.js') }}"></script>
+<script src="{{ asset('js/animations.js') }}"></script>
+<script src="{{ asset('js/celebracion.js') }}"></script>
 <script src="{{ asset('js/script.js') }}"></script>
 <script src="{{ asset('js/profile.js') }}"></script>
 @stack('scripts')

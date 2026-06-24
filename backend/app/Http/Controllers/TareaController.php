@@ -20,6 +20,17 @@ class TareaController extends Controller
         return response()->json($tareas);
     }
 
+    // Total de tareas pendientes del usuario en TODAS sus materias (sin filtrar
+    // por una materia particular). Alimenta el stat "Tareas pendientes" del Inicio.
+    public function pendientesCount(Request $request)
+    {
+        $cantidad = Tarea::where('usuario_id', $request->user()->id)
+            ->where('columna', '!=', 'finalizado')
+            ->count();
+
+        return response()->json(['cantidad' => $cantidad]);
+    }
+
     // Tareas con fecha de vencimiento de todas las materias que el usuario está
     // cursando, sin importar cuál tenga seleccionada en el Área de Estudio.
     // Alimenta la tarjeta "Entregas próximas" del Inicio.
@@ -55,6 +66,7 @@ class TareaController extends Controller
             'materia_id' => 'required|exists:materias,id',
             'titulo' => 'required|string|max:255',
             'fecha_vencimiento' => 'nullable|date',
+            'columna' => 'sometimes|in:pendiente,progreso,finalizado',
         ]);
 
         $tarea = Tarea::create([
@@ -62,7 +74,7 @@ class TareaController extends Controller
             'materia_id' => $data['materia_id'],
             'titulo' => $data['titulo'],
             'fecha_vencimiento' => $data['fecha_vencimiento'] ?? null,
-            'columna' => 'pendiente',
+            'columna' => $data['columna'] ?? 'pendiente',
         ]);
 
         return response()->json($tarea, 201);

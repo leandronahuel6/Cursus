@@ -52,10 +52,12 @@
             <div class="mat-chip-v" id="chip-stat-pomos">—</div>
             <div class="mat-chip-l">🍅 totales</div>
           </div>
+          {{-- Chip "online ahora" comentado: dato simulado, no real.
           <div class="mat-chip">
             <div class="mat-chip-v" id="chip-stat-online">4</div>
             <div class="mat-chip-l">online ahora</div>
           </div>
+          --}}
         </div>
       </div>
 
@@ -164,8 +166,9 @@
             </div>
 
             <div class="focus-body" style="position: relative;">
+              <button id="pomo-restart-cycle-btn" onclick="restartPomoCycle()" style="position: absolute; top: 12px; left: 14px; background: none; border: none; cursor: pointer; font-size: 15px; color: rgba(255,255,255,.5); padding: 4px; transition: color .15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'" title="Reiniciar ciclo de sesiones (volver a la sesión 1)">⏮</button>
               <button id="pomo-settings-btn" onclick="openCustomPomoModal()" style="display:none; position: absolute; top: 12px; right: 14px; background: none; border: none; cursor: pointer; font-size: 15px; color: rgba(255,255,255,.5); padding: 4px; transition: color .15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'" title="Ajustes de pomodoro personalizado">⚙️</button>
-              
+
               <!-- Progress Ring -->
               <div class="ring-wrap" id="ring-wrap">
                 <svg width="140" height="140" viewBox="0 0 140 140">
@@ -207,6 +210,7 @@
             </div>
           </div><!-- /focus-card -->
 
+          {{-- Panel "Estudiando ahora" comentado: compañeros simulados, no reales.
           <!-- SOCIAL PANEL / COMMUNITY -->
           <div class="community">
             <div class="cp-head">
@@ -225,6 +229,7 @@
               💡 Tus compañeros están concentrados.<br>¡Buen momento para enfocar!
             </div>
           </div><!-- /community -->
+          --}}
 
         </div><!-- /right-sidebar -->
 

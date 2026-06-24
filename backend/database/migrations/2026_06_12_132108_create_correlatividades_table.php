@@ -14,7 +14,7 @@ return new class extends Migration
         $table->foreignId('materia_id')->constrained('materias')->onDelete('cascade');
         $table->foreignId('requisito_id')->constrained('materias')->onDelete('cascade');
         $table->enum('condicion_requerida', ['regular', 'aprobada']);
-        $table->primary(['materia_id', 'requisito_id']);
+        $table->primary(['materia_id', 'requisito_id', 'condicion_requerida']);
         $table->timestamps();
         });
     }

@@ -377,7 +377,9 @@ h1, h2, h3, h4, h5, h6, .display-text {
 }
 .topbar-title span { font-weight: 300; color: var(--t3); }
 .topbar-title .greeting-name,
-.mob-greet .greeting-name { font-weight: 700; color: inherit; }
+.mob-greet .greeting-name,
+.topbar-title #greet-text-topbar,
+.mob-greet #greet-text-mob { font-weight: 700; color: inherit; }
 .streak-chip {
   display: flex; align-items: center; gap: 5px;
   background: #fff7ed; border: 1px solid #fed7aa;
@@ -1878,6 +1880,27 @@ h1, h2, h3, h4, h5, h6, .display-text {
 .btn-status-toggle.active.cursando { background: var(--brand); color: #ffffff; border-color: var(--brand); }
 .btn-status-toggle.active.regular { background: var(--orange); color: #ffffff; border-color: var(--orange); }
 .btn-status-toggle.active.aprobada { background: var(--green); color: #ffffff; border-color: var(--green); }
+
+/* Botón "Aprobar" cuando la materia se puede regularizar pero todavía no aprobar */
+.btn-status-toggle.aprobar-bloqueada {
+  background: #fef2f2;
+  color: var(--red);
+  border-color: #fecaca;
+  cursor: not-allowed;
+}
+.btn-status-toggle.aprobar-bloqueada:hover {
+  background: #fee2e2;
+}
+.btn-status-toggle.shake {
+  animation: btn-shake .4s ease-in-out;
+}
+@keyframes btn-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
 
 /* Modal de Notas */
 .grade-modal-overlay {
@@ -3914,6 +3937,45 @@ img.pmenu-ic {
   filter: invert(1);
 }
 .profile-menu-divider { height: 1px; background: rgba(255,255,255,.07); margin: 4px 4px; }
+.profile-menu-switch-row { justify-content: space-between; cursor: default; }
+.profile-menu-switch-row:hover { background: none; color: #d1d5db; }
+
+/* Festejo al completar el 100% del plan de estudios */
+.celebracion-banner {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 16px 26px;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.35);
+  text-align: center;
+  max-width: 90vw;
+  opacity: 0;
+  animation: celebracion-banner-in .4s ease forwards, celebracion-banner-out .4s ease forwards 4.6s;
+}
+@keyframes celebracion-banner-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-20px) scale(.9); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+@keyframes celebracion-banner-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Desactiva animaciones y transiciones en toda la app cuando el switch está apagado */
+body.no-animations *,
+body.no-animations *::before,
+body.no-animations *::after {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
 
 .sb-user-caret {
   margin-left: auto;

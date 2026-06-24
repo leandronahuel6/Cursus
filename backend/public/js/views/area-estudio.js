@@ -151,7 +151,7 @@
               id: String(t.id),
               column: COLUMNA_DB_TO_UI[t.columna] || 'pending',
               title: t.titulo,
-              dueDate: t.fecha_vencimiento ? t.fecha_vencimiento.split('T')[0] : "",
+              dueDate: t.fecha_vencimiento ? t.fecha_vencimiento.substring(0, 16) : "",
               description: localMatches ? localMatches.description : "",
               subtasks: localMatches ? localMatches.subtasks : [] // [MOCK API]
           };
@@ -216,6 +216,41 @@
   };
 
   let pomoTicker = null;
+
+  /* -------- Sonido suave al terminar fases de enfoque/descanso -------- */
+  let pomoAudioCtx = null;
+
+  function getPomoAudioCtx() {
+    if (!pomoAudioCtx) {
+      const AudioCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtor) return null;
+      pomoAudioCtx = new AudioCtor();
+    }
+    if (pomoAudioCtx.state === 'suspended') pomoAudioCtx.resume();
+    return pomoAudioCtx;
+  }
+
+  function playPomoChime() {
+    const ctx = getPomoAudioCtx();
+    if (!ctx) return;
+
+    [880, 1175].forEach((freq, i) => {
+      const start = ctx.currentTime + i * 0.16;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.12, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.7);
+
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + 0.75);
+    });
+  }
 
   function initPomodoro() {
     // 1. Cargar configuraciones
@@ -407,6 +442,7 @@
         .catch(err => showToast(err.message, "error"));
     } else {
       // Reanudar/Iniciar
+      getPomoAudioCtx(); // Desbloquear audio con el gesto del usuario
       const isNew = pomoState.estado_reloj === 'detenido';
       pomoState.estado_reloj = 'corriendo';
       savePomoStateToLocal();
@@ -422,7 +458,7 @@
 
   function handleFaseComplete() {
     clearInterval(pomoTicker);
-    pomoState.estado_reloj = 'detenido';
+    playPomoChime();
 
     if (pomoState.fase_actual === 'enfoque') {
       // Completó enfoque
@@ -465,9 +501,14 @@
       showToast("El descanso ha terminado. ¡A enfocar nuevamente!", "success");
     }
 
+    // Continuar automáticamente con la siguiente fase, sin esperar a que el
+    // usuario la arranque a mano.
+    pomoState.estado_reloj = 'corriendo';
+
     savePomoStateToLocal();
     savePomoCyclesToLocal();
     updatePomoUI();
+    startTicker();
   }
 
   function resetPomo() {
@@ -501,6 +542,20 @@
       resetToDefaultPomoState();
       updatePomoUI();
       showToast("Temporizador reiniciado", "success");
+    });
+  }
+
+  // Reinicia todo el ciclo de sesiones (vuelve a la sesión 1), no solo la fase actual.
+  function restartPomoCycle() {
+    openConfirm("¿Desea reiniciar el ciclo de sesiones? Volverá a la sesión 1 y se perderá el progreso de la sesión actual.", () => {
+      clearInterval(pomoTicker);
+
+      pomoCycles.ciclo_actual = 1;
+      savePomoCyclesToLocal();
+
+      resetToDefaultPomoState();
+      updatePomoUI();
+      showToast("Ciclo de sesiones reiniciado", "success");
     });
   }
 
@@ -742,14 +797,18 @@
         // Crear meta indicators
         let metaHtml = '';
         if (task.dueDate) {
-          const [y, m, d] = task.dueDate.split('-');
+          const [datePart, timePart] = task.dueDate.split('T');
+          const [y, m, d] = datePart.split('-');
           const date = new Date(y, m - 1, d);
           const currentYear = new Date().getFullYear();
           let dateStr = date.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
           if (date.getFullYear() !== currentYear) {
             dateStr += ` ${date.getFullYear()}`;
           }
-          
+          if (timePart) {
+            dateStr += ` · ${timePart.substring(0, 5)}`;
+          }
+
           // Urgencia si vence hoy/antes y no está finalizado
           const today = new Date();
           today.setHours(0,0,0,0);
@@ -872,7 +931,7 @@
     fetch(`${API_BASE}/tareas`, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ materia_id: selectedMateriaId, titulo: title })
+      body: JSON.stringify({ materia_id: selectedMateriaId, titulo: title, columna: COLUMNA_UI_TO_DB[col] })
     }).then(async (res) => {
       if (!res.ok) throw new Error();
       await loadAppState(); // Recargar desde BD para tener el ID real
@@ -1392,54 +1451,55 @@
   }
 
   /* ==========================================================================
-     SOCIAL COMPONENT (Heartbeat / Compañeros)
+     SOCIAL COMPONENT (Heartbeat / Compañeros) — comentado: panel "Estudiando
+     ahora" y chip "online ahora" removidos del HTML (datos simulados, no reales).
      ========================================================================== */
-  const mockStudents = [
-    { name: "Laura G.", initials: "LG", state: "estudiando", time: "Hace 12 seg", pomodoros: 2, bg: "linear-gradient(135deg,#06b6d4,#0284c7)" },
-    { name: "Franco M.", initials: "FM", state: "estudiando", time: "Hace 5 min", pomodoros: 1, bg: "linear-gradient(135deg,#8b5cf6,#7c3aed)" },
-    { name: "Ana L.", initials: "AL", state: "descansando", time: "Hace 1 min", pomodoros: 3, bg: "linear-gradient(135deg,#f59e0b,#d97706)" },
-    { name: "Mateo R.", initials: "MR", state: "estudiando", time: "Hace 18 min", pomodoros: 0, bg: "linear-gradient(135deg,#10b981,#059669)" }
-  ];
+  // const mockStudents = [
+  //   { name: "Laura G.", initials: "LG", state: "estudiando", time: "Hace 12 seg", pomodoros: 2, bg: "linear-gradient(135deg,#06b6d4,#0284c7)" },
+  //   { name: "Franco M.", initials: "FM", state: "estudiando", time: "Hace 5 min", pomodoros: 1, bg: "linear-gradient(135deg,#8b5cf6,#7c3aed)" },
+  //   { name: "Ana L.", initials: "AL", state: "descansando", time: "Hace 1 min", pomodoros: 3, bg: "linear-gradient(135deg,#f59e0b,#d97706)" },
+  //   { name: "Mateo R.", initials: "MR", state: "estudiando", time: "Hace 18 min", pomodoros: 0, bg: "linear-gradient(135deg,#10b981,#059669)" }
+  // ];
 
   // [MOCK API] Panel social simulado
-  function renderSocial() {
-    const list = document.getElementById('social-list');
-    list.innerHTML = '';
+  // function renderSocial() {
+  //   const list = document.getElementById('social-list');
+  //   list.innerHTML = '';
 
-    mockStudents.forEach(st => {
-      const user = document.createElement('div');
-      user.className = 'cp-user';
-      user.innerHTML = `
-        <div class="cp-av ${st.state === 'descansando' ? 'descansando' : ''}" style="background: ${st.bg}">${st.initials}</div>
-        <div class="cp-inf">
-          <div class="cp-name">${st.name}</div>
-        </div>
-        <div class="cp-pom">${st.state === 'estudiando' ? '🍅' : '☕'} × ${st.pomodoros}</div>
-      `;
-      list.appendChild(user);
-    });
+  //   mockStudents.forEach(st => {
+  //     const user = document.createElement('div');
+  //     user.className = 'cp-user';
+  //     user.innerHTML = `
+  //       <div class="cp-av ${st.state === 'descansando' ? 'descansando' : ''}" style="background: ${st.bg}">${st.initials}</div>
+  //       <div class="cp-inf">
+  //         <div class="cp-name">${st.name}</div>
+  //       </div>
+  //       <div class="cp-pom">${st.state === 'estudiando' ? '🍅' : '☕'} × ${st.pomodoros}</div>
+  //     `;
+  //     list.appendChild(user);
+  //   });
 
-    document.getElementById('social-active-count').textContent = `${mockStudents.length} activos en Programación II`;
-  }
+  //   document.getElementById('social-active-count').textContent = `${mockStudents.length} activos en Programación II`;
+  // }
 
   // Simulación de Heartbeat Pings (Cada 60s)
-  setInterval(() => {
-    mockFetch('/api/presencia/ping', { method: 'POST' })
-      .then(() => {
-        // Simular actualizaciones aleatorias del estado de los compañeros
-        const rand = Math.random();
-        if (rand < 0.3) {
-          // Cambiar estado
-          const index = Math.floor(Math.random() * mockStudents.length);
-          mockStudents[index].state = mockStudents[index].state === 'estudiando' ? 'descansando' : 'estudiando';
-          mockStudents[index].time = "Hace 12 seg";
-          if (mockStudents[index].state === 'estudiando' && Math.random() > 0.5) {
-            mockStudents[index].pomodoros++;
-          }
-          renderSocial();
-        }
-      });
-  }, 60000);
+  // setInterval(() => {
+  //   mockFetch('/api/presencia/ping', { method: 'POST' })
+  //     .then(() => {
+  //       // Simular actualizaciones aleatorias del estado de los compañeros
+  //       const rand = Math.random();
+  //       if (rand < 0.3) {
+  //         // Cambiar estado
+  //         const index = Math.floor(Math.random() * mockStudents.length);
+  //         mockStudents[index].state = mockStudents[index].state === 'estudiando' ? 'descansando' : 'estudiando';
+  //         mockStudents[index].time = "Hace 12 seg";
+  //         if (mockStudents[index].state === 'estudiando' && Math.random() > 0.5) {
+  //           mockStudents[index].pomodoros++;
+  //         }
+  //         renderSocial();
+  //       }
+  //     });
+  // }, 60000);
 
   /* ==========================================================================
      INTERFAZ Y MODAL AUXILIAR DE CONFIRMACIÓN / CONTACTO
@@ -1484,11 +1544,12 @@
   window.addEventListener('DOMContentLoaded', async () => {
     await loadMateriasCursando();
     initPomodoro();
-    renderSocial();
+    // renderSocial(); // Panel "Estudiando ahora" comentado (ver arriba)
   });
 
 // Exponer funciones globales para que funcionen los eventos inline en Blade con type='module'
 window.resetPomo = resetPomo;
+window.restartPomoCycle = restartPomoCycle;
 window.togglePomo = togglePomo;
 window.skipPomo = skipPomo;
 window.setPreset = setPreset;

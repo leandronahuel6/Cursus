@@ -91,7 +91,7 @@ class MateriaController extends Controller
     {
         $data = $request->validate([
             'estado' => 'required|in:libre,cursando,regular,aprobada',
-            'nota' => 'nullable|numeric|min:0|max:10',
+            'nota' => 'nullable|numeric|min:6|max:10',
         ]);
 
         $materiaUsuario = MateriaUsuario::updateOrCreate(
