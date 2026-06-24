@@ -139,7 +139,10 @@ async function loadDashboardMaterias() {
     renderStudyPanel(cursando);
 
     const statMateriasActivas = document.getElementById('stat-materias-activas');
-    if (statMateriasActivas) statMateriasActivas.textContent = cursando.length;
+    if (statMateriasActivas) {
+      statMateriasActivas.textContent = cursando.length;
+      statMateriasActivas.classList.remove('skel');
+    }
   } catch (e) {
     console.error('No se pudieron cargar las materias del usuario', e);
   }
@@ -184,13 +187,22 @@ function setRachaText(dias) {
   const corto = `🔥 ${dias} día${dias !== 1 ? 's' : ''}`;
 
   const statRacha = document.getElementById('stat-racha');
-  if (statRacha) statRacha.textContent = `${dias} día${dias !== 1 ? 's' : ''}`;
+  if (statRacha) {
+    statRacha.textContent = `${dias} día${dias !== 1 ? 's' : ''}`;
+    statRacha.classList.remove('skel');
+  }
 
   const mobRacha = document.getElementById('mob-racha');
-  if (mobRacha) mobRacha.textContent = corto;
+  if (mobRacha) {
+    mobRacha.textContent = corto;
+    mobRacha.classList.remove('skel');
+  }
 
   const hmRacha = document.getElementById('hm-racha');
-  if (hmRacha) hmRacha.textContent = corto;
+  if (hmRacha) {
+    hmRacha.textContent = corto;
+    hmRacha.classList.remove('skel');
+  }
 }
 
 async function loadPomodoroResumen() {
@@ -203,7 +215,10 @@ async function loadPomodoroResumen() {
     const data = await response.json();
 
     const statHoras = document.getElementById('stat-horas-semana');
-    if (statHoras) statHoras.textContent = formatHoras(data.horas_semana);
+    if (statHoras) {
+      statHoras.textContent = formatHoras(data.horas_semana);
+      statHoras.classList.remove('skel');
+    }
 
     setRachaText(data.racha_dias);
     renderHeatmap(data.actividad || {});
@@ -289,6 +304,7 @@ async function loadTareasPendientesCount() {
     if (!response.ok) throw new Error('No se pudo cargar la cantidad de tareas pendientes');
     const data = await response.json();
     stat.textContent = data.cantidad;
+    stat.classList.remove('skel');
   } catch (e) {
     console.error('No se pudo cargar la cantidad de tareas pendientes', e);
   }

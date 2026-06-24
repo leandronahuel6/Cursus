@@ -19,7 +19,7 @@
     <div class="mob-greet"><span id="greet-text-mob">{{ $greeting }}</span>, <span class="greeting-name">{{ $userName }}</span> 👋</div>
     <div class="mob-sub">
       {{ $formattedDate }}
-      <span class="mob-stk" id="mob-racha">🔥 0 días</span>
+      <span class="mob-stk skel" id="mob-racha">🔥 0 días</span>
     </div>
   </div>
 @endsection
@@ -43,22 +43,22 @@
   <div class="stats">
     <div class="stat">
       <span class="stat-ic">⏱️</span>
-      <div class="stat-val" id="stat-horas-semana">0h</div>
+      <div class="stat-val skel" id="stat-horas-semana">0h</div>
       <div class="stat-lbl">Horas esta semana</div>
     </div>
     <div class="stat">
       <span class="stat-ic">🔥</span>
-      <div class="stat-val" id="stat-racha">0 días</div>
+      <div class="stat-val skel" id="stat-racha">0 días</div>
       <div class="stat-lbl">Racha actual</div>
     </div>
     <div class="stat">
       <span class="stat-ic">📚</span>
-      <div class="stat-val" id="stat-materias-activas">0</div>
+      <div class="stat-val skel" id="stat-materias-activas">0</div>
       <div class="stat-lbl">Materias activas</div>
     </div>
     <div class="stat">
       <span class="stat-ic">⚠️</span>
-      <div class="stat-val" id="stat-tareas-pendientes">0</div>
+      <div class="stat-val skel" id="stat-tareas-pendientes">0</div>
       <div class="stat-lbl">Tareas pendientes</div>
     </div>
   </div>
@@ -147,7 +147,7 @@
         <div class="hm-wrap">
           <div class="hm-top">
             <div class="hm-title">🗓️ Actividad — 13 semanas</div>
-            <div class="hm-streak" id="hm-racha">🔥 0 días</div>
+            <div class="hm-streak skel" id="hm-racha">🔥 0 días</div>
           </div>
           <div class="hm-grid" id="hm"></div>
           <div class="hm-leg">

@@ -20,7 +20,7 @@
     <div class="progression-card">
       <div class="prog-icon">📈</div>
       <div class="prog-info">
-        <div class="prog-val" id="career-progress-pct">0%</div>
+        <div class="prog-val skel" id="career-progress-pct">0%</div>
         <div class="prog-lbl">Avance de Carrera</div>
       </div>
     </div>
@@ -28,7 +28,7 @@
     <div class="progression-card">
       <div class="prog-icon">🎓</div>
       <div class="prog-info">
-        <div class="prog-val" id="career-average">0.00</div>
+        <div class="prog-val skel" id="career-average">0.00</div>
         <div class="prog-lbl">Promedio General</div>
       </div>
     </div>
@@ -36,7 +36,7 @@
     <div class="progression-card">
       <div class="prog-icon">✓</div>
       <div class="prog-info">
-        <div class="prog-val" id="career-approved-count">0 / 17</div>
+        <div class="prog-val skel" id="career-approved-count">0 / 17</div>
         <div class="prog-lbl">Materias Aprobadas</div>
       </div>
     </div>

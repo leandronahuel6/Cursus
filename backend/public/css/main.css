@@ -46,6 +46,8 @@
   --brand-light:  #eef2ff;
   --brand-dim:    #c7d2fe;
 
+  --green-light:  #d1fae5;
+
   --sidebar-bg:   #111827;
   --sidebar-w:    220px;
 
@@ -78,14 +80,21 @@
 }
 
 body.dark-mode {
-  --bg: #070a13;
-  --surface: rgba(17, 24, 39, 0.72);
-  --border: rgba(255, 255, 255, 0.1);
-  --border-light: rgba(255, 255, 255, 0.06);
+  --bg: #0b0f1a;
+  --surface: rgba(30, 41, 59, 0.78);
+  --border: rgba(255, 255, 255, 0.12);
+  --border-light: rgba(255, 255, 255, 0.07);
   --t1: #f3f4f6;
   --t2: #cbd5e1;
   --t3: #94a3b8;
   --tm: #64748b;
+
+  --brand-light: rgba(99, 102, 241, 0.18);
+  --brand-dim: rgba(129, 140, 248, 0.45);
+  --green-light: rgba(16, 185, 129, 0.18);
+
+  --sh:    0 1px 3px rgba(0,0,0,.5), 0 1px 2px rgba(0,0,0,.35);
+  --sh-md: 0 4px 14px rgba(0,0,0,.5), 0 2px 4px rgba(0,0,0,.4);
 
   background-image:
     radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
@@ -150,6 +159,20 @@ body.dark-mode .contact-title {
 
 body.dark-mode .contact-title img {
   filter: invert(1);
+}
+
+/* Skeleton: placeholder visual mientras se carga el dato real desde la API,
+   para no mostrar valores de ejemplo (0%, 0 días, etc.) como si fueran reales. */
+.skel {
+  color: transparent !important;
+  background: linear-gradient(90deg, var(--border-light) 25%, var(--border) 37%, var(--border-light) 63%);
+  background-size: 400% 100%;
+  animation: skel-loading 1.4s ease infinite;
+  border-radius: 4px;
+}
+@keyframes skel-loading {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
 }
 
 body.dark-mode .contact-input {
@@ -1813,7 +1836,7 @@ h1, h2, h3, h4, h5, h6, .display-text {
 .sub-status-badge.disponible { background: #f3f4f6; color: var(--t3); }
 .sub-status-badge.cursando { background: var(--brand-light); color: var(--brand); }
 .sub-status-badge.regular { background: #ffedd5; color: var(--orange); }
-.sub-status-badge.aprobada { background: #d1fae5; color: var(--green); }
+.sub-status-badge.aprobada { background: var(--green-light); color: var(--green); }
 .sub-status-badge.locked { background: #fee2e2; color: var(--red); }
 
 .sub-title {
@@ -1826,7 +1849,7 @@ h1, h2, h3, h4, h5, h6, .display-text {
   font-size: 11px;
   font-weight: 700;
   color: var(--green);
-  background: #ecfdf5;
+  background: var(--green-light);
   padding: 2px 8px;
   border-radius: 4px;
   display: inline-block;
@@ -1954,6 +1977,7 @@ h1, h2, h3, h4, h5, h6, .display-text {
   border: 1px solid var(--border);
   outline: none;
   background: var(--surface);
+  color: var(--t1);
 }
 .grade-modal-footer {
   display: flex;
@@ -2063,10 +2087,10 @@ h1, h2, h3, h4, h5, h6, .display-text {
   transform: translateY(-1px);
 }
 .tree-node-card.disponible { border-left: 3px solid #d1d5db; }
-.tree-node-card.cursando { border-left: 3px solid var(--brand); background: #f5f3ff; }
-.tree-node-card.regular { border-left: 3px solid var(--orange); background: #fff7ed; }
-.tree-node-card.aprobada { border-left: 3px solid var(--green); background: #ecfdf5; }
-.tree-node-card.bloqueada { border-left: 3px solid var(--red); background: #fca5a5; opacity: .7; }
+.tree-node-card.cursando { border-left: 3px solid var(--brand); }
+.tree-node-card.regular { border-left: 3px solid var(--orange); }
+.tree-node-card.aprobada { border-left: 3px solid var(--green); }
+.tree-node-card.bloqueada { border-left: 3px solid var(--red); background: var(--border-light); opacity: .7; }
 
 .tree-node-info {
   display: flex;
@@ -2649,11 +2673,11 @@ h1, h2, h3, h4, h5, h6, .display-text {
   justify-content: center;
 }
 
-.login-visual-placeholder {
+.login-visual-img {
   width: 100%;
   height: 100%;
   min-height: 400px;
-  background: #e5e7eb;
+  object-fit: cover;
   border-radius: 24px;
 }
 
@@ -4115,6 +4139,75 @@ body.no-animations *::after {
 /* Dark Mode Navigation Icons Override */
 body.dark-mode .bn-ic {
   filter: invert(1);
+}
+
+/* Dark Mode: ajustes generales de contraste
+   (botones, badges, steppers y modales que usaban colores claros fijos) */
+body.dark-mode .btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+body.dark-mode .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--t1);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+body.dark-mode .hm-cell:not(.l1):not(.l2):not(.l3) { background: rgba(255, 255, 255, 0.06); }
+body.dark-mode .grade-stepper { background: rgba(255, 255, 255, 0.05); }
+body.dark-mode .g-btn { background: rgba(255, 255, 255, 0.04); }
+body.dark-mode .g-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
+body.dark-mode .pace-btn { background: rgba(255, 255, 255, 0.08); }
+body.dark-mode .metrics-box,
+body.dark-mode .formula-container,
+body.dark-mode .sched-empty-note,
+body.dark-mode .sched-drag-card,
+body.dark-mode .grid-header-row,
+body.dark-mode .time-col-hdr,
+body.dark-mode .grid-time-axis,
+body.dark-mode .sim-row.disabled {
+  background: rgba(255, 255, 255, 0.04);
+}
+body.dark-mode .grid-body-row { background: transparent; }
+body.dark-mode .sug-chip-lbl,
+body.dark-mode .sim-subject-badge.b-lib,
+body.dark-mode .modal-inp-readonly,
+body.dark-mode .modal-select,
+body.dark-mode .edit-name-prompt:focus,
+body.dark-mode .alert-priority-baja,
+body.dark-mode .contact-btn-cancel,
+body.dark-mode .btn-modal-action.cancel,
+body.dark-mode .sub-status-badge.disponible,
+body.dark-mode .btn-status-toggle.active.disponible,
+body.dark-mode .legend-color.disponible {
+  background: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .legend-color.disponible { border-color: rgba(255, 255, 255, 0.22); }
+body.dark-mode .contact-btn-cancel:hover { background: rgba(255, 255, 255, 0.14); }
+body.dark-mode .sched-modal-card { background: #161b29; }
+body.dark-mode .sched-drag-card.activity .card-btn-add {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #93c5fd;
+}
+body.dark-mode .streak-chip {
+  background: rgba(234, 88, 12, 0.18);
+  border-color: rgba(234, 88, 12, 0.4);
+  color: #fdba74;
+}
+body.dark-mode .alert-popup-notification.success {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #6ee7b7;
+}
+body.dark-mode .alert-popup-notification.error {
+  background: rgba(220, 38, 38, 0.16);
+  border-color: rgba(220, 38, 38, 0.4);
+  color: #fca5a5;
+}
+body.dark-mode .alert-popup-notification.info {
+  background: rgba(59, 130, 246, 0.16);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #93c5fd;
 }
 
 /* Posicionamiento móvil del menú de perfil (al final para ganancia de cascada) */
