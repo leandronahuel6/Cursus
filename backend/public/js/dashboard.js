@@ -278,6 +278,22 @@ async function loadTareasProximas() {
   }
 }
 
+// Cuenta TODAS las tareas pendientes del usuario, sin separar por materia.
+async function loadTareasPendientesCount() {
+  const token = getStoredToken();
+  const stat = document.getElementById('stat-tareas-pendientes');
+  if (!token || !stat) return;
+
+  try {
+    const response = await fetch('/api/tareas/pendientes-count', { headers: getAuthHeaders() });
+    if (!response.ok) throw new Error('No se pudo cargar la cantidad de tareas pendientes');
+    const data = await response.json();
+    stat.textContent = data.cantidad;
+  } catch (e) {
+    console.error('No se pudo cargar la cantidad de tareas pendientes', e);
+  }
+}
+
 // Banner superior: muestra la alerta más urgente (dentro de los próximos 7 días),
 // si hay alguna. Reemplaza el aviso de pago de cuota que estaba fijo.
 function diasHastaAlerta(fechaStr) {
@@ -318,9 +334,28 @@ async function loadAlertaDestacada() {
   }
 }
 
+// El saludo (Buen día / Buenas tardes / Buenas noches) viene calculado en el
+// servidor, pero con la hora del servidor. Lo recalculamos con la hora local
+// del navegador del usuario para que coincida con su horario real.
+function setGreetingLocal() {
+  const hora = new Date().getHours();
+  let texto;
+  if (hora < 12) texto = 'Buen día';
+  else if (hora < 20) texto = 'Buenas tardes';
+  else texto = 'Buenas noches';
+
+  const mob = document.getElementById('greet-text-mob');
+  if (mob) mob.textContent = texto;
+
+  const topbar = document.getElementById('greet-text-topbar');
+  if (topbar) topbar.textContent = texto;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  setGreetingLocal();
   loadDashboardMaterias();
   loadPomodoroResumen();
   loadTareasProximas();
+  loadTareasPendientesCount();
   loadAlertaDestacada();
 });

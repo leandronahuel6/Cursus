@@ -87,8 +87,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// Comprobar si una materia está bloqueada por correlativas
-function isSubjectLocked(sub) {
+// Comprobar si una materia está bloqueada por correlativas.
+// `newStatus` es el estado al que se quiere pasar la materia (opcional).
+function isSubjectLocked(sub, newStatus) {
   // 1. Validar cursadas obligatorias (deben estar al menos como "regular" o "aprobada")
   for (const reqId of sub.prereq.cursadas) {
     const reqState = state.subjects[reqId];
@@ -96,15 +97,24 @@ function isSubjectLocked(sub) {
       return true;
     }
   }
-  
-  // 2. Validar aprobadas obligatorias (deben estar como "aprobada")
+
+  // 2. Validar aprobadas obligatorias (deben estar como "aprobada").
+  // Caso especial: el Trabajo Final Integrador se REGULARIZA con las materias 8 a
+  // 12 cursadas (chequeo de arriba), pero solo se ACREDITA (estado 'aprobada')
+  // teniendo aprobadas las 17 materias del plan. Para cualquier otro destino
+  // (cursando/regular/disponible) esa lista de aprobadas no debe bloquearlo.
+  const esTFI = sub.name === 'Trabajo Final Integrador';
+  if (esTFI && newStatus !== 'aprobada') {
+    return false;
+  }
+
   for (const reqId of sub.prereq.aprobadas) {
     const reqState = state.subjects[reqId];
     if (!reqState || reqState.status !== 'aprobada') {
       return true;
     }
   }
-  
+
   return false;
 }
 
@@ -120,7 +130,7 @@ window.changeSubjectStatus = function(id, newStatus) {
   if (!sub) return;
   
   // Si está bloqueada, no permitir cambiar
-  if (isSubjectLocked(sub) && newStatus !== 'disponible') {
+  if (isSubjectLocked(sub, newStatus) && newStatus !== 'disponible') {
     alert('Esta materia se encuentra bloqueada. Debes cumplir sus correlativas primero.');
     return;
   }
@@ -141,6 +151,13 @@ window.changeSubjectStatus = function(id, newStatus) {
     cascadeVerifications();
     updateUI();
   }
+};
+
+// Feedback visual cuando se toca "Aprobar" estando solo regularizable (no aprobable)
+window.shakeApproveButton = function(btn) {
+  btn.classList.remove('shake');
+  void btn.offsetWidth; // Forzar reflow para poder re-disparar la animación en clics seguidos
+  btn.classList.add('shake');
 };
 
 // Cerrar modal de carga de notas
@@ -169,7 +186,7 @@ function cascadeVerifications() {
     changed = false;
     TUP_PLAN.forEach(sub => {
       const subState = state.subjects[sub.id];
-      if (subState.status !== 'disponible' && isSubjectLocked(sub)) {
+      if (subState.status !== 'disponible' && isSubjectLocked(sub, subState.status)) {
         // La materia ya no cumple sus correlativas, bajar a disponible
         subState.status = 'disponible';
         subState.grade = null;
@@ -249,7 +266,7 @@ function calculateStats() {
       if (subState.status === 'aprobada') {
         approvedCount++;
         if (subState.grade) {
-          gradesSum += subState.grade;
+          gradesSum += Number(subState.grade);
         }
       } else if (subState.status === 'cursando') {
         activeCount++;
@@ -264,6 +281,18 @@ function calculateStats() {
   document.getElementById('career-progress-pct').innerText = `${progressPct}%`;
   document.getElementById('career-average').innerText = avg;
   document.getElementById('career-approved-count').innerText = `${approvedCount} / ${totalSubjects}`;
+
+  // Festejo único cuando se completa el 100% del plan (se vuelve a habilitar
+  // si alguna materia se demueve y luego se vuelve a aprobar todo de nuevo).
+  const FLAG_PLAN_COMPLETO = 'cursus_plan_completo_celebrado';
+  if (totalSubjects > 0 && approvedCount === totalSubjects) {
+    if (localStorage.getItem(FLAG_PLAN_COMPLETO) !== 'true') {
+      localStorage.setItem(FLAG_PLAN_COMPLETO, 'true');
+      if (window.celebrarPlanCompleto) window.celebrarPlanCompleto();
+    }
+  } else {
+    localStorage.removeItem(FLAG_PLAN_COMPLETO);
+  }
 }
 
 // Renderizar lista de solo lectura en pestaña "Plan de Estudios"
@@ -422,7 +451,17 @@ function renderTreeView() {
       levelSubjects.forEach(sub => {
         const subState = state.subjects[sub.id];
         const isLocked = isSubjectLocked(sub);
-        
+        const lockedDisponible = false; // siempre se puede volver a "Disponible"
+        const lockedCursando = isSubjectLocked(sub, 'cursando');
+        const lockedRegular = isSubjectLocked(sub, 'regular');
+        const lockedAprobada = isSubjectLocked(sub, 'aprobada');
+
+        // Caso particular: se puede regularizar la materia pero todavía no aprobarla
+        // (ej. el TFI regularizado, sin tener aprobadas las 17 materias). En ese
+        // caso el botón "Aprobar" queda habilitado para el click, pero en rojo
+        // suave y con un shake en vez de cambiar el estado.
+        const aprobarBloqueadaParcial = subState.status !== 'aprobada' && !lockedRegular && lockedAprobada;
+
         const node = document.createElement('div');
         let nodeClass = subState.status;
         if (isLocked) nodeClass = 'bloqueada';
@@ -447,14 +486,16 @@ function renderTreeView() {
             <span class="tree-node-meta">${metaText}</span>
           </div>
           <div class="status-buttons-row">
-            <button class="btn-status-toggle ${!isLocked && subState.status === 'disponible' ? 'active disponible' : ''}"
-                    ${isLocked ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'disponible')">D</button>
-            <button class="btn-status-toggle ${!isLocked && subState.status === 'cursando' ? 'active cursando' : ''}"
-                    ${isLocked ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'cursando')">Cursar</button>
-            <button class="btn-status-toggle ${!isLocked && subState.status === 'regular' ? 'active regular' : ''}"
-                    ${isLocked ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'regular')">Regular</button>
-            <button class="btn-status-toggle ${!isLocked && subState.status === 'aprobada' ? 'active aprobada' : ''}"
-                    ${isLocked ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'aprobada')">Aprobar</button>
+            <button class="btn-status-toggle ${!lockedDisponible && subState.status === 'disponible' ? 'active disponible' : ''}"
+                    ${lockedDisponible ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'disponible')">D</button>
+            <button class="btn-status-toggle ${!lockedCursando && subState.status === 'cursando' ? 'active cursando' : ''}"
+                    ${lockedCursando ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'cursando')">Cursar</button>
+            <button class="btn-status-toggle ${!lockedRegular && subState.status === 'regular' ? 'active regular' : ''}"
+                    ${lockedRegular ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'regular')">Regular</button>
+            <button class="btn-status-toggle ${!lockedAprobada && subState.status === 'aprobada' ? 'active aprobada' : ''} ${aprobarBloqueadaParcial ? 'aprobar-bloqueada' : ''}"
+                    ${lockedAprobada && !aprobarBloqueadaParcial ? 'disabled' : ''}
+                    title="${aprobarBloqueadaParcial ? 'Podés regularizarla, pero todavía no podés aprobarla: faltan correlativas.' : ''}"
+                    onclick="event.stopPropagation(); ${aprobarBloqueadaParcial ? `window.shakeApproveButton(this)` : `window.changeSubjectStatus(${sub.id}, 'aprobada')`}">Aprobar</button>
           </div>
         `;
 

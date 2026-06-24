@@ -47,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/materias/{materia}/pomodoro-resumen', [SesionPomodoroController::class, 'resumenMateria']);
 
     Route::get('/tareas/proximas', [TareaController::class, 'proximas']);
+    Route::get('/tareas/pendientes-count', [TareaController::class, 'pendientesCount']);
     Route::get('/tareas', [TareaController::class, 'index']);
     Route::post('/tareas', [TareaController::class, 'store']);
     Route::put('/tareas/{tarea}', [TareaController::class, 'update']);

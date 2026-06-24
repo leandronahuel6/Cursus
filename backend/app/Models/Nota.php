@@ -14,6 +14,10 @@ class Nota extends Model
         'fecha',
     ];
 
+    protected $casts = [
+        'valor' => 'float',
+    ];
+
     public function materiaUsuario()
     {
         return $this->belongsTo(MateriaUsuario::class);
