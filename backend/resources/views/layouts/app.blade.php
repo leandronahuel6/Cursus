@@ -72,16 +72,11 @@
   <!-- Menú de perfil — fuera del sidebar para que sea visible en mobile -->
   <div class="profile-menu" id="profile-menu">
     <button class="profile-menu-item" onclick="window.openProfileModal()">
-      <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
-        <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4"/>
-        <path d="M8 1v1M8 14v1M1 8h1M14 8h1M2.9 2.9l.7.7M12.4 12.4l.7.7M2.9 13.1l.7-.7M12.4 3.6l.7-.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-      </svg>
+      <img class="pmenu-ic" src="{{ asset('assets/icons/user.svg') }}" alt="Perfil">
       Perfil
     </button>
     <button class="profile-menu-item" onclick="window.openContactModal()">
-      <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
-        <path d="M2 3h12v8H9l-3 2.5V11H2V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-      </svg>
+      <img class="pmenu-ic" src="{{ asset('assets/icons/message-square.svg') }}" alt="Contacto">
       Contacto
     </button>
     <div class="profile-menu-divider"></div>
@@ -123,26 +118,38 @@
   <nav class="bnav">
     <div class="bnav-row">
       <div class="bn {{ Request::routeIs('dashboard') ? 'on' : '' }}" onclick="location.href='{{ route('dashboard') }}'">
-        <span class="bn-ic">⊞</span><span class="bn-lbl">Inicio</span>
+        <img class="bn-ic" src="{{ asset('assets/icons/layout-dashboard.svg') }}" alt="Inicio">
+        <span class="bn-lbl">Inicio</span>
       </div>
       <div class="bn {{ Request::routeIs('materias') ? 'on' : '' }}" onclick="location.href='{{ route('materias') }}'">
-        <span class="bn-ic">📚</span><span class="bn-lbl">Materias</span>
+        <img class="bn-ic" src="{{ asset('assets/icons/book-copy.svg') }}" alt="Materias">
+        <span class="bn-lbl">Materias</span>
       </div>
       <div class="bn {{ Request::routeIs('area-estudio') ? 'on' : '' }}" onclick="location.href='{{ route('area-estudio') }}'">
-        <span class="bn-ic">⏱</span><span class="bn-lbl">Estudio</span>
+        <img class="bn-ic" src="{{ asset('assets/icons/timer.svg') }}" alt="Estudio">
+        <span class="bn-lbl">Estudio</span>
       </div>
       <div class="bn {{ Request::routeIs('horarios') ? 'on' : '' }}" onclick="location.href='{{ route('horarios') }}'">
-        <span class="bn-ic">☑️</span><span class="bn-lbl">Horarios</span>
+        <img class="bn-ic" src="{{ asset('assets/icons/calendar.svg') }}" alt="Horarios">
+        <span class="bn-lbl">Horarios</span>
+      </div>
+      <div class="bn {{ Request::routeIs('beneficios') ? 'on' : '' }}" onclick="location.href='{{ route('beneficios') }}'">
+        <img class="bn-ic" src="{{ asset('assets/icons/wallet.svg') }}" alt="Beneficios">
+        <span class="bn-lbl">Beneficios</span>
       </div>
       <div class="bn {{ Request::routeIs('alertas') ? 'on' : '' }}" onclick="location.href='{{ route('alertas') }}'">
-        <span class="bn-ic">🔔</span><span class="bn-lbl">Alertas</span>
-        <span class="bn-badge" id="bnav-badge-count">0</span>
+        <span class="bnav-icon-wrapper" style="position: relative; display: flex; align-items: center; justify-content: center;">
+          <img class="bn-ic" src="{{ asset('assets/icons/bell.svg') }}" alt="Alertas">
+          <span class="bn-badge" id="bnav-badge-count">0</span>
+        </span>
+        <span class="bn-lbl">Alertas</span>
+      </div>
+      <div class="bn {{ Request::routeIs('progreso') ? 'on' : '' }}" onclick="location.href='{{ route('progreso') }}'">
+        <img class="bn-ic" src="{{ asset('assets/icons/chart-line.svg') }}" alt="Progreso">
+        <span class="bn-lbl">Progreso</span>
       </div>
       <div class="bn" id="bn-profile" onclick="window.toggleMobileProfileMenu(event)">
-        <svg class="bn-ic" width="20" height="20" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.4"/>
-          <path d="M2.5 13.5c0-2.761 2.462-5 5.5-5s5.5 2.239 5.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-        </svg>
+        <img class="bn-ic" src="{{ asset('assets/icons/user.svg') }}" alt="Perfil">
         <span class="bn-lbl">Perfil</span>
       </div>
     </div>
@@ -195,10 +202,7 @@
   <div class="contact-box">
     <div class="contact-header">
       <div class="contact-title">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="3" stroke="var(--brand)" stroke-width="1.4"/>
-          <path d="M8 1v1M8 14v1M1 8h1M14 8h1M2.9 2.9l.7.7M12.4 12.4l.7.7M2.9 13.1l.7-.7M12.4 3.6l.7-.7" stroke="var(--brand)" stroke-width="1.2" stroke-linecap="round"/>
-        </svg>
+        <img class="contact-title-ic" src="{{ asset('assets/icons/user.svg') }}" alt="Perfil" style="width: 16px; height: 16px; opacity: 0.9;">
         Editar perfil
       </div>
       <button class="contact-close" onclick="window.closeProfileModal()">✕</button>

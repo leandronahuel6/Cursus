@@ -79,16 +79,11 @@
       <!-- Menú de perfil (aparece hacia arriba al hacer clic) -->
       <div class="profile-menu" id="profile-menu">
         <button class="profile-menu-item" onclick="location.href='#'">
-          <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
-            <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4"/>
-            <path d="M8 1v1M8 14v1M1 8h1M14 8h1M2.9 2.9l.7.7M12.4 12.4l.7.7M2.9 13.1l.7-.7M12.4 3.6l.7-.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-          </svg>
+          <img class="pmenu-ic" src="../backend/resources/icons/user.svg" alt="Perfil">
           Perfil
         </button>
         <button class="profile-menu-item" onclick="window.openContactModal()">
-          <svg class="pmenu-ic" viewBox="0 0 16 16" fill="none">
-            <path d="M2 3h12v8H9l-3 2.5V11H2V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-          </svg>
+          <img class="pmenu-ic" src="../backend/resources/icons/message-square.svg" alt="Contacto">
           Contacto
         </button>
         <div class="profile-menu-divider"></div>
@@ -305,20 +300,37 @@
     <nav class="bnav">
       <div class="bnav-row">
         <div class="bn" onclick="location.href='index.html'">
-          <span class="bn-ic">⊞</span>Inicio
+          <img class="bn-ic" src="../backend/resources/icons/layout-dashboard.svg" alt="Inicio">
+          Inicio
         </div>
         <div class="bn" onclick="location.href='materias.html'">
-          <span class="bn-ic">📚</span>Materias
+          <img class="bn-ic" src="../backend/resources/icons/book-copy.svg" alt="Materias">
+          Materias
         </div>
         <div class="bn" onclick="location.href='area-estudio.html'">
-          <span class="bn-ic">⏱</span>Estudio
+          <img class="bn-ic" src="../backend/resources/icons/timer.svg" alt="Estudio">
+          Estudio
         </div>
         <div class="bn" onclick="location.href='horarios.html'">
-          <span class="bn-ic">📅</span>Horarios
+          <img class="bn-ic" src="../backend/resources/icons/calendar.svg" alt="Horarios">
+          Horarios
+        </div>
+        <div class="bn" onclick="location.href='beneficios.html'">
+          <img class="bn-ic" src="../backend/resources/icons/wallet.svg" alt="Beneficios">
+          Beneficios
         </div>
         <div class="bn on" onclick="location.href='alertas.html'">
-          <span class="bn-ic">🔔</span>Alertas
+          <img class="bn-ic" src="../backend/resources/icons/bell.svg" alt="Alertas">
+          Alertas
           <span class="bn-badge" id="bnav-badge-count">0</span>
+        </div>
+        <div class="bn" onclick="location.href='progreso.html'">
+          <img class="bn-ic" src="../backend/resources/icons/chart-line.svg" alt="Progreso">
+          Progreso
+        </div>
+        <div class="bn" id="bn-profile" onclick="window.toggleMobileProfileMenu(event)">
+          <img class="bn-ic" src="../backend/resources/icons/user.svg" alt="Perfil">
+          Perfil
         </div>
       </div>
     </nav>

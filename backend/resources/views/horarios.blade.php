@@ -3,10 +3,10 @@
 @section('title', 'Cursus - Simulador de Horarios')
 
 @section('mobile-header')
-  <div class="mob-hdr">
-    <div class="mob-lbl">Académico</div>
+  <div class="mob-hdr mob-hdr-swapped">
+    <div class="mob-lbl">Simulador de Horarios</div>
     <div class="mob-row">
-      <div class="mob-name">Simulador de Horarios</div>
+      <div class="mob-name">Académico</div>
       <div class="mob-tb-actions">
         <button class="btn-secondary btn-mob-action" onclick="document.getElementById('btn-clear-grid').click()">♻ Limpiar</button>
         <button class="btn-primary btn-mob-action" onclick="document.getElementById('btn-save-schedule').click()">💾 Guardar</button>
