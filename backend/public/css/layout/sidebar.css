@@ -253,4 +253,8 @@ body.dark-mode .nav-item.active {
 
 @media (max-width: 768px) {
   .sidebar { display: none; }
+  body.sidebar-collapsed .main {
+    margin-left: 0;
+    max-width: 100%;
+  }
 }

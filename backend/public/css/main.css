@@ -2466,7 +2466,7 @@ h1, h2, h3, h4, h5, h6, .display-text {
 @media (max-width: 768px) {
   /* .sidebar display:none → ver css/layout/sidebar.css */
   .topbar  { display: none; }
-  .main    { margin-left: 0; }
+  .main    { margin-left: 0; max-width: 100%; }
 
   .theme-toggle-desktop { display: none; }
   .theme-toggle-btn.theme-toggle-mobile { display: inline-flex; }
