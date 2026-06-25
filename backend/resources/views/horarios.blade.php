@@ -4,7 +4,7 @@
 
 @section('mobile-header')
   <div class="mob-hdr mob-hdr-swapped">
-    <div class="mob-lbl">Simulador de Horarios</div>
+    <div class="mob-lbl">Simulador de Horarios 📅</div>
     <div class="mob-row">
       <div class="mob-name">Académico</div>
       <div class="mob-tb-actions">
@@ -16,11 +16,7 @@
 @endsection
 
 @section('topbar-content')
-  <div class="breadcrumb">
-    <a href="{{ route('dashboard') }}">Inicio</a>
-    <span class="sep">›</span>
-    <span class="cur">Simulador de Horarios</span>
-  </div>
+  <div class="topbar-title">Simulador de Horarios 📅</div>
   <div class="tb-actions">
     <button class="btn-secondary" id="btn-clear-grid">♻ Limpiar Grilla</button>
     <button class="btn-primary" id="btn-save-schedule">💾 Guardar Horario</button>

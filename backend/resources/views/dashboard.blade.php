@@ -152,10 +152,10 @@
           <div class="hm-grid" id="hm"></div>
           <div class="hm-leg">
             <span class="hm-lt">Menos</span>
-            <div class="hm-sq" style="background:#f3f4f6;border:1px solid #e5e7eb"></div>
-            <div class="hm-sq" style="background:#c7d2fe"></div>
-            <div class="hm-sq" style="background:#818cf8"></div>
-            <div class="hm-sq" style="background:#4f46e5"></div>
+            <div class="hm-sq l0"></div>
+            <div class="hm-sq l1"></div>
+            <div class="hm-sq l2"></div>
+            <div class="hm-sq l3"></div>
             <span class="hm-lt">Más</span>
           </div>
         </div>

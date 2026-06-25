@@ -80,10 +80,16 @@
 }
 
 body.dark-mode {
+  color-scheme: dark;
+  --brand: #6366f1;
+  --brand-hover: #818cf8;
+  --brand-light: rgba(99, 102, 241, 0.12);
+  --brand-dim: rgba(99, 102, 241, 0.25);
+
   --bg: #0b0f1a;
   --surface: rgba(30, 41, 59, 0.78);
   --border: rgba(255, 255, 255, 0.12);
-  --border-light: rgba(255, 255, 255, 0.07);
+  --border-light: rgba(255, 255, 255, 0.07);  
   --t1: #f3f4f6;
   --t2: #cbd5e1;
   --t3: #94a3b8;
@@ -181,6 +187,256 @@ body.dark-mode .contact-input {
   color: #f9fafb;
 }
 
+/* Horarios Dark Mode Overrides */
+body.dark-mode .sched-canvas-card {
+  background: var(--surface);
+}
+body.dark-mode .sched-drag-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .sched-empty-note {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+body.dark-mode .sched-drag-card.activity .card-btn-add {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+body.dark-mode .grid-header-row {
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .time-col-hdr {
+  background: #121621;
+  border-right-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .grid-body-row {
+  background: transparent;
+}
+body.dark-mode .grid-time-axis {
+  background: #0b0f19;
+  border-right-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .grid-bg-line-hour {
+  background: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .grid-bg-line-half {
+  border-top-color: rgba(255, 255, 255, 0.04);
+}
+body.dark-mode .grid-day-col {
+  border-right-color: rgba(255, 255, 255, 0.04);
+}
+body.dark-mode .sched-time-block {
+  background: rgba(79, 70, 229, 0.22);
+  border-color: var(--brand);
+}
+body.dark-mode .sched-time-block .block-code-row {
+  color: #a5b4fc;
+}
+body.dark-mode .sched-time-block.act {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+}
+body.dark-mode .sched-time-block.act .block-code-row {
+  color: #60a5fa;
+}
+body.dark-mode .sched-modal-card {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+}
+body.dark-mode .modal-inp-readonly {
+  background: #1f2937;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--t1);
+}
+body.dark-mode .modal-select {
+  background: #1f2937;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--t1);
+}
+body.dark-mode .btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--t1);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+body.dark-mode .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Progreso Dark Mode Overrides */
+body.dark-mode .grade-stepper {
+  background: #1f2937;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .g-btn {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--t2);
+}
+body.dark-mode .g-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .g-val {
+  color: var(--t3);
+}
+body.dark-mode .formula-container {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+body.dark-mode .pace-btn {
+  background: #1f2937;
+  color: var(--t2);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.5);
+}
+body.dark-mode .metrics-box {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+body.dark-mode .sug-chip-lbl {
+  background: #1f2937;
+  color: var(--t2);
+}
+body.dark-mode .chart-card {
+  background: var(--surface);
+}
+body.dark-mode .chart-card svg line {
+  stroke: var(--border) !important;
+}
+body.dark-mode .chart-card svg text {
+  fill: var(--t2) !important;
+}
+body.dark-mode .chart-card svg text[fill="#1e293b"],
+body.dark-mode .chart-card svg text[fill="#111827"] {
+  fill: var(--t1) !important;
+}
+body.dark-mode .chart-card svg circle[fill="#ffffff"] {
+  display: none !important;
+}
+
+/* Adaptación de la tarjeta de sugerencia (tip-box) y del heatmap de actividad al modo oscuro */
+body.dark-mode .tip-box {
+  background-color: rgba(168, 85, 247, 0.1);
+  border-color: rgba(168, 85, 247, 0.25);
+}
+body.dark-mode .tip-box .tip-title {
+  color: #c084fc;
+}
+body.dark-mode .tip-box .tip-body {
+  color: #e9d5ff;
+}
+body.dark-mode .heatmap-day {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Adaptación de las tarjetas de racha (.stat-badge-card) al modo oscuro en Productividad y Estudio */
+body.dark-mode .stat-badge-card {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+body.dark-mode .stat-badge-val {
+  color: #818cf8;
+}
+
+/* Heatmap de Progreso (Productividad y Estudio) modo oscuro */
+body.dark-mode .heatmap-day.lvl-1 {
+  background-color: #312e81; 
+}
+body.dark-mode .heatmap-day.lvl-2 {
+  background-color: #4338ca; 
+}
+body.dark-mode .heatmap-day.lvl-3 {
+  background-color: #6366f1;
+}
+body.dark-mode .heatmap-day.lvl-4 {
+  background-color: #c7d2fe; 
+}
+
+/* Heatmap de Dashboard (Inicio) modo oscuro */
+body.dark-mode .hm-cell,
+body.dark-mode .hm-sq.l0 {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .hm-cell.l1,
+body.dark-mode .hm-sq.l1 {
+  background: #312e81;
+}
+body.dark-mode .hm-cell.l2,
+body.dark-mode .hm-sq.l2 {
+  background: #6366f1; 
+}
+body.dark-mode .hm-cell.l3,
+body.dark-mode .hm-sq.l3 {
+  background: #c7d2fe;
+}
+
+/* Botón cancelar del popup de contacto y perfil en modo oscuro */
+body.dark-mode .contact-btn-cancel {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--t2);
+}
+body.dark-mode .contact-btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Filas (.sim-row.disabled) en Mi Progreso en modo oscuro */
+body.dark-mode .sim-row.disabled {
+  background: rgba(255, 255, 255, 0.02) !important;
+  opacity: 0.4;
+}
+body.dark-mode .grade-stepper.stepper-disabled {
+  background: rgba(255, 255, 255, 0.02);
+  opacity: 0.5;
+}
+
+/* Gestión de Cursada en modo oscuro: tarjetas de estado (.tree-node-card) */
+body.dark-mode .tree-node-card.cursando {
+  background: rgba(99, 102, 241, 0.12) !important;
+}
+body.dark-mode .tree-node-card.regular {
+  background: rgba(249, 115, 22, 0.12) !important;
+}
+body.dark-mode .tree-node-card.aprobada {
+  background: rgba(16, 185, 129, 0.12) !important;
+}
+body.dark-mode .tree-node-card.bloqueada {
+  background: rgba(239, 68, 68, 0.12) !important;
+}
+
+/* Botón interactivo activo disponible en modo oscuro */
+body.dark-mode .btn-status-toggle.active.disponible {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: var(--t1) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+body.dark-mode .btn-status-toggle.aprobar-bloqueada {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #fca5a5 !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+/* Modal de calificación de aprobación en modo oscuro */
+body.dark-mode .grade-modal-box {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+}
+body.dark-mode .grade-input-select {
+  background: #1f2937;
+  color: var(--t1);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .btn-modal-action.cancel {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--t2);
+}
+body.dark-mode .btn-modal-action.cancel:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 /* ==============================
    RESET
 ============================== */
@@ -194,9 +450,6 @@ body {
   font-family: var(--font-body);
   color: var(--t1);
   background: var(--bg);
-  background-image: radial-gradient(var(--border) 1px, transparent 1px);
-  background-size: 24px 24px;
-  background-attachment: fixed;
   min-height: 100vh;
 }
 button { font-family: inherit; cursor: pointer; border: none; background: none; outline: none; }
@@ -725,6 +978,10 @@ h1, h2, h3, h4, h5, h6, .display-text {
 }
 .hm-lt { font-size: 10px; color: var(--tm); }
 .hm-sq { width: 9px; height: 9px; border-radius: 2px; }
+.hm-sq.l0 { background: #f3f4f6; border: 1px solid #e5e7eb; }
+.hm-sq.l1 { background: #c7d2fe; }
+.hm-sq.l2 { background: #818cf8; }
+.hm-sq.l3 { background: #4f46e5; }
 
 /* ==============================
    MOBILE HEADER
@@ -4143,52 +4400,17 @@ body.dark-mode .bn-ic {
 
 /* Dark Mode: ajustes generales de contraste
    (botones, badges, steppers y modales que usaban colores claros fijos) */
-body.dark-mode .btn-secondary {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.14);
-}
-body.dark-mode .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--t1);
-  border-color: rgba(255, 255, 255, 0.24);
-}
 body.dark-mode .hm-cell:not(.l1):not(.l2):not(.l3) { background: rgba(255, 255, 255, 0.06); }
-body.dark-mode .grade-stepper { background: rgba(255, 255, 255, 0.05); }
-body.dark-mode .g-btn { background: rgba(255, 255, 255, 0.04); }
-body.dark-mode .g-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
-body.dark-mode .pace-btn { background: rgba(255, 255, 255, 0.08); }
-body.dark-mode .metrics-box,
-body.dark-mode .formula-container,
-body.dark-mode .sched-empty-note,
-body.dark-mode .sched-drag-card,
-body.dark-mode .grid-header-row,
-body.dark-mode .time-col-hdr,
-body.dark-mode .grid-time-axis,
-body.dark-mode .sim-row.disabled {
-  background: rgba(255, 255, 255, 0.04);
-}
-body.dark-mode .grid-body-row { background: transparent; }
-body.dark-mode .sug-chip-lbl,
+
 body.dark-mode .sim-subject-badge.b-lib,
-body.dark-mode .modal-inp-readonly,
-body.dark-mode .modal-select,
 body.dark-mode .edit-name-prompt:focus,
 body.dark-mode .alert-priority-baja,
-body.dark-mode .contact-btn-cancel,
-body.dark-mode .btn-modal-action.cancel,
 body.dark-mode .sub-status-badge.disponible,
-body.dark-mode .btn-status-toggle.active.disponible,
 body.dark-mode .legend-color.disponible {
   background: rgba(255, 255, 255, 0.08);
 }
 body.dark-mode .legend-color.disponible { border-color: rgba(255, 255, 255, 0.22); }
-body.dark-mode .contact-btn-cancel:hover { background: rgba(255, 255, 255, 0.14); }
-body.dark-mode .sched-modal-card { background: #161b29; }
-body.dark-mode .sched-drag-card.activity .card-btn-add {
-  background: rgba(59, 130, 246, 0.18);
-  border-color: rgba(59, 130, 246, 0.4);
-  color: #93c5fd;
-}
+
 body.dark-mode .streak-chip {
   background: rgba(234, 88, 12, 0.18);
   border-color: rgba(234, 88, 12, 0.4);

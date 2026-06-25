@@ -8,7 +8,7 @@
     <style>
         /* Estilos específicos para la página de Progreso y Gráficos SVG */
         .chart-card {
-            background: #ffffff;
+            background: var(--surface);
             border-radius: var(--r);
             border: 1px solid var(--border);
             padding: 20px;
@@ -132,10 +132,10 @@
             transform: scale(1.2);
             z-index: 2;
         }
-        .heatmap-day.lvl-1 { background-color: #dbeafe; }
-        .heatmap-day.lvl-2 { background-color: #93c5fd; }
-        .heatmap-day.lvl-3 { background-color: #3b82f6; }
-        .heatmap-day.lvl-4 { background-color: #1d4ed8; }
+        .heatmap-day.lvl-1 { background-color: #c7d2fe; }
+        .heatmap-day.lvl-2 { background-color: #818cf8; }
+        .heatmap-day.lvl-3 { background-color: #4f46e5; }
+        .heatmap-day.lvl-4 { background-color: #312e81; }
         
         .donut-legend-list {
             display: flex;
@@ -161,6 +161,28 @@
         .donut-legend-pct {
             font-weight: 600;
             color: var(--t2);
+        }
+        
+        /* Estilos para la tarjeta de tip/sugerencia de productividad */
+        .tip-box {
+            background-color: #faf5ff;
+            border: 1px solid #e9d5ff;
+            border-radius: var(--r-sm);
+            padding: 12px;
+        }
+        .tip-box .tip-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #7e22ce;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tip-box .tip-body {
+            font-size: 11.5px;
+            color: #6b21a8;
+            margin-top: 4px;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -270,17 +292,13 @@
 
       <!-- Mobile header -->
       <div class="mob-hdr mob-hdr-swapped">
-        <div class="mob-lbl">Mi Progreso</div>
+        <div class="mob-lbl">Mi Progreso 📈</div>
         <div class="mob-name">Estadísticas</div>
       </div>
 
       <!-- Topbar (desktop) -->
       <header class="topbar">
-        <div class="breadcrumb">
-          <a href="index.html">Inicio</a>
-          <span class="sep">›</span>
-          <span class="cur">Mi Progreso</span>
-        </div>
+        <div class="topbar-title">Mi Progreso 📈</div>
       </header>
 
       <!-- Page Content -->
@@ -520,11 +538,11 @@
                 <p style="font-size: 12.5px; color: var(--t2); line-height: 1.5; margin: 0 0 12px 0;">
                   Según tu racha e historial de concentración de los últimos días, tu hora más productiva es de <strong>18:00 a 20:00 hs</strong>. 
                 </p>
-                <div style="background-color: #faf5ff; border: 1px solid #e9d5ff; border-radius: var(--r-sm); padding: 12px;">
-                  <div style="font-size: 12px; font-weight: 700; color: #7e22ce; display: flex; align-items: center; gap: 6px;">
+                <div class="tip-box">
+                  <div class="tip-title">
                     <span>💡 Tip de Rendimiento</span>
                   </div>
-                  <div style="font-size: 11.5px; color: #6b21a8; margin-top: 4px; line-height: 1.4;">
+                  <div class="tip-body">
                     Si mantienes el ritmo promedio de 1.8 horas diarias, completarás el tiempo de preparación sugerido para los finales de <em>Laboratorio II</em> y <em>Estadística</em> en 8 días.
                   </div>
                 </div>
