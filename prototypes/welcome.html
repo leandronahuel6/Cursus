@@ -1113,6 +1113,26 @@
         }
 
         @media (max-width: 600px) {
+            .landing-header {
+                padding: 0 12px;
+                height: 60px;
+            }
+            .landing-header.scrolled {
+                height: 55px;
+            }
+            .logo-wrap img {
+                height: 30px !important;
+            }
+            .logo-tx {
+                font-size: 15px;
+            }
+            .logo-tx small {
+                display: none;
+            }
+            .theme-toggle-btn {
+                width: 32px;
+                height: 32px;
+            }
             .hero-title {
                 font-size: 34px;
             }
@@ -1123,13 +1143,15 @@
                 grid-template-columns: 1fr;
             }
             .landing-actions {
-                gap: 8px;
+                gap: 4px;
             }
             .btn-login {
-                padding: 8px 12px;
+                padding: 6px 8px;
+                font-size: 12.5px;
             }
             .btn-register {
-                padding: 8px 16px;
+                padding: 6px 12px;
+                font-size: 12.5px;
             }
         }
 

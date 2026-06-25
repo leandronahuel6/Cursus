@@ -8,7 +8,7 @@
 
 @section('mobile-header')
 <div class="mob-hdr">
-  <div class="mob-lbl">Área de Estudio 💻</div>
+  <div class="mob-lbl">Área de Estudio 🕑</div>
   <div class="mob-name">
     <span id="mob-materia-name">—</span>
     <span class="badge b-reg" id="mob-materia-badge">Regular</span>
@@ -18,13 +18,9 @@
 @endsection
 
 @section('topbar-content')
-<div class="breadcrumb">
-        <a href="index.html">Inicio</a>
-        <span class="sep">›</span>
-        <span class="cur">Área de Estudio</span>
-      </div>
-      <div class="tb-right">
-      </div>
+  <div class="topbar-title">Área de Estudio 🕑</div>
+  <div class="tb-right">
+  </div>
 @endsection
 
 @section('content')

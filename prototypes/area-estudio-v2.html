@@ -963,6 +963,54 @@
         width: 200px;
       }
     }
+
+    /* ==========================================================================
+       MODO OSCURO (DARK MODE)
+       ========================================================================== */
+    body.dark-mode .modal-box {
+      background: #111827;
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    body.dark-mode .modal-input {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: var(--t1);
+    }
+
+    body.dark-mode .modal-input:focus {
+      border-color: var(--brand);
+    }
+
+    body.dark-mode .modal-foot {
+      background: #0b0f19;
+      border-top-color: rgba(255, 255, 255, 0.06);
+    }
+
+    body.dark-mode .btn-cancel {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: var(--t2);
+    }
+
+    body.dark-mode .btn-cancel:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--t1);
+    }
+
+    /* Formulario inline para agregar tarea (modo oscuro) */
+    body.dark-mode .kb-add-inp {
+      background: transparent;
+      color: var(--t1);
+    }
+
+    /* Evitar fondo blanco en menú desplegable nativo en modo oscuro */
+    body.dark-mode select.modal-input,
+    body.dark-mode select.modal-input option {
+      background-color: #1f2937;
+      color: var(--t1);
+    }
   </style>
 </head>
 <body>
@@ -1060,13 +1108,7 @@
 
     <!-- Topbar -->
     <header class="topbar">
-      <div class="breadcrumb">
-        <a href="index.html">Inicio</a>
-        <span class="sep">›</span>
-        <span>Área de Estudio</span>
-        <span class="sep">›</span>
-        <span class="cur">Programación II</span>
-      </div>
+      <div class="topbar-title">Área de Estudio 🕑</div>
       <div class="tb-right">
         <!-- Switch de Simulación de Errores de Red -->
         <div class="sim-toggle-wrap">
