@@ -128,12 +128,25 @@
     const unameEl = document.getElementById('sb-uname');
     const ulegEl = document.getElementById('sb-uleg');
     const avEl = document.getElementById('sb-av');
+    const bnAvEl = document.getElementById('bn-av');
+    
+    // PM header elements (Mobile profile modal like GitHub)
+    const pmUnameEl = document.getElementById('pm-uname');
+    const pmUlegEl = document.getElementById('pm-uleg');
+    const pmAvEl = document.getElementById('pm-av');
 
     if (unameEl && user.nombre) unameEl.textContent = user.nombre;
     if (ulegEl) ulegEl.textContent = user.legajo ? `Legajo ${user.legajo}` : '';
-    if (avEl && user.nombre) {
+    
+    if (pmUnameEl && user.nombre) pmUnameEl.textContent = user.nombre;
+    if (pmUlegEl) pmUlegEl.textContent = user.legajo ? `Legajo ${user.legajo}` : '';
+
+    if (user.nombre) {
       const parts = user.nombre.trim().split(' ');
-      avEl.textContent = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
+      const initials = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
+      if (avEl) avEl.textContent = initials;
+      if (bnAvEl) bnAvEl.textContent = initials;
+      if (pmAvEl) pmAvEl.textContent = initials;
     }
   }
 
