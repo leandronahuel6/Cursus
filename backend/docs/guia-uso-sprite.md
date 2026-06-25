@@ -19,18 +19,32 @@ En lugar de cargar cada icono mediante la etiqueta `<img>` o pegando todo el có
 Si quieres usar el icono de la campana (`bell.svg`), su ID dentro del sprite es `bell`. Así lo usarías en Blade:
 
 ```html
-<button class="btn-notification">
-    <svg
-        class="icon-bell"
-        width="24"
-        height="24"
-        fill="none"
-        stroke="currentColor"
-    >
+<!-- Ejemplo en un botón sin texto (requiere aria-label en el botón y aria-hidden en el icono) -->
+<button class="btn-notification" aria-label="Notificaciones">
+    <svg class="icon-bell" width="24" height="24" aria-hidden="true">
         <use href="{{ asset('assets/icons/sprite.svg#bell') }}"></use>
     </svg>
 </button>
+
+<!-- Ejemplo decorativo con texto (requiere aria-hidden en el icono) -->
+<a href="/perfil" class="link-perfil">
+    <svg class="icon-user" width="24" height="24" aria-hidden="true">
+        <use href="{{ asset('assets/icons/sprite.svg#user') }}"></use>
+    </svg>
+    Mi Perfil
+</a>
 ```
+
+### Accesibilidad (a11y)
+
+Como buena práctica, siempre debes tener en cuenta cómo leerán los lectores de pantalla tus iconos:
+
+- **`aria-hidden="true"`**: Se añade en la etiqueta `<svg>` instanciada cuando el icono es puramente **decorativo** o está acompañado de un texto que ya describe la acción (como el enlace "Mi Perfil" superior).
+- **`aria-label="Descripción"`**: Se utiliza en el elemento contenedor (como un `<button>` o `<a>`) cuando el icono es el **único contenido visual**, para que el lector de pantalla sepa para qué sirve (como el botón de "Notificaciones" superior).
+
+> [!TIP]
+> **Atributos predeterminados:** Los atributos visuales básicos (`fill="none"`, `stroke="currentColor"`, `stroke-width="2"`, etc.) ya vienen incluidos por defecto en cada símbolo del sprite. Por esto no necesitas declararlos en la etiqueta `<svg>` de uso, manteniendo tu código más limpio.
+
 
 ### Personalizando colores y tamaños
 

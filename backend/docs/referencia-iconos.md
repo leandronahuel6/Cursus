@@ -9,13 +9,15 @@ Este documento contiene la especificación clara, mejorada y ordenada de dónde 
 - `chevron-up.svg`: Utilizado en la esquina derecha del bloque de perfil dentro del Sidebar.
 - `chevron-down.svg`: Sin uso definido actualmente (mantener disponible por si acaso).
 - `move-right.svg`: Se utiliza en los enlaces de navegación de bloques en `/dashboard`: "Materias este cuatrimestre", "Ver todas", "Ver Kanban", y en los bloques de "Estudiar otra Materia". _(Nota: Ha sido quitado del botón "Continuar estudiando" en /dashboard)_.
-- `x.svg`: Esquina derecha en "Alerta próxima" (`/dashboard`). Esquina derecha en el Bloque superior en el Modal de tarea, botón Esquina Derecha al cliquear "Añadir una subtarea" en Modal de tarea, esquina derecha en Bloque superior en Modal de Ajustes Pomodoro Personalizado (`/area-estudio`). Esquina superior derecha en bloques de la grilla del simulador y en el bloque superior del Modal "Agregar a la grilla" (`/horarios`), y como el 2do botón en el extremo derecho en el Bloque de Aviso (`/alertas`).
+- `x.svg`: Botón de cerrar en el menú/modal de perfil móvil en la cabecera. Esquina derecha en "Alerta próxima" (`/dashboard`). Esquina derecha en el Bloque superior en el Modal de tarea, botón Esquina Derecha al cliquear "Añadir una subtarea" en Modal de tarea, esquina derecha en Bloque superior en Modal de Ajustes Pomodoro Personalizado (`/area-estudio`). Esquina superior derecha en bloques de la grilla del simulador y en el bloque superior del Modal "Agregar a la grilla" (`/horarios`), y como el 2do botón en el extremo derecho en el Bloque de Aviso (`/alertas`).
 - `plus.svg`: Utilizado en el botón "Agregar tarea" en las Columnas del Tablero Kanban, y "Añadir una subtarea" en el Modal de tarea (`/area-estudio`). También en el botón "Agregar actividad" debajo de todas las tarjetas de Actividades Personales (`/horarios`). Reemplaza el caracter "+" en los botones de cada materia para sumar nota y en el botón derecho de aprobadas por cuatrimestre (`/progreso`).
 - `minus.svg`: Reemplaza el caracter "-" en los botones de cada materia para restar nota y en el botón izquierdo de aprobadas por cuatrimestre (`/progreso`).
 - `check.svg`: Utilizado para indicar Materias Aprobadas (`/materias`), y como el 1er botón en el extremo derecho en el Bloque de Aviso (`/alertas`).
 - `trash-2.svg`: Icono de eliminación. Se muestra en la esquina superior derecha al hacer `:hover` sobre una tarjeta de tarea, en la esquina derecha en cada subtarea en "Subtareas (Checklist)" en el Modal de tarea, y al hacer `:hover` en la tarjeta de Marcador (en la esquina derecha, siendo el 3er botón de izquierda a derecha) (`/area-estudio`). Además, aparece en el extremo derecho al hacer `:hover` sobre los Bloques de Mis Actividades Personales, y en el botón "Eliminar" en el bloque que aparece al cliquear una tarjeta en la grilla (`/horarios`).
 - `pen.svg`: Icono de edición. Al hacer `:hover` en una tarjeta de Marcador, se ubica en la esquina derecha como el 2do botón de izquierda a derecha (`/area-estudio`).
 - `settings.svg`: Botón de Ajustes para Pomodoro Personalizado, ubicado en la esquina derecha del bloque superior del Temporizador pomodoro (`/area-estudio`).
+- `sun.svg`: Botón de cambio de tema (modo claro) en la cabecera superior (escritorio y móvil).
+- `moon.svg`: Botón de cambio de tema (modo oscuro) en la cabecera superior (escritorio y móvil).
 
 ## Iconos de Sidebar y Menú Principal
 
@@ -27,6 +29,7 @@ Este documento contiene la especificación clara, mejorada y ordenada de dónde 
 - `library.svg`: Icono para enlace "Mis Materias" (Sidebar).
 - `clock.svg`: Icono para enlace "Área de Estudio" (Sidebar) y para el "Historial de Pagos" (`/alertas`).
 - `calendar.svg`: Icono para enlace "Simulador de Horarios" (Sidebar) y para indicador "Vence [fecha]" (`/area-estudio`).
+- `gift.svg`: Icono para enlace "Beneficios" (Sidebar).
 - `bell.svg`: Icono para enlace "Alertas" (Sidebar) y en el título "Alertas y Vencimientos" (`/alertas`).
 - `trending-up.svg`: Icono para enlace "Mi Progreso" (Sidebar).
 - `user.svg`: Icono para enlace "Perfil" (se muestra al cliquear el bloque de perfil en el Sidebar), y en Alerta categoría "Personal" (`/alertas`).
