@@ -199,9 +199,11 @@ body.sidebar-collapsed .main {
 .sidebar.collapsed .sb-user {
   padding: 14px 21px;
 }
-body.sidebar-collapsed .profile-menu {
-  width: 220px;
-  left: calc(var(--sidebar-w-collapsed) + 8px);
+@media (min-width: 769px) {
+  body.sidebar-collapsed .profile-menu {
+    width: 220px;
+    left: calc(var(--sidebar-w-collapsed) + 8px);
+  }
 }
 
 .sb-user-caret {
