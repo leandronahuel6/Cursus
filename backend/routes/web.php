@@ -33,6 +33,10 @@ Route::get('/beneficios', function () {
     return view('beneficios');
 })->name('beneficios');
 
+Route::get('/flashcards', function () {
+    return view('flashcards');
+})->name('flashcards');
+
 Route::get('/progreso', function () {
     return view('progreso');
 })->name('progreso');

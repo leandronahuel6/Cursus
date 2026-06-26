@@ -10,7 +10,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement('ALTER TABLE tareas MODIFY fecha_vencimiento DATETIME NULL');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE tareas MODIFY fecha_vencimiento DATETIME NULL');
+        }
     }
 
     /**
@@ -18,6 +20,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement('ALTER TABLE tareas MODIFY fecha_vencimiento DATE NULL');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE tareas MODIFY fecha_vencimiento DATE NULL');
+        }
     }
 };

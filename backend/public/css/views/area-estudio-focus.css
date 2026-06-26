@@ -1,0 +1,893 @@
+/* ==========================================================================
+   ESTILOS DEL MODO CONCENTRACIÓN (AESTHETIC FOCUS OVERLAY)
+   ========================================================================== */
+
+#focus-mode-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 20000;
+    overflow: hidden;
+    display: none; /* Se maneja dinámicamente con JS */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-family: 'Outfit', sans-serif;
+}
+
+#focus-mode-overlay.show {
+    display: flex;
+    animation: focus-fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ==========================================================================
+   ANIMACIONES DE ENTRADA INMERSIVAS
+   ========================================================================== */
+
+@keyframes focus-fade-in {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+    }
+    to {
+        opacity: 1;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+}
+
+@keyframes focus-card-entrance {
+    from {
+        opacity: 0;
+        transform: scale(0.88) translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes focus-bottom-bar-entrance {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes focus-banner-entrance {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes focus-canvas-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Aplicación de las animaciones al entrar */
+#focus-mode-overlay.show .focus-central-card {
+    animation: focus-card-entrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+
+#focus-mode-overlay.show .focus-bottom-bar {
+    animation: focus-bottom-bar-entrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+#focus-mode-overlay.show .focus-goal-banner {
+    animation: focus-banner-entrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+#focus-mode-overlay.show #focus-canvas {
+    animation: focus-canvas-fade-in 1.5s ease 0.4s both;
+}
+
+/* Animaciones de Salida (Leaving) */
+#focus-mode-overlay.show.leaving {
+    animation: focus-fade-out 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+#focus-mode-overlay.show.leaving .focus-central-card {
+    animation: focus-card-exit 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+#focus-mode-overlay.show.leaving .focus-bottom-bar {
+    animation: focus-bottom-bar-exit 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+#focus-mode-overlay.show.leaving .focus-goal-banner {
+    animation: focus-banner-exit 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes focus-fade-out {
+    from {
+        opacity: 1;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+    to {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+    }
+}
+
+@keyframes focus-card-exit {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.92) translateY(20px);
+    }
+}
+
+@keyframes focus-bottom-bar-exit {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+}
+
+@keyframes focus-banner-exit {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+/* Contenedor del fondo visual */
+#focus-bg-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    transition: background 0.8s ease-in-out;
+}
+
+/* Lienzo de partículas dinámicas (Lluvia, Chispas) */
+#focus-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   TEMAS VISUALES DE FONDO
+   ========================================================================== */
+
+/* Tema Aurora (Mesh Gradient Animado) */
+.theme-aurora {
+    background: radial-gradient(circle at 20% 30%, #0f172a, transparent 60%),
+                radial-gradient(circle at 80% 70%, #1e1b4b, transparent 60%),
+                radial-gradient(circle at 50% 50%, #311042, transparent 50%),
+                #070a13;
+    background-size: 200% 200%;
+    animation: aurora-focus-bg 20s ease infinite alternate;
+}
+
+@keyframes aurora-focus-bg {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 50% 100%;
+    }
+}
+
+/* Tema Lluvia (Noche azulada/grisácea profunda) */
+.theme-rain {
+    background: radial-gradient(circle at 50% 30%, rgba(15, 23, 42, 0.9), transparent 80%),
+                radial-gradient(circle at 10% 80%, rgba(30, 41, 59, 0.95), transparent 50%),
+                #050811;
+}
+
+/* Tema Fogón (Calidez con oscilaciones de luz) */
+.theme-fire {
+    background: radial-gradient(circle at 50% 90%, rgba(120, 30, 5, 0.4), transparent 70%),
+                radial-gradient(circle at 50% 100%, rgba(220, 60, 5, 0.15), transparent 40%),
+                #06080d;
+    animation: fireplace-pulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes fireplace-pulse {
+    0% {
+        filter: brightness(0.9) contrast(1);
+    }
+    50% {
+        filter: brightness(1.05) contrast(1.05);
+    }
+    100% {
+        filter: brightness(0.95) contrast(0.98);
+    }
+}
+
+/* ==========================================================================
+   TARJETA CENTRAL GLASSMORPHIC (REPRODUCTOR ZEN)
+   ========================================================================== */
+
+.focus-central-card {
+    position: relative;
+    z-index: 10;
+    width: 90%;
+    max-width: 480px;
+    background: rgba(10, 15, 30, 0.35);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+/* Fase actual de estudio */
+.focus-phase-badge {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.focus-phase-badge.enfoque {
+    background: rgba(99, 102, 241, 0.15);
+    color: #a5b4fc;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
+}
+
+.focus-phase-badge.recreo {
+    background: rgba(16, 185, 129, 0.15);
+    color: #6ee7b7;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+}
+
+/* Anillo de Progreso y Reloj */
+.focus-timer-ring-wrapper {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.focus-timer-ring-wrapper svg {
+    transform: rotate(-90deg);
+}
+
+.focus-timer-ring-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.03);
+    stroke-width: 5;
+}
+
+.focus-timer-ring-progress {
+    fill: none;
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear;
+}
+
+.focus-timer-ring-progress.enfoque {
+    stroke: #818cf8;
+}
+
+.focus-timer-ring-progress.recreo {
+    stroke: #34d399;
+}
+
+/* Números del Cronómetro */
+.focus-timer-clock {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.focus-time-display {
+    font-family: 'Outfit', monospace;
+    font-size: 3.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    line-height: 1;
+}
+
+.focus-session-display {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Controles Minimalistas */
+.focus-controls-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.focus-ctrl-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.focus-ctrl-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.focus-ctrl-btn.play-pause {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.focus-ctrl-btn.play-pause:hover {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
+}
+
+/* ==========================================================================
+   BARRA INFERIOR DE AJUSTES ESTÉTICOS (MIXER & THEME)
+   ========================================================================== */
+
+.focus-bottom-bar {
+    position: absolute;
+    bottom: 30px;
+    z-index: 10;
+    width: 90%;
+    max-width: 680px;
+    background: rgba(10, 15, 30, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    padding: 0.8rem 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* Selección de Temas Estéticos */
+.focus-themes-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.focus-theme-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.focus-theme-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.focus-theme-btn.active {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+}
+
+/* Mezclador de Sonidos */
+.focus-audio-mixer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.focus-audio-control {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.focus-audio-control span {
+    font-size: 0.85rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.focus-audio-control input[type="range"] {
+    width: 60px;
+    height: 3px;
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.focus-audio-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+
+.focus-audio-control input[type="range"]:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Botón de Salida */
+.focus-exit-btn {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #f87171;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.focus-exit-btn:hover {
+    background: rgba(239, 68, 68, 0.25);
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+   ESTILOS GENERALES Y BOTÓN DE INGRESO
+   ========================================================================== */
+
+/* Botón glassmorphic en la cabecera */
+.btn-focus-mode-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 1rem;
+    background: rgba(99, 102, 241, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: 'Outfit', sans-serif;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.btn-focus-mode-trigger:hover {
+    background: rgba(99, 102, 241, 0.18);
+    border-color: rgba(99, 102, 241, 0.35);
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px -4px rgba(99, 102, 241, 0.25);
+}
+
+.btn-focus-mode-trigger svg {
+    transition: transform 0.3s ease;
+}
+
+.btn-focus-mode-trigger:hover svg {
+    transform: rotate(15deg) scale(1.08);
+}
+
+/* ==========================================================================
+   RESPONSIVIDAD Y AJUSTES MÓVILES
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .focus-central-card {
+        padding: 2rem 1.2rem;
+        max-width: 92%;
+    }
+
+    .focus-timer-ring-wrapper {
+        width: 180px;
+        height: 180px;
+    }
+
+    .focus-time-display {
+        font-size: 2.8rem;
+    }
+
+    .focus-bottom-bar {
+        bottom: 20px;
+        border-radius: 20px;
+        padding: 0.8rem 1rem;
+        flex-direction: column;
+        gap: 0.8rem;
+        width: 92%;
+    }
+
+    .focus-themes-wrapper, .focus-audio-mixer {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Banner de Meta / Tarea Activa */
+.focus-goal-banner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 1.5rem;
+    max-width: 90%;
+}
+
+.focus-goal-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 700;
+}
+
+.focus-goal-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 320px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.18);
+    padding-bottom: 0.3rem;
+}
+
+/* ==========================================================================
+   ESTILOS DE TABS DE FASE Y PANEL LOFI
+   ========================================================================== */
+
+.focus-phase-tabs {
+    display: inline-flex;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    padding: 0.25rem;
+    margin-bottom: 1.5rem;
+    gap: 0.25rem;
+    z-index: 12;
+}
+
+.focus-phase-tab {
+    background: transparent;
+    border: 1px solid transparent;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 0.4rem 1.1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: 'Outfit', sans-serif;
+    outline: none;
+}
+
+.focus-phase-tab:hover {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.focus-phase-tab.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#phase-tab-enfoque.active {
+    background: rgba(99, 102, 241, 0.25);
+    color: #a5b4fc;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.15);
+}
+
+#phase-tab-corto.active, #phase-tab-largo.active {
+    background: rgba(16, 185, 129, 0.25);
+    color: #6ee7b7;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.15);
+}
+
+/* Panel Lofi Lateral */
+.focus-lofi-panel {
+    position: absolute;
+    top: 80px;
+    right: -340px; /* Oculto por defecto */
+    width: 300px;
+    background: rgba(10, 15, 30, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    z-index: 15;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.focus-lofi-panel.show {
+    right: 30px; /* Deslizar hacia adentro */
+}
+
+.focus-lofi-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 1.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.focus-lofi-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 0.02em;
+}
+
+.focus-lofi-close {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.focus-lofi-close:hover {
+    color: #ffffff;
+}
+
+.focus-lofi-body {
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.focus-lofi-select-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.focus-lofi-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 700;
+}
+
+.focus-lofi-select {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: #ffffff;
+    padding: 0.5rem;
+    font-size: 0.82rem;
+    outline: none;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.focus-lofi-select:hover, .focus-lofi-select:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.focus-lofi-select option {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.focus-lofi-video-container {
+    position: relative;
+    width: 100%;
+    height: 150px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: #000000;
+}
+
+.focus-lofi-video-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+#lofi-panel-toggle.active {
+    color: #a5b4fc;
+    background: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.35);
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
+}
+
+/* Responsividad para móviles del panel lofi */
+@media (max-width: 768px) {
+    .focus-lofi-panel {
+        top: 70px;
+        left: 50%;
+        right: auto;
+        transform: translate(-50%, -50px);
+        opacity: 0;
+        pointer-events: none;
+        width: 280px;
+        max-height: calc(100vh - 180px);
+    }
+    .focus-lofi-panel.show {
+        transform: translate(-50%, 0);
+        opacity: 1;
+        pointer-events: auto;
+        z-index: 100;
+    }
+    .focus-lofi-video-container {
+        height: 120px;
+    }
+}
+
+/* ==========================================================================
+   MEJORAS ADICIONALES: BOTÓN COMPLETAR META Y PUNTOS DE SESIÓN
+   ========================================================================== */
+
+.focus-goal-complete-btn {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: #6ee7b7;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    outline: none;
+    padding: 0;
+}
+
+.focus-goal-complete-btn:hover {
+    background: rgba(16, 185, 129, 0.25);
+    border-color: rgba(16, 185, 129, 0.45);
+    color: #ffffff;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+
+.focus-dots-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 1.8rem;
+}
+
+.focus-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.focus-dot.done {
+    background: #818cf8;
+    border-color: rgba(129, 140, 248, 0.5);
+    box-shadow: 0 0 8px rgba(129, 140, 248, 0.4);
+}
+
+.focus-goal-nav-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.6);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    outline: none;
+    padding: 0;
+}
+
+.focus-goal-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+

@@ -4,15 +4,24 @@
 
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/views/area-estudio.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/views/area-estudio-focus.css') }}">
 @endpush
 
 @section('mobile-header')
 <div class="mob-hdr">
-  <div class="mob-lbl">Área de Estudio 🕑</div>
-  <div class="mob-name">
-    <span id="mob-materia-name">—</span>
-    <span class="badge b-reg" id="mob-materia-badge">Regular</span>
-    <span style="font-size:11px;color:#6b7280" id="mob-materia-meta">Cargando...</span>
+  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+    <div style="display: flex; flex-direction: column;">
+      <div class="mob-lbl">Área de Estudio 🕑</div>
+      <div class="mob-name">
+        <span id="mob-materia-name">—</span>
+        <span class="badge b-reg" id="mob-materia-badge">Regular</span>
+        <span style="font-size:11px;color:#6b7280" id="mob-materia-meta">Cargando...</span>
+      </div>
+    </div>
+    <button class="btn-focus-mode-trigger" onclick="window.enterFocusMode()" style="padding: 0.4rem 0.7rem; font-size: 0.75rem; border-radius: 6px; margin-right: 8px;" title="Entrar a Modo Concentración">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/><path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5Z"/><path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1Z"/></svg>
+      <span>Concentración</span>
+    </button>
   </div>
 </div>
 @endsection
@@ -20,6 +29,10 @@
 @section('topbar-content')
   <div class="topbar-title">Área de Estudio 🕑</div>
   <div class="tb-right">
+    <button class="btn-focus-mode-trigger" onclick="window.enterFocusMode()" title="Entrar a Modo Concentración a pantalla completa">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/><path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5Z"/><path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1Z"/></svg>
+      <span>Modo Concentración</span>
+    </button>
   </div>
 @endsection
 
@@ -163,7 +176,7 @@
 
             <div class="focus-body" style="position: relative;">
               <button id="pomo-restart-cycle-btn" onclick="restartPomoCycle()" style="position: absolute; top: 12px; left: 14px; background: none; border: none; cursor: pointer; font-size: 15px; color: rgba(255,255,255,.5); padding: 4px; transition: color .15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'" title="Reiniciar ciclo de sesiones (volver a la sesión 1)">⏮</button>
-              <button id="pomo-settings-btn" onclick="openCustomPomoModal()" style="display:none; position: absolute; top: 12px; right: 14px; background: none; border: none; cursor: pointer; font-size: 15px; color: rgba(255,255,255,.5); padding: 4px; transition: color .15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'" title="Ajustes de pomodoro personalizado">⚙️</button>
+              <button id="pomo-settings-btn" onclick="openCustomPomoModal()" style="position: absolute; top: 12px; right: 14px; background: none; border: none; cursor: pointer; font-size: 15px; color: rgba(255,255,255,.5); padding: 4px; transition: color .15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'" title="Ajustes de pomodoro personalizado">⚙️</button>
 
               <!-- Progress Ring -->
               <div class="ring-wrap" id="ring-wrap">
@@ -330,6 +343,21 @@
         </select>
       </div>
 
+      <div class="modal-field">
+        <label class="modal-label" for="custom-pomo-sound">Sonido de Alarma</label>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <select id="custom-pomo-sound" class="modal-input" style="flex: 1;">
+            <option value="chime">Campana Clásica (Chime)</option>
+            <option value="beep">Beep Digital (Retro)</option>
+            <option value="zen">Campana Zen (Relajante)</option>
+            <option value="none">Ninguno (Silencioso)</option>
+          </select>
+          <button type="button" class="btn-cancel" id="btn-test-sound" onclick="testSelectedSound()" style="padding: 10px 14px; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.25rem; white-space: nowrap; border-radius: 6px;" title="Probar sonido">
+            🔊 Probar
+          </button>
+        </div>
+      </div>
+
       <div id="pomo-validation-error" style="color: var(--red); font-size:12px; font-weight:600; display:none;"></div>
 
     </div>
@@ -360,8 +388,131 @@
 
 <!-- Contenedor global de Toasts -->
 <div class="toast-container" id="toast-container"></div>
+
+<!-- 4. OVERLAY MODO CONCENTRACIÓN AESTHETIC -->
+<div id="focus-mode-overlay">
+  <!-- Contenedor del fondo animado -->
+  <div id="focus-bg-container" class="theme-aurora"></div>
+  
+  <!-- Lienzo de partículas -->
+  <canvas id="focus-canvas"></canvas>
+
+  <!-- Tarjeta central con el reloj y controles -->
+  <div class="focus-central-card">
+    <div class="focus-phase-tabs">
+      <button class="focus-phase-tab active" id="phase-tab-enfoque" onclick="window.changeFocusPhase('enfoque')">Pomodoro</button>
+      <button class="focus-phase-tab" id="phase-tab-corto" onclick="window.changeFocusPhase('descanso_corto')">Recreo Corto</button>
+      <button class="focus-phase-tab" id="phase-tab-largo" onclick="window.changeFocusPhase('descanso_largo')">Recreo Largo</button>
+    </div>
+    
+    <!-- Banner de Meta / Tarea Activa -->
+    <div class="focus-goal-banner" id="focus-goal-banner">
+      <span class="focus-goal-label">Enfocándote en:</span>
+      <div class="focus-goal-title-wrapper" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center; width: 100%;">
+        <button class="focus-goal-nav-btn" id="focus-goal-prev-btn" onclick="window.prevFocusTask()" title="Tarea anterior" style="display: none;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span class="focus-goal-title" id="focus-goal-title">Ninguna tarea en curso</span>
+        <button class="focus-goal-nav-btn" id="focus-goal-next-btn" onclick="window.nextFocusTask()" title="Siguiente tarea" style="display: none;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="focus-goal-complete-btn" id="focus-goal-complete-btn" onclick="window.completeFocusActiveTask()" title="Marcar tarea como completada" style="display: none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Anillo de progreso circular -->
+    <div class="focus-timer-ring-wrapper">
+      <svg width="220" height="220" viewBox="0 0 220 220">
+        <circle class="focus-timer-ring-bg" cx="110" cy="110" r="102"/>
+        <circle class="focus-timer-ring-progress enfoque" cx="110" cy="110" r="102" id="focus-ring-progress" stroke-dasharray="640.88" stroke-dashoffset="0"/>
+      </svg>
+      <div class="focus-timer-clock">
+        <span class="focus-time-display" id="focus-time-display">25:00</span>
+        <span class="focus-session-display" id="focus-session-display">Sesión 1 de 4</span>
+      </div>
+    </div>
+
+    <!-- Controles de reproducción -->
+    <div class="focus-controls-row">
+      <button class="focus-ctrl-btn" onclick="window.resetPomo()" title="Reiniciar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+      </button>
+      <button class="focus-ctrl-btn play-pause" id="focus-play-btn" onclick="window.togglePomo()" title="Pausar/Reanudar">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="focus-play-icon"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </button>
+      <button class="focus-ctrl-btn" onclick="window.skipPomo()" title="Saltear fase">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+      </button>
+    </div>
+
+    <!-- Puntos de progreso de sesión -->
+    <div class="focus-dots-row" id="focus-dots"></div>
+  </div>
+
+  <!-- Barra flotante inferior de ajustes (Mixer & Themes) -->
+  <div class="focus-bottom-bar">
+    <!-- Selector de Temas -->
+    <div class="focus-themes-wrapper">
+      <button class="focus-theme-btn active" id="theme-btn-aurora" onclick="window.changeFocusTheme('aurora')">🌌 Aurora</button>
+      <button class="focus-theme-btn" id="theme-btn-rain" onclick="window.changeFocusTheme('rain')">🌧️ Lluvia</button>
+      <button class="focus-theme-btn" id="theme-btn-fire" onclick="window.changeFocusTheme('fire')">🔥 Fogón</button>
+    </div>
+
+    <!-- Mezclador de Sonidos Ambientales -->
+    <div class="focus-audio-mixer">
+      <div class="focus-audio-control">
+        <span onclick="window.toggleRainAudio()" id="mixer-icon-rain" style="cursor: pointer;" title="Encender/Apagar sonido de lluvia">🌧️</span>
+        <input type="range" id="focus-vol-rain" min="0" max="1" step="0.05" value="0" oninput="window.setRainVolume(this.value)">
+      </div>
+      <div class="focus-audio-control">
+        <span onclick="window.toggleFireAudio()" id="mixer-icon-fire" style="cursor: pointer;" title="Encender/Apagar sonido de fogón">🔥</span>
+        <input type="range" id="focus-vol-fire" min="0" max="1" step="0.05" value="0" oninput="window.setFireVolume(this.value)">
+      </div>
+    </div>
+
+    <!-- Botón de Música Lofi -->
+    <button class="focus-theme-btn" id="lofi-panel-toggle" onclick="window.toggleLofiPanel()" title="Música Lofi">
+      🎵 Música Lofi
+    </button>
+
+    <!-- Botón de Salir -->
+    <button class="focus-exit-btn" onclick="window.exitFocusMode()" title="Salir del Modo Concentración">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- Panel de Música Lofi Lateral -->
+  <div class="focus-lofi-panel" id="focus-lofi-panel">
+    <div class="focus-lofi-header">
+      <span class="focus-lofi-title">🎵 Reproductor Lofi</span>
+      <button class="focus-lofi-close" onclick="window.toggleLofiPanel()" title="Cerrar panel">✕</button>
+    </div>
+    
+    <div class="focus-lofi-body">
+      <!-- Selector de canal/estación -->
+      <div class="focus-lofi-select-wrapper">
+        <label for="focus-lofi-select" class="focus-lofi-label">Estación:</label>
+        <select id="focus-lofi-select" class="focus-lofi-select" onchange="window.changeLofiChannel(this.value)">
+          <option value="3yH2Wo2SaIM">☕ Lofi Girl (Estudio)</option>
+          <option value="Ru3rJJaqJl4">爵 Chillhop Radio (Jazz Beats)</option>
+          <option value="jdIDQ1qGutE">🌌 Synthwave Radio (Retro)</option>
+          <option value="DSmS_59twmU">☕ Cafe Music Bossa Nova</option>
+        </select>
+      </div>
+
+      <!-- Iframe contenedor -->
+      <div class="focus-lofi-video-container">
+        <iframe id="focus-lofi-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 @push('scripts')
+  <script src="{{ asset('js/views/pomo-ambient-synth.js') }}"></script>
+  <script src="{{ asset('js/views/pomo-focus-canvas.js') }}"></script>
   <script src="{{ asset('js/views/area-estudio.js') }}" type="module"></script>
 @endpush

@@ -258,6 +258,7 @@
 <script src="{{ asset('js/shared/sidebar.js') }}"></script>
 <script src="{{ asset('js/script.js') }}"></script>
 <script src="{{ asset('js/profile.js') }}"></script>
+<script src="{{ asset('js/pomo-float.js') }}"></script>
 @stack('scripts')
 
 </body>
