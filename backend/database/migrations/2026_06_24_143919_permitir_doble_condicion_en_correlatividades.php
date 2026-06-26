@@ -15,7 +15,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement('ALTER TABLE correlatividades DROP PRIMARY KEY, ADD PRIMARY KEY (materia_id, requisito_id, condicion_requerida)');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE correlatividades DROP PRIMARY KEY, ADD PRIMARY KEY (materia_id, requisito_id, condicion_requerida)');
+        }
     }
 
     /**
@@ -23,6 +25,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement('ALTER TABLE correlatividades DROP PRIMARY KEY, ADD PRIMARY KEY (materia_id, requisito_id)');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE correlatividades DROP PRIMARY KEY, ADD PRIMARY KEY (materia_id, requisito_id)');
+        }
     }
 };

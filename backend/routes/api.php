@@ -13,6 +13,7 @@ use App\Http\Controllers\MarcadorController;
 use App\Http\Controllers\AlertaController;
 use App\Http\Controllers\RecordatorioCuotaController;
 use App\Http\Controllers\PagoCuotaController;
+use App\Http\Controllers\FlashcardController;
 
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
@@ -68,4 +69,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/pagos-cuota/estado', [PagoCuotaController::class, 'estado']);
     Route::post('/pagos-cuota', [PagoCuotaController::class, 'store']);
+
+    // Rutas de Flashcards
+    Route::get('/flashcards/decks', [FlashcardController::class, 'indexDecks']);
+    Route::post('/flashcards/decks', [FlashcardController::class, 'storeDeck']);
+    Route::post('/flashcards/decks/import', [FlashcardController::class, 'importDeck']);
+    Route::put('/flashcards/decks/{deck}', [FlashcardController::class, 'updateDeck']);
+    Route::delete('/flashcards/decks/{deck}', [FlashcardController::class, 'destroyDeck']);
+    Route::get('/flashcards/decks/{deck}/cards', [FlashcardController::class, 'indexCards']);
+    Route::post('/flashcards/decks/{deck}/cards', [FlashcardController::class, 'storeCard']);
+    Route::put('/flashcards/cards/{card}', [FlashcardController::class, 'updateCard']);
+    Route::delete('/flashcards/cards/{card}', [FlashcardController::class, 'destroyCard']);
+    Route::post('/flashcards/cards/{card}/resultado', [FlashcardController::class, 'recordResult']);
 });

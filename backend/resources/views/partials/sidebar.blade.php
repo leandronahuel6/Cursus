@@ -48,6 +48,10 @@
       <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#gift') }}"></use></svg>
       <span class="nav-text">Beneficios</span>
     </div>
+    <div class="nav-item {{ Request::routeIs('flashcards') ? 'active' : '' }}" onclick="location.href='{{ route('flashcards') }}'" title="Flashcards">
+      <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#book-copy') }}"></use></svg>
+      <span class="nav-text">Flashcards</span>
+    </div>
     <div class="nav-group">Personal</div>
     <div class="nav-item {{ Request::routeIs('alertas') ? 'active' : '' }}" onclick="location.href='{{ route('alertas') }}'" title="Alertas">
       <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#bell') }}"></use></svg>

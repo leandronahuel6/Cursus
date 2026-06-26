@@ -230,10 +230,7 @@
     return pomoAudioCtx;
   }
 
-  function playPomoChime() {
-    const ctx = getPomoAudioCtx();
-    if (!ctx) return;
-
+  function playChime(ctx) {
     [880, 1175].forEach((freq, i) => {
       const start = ctx.currentTime + i * 0.16;
       const osc = ctx.createOscillator();
@@ -252,6 +249,69 @@
     });
   }
 
+  function playBeep(ctx) {
+    [0, 0.2, 0.4].forEach((delay) => {
+      const start = ctx.currentTime + delay;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'square';
+      osc.frequency.value = 987.77; // Si5
+
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.08, start + 0.01);
+      gain.gain.setValueAtTime(0.08, start + 0.09);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.12);
+
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + 0.15);
+    });
+  }
+
+  function playZen(ctx) {
+    const frequencies = [440, 554.37, 659.25, 880];
+    frequencies.forEach((freq, index) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      osc.type = index % 2 === 0 ? 'sine' : 'triangle';
+      osc.frequency.value = freq;
+
+      const start = ctx.currentTime;
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.05, start + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 1.8 - (index * 0.2));
+
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + 2.0);
+    });
+  }
+
+  function playPomoAlarm(soundName) {
+    if (!soundName || soundName === 'none') return;
+    const ctx = getPomoAudioCtx();
+    if (!ctx) return;
+
+    if (soundName === 'chime') {
+      playChime(ctx);
+    } else if (soundName === 'beep') {
+      playBeep(ctx);
+    } else if (soundName === 'zen') {
+      playZen(ctx);
+    }
+  }
+
+  function testSelectedSound() {
+    getPomoAudioCtx();
+    const select = document.getElementById('custom-pomo-sound');
+    if (select) {
+      playPomoAlarm(select.value);
+    }
+  }
+  window.testSelectedSound = testSelectedSound;
+
   function initPomodoro() {
     // 1. Cargar configuraciones
     const localSettings = localStorage.getItem('cursus_pomo_settings_v2');
@@ -264,7 +324,7 @@
     
     const settingsBtn = document.getElementById('pomo-settings-btn');
     if (settingsBtn) {
-      settingsBtn.style.display = (activePreset === 'custom') ? 'inline-block' : 'none';
+      settingsBtn.style.display = 'inline-block';
     }
 
     // 2. Cargar ciclos
@@ -319,6 +379,25 @@
     }
 
     updatePomoUI();
+
+    // Sincronizar con cambios del reproductor flotante en otras pestañas
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'cursus_pomo_estado_v2' || e.key === 'cursus_pomo_settings_v2' || e.key === 'cursus_pomo_ciclos_v2') {
+        const localState = localStorage.getItem('cursus_pomo_estado_v2');
+        if (localState) pomoState = JSON.parse(localState);
+        const localSettings = localStorage.getItem('cursus_pomo_settings_v2');
+        if (localSettings) pomoSettings = JSON.parse(localSettings);
+        const localCycles = localStorage.getItem('cursus_pomo_ciclos_v2');
+        if (localCycles) pomoCycles = JSON.parse(localCycles);
+        
+        updatePomoUI();
+        if (pomoState.estado_reloj === 'corriendo') {
+          startTicker();
+        } else {
+          clearInterval(pomoTicker);
+        }
+      }
+    });
   }
 
   function resetToDefaultPomoState() {
@@ -382,7 +461,7 @@
     
     const settingsBtn = document.getElementById('pomo-settings-btn');
     if (settingsBtn) {
-      settingsBtn.style.display = (activePreset === 'custom') ? 'inline-block' : 'none';
+      settingsBtn.style.display = 'inline-block';
     }
 
     // 6. Dots de progreso
@@ -409,6 +488,74 @@
     });
 
     // Las estadísticas superiores se actualizan con datos reales del backend (loadMateriaResumen).
+
+    // === ACTUALIZAR EL MODO CONCENTRACIÓN A PANTALLA COMPLETA ===
+    const focusTimeEl = document.getElementById('focus-time-display');
+    if (focusTimeEl) {
+      focusTimeEl.textContent = `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+      
+      const focusSessionEl = document.getElementById('focus-session-display');
+      if (focusSessionEl) {
+        focusSessionEl.textContent = `${faseTxt} · Sesión ${pomoCycles.ciclo_actual} de ${pomoSettings.sessionsPerCycle}`;
+      }
+
+      // Toggles active class on focus phase tabs
+      const tabEnfoque = document.getElementById('phase-tab-enfoque');
+      const tabCorto = document.getElementById('phase-tab-corto');
+      const tabLargo = document.getElementById('phase-tab-largo');
+      
+      if (tabEnfoque && tabCorto && tabLargo) {
+        tabEnfoque.classList.remove('active');
+        tabCorto.classList.remove('active');
+        tabLargo.classList.remove('active');
+        
+        if (pomoState.fase_actual === 'enfoque') {
+          tabEnfoque.classList.add('active');
+        } else if (pomoState.fase_actual === 'descanso_corto') {
+          tabCorto.classList.add('active');
+        } else if (pomoState.fase_actual === 'descanso_largo') {
+          tabLargo.classList.add('active');
+        }
+      }
+
+      // Progreso del Ring del Modo Concentración (r=102 -> circ=640.88)
+      const CIRC_FOCUS = 2 * Math.PI * 102;
+      const rpFocus = document.getElementById('focus-ring-progress');
+      if (rpFocus) {
+        rpFocus.style.strokeDasharray = CIRC_FOCUS;
+        rpFocus.style.strokeDashoffset = CIRC_FOCUS * (1 - pct);
+        
+        // Cambiar color de la barra según fase
+        if (pomoState.fase_actual === 'enfoque') {
+          rpFocus.setAttribute('class', 'focus-timer-ring-progress enfoque');
+        } else {
+          rpFocus.setAttribute('class', 'focus-timer-ring-progress recreo');
+        }
+      }
+
+      // Dots de progreso en Modo Concentración
+      const focusDotsContainer = document.getElementById('focus-dots');
+      if (focusDotsContainer) {
+        focusDotsContainer.innerHTML = '';
+        for (let i = 1; i <= pomoSettings.sessionsPerCycle; i++) {
+          const dot = document.createElement('div');
+          dot.className = `focus-dot ${i < pomoCycles.ciclo_actual ? 'done' : ''}`;
+          focusDotsContainer.appendChild(dot);
+        }
+      }
+
+      // Botón Play/Pause en overlay de concentración
+      const focusPlayBtn = document.getElementById('focus-play-btn');
+      if (focusPlayBtn) {
+        if (pomoState.estado_reloj === 'corriendo') {
+          focusPlayBtn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="4" x2="18" y2="20"/><line x1="6" y1="4" x2="6" y2="20"/></svg>`;
+          focusPlayBtn.title = 'Pausar';
+        } else {
+          focusPlayBtn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
+          focusPlayBtn.title = 'Reanudar';
+        }
+      }
+    }
   }
 
   function startTicker() {
@@ -458,7 +605,8 @@
 
   function handleFaseComplete() {
     clearInterval(pomoTicker);
-    playPomoChime();
+    const alarmSound = localStorage.getItem('cursus_pomo_alarm_sound') || 'chime';
+    playPomoAlarm(alarmSound);
 
     if (pomoState.fase_actual === 'enfoque') {
       // Completó enfoque
@@ -619,7 +767,7 @@
 
     const settingsBtn = document.getElementById('pomo-settings-btn');
     if (settingsBtn) {
-      settingsBtn.style.display = (type === 'custom') ? 'inline-block' : 'none';
+      settingsBtn.style.display = 'inline-block';
     }
 
     if (type === 'classic') {
@@ -678,6 +826,10 @@
     document.getElementById('custom-pomo-long').value = pomoSettings.longBreak;
     document.getElementById('custom-pomo-sessions').value = pomoSettings.sessionsPerCycle;
     document.getElementById('custom-pomo-cycles').value = pomoSettings.totalCycles || "infinite";
+    
+    const savedSound = localStorage.getItem('cursus_pomo_alarm_sound') || 'chime';
+    const soundSelect = document.getElementById('custom-pomo-sound');
+    if (soundSelect) soundSelect.value = savedSound;
     
     document.getElementById('pomo-validation-error').style.display = 'none';
     document.getElementById('pomo-custom-modal').classList.add('show');
@@ -740,6 +892,12 @@
     pomoSettings.longBreak = long;
     pomoSettings.sessionsPerCycle = sessions;
     pomoSettings.totalCycles = cycles;
+
+    const soundSelect = document.getElementById('custom-pomo-sound');
+    if (soundSelect) {
+      localStorage.setItem('cursus_pomo_alarm_sound', soundSelect.value);
+      window.dispatchEvent(new Event('storage'));
+    }
 
     localStorage.setItem('cursus_pomo_custom_settings', JSON.stringify({
       focusTime: focus,
@@ -849,6 +1007,10 @@
         container.appendChild(card);
       });
     });
+    
+    if (typeof updateFocusActiveGoal === 'function') {
+      updateFocusActiveGoal();
+    }
   }
 
   // Flujo Creación Inline
@@ -1695,3 +1857,342 @@ function selectMateria(id) {
 }
 
 window.toggleMateriaDropdown = toggleMateriaDropdown;
+
+  /* ==========================================================================
+     LÓGICA DEL MODO CONCENTRACIÓN A PANTALLA COMPLETA (AESTHETIC FOCUS MODE)
+     ========================================================================== */
+  
+  let activeFocusTaskIndex = 0;
+
+  function updateFocusActiveGoal() {
+    const focusGoalTitle = document.getElementById('focus-goal-title');
+    const completeBtn = document.getElementById('focus-goal-complete-btn');
+    const prevBtn = document.getElementById('focus-goal-prev-btn');
+    const nextBtn = document.getElementById('focus-goal-next-btn');
+    if (!focusGoalTitle) return;
+
+    const progressTasks = tasks.filter(t => t.column === 'progress');
+    if (progressTasks.length > 0) {
+      if (activeFocusTaskIndex >= progressTasks.length) {
+        activeFocusTaskIndex = 0;
+      }
+      
+      const activeTask = progressTasks[activeFocusTaskIndex];
+      focusGoalTitle.textContent = activeTask.title;
+      focusGoalTitle.title = activeTask.title;
+      if (completeBtn) completeBtn.style.display = 'inline-flex';
+
+      // Toggle navigation arrows visibility
+      if (progressTasks.length > 1) {
+        if (prevBtn) prevBtn.style.display = 'inline-flex';
+        if (nextBtn) nextBtn.style.display = 'inline-flex';
+      } else {
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'none';
+      }
+    } else {
+      activeFocusTaskIndex = 0;
+      focusGoalTitle.textContent = "Ninguna tarea en curso";
+      focusGoalTitle.title = "";
+      if (completeBtn) completeBtn.style.display = 'none';
+      if (prevBtn) prevBtn.style.display = 'none';
+      if (nextBtn) nextBtn.style.display = 'none';
+    }
+  }
+
+  function enterFocusMode() {
+    const overlay = document.getElementById('focus-mode-overlay');
+    if (!overlay) return;
+
+    // 1. Mostrar el overlay
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    
+    // 2. Inicializar mezclador de sonido (cargar volúmenes previos)
+    const volRainInput = document.getElementById('focus-vol-rain');
+    const volFireInput = document.getElementById('focus-vol-fire');
+    
+    if (volRainInput) {
+      volRainInput.value = window.pomoAmbientSynth.rainVol;
+      updateMixerIcon('rain', window.pomoAmbientSynth.rainVol);
+    }
+    if (volFireInput) {
+      volFireInput.value = window.pomoAmbientSynth.fireVol;
+      updateMixerIcon('fire', window.pomoAmbientSynth.fireVol);
+    }
+
+    // 3. Cargar el tema preferido (por defecto aurora)
+    const savedTheme = localStorage.getItem('cursus_pomo_focus_theme') || 'aurora';
+    changeFocusTheme(savedTheme);
+
+    // 4. Actualizar meta activa
+    updateFocusActiveGoal();
+
+    // 5. Actualizar la UI del reloj
+    updatePomoUI();
+    showToast("Entrando en Modo Concentración ✨", "success");
+  }
+
+  function exitFocusMode() {
+    const overlay = document.getElementById('focus-mode-overlay');
+    if (!overlay) return;
+
+    // Iniciar animación de salida
+    overlay.classList.add('leaving');
+
+    // Esperar 400ms a que termine la animación antes de limpiar y ocultar
+    setTimeout(() => {
+      overlay.classList.remove('show', 'leaving');
+      document.body.style.overflow = '';
+      
+      // Apagar sintetizadores y partículas
+      window.pomoAmbientSynth.stopAll();
+      window.pomoFocusCanvas.stop();
+
+      // Apagar lofi si está activo y limpiar iframe
+      const lofiPanel = document.getElementById('focus-lofi-panel');
+      const lofiIframe = document.getElementById('focus-lofi-iframe');
+      const lofiBtn = document.getElementById('lofi-panel-toggle');
+      if (lofiPanel) lofiPanel.classList.remove('show');
+      if (lofiBtn) lofiBtn.classList.remove('active');
+      if (lofiIframe) lofiIframe.src = "";
+      
+      showToast("Saliste del Modo Concentración", "success");
+    }, 400);
+  }
+
+  function changeFocusTheme(theme) {
+    const bgContainer = document.getElementById('focus-bg-container');
+    if (!bgContainer) return;
+
+    // Resetear clases de fondo
+    bgContainer.className = '';
+    bgContainer.classList.add('theme-' + theme);
+    localStorage.setItem('cursus_pomo_focus_theme', theme);
+
+    // Actualizar botones de tema activos
+    document.querySelectorAll('.focus-theme-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById('theme-btn-' + theme);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    // Manejar chispas o lluvia física del canvas
+    if (theme === 'rain') {
+      window.pomoFocusCanvas.start('focus-canvas', 'rain');
+      if (window.pomoAmbientSynth.rainVol === 0) {
+        setRainVolume(0.3);
+      } else {
+        window.pomoAmbientSynth.startRain();
+      }
+      window.pomoAmbientSynth.stopFire();
+    } else if (theme === 'fire') {
+      window.pomoFocusCanvas.start('focus-canvas', 'fire');
+      if (window.pomoAmbientSynth.fireVol === 0) {
+        setFireVolume(0.35);
+      } else {
+        window.pomoAmbientSynth.startFire();
+      }
+      window.pomoAmbientSynth.stopRain();
+    } else {
+      window.pomoFocusCanvas.stop();
+      window.pomoAmbientSynth.stopAll();
+    }
+  }
+
+  function setRainVolume(val) {
+    const volume = parseFloat(val);
+    window.pomoAmbientSynth.setRainVolume(volume);
+    
+    const input = document.getElementById('focus-vol-rain');
+    if (input) input.value = volume;
+    
+    updateMixerIcon('rain', volume);
+
+    if (volume > 0) {
+      window.pomoAmbientSynth.startRain();
+    } else {
+      window.pomoAmbientSynth.stopRain();
+    }
+  }
+
+  function setFireVolume(val) {
+    const volume = parseFloat(val);
+    window.pomoAmbientSynth.setFireVolume(volume);
+
+    const input = document.getElementById('focus-vol-fire');
+    if (input) input.value = volume;
+
+    updateMixerIcon('fire', volume);
+
+    if (volume > 0) {
+      window.pomoAmbientSynth.startFire();
+    } else {
+      window.pomoAmbientSynth.stopFire();
+    }
+  }
+
+  function toggleRainAudio() {
+    if (window.pomoAmbientSynth.rainVol > 0) {
+      setRainVolume(0);
+    } else {
+      setRainVolume(0.3);
+    }
+  }
+
+  function toggleFireAudio() {
+    if (window.pomoAmbientSynth.fireVol > 0) {
+      setFireVolume(0);
+    } else {
+      setFireVolume(0.35);
+    }
+  }
+
+  function updateMixerIcon(type, volume) {
+    const iconSpan = document.getElementById('mixer-icon-' + type);
+    if (!iconSpan) return;
+
+    if (volume === 0) {
+      iconSpan.textContent = type === 'rain' ? '🔇🌧' : '🔇🔥';
+      iconSpan.style.opacity = '0.5';
+    } else {
+      iconSpan.textContent = type === 'rain' ? '🌧' : '🔥';
+      iconSpan.style.opacity = '1';
+    }
+  }
+
+  function changeFocusPhase(phase) {
+    pomoState.fase_actual = phase;
+    if (phase === 'enfoque') {
+      pomoState.tiempo_restante = pomoSettings.focusTime * 60;
+    } else if (phase === 'descanso_corto') {
+      pomoState.tiempo_restante = pomoSettings.shortBreak * 60;
+    } else if (phase === 'descanso_largo') {
+      pomoState.tiempo_restante = pomoSettings.longBreak * 60;
+    }
+    
+    // Pausar el reloj al cambiar de fase
+    pomoState.estado_reloj = 'pausado';
+    clearInterval(pomoTicker);
+    
+    savePomoStateToLocal();
+    updatePomoUI();
+    
+    // Disparar sincronización
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new Event('pomo_local_change'));
+    
+    showToast(`Cambiado a fase: ${phase === 'enfoque' ? 'Pomodoro' : phase === 'descanso_corto' ? 'Recreo Corto' : 'Recreo Largo'}`, "success");
+  }
+
+  let currentLofiVideoId = '3yH2Wo2SaIM';
+
+  function toggleLofiPanel() {
+    const panel = document.getElementById('focus-lofi-panel');
+    const btn = document.getElementById('lofi-panel-toggle');
+    const iframe = document.getElementById('focus-lofi-iframe');
+    if (!panel || !iframe) return;
+
+    const isOpen = panel.classList.contains('show');
+    if (isOpen) {
+      panel.classList.remove('show');
+      if (btn) btn.classList.remove('active');
+      iframe.src = "";
+    } else {
+      panel.classList.add('show');
+      if (btn) btn.classList.add('active');
+      const select = document.getElementById('focus-lofi-select');
+      const videoId = select ? select.value : currentLofiVideoId;
+      iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=0`;
+    }
+  }
+
+  function changeLofiChannel(videoId) {
+    currentLofiVideoId = videoId;
+    const panel = document.getElementById('focus-lofi-panel');
+    const iframe = document.getElementById('focus-lofi-iframe');
+    if (!panel || !iframe) return;
+
+    if (panel.classList.contains('show')) {
+      iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=0`;
+    }
+  }
+
+  // Exponer a window para ser llamados por botones HTML
+  window.enterFocusMode = enterFocusMode;
+  window.exitFocusMode = exitFocusMode;
+  window.changeFocusTheme = changeFocusTheme;
+  window.setRainVolume = setRainVolume;
+  window.setFireVolume = setFireVolume;
+  window.toggleRainAudio = toggleRainAudio;
+  window.toggleFireAudio = toggleFireAudio;
+  function prevFocusTask() {
+    const progressTasks = tasks.filter(t => t.column === 'progress');
+    if (progressTasks.length <= 1) return;
+    
+    activeFocusTaskIndex--;
+    if (activeFocusTaskIndex < 0) {
+      activeFocusTaskIndex = progressTasks.length - 1;
+    }
+    updateFocusActiveGoal();
+  }
+
+  function nextFocusTask() {
+    const progressTasks = tasks.filter(t => t.column === 'progress');
+    if (progressTasks.length <= 1) return;
+    
+    activeFocusTaskIndex++;
+    if (activeFocusTaskIndex >= progressTasks.length) {
+      activeFocusTaskIndex = 0;
+    }
+    updateFocusActiveGoal();
+  }
+
+  function completeFocusActiveTask() {
+    const progressTasks = tasks.filter(t => t.column === 'progress');
+    if (progressTasks.length === 0) return;
+    
+    const activeTask = progressTasks[activeFocusTaskIndex];
+    if (!activeTask) return;
+
+    const oldCol = activeTask.column;
+    const taskId = activeTask.id;
+    
+    // Mover optimísticamente a 'done'
+    activeTask.column = 'done';
+    updateCounts();
+    
+    // Ajustar el índice si estamos al final de la lista
+    if (activeFocusTaskIndex >= progressTasks.length - 1 && activeFocusTaskIndex > 0) {
+      activeFocusTaskIndex--;
+    }
+    
+    updateFocusActiveGoal();
+    
+    // [REAL API] Actualizar columna en base de datos
+    fetch(`${API_BASE}/tareas/${taskId}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ columna: 'finalizado' })
+    })
+    .then(async (res) => {
+      if (!res.ok) throw new Error();
+      saveTasksToLocal();
+      renderKanban();
+      
+      showToast("¡Tarea completada con éxito! 🎉", "success");
+    })
+    .catch(err => {
+      // Rollback
+      activeTask.column = oldCol;
+      updateCounts();
+      updateFocusActiveGoal();
+      renderKanban();
+      showToast("Error al completar la tarea", "error");
+    });
+  }
+
+  window.changeFocusPhase = changeFocusPhase;
+  window.toggleLofiPanel = toggleLofiPanel;
+  window.changeLofiChannel = changeLofiChannel;
+  window.completeFocusActiveTask = completeFocusActiveTask;
+  window.prevFocusTask = prevFocusTask;
+  window.nextFocusTask = nextFocusTask;
