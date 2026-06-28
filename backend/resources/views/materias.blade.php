@@ -84,6 +84,20 @@
 
   </div>
 
+  <!-- Toast de avisos (correlativas bloqueadas, etc.) -->
+  <div class="alert-popup-notification" id="materias-toast" aria-live="polite"></div>
+
+  <!-- ===================== MODAL DE DETALLE DE MATERIA ===================== -->
+  <div class="grade-modal-overlay" id="subject-info-modal" role="dialog" aria-modal="true" aria-labelledby="subject-info-modal-title">
+    <div class="grade-modal-box subject-info-modal-box">
+      <div class="grade-modal-header" id="subject-info-modal-title">Detalle de materia</div>
+      <div class="grade-modal-body" id="subject-info-modal-body"></div>
+      <div class="grade-modal-footer">
+        <button class="btn-modal-action cancel" type="button" onclick="window.closeSubjectInfoModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== MODAL DE CALIFICACIONES ===================== -->
   <div class="grade-modal-overlay" id="grade-modal">
     <div class="grade-modal-box">
