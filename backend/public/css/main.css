@@ -1800,6 +1800,11 @@ h1, h2, h3, h4, h5, h6, .display-text {
   border-color: #bfdbfe;
   color: #1e40af;
 }
+.alert-popup-notification.warn {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
 
 /* ==============================
    PÁGINA DE MIS MATERIAS
@@ -2136,6 +2141,34 @@ h1, h2, h3, h4, h5, h6, .display-text {
 .btn-modal-action.save {
   background: var(--green);
   color: #ffffff;
+}
+
+.subject-info-modal-box {
+  max-width: 400px;
+}
+.subject-info-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.subject-info-code {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--tm);
+  letter-spacing: 0.03em;
+}
+.subject-info-prereqs-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--t2);
+  margin-bottom: 8px;
+}
+.subject-info-empty {
+  font-size: 12px;
+  color: var(--t3);
+  line-height: 1.5;
 }
 
 /* Árbol de Correlativas */
@@ -4302,6 +4335,11 @@ body.dark-mode .alert-popup-notification.info {
   background: rgba(59, 130, 246, 0.16);
   border-color: rgba(59, 130, 246, 0.4);
   color: #93c5fd;
+}
+body.dark-mode .alert-popup-notification.warn {
+  background: rgba(234, 179, 8, 0.16);
+  border-color: rgba(234, 179, 8, 0.4);
+  color: #fde68a;
 }
 
 /* Posicionamiento móvil del menú de perfil (al final para ganancia de cascada) */
