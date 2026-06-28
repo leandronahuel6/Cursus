@@ -7,19 +7,20 @@ use Illuminate\Http\Request;
 
 class CuotaController extends Controller
 {
-    // Ver la cuota vigente de una carrera
+    // Ver la cuota vigente. Si se pasa carrera_id filtra por carrera; si no, devuelve la más reciente.
     public function index(Request $request)
     {
-        $request->validate([
-            'carrera_id' => 'required|exists:carreras,id',
-        ]);
+        $query = Cuota::orderBy('vigente_desde', 'desc');
 
-        $cuota = Cuota::where('carrera_id', $request->carrera_id)
-            ->orderBy('vigente_desde', 'desc')
-            ->first();
+        if ($request->filled('carrera_id')) {
+            $request->validate(['carrera_id' => 'exists:carreras,id']);
+            $query->where('carrera_id', $request->carrera_id);
+        }
+
+        $cuota = $query->first();
 
         if (!$cuota) {
-            return response()->json(['message' => 'No hay cuota cargada para esta carrera'], 404);
+            return response()->json(['message' => 'No hay cuota cargada'], 404);
         }
 
         return response()->json($cuota);

@@ -1,0 +1,326 @@
+.admin-alumnos-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---- Search card ---- */
+.aa-search-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 20px 24px;
+}
+
+.aa-search-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: var(--text-muted);
+}
+
+.aa-search-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.aa-search-row {
+  display: flex;
+  gap: 10px;
+}
+
+.aa-input {
+  flex: 1;
+  padding: 9px 13px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  outline: none;
+  transition: border-color .15s;
+}
+.aa-input:focus { border-color: var(--brand); }
+
+.aa-btn-search {
+  padding: 9px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  color: #fff;
+  background: var(--brand);
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: opacity .15s;
+  white-space: nowrap;
+}
+.aa-btn-search:hover:not(:disabled) { opacity: .88; }
+.aa-btn-search:disabled { opacity: .55; cursor: not-allowed; }
+
+.aa-error {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--danger, #e53e3e);
+}
+.aa-success { color: var(--success, #38a169); }
+
+/* ---- Student card ---- */
+.aa-student-card,
+.aa-materias-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 20px 24px;
+}
+
+.aa-student-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.aa-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--brand-light);
+  color: var(--brand);
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.aa-student-info { flex: 1; min-width: 0; }
+
+.aa-student-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aa-student-meta {
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.aa-dot { opacity: .5; }
+
+.aa-btn-delete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--danger, #e53e3e);
+  background: transparent;
+  border: 1px solid var(--danger, #e53e3e);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+.aa-btn-delete:hover { background: rgba(229,62,62,.08); }
+
+/* ---- Stats row ---- */
+.aa-stats-row {
+  display: flex;
+  gap: 0;
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.aa-stat {
+  flex: 1;
+  min-width: 80px;
+  text-align: center;
+}
+
+.aa-stat-val {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+.text-ok   { color: var(--success, #38a169); }
+.text-warn { color: var(--warning, #d97706); }
+
+.aa-stat-lbl {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ---- Materias table ---- */
+.aa-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 14px;
+}
+
+.aa-materias-table-wrap { overflow-x: auto; }
+
+.aa-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.aa-table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.aa-table td {
+  padding: 9px 12px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+
+.aa-table tr:last-child td { border-bottom: none; }
+
+.aa-table-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 20px !important;
+}
+
+/* ---- Badges ---- */
+.aa-badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-aprobada { background: rgba(56,161,105,.15);  color: #38a169; }
+.badge-cursando { background: rgba(66,153,225,.15);  color: #4299e1; }
+.badge-regular  { background: rgba(237,137,54,.15);  color: #ed8936; }
+.badge-libre    { background: var(--border);          color: var(--text-muted); }
+
+/* ---- Confirm overlay ---- */
+.aa-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+.aa-confirm-overlay[hidden] { display: none; }
+
+.aa-confirm-box {
+  background: var(--card);
+  border: 1px solid rgba(229,62,62,.35);
+  border-radius: var(--r-md);
+  padding: 32px 32px 28px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+.aa-confirm-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(229,62,62,.15);
+  border: 1px solid rgba(229,62,62,.25);
+  color: #e53e3e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.aa-confirm-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.aa-confirm-msg {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 300px;
+}
+
+.aa-confirm-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.aa-btn-cancel {
+  flex: 1;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background .15s;
+}
+.aa-btn-cancel:hover { background: var(--border); }
+
+.aa-btn-confirm-delete {
+  flex: 1;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: #e53e3e;
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.aa-btn-confirm-delete:hover:not(:disabled) { opacity: .88; }
+.aa-btn-confirm-delete:disabled { opacity: .55; cursor: not-allowed; }
+
+@media (max-width: 600px) {
+  .aa-student-header { flex-direction: column; align-items: flex-start; }
+  .aa-btn-delete { align-self: flex-end; }
+  .aa-stats-row { gap: 8px; }
+  .aa-stat { min-width: 70px; }
+  .aa-stat-val { font-size: 18px; }
+}
