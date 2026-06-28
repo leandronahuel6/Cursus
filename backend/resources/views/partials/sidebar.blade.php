@@ -52,6 +52,21 @@
       <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#book-copy') }}"></use></svg>
       <span class="nav-text">Flashcards</span>
     </div>
+    <!-- Sección admin: visible solo si role === 'admin' (controlado por JS en profile.js) -->
+    <div class="nav-group" id="admin-nav-group" style="display:none">Administración</div>
+    <div class="nav-item {{ Request::routeIs('admin.alumnos') ? 'active' : '' }}" id="admin-nav-alumnos" style="display:none" onclick="location.href='{{ route('admin.alumnos') }}'" title="Alumnos">
+      <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#users') }}"></use></svg>
+      <span class="nav-text">Alumnos</span>
+    </div>
+    <div class="nav-item {{ Request::routeIs('admin.cuotas') ? 'active' : '' }}" id="admin-nav-cuotas" style="display:none" onclick="location.href='{{ route('admin.cuotas') }}'" title="Cuotas">
+      <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#dollar-sign') }}"></use></svg>
+      <span class="nav-text">Cuotas</span>
+    </div>
+    <div class="nav-item {{ Request::routeIs('admin.plan-estudios') ? 'active' : '' }}" id="admin-nav-plan" style="display:none" onclick="location.href='{{ route('admin.plan-estudios') }}'" title="Plan de Estudios">
+      <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#book-open') }}"></use></svg>
+      <span class="nav-text">Plan de Estudios</span>
+    </div>
+
     <div class="nav-group">Personal</div>
     <div class="nav-item {{ Request::routeIs('alertas') ? 'active' : '' }}" onclick="location.href='{{ route('alertas') }}'" title="Alertas">
       <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#bell') }}"></use></svg>

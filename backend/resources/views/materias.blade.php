@@ -52,7 +52,7 @@
   <div id="panel-manage-view">
     <div class="tree-container">
       <div class="tree-legend">
-        <div class="legend-item"><div class="legend-color disponible"></div> Disponible / Cursar</div>
+        <div class="legend-item"><div class="legend-color disponible"></div> Disponible</div>
         <div class="legend-item"><div class="legend-color cursando"></div> Cursando</div>
         <div class="legend-item"><div class="legend-color regular"></div> Regular (Pendiente Final)</div>
         <div class="legend-item"><div class="legend-color aprobada"></div> Aprobada</div>
