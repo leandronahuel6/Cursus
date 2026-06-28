@@ -148,6 +148,13 @@
       if (bnAvEl) bnAvEl.textContent = initials;
       if (pmAvEl) pmAvEl.textContent = initials;
     }
+
+    // Mostrar sección admin en sidebar solo si es admin
+    const isAdmin = user.role === 'admin';
+    ['admin-nav-group', 'admin-nav-alumnos', 'admin-nav-cuotas', 'admin-nav-plan'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = isAdmin ? '' : 'none';
+    });
   }
 
   // Pop up para editar los datos de perfil (nombre, legajo, email)

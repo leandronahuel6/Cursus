@@ -87,25 +87,18 @@
           <span>🎓</span> Cuota de la Universidad
         </h3>
         <p style="font-size: 11.5px; color: var(--t3); margin-bottom: 14px;">
-          Recordatorio personal del monto vigente. Actualizalo solo cuando la universidad informe un aumento — no hace falta crear una alerta nueva cada mes.
+          Monto vigente fijado por la institución.
         </p>
-        <form id="cuota-form" onsubmit="window.handleCuotaSubmit(event)">
-          <div class="alert-form-group">
-            <label for="cuota-monto">Monto actual de la cuota</label>
-            <div class="currency-input-wrap">
-              <span class="currency-input-sign">$</span>
-              <input type="number" id="cuota-monto" class="alert-form-input currency-input" placeholder="80000" min="0" step="0.01" required>
-            </div>
+        <div class="alert-form-group">
+          <label style="font-size: 11px; font-weight: 600; color: var(--t2);">Monto actual de la cuota</label>
+          <div class="currency-input-wrap" style="pointer-events: none; opacity: 0.8;">
+            <span class="currency-input-sign">$</span>
+            <input type="text" id="cuota-monto" class="alert-form-input currency-input" readonly tabindex="-1" placeholder="—">
           </div>
-          <div style="display: flex; gap: 8px;">
-            <button type="submit" class="btn-alert-submit" style="flex: 1;">
-              💾 Guardar Monto
-            </button>
-            <button type="button" class="btn-alert-submit" id="btn-abrir-pago" style="flex: 1; background: var(--green);" onclick="window.openPagoModal()">
-              💳 Pagar
-            </button>
-          </div>
-        </form>
+        </div>
+        <button type="button" class="btn-alert-submit" id="btn-abrir-pago" style="width: 100%; background: var(--green);" onclick="window.openPagoModal()">
+          💳 Pagar
+        </button>
         <div id="cuota-pago-info" style="margin-top: 10px; font-size: 11.5px; color: var(--t3);"></div>
       </div>
 
