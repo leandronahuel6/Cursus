@@ -3,39 +3,56 @@
     if (isAreaEstudioPage) return; // No mostrar el flotante en la propia página de estudio
 
     let pomoState = null;
-    let pomoSettings = { focusTime: 25, shortBreak: 5, longBreak: 15 };
+    let pomoSettings = { focusTime: 25, shortBreak: 5, longBreak: 15, sessionsPerCycle: 4 };
+    let pomoCycles = { ciclo_actual: 1 };
     let tickerInterval = null;
+    let widgetDismissed = false;
 
     // Crear e inyectar el contenedor del widget flotante
     const widget = document.createElement('div');
     widget.id = 'pomo-floating-widget';
-    widget.style.cssText = 'display: none; position: fixed; bottom: 85px; right: 20px; z-index: 10000; background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 999px; padding: 0.4rem 0.9rem; align-items: center; gap: 0.65rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); color: #ffffff; cursor: move; user-select: none; -webkit-user-select: none; font-family: "Outfit", sans-serif; transition: border-color 0.2s;';
+    widget.className = 'pomo-float';
     
     widget.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;" id="pomo-float-info-wrapper" title="Maximizar / Ir a Área de Estudio">
-            <span id="pomo-float-icon">⏱️</span>
-            <span id="pomo-float-time" style="font-family: monospace; font-size: 1.05rem; font-weight: 700; color: #ffffff; letter-spacing: 0.02em;">25:00</span>
-            <span id="pomo-float-label" style="font-size: 0.72rem; opacity: 0.8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #eef2ff;">Enfoque</span>
+        <div class="pomo-float__info" id="pomo-float-info" title="Mostrar/Ocultar controles">
+            <span class="pomo-float__icon" id="pomo-float-icon">
+                <svg width="18" height="18" aria-hidden="true"><use href="/assets/icons/sprite.svg#timer"></use></svg>
+            </span>
+            <span class="pomo-float__time" id="pomo-float-time">25:00</span>
+            <span class="pomo-float__label" id="pomo-float-label">Enfoque</span>
+            <span class="pomo-float__session" id="pomo-float-session"></span>
         </div>
-        <div style="height: 16px; width: 1px; background: rgba(255,255,255,0.18);"></div>
-        <div style="display: flex; align-items: center; gap: 0.4rem;">
-            <button id="pomo-float-play-btn" style="background: transparent; border: none; color: #ffffff; cursor: pointer; padding: 0.2rem; display: flex; align-items: center; justify-content: center; opacity: 0.9; transition: opacity 0.2s; outline: none;" title="Pausar/Reanudar">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <div class="pomo-float__divider"></div>
+        <div class="pomo-float__actions" id="pomo-float-actions">
+            <button class="pomo-float__btn pomo-float__btn--play" id="pomo-float-play-btn" title="Pausar/Reanudar" aria-label="Pausar/Reanudar">
+                <svg width="15" height="15" aria-hidden="true"><use href="/assets/icons/sprite.svg#play"></use></svg>
             </button>
-            <button id="pomo-float-stop-btn" style="background: transparent; border: none; color: #ef4444; cursor: pointer; padding: 0.2rem; display: flex; align-items: center; justify-content: center; opacity: 0.9; transition: opacity 0.2s; outline: none;" title="Reiniciar/Detener">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+            <button class="pomo-float__btn pomo-float__btn--nav" id="pomo-float-nav-btn" title="Ir a Área de Estudio" aria-label="Ir a Área de Estudio">
+                <svg width="15" height="15" aria-hidden="true"><use href="/assets/icons/sprite.svg#move-right"></use></svg>
+            </button>
+            <button class="pomo-float__btn pomo-float__btn--min" id="pomo-float-min-btn" title="Minimizar" aria-label="Minimizar">
+                <svg width="15" height="15" aria-hidden="true"><use href="/assets/icons/sprite.svg#minus"></use></svg>
+            </button>
+            <button class="pomo-float__btn pomo-float__btn--close" id="pomo-float-close-btn" title="Cerrar widget" aria-label="Cerrar widget">
+                <svg width="15" height="15" aria-hidden="true"><use href="/assets/icons/sprite.svg#x"></use></svg>
             </button>
         </div>
     `;
 
     document.body.appendChild(widget);
 
+    // Referencias al DOM
     const playBtn = document.getElementById('pomo-float-play-btn');
-    const stopBtn = document.getElementById('pomo-float-stop-btn');
-    const infoWrapper = document.getElementById('pomo-float-info-wrapper');
+    const navBtn = document.getElementById('pomo-float-nav-btn');
+    const minBtn = document.getElementById('pomo-float-min-btn');
+    const closeBtn = document.getElementById('pomo-float-close-btn');
+    const infoWrapper = document.getElementById('pomo-float-info');
+    const actionsWrapper = document.getElementById('pomo-float-actions');
     const timeEl = document.getElementById('pomo-float-time');
     const labelEl = document.getElementById('pomo-float-label');
-    const iconEl = document.getElementById('pomo-float-icon');
+    const iconUseEl = document.querySelector('#pomo-float-icon use');
+    const playUseEl = document.querySelector('#pomo-float-play-btn use');
+    const sessionEl = document.getElementById('pomo-float-session');
 
     // Restaurar posición persistente en pantalla
     const savedPos = localStorage.getItem('cursus_pomo_float_pos');
@@ -50,13 +67,13 @@
     }
 
     makeElementDraggable(widget, widget);
-
+    
     loadSettings();
     syncWithStorage();
 
     // Sincronización multi-pestaña usando storage de HTML5
     window.addEventListener('storage', function(e) {
-        if (e.key === 'cursus_pomo_estado_v2' || e.key === 'cursus_pomo_settings_v2') {
+        if (e.key === 'cursus_pomo_estado_v2' || e.key === 'cursus_pomo_settings_v2' || e.key === 'cursus_pomo_ciclos_v2') {
             loadSettings();
             syncWithStorage();
         }
@@ -72,12 +89,18 @@
         if (localSettings) {
             try { pomoSettings = JSON.parse(localSettings); } catch(e){}
         }
+        const localCycles = localStorage.getItem('cursus_pomo_ciclos_v2');
+        if (localCycles) {
+            try { pomoCycles = JSON.parse(localCycles); } catch(e){}
+        }
     }
 
     function syncWithStorage() {
+        if (widgetDismissed) return;
+
         const localState = localStorage.getItem('cursus_pomo_estado_v2');
         if (!localState) {
-            widget.style.display = 'none';
+            widget.classList.remove('is-visible');
             stopTicker();
             return;
         }
@@ -85,17 +108,17 @@
         try {
             pomoState = JSON.parse(localState);
         } catch (e) {
-            widget.style.display = 'none';
+            widget.classList.remove('is-visible');
             stopTicker();
             return;
         }
 
         // Si el reloj está detenido, no mostrar el reproductor flotante
         if (pomoState.estado_reloj === 'detenido') {
-            widget.style.display = 'none';
+            widget.classList.remove('is-visible');
             stopTicker();
         } else {
-            widget.style.display = 'flex';
+            widget.classList.add('is-visible');
             updateWidgetUI();
             
             if (pomoState.estado_reloj === 'corriendo') {
@@ -109,26 +132,49 @@
     function updateWidgetUI() {
         const min = Math.floor(pomoState.tiempo_restante / 60);
         const sec = pomoState.tiempo_restante % 60;
-        timeEl.textContent = `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-
-        if (pomoState.fase_actual === 'enfoque') {
-            labelEl.textContent = 'Enfoque';
-            iconEl.textContent = '⏱️';
-            labelEl.style.color = '#818cf8'; // Índigo suave
-            widget.style.borderColor = 'rgba(129, 140, 248, 0.3)';
-        } else {
-            labelEl.textContent = 'Recreo';
-            iconEl.textContent = '☕';
-            labelEl.style.color = '#34d399'; // Esmeralda suave
-            widget.style.borderColor = 'rgba(52, 211, 153, 0.3)';
+        
+        // Evitamos parpadeos actualizando solo el textContent
+        const newTime = `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+        if (timeEl.textContent !== newTime) {
+            timeEl.textContent = newTime;
         }
 
-        if (pomoState.estado_reloj === 'corriendo') {
-            playBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="4" x2="18" y2="20"/><line x1="6" y1="4" x2="6" y2="20"/></svg>`;
-            playBtn.title = 'Pausar';
-        } else {
-            playBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
-            playBtn.title = 'Reanudar';
+        // Configuración por fase
+        let phaseLabel = 'Enfoque';
+        let phaseIcon = 'timer';
+        let phaseClass = 'pomo-float--enfoque';
+        
+        if (pomoState.fase_actual === 'descanso_corto') {
+            phaseLabel = 'D. Corto';
+            phaseIcon = 'coffee';
+            phaseClass = 'pomo-float--corto';
+        } else if (pomoState.fase_actual === 'descanso_largo') {
+            phaseLabel = 'D. Largo';
+            phaseIcon = 'bed';
+            phaseClass = 'pomo-float--largo';
+        }
+
+        if (labelEl.textContent !== phaseLabel) {
+            labelEl.textContent = phaseLabel;
+            iconUseEl.setAttribute('href', `/assets/icons/sprite.svg#${phaseIcon}`);
+            widget.classList.remove('pomo-float--enfoque', 'pomo-float--corto', 'pomo-float--largo');
+            widget.classList.add(phaseClass);
+        }
+
+        // Actualizar sesión actual/total
+        const sessionText = `${pomoCycles.ciclo_actual || 1}/${pomoSettings.sessionsPerCycle || 4}`;
+        if (sessionEl.textContent !== sessionText) {
+            sessionEl.textContent = sessionText;
+        }
+
+        // Actualizar botón play/pause
+        const isRunning = pomoState.estado_reloj === 'corriendo';
+        const playIcon = isRunning ? 'pause' : 'play';
+        const currentPlayHref = playUseEl.getAttribute('href');
+        if (!currentPlayHref.endsWith(`#${playIcon}`)) {
+            playUseEl.setAttribute('href', `/assets/icons/sprite.svg#${playIcon}`);
+            playBtn.title = isRunning ? 'Pausar' : 'Reanudar';
+            playBtn.setAttribute('aria-label', playBtn.title);
         }
     }
 
@@ -146,8 +192,10 @@
                     if (pomoState.tiempo_restante <= 0) {
                         handleFaseComplete();
                     } else {
-                        // Guardamos intermitentemente en localStorage
-                        localStorage.setItem('cursus_pomo_estado_v2', JSON.stringify(pomoState));
+                        // Guardamos intermitentemente en localStorage para no sobresaturar
+                        if (pomoState.tiempo_restante % 5 === 0) {
+                            localStorage.setItem('cursus_pomo_estado_v2', JSON.stringify(pomoState));
+                        }
                         updateWidgetUI();
                     }
                 }
@@ -162,6 +210,7 @@
         }
     }
 
+    // Funciones de Sonido
     function playPomoAlarm(soundName) {
         if (!soundName || soundName === 'none') return;
         try {
@@ -214,6 +263,15 @@
         } catch (e) {}
     }
 
+    function getAuthHeaders() {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        return {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ' + token
+        };
+    }
+
     function handleFaseComplete() {
         stopTicker();
         
@@ -221,13 +279,65 @@
         playPomoAlarm(alarmSound);
 
         if (pomoState.fase_actual === 'enfoque') {
-            pomoState.fase_actual = 'recreo_corto';
-            pomoState.tiempo_restante = pomoSettings.shortBreak * 60;
+            // Lógica Anti-Duplicación de Sesiones
+            const nowTime = Date.now();
+            const dedupKey = 'cursus_pomo_dedup_token';
+            const existingToken = localStorage.getItem(dedupKey);
+            
+            // Si no hay token o es muy viejo (>10 segs), registramos
+            if (!existingToken || (nowTime - parseInt(existingToken)) > 10000) {
+                localStorage.setItem(dedupKey, String(nowTime));
+                
+                // Limpiar el token después de 30 segundos por seguridad
+                setTimeout(() => {
+                    if (localStorage.getItem(dedupKey) === String(nowTime)) {
+                        localStorage.removeItem(dedupKey);
+                    }
+                }, 30000);
+
+                const materiaId = localStorage.getItem('cursus_selected_materia');
+                if (materiaId) {
+                    fetch('/api/pomodoro/sesiones', {
+                        method: 'POST',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify({
+                            materia_id: materiaId,
+                            duracion_segundos: pomoSettings.focusTime * 60
+                        })
+                    }).catch(e => console.error('Error registrando sesión de Pomodoro desde widget', e));
+                }
+            }
+
+            // Actualizar ciclos
+            if (!pomoCycles.sesiones_completadas_hoy) pomoCycles.sesiones_completadas_hoy = 0;
+            pomoCycles.sesiones_completadas_hoy++;
+            
+            if (!pomoCycles.log) pomoCycles.log = [];
+            const d = new Date();
+            const hhmm = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+            pomoCycles.log.unshift({
+                time: hhmm,
+                duration: `${pomoSettings.focusTime}:00`,
+                status: "✓ Completada"
+            });
+
+            if (pomoCycles.ciclo_actual < pomoSettings.sessionsPerCycle) {
+                pomoState.fase_actual = 'descanso_corto';
+                pomoState.tiempo_restante = pomoSettings.shortBreak * 60;
+                pomoCycles.ciclo_actual++;
+            } else {
+                pomoState.fase_actual = 'descanso_largo';
+                pomoState.tiempo_restante = pomoSettings.longBreak * 60;
+                pomoCycles.ciclo_actual = 1;
+            }
             showNotificationToast("¡Fase de Enfoque Completada! Tómate un recreo.", "success");
+            
+            localStorage.setItem('cursus_pomo_ciclos_v2', JSON.stringify(pomoCycles));
+
         } else {
             pomoState.fase_actual = 'enfoque';
             pomoState.tiempo_restante = pomoSettings.focusTime * 60;
-            showNotificationToast("¡Recreo finalizado! Hora de enfocarse.", "success");
+            showNotificationToast("¡El descanso ha terminado! A enfocar nuevamente.", "success");
         }
         
         pomoState.estado_reloj = 'pausado'; 
@@ -252,7 +362,16 @@
         window.dispatchEvent(new Event('pomo_local_change'));
     }
 
-    // Botones de control del widget flotante
+    // Comportamiento de botones y área de info
+    infoWrapper.addEventListener('click', (e) => {
+        // Toggle de los botones de acción si no está minimizado
+        if (widget.classList.contains('pomo-float--minimized')) {
+            widget.classList.remove('pomo-float--minimized');
+            return;
+        }
+        actionsWrapper.classList.toggle('pomo-float__actions--visible');
+    });
+
     playBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (!pomoState) return;
@@ -272,36 +391,37 @@
         triggerPomoChangeEvent();
     });
 
-    stopBtn.addEventListener('click', (e) => {
+    navBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (!pomoState) return;
-        
-        if (confirm('¿Deseas reiniciar/detener el Pomodoro actual?')) {
-            pomoState.estado_reloj = 'detenido';
-            pomoState.tiempo_restante = pomoSettings.focusTime * 60;
-            pomoState.fase_actual = 'enfoque';
-            pomoState.timestamp_ultimo_cambio = Date.now();
-            
-            localStorage.setItem('cursus_pomo_estado_v2', JSON.stringify(pomoState));
-            widget.style.display = 'none';
-            stopTicker();
-            triggerPomoChangeEvent();
-        }
+        window.location.href = '/area-estudio';
     });
 
-    infoWrapper.addEventListener('click', () => {
-        window.location.href = '/area-estudio';
+    minBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        actionsWrapper.classList.remove('pomo-float__actions--visible');
+        widget.classList.add('pomo-float--minimized');
+    });
+
+    closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        widgetDismissed = true;
+        widget.classList.remove('is-visible');
+        stopTicker();
     });
 
     // Lógica Draggable (Mouse y Touch)
     function makeElementDraggable(el, handle) {
         let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        let isDragging = false;
+        let dragStartTime = 0;
+
         handle.onmousedown = dragMouseDown;
         handle.ontouchstart = dragMouseDown;
 
         function dragMouseDown(e) {
             e = e || window.event;
-            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+            // No arrastrar si hace clic en los botones
+            if (e.target.closest('.pomo-float__btn')) return;
             
             if (e.type === 'touchstart') {
                 pos3 = e.touches[0].clientX;
@@ -310,6 +430,9 @@
                 pos3 = e.clientX;
                 pos4 = e.clientY;
             }
+            isDragging = false;
+            dragStartTime = Date.now();
+            
             document.onmouseup = closeDragElement;
             document.ontouchend = closeDragElement;
             document.onmousemove = elementDrag;
@@ -318,8 +441,18 @@
 
         function elementDrag(e) {
             e = e || window.event;
+            
             let clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
             let clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+            
+            // Si el movimiento es muy pequeño, no lo consideramos drag (para permitir clics normales)
+            if (Math.abs(clientX - pos3) > 5 || Math.abs(clientY - pos4) > 5) {
+                isDragging = true;
+            }
+            
+            if (!isDragging) return;
+            
+            if (e.type === 'touchmove') e.preventDefault(); // Evitar scroll
             
             pos1 = pos3 - clientX;
             pos2 = pos4 - clientY;
@@ -344,16 +477,33 @@
             el.style.right = "auto";
         }
 
-        function closeDragElement() {
+        function closeDragElement(e) {
             document.onmouseup = null;
             document.onmousemove = null;
             document.ontouchend = null;
             document.ontouchmove = null;
             
-            localStorage.setItem('cursus_pomo_float_pos', JSON.stringify({
-                top: el.style.top,
-                left: el.style.left
-            }));
+            // Prevenir click event si estábamos arrastrando
+            if (isDragging && Date.now() - dragStartTime > 150) {
+                if (e) {
+                    e.stopPropagation();
+                }
+                // Hacemos una captura en la fase de captura para matar el click subsecuente
+                const captureClick = (ev) => {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                    window.removeEventListener('click', captureClick, true);
+                };
+                window.addEventListener('click', captureClick, true);
+                setTimeout(() => window.removeEventListener('click', captureClick, true), 50);
+            }
+            
+            if (isDragging) {
+                localStorage.setItem('cursus_pomo_float_pos', JSON.stringify({
+                    top: el.style.top,
+                    left: el.style.left
+                }));
+            }
         }
     }
 })();
