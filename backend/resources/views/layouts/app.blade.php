@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="{{ asset('css/main.css') }}">
   <link rel="stylesheet" href="{{ asset('css/layout/sidebar.css') }}">
   <link rel="icon" href="{{ asset('assets/icons/cursus-logo.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ asset('css/components/pomo-float.css') }}">
   @stack('styles')
 </head>
 
