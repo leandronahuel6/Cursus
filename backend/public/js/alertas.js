@@ -125,42 +125,22 @@ async function loadAlertas() {
   }
 }
 
-// Recordatorio personal de cuota: un único valor por usuario que se actualiza
-// (nunca crea una alerta/registro nuevo cada mes, siempre pisa el mismo monto).
+// Carga el monto vigente fijado por el admin y lo muestra como solo lectura.
 async function loadRecordatorioCuota() {
   const input = document.getElementById('cuota-monto');
   if (!input) return;
 
   try {
-    const response = await fetch(`${API_BASE}/recordatorio-cuota`, { headers: getAuthHeaders() });
-    if (!response.ok) throw new Error('No se pudo cargar el recordatorio de cuota');
+    const response = await fetch(`${API_BASE}/cuotas`, { headers: getAuthHeaders() });
+    if (!response.ok) return;
     const data = await response.json();
-    if (data.monto !== null) input.value = data.monto;
+    if (data.valor_mensual != null) {
+      input.value = parseFloat(data.valor_mensual).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+    }
   } catch (e) {
     console.error(e);
   }
 }
-
-window.handleCuotaSubmit = async function(event) {
-  event.preventDefault();
-
-  const monto = document.getElementById('cuota-monto').value;
-  if (monto === '') return;
-
-  try {
-    const response = await fetch(`${API_BASE}/recordatorio-cuota`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ monto })
-    });
-    if (!response.ok) throw new Error('No se pudo guardar el monto');
-
-    showAlertPopup('Monto de cuota actualizado con éxito.', 'success');
-  } catch (e) {
-    console.error(e);
-    showAlertPopup('No se pudo guardar el monto. Intentá de nuevo.', 'error');
-  }
-};
 
 // Aviso de pago de la cuota: aparece a partir del 1° de cada mes y desaparece
 // recién cuando se registra el pago de ese mes (el backend resetea esto solo,

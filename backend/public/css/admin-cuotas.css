@@ -1,0 +1,179 @@
+.admin-cuotas-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---- Card genérica ---- */
+.ac-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ac-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+}
+
+.ac-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+/* ---- Cuota vigente ---- */
+.ac-vigente-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ac-monto {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.ac-vigente-desde {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.ac-btn-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--brand);
+  background: var(--brand-light);
+  border: 1px solid var(--brand-dim);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+.ac-btn-edit:hover { background: var(--brand-dim); }
+
+/* ---- Formulario nueva cuota ---- */
+.ac-form {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.ac-form-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ac-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.ac-field label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.ac-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  justify-content: flex-end;
+}
+
+/* ---- Stats ---- */
+.ac-stats-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 4px;
+}
+
+.ac-stat {
+  flex: 1;
+  min-width: 80px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 12px 16px;
+  text-align: center;
+}
+
+.ac-stat-val {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ac-stat-lbl {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ---- Filtro ---- */
+.ac-filter-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ac-filter-btn {
+  padding: 5px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.ac-filter-btn:hover { border-color: var(--brand); color: var(--brand); }
+.ac-filter-btn.active {
+  background: var(--brand-light);
+  border-color: var(--brand-dim);
+  color: var(--brand);
+}
+
+/* ---- Tabla ---- */
+.ac-table-wrap { overflow-x: auto; }
+
+.ac-loading {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 20px 0;
+}
+
+@media (max-width: 600px) {
+  .ac-monto { font-size: 26px; }
+  .ac-form-row { flex-direction: column; }
+  .ac-form-actions { flex-direction: column; }
+  .ac-form-actions button { width: 100%; }
+}
