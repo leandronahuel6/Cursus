@@ -264,6 +264,9 @@
   </div>
 </div>
 
+<!-- Contenedor global de Toasts -->
+<div class="toast-container" id="toast-container"></div>
+
 <!-- Scripts -->
 <script src="{{ asset('js/theme.js') }}"></script>
 <script src="{{ asset('js/animations.js') }}"></script>

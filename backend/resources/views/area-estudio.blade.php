@@ -397,8 +397,6 @@
   </div>
 </div>
 
-<!-- Contenedor global de Toasts -->
-<div class="toast-container" id="toast-container"></div>
 
 <!-- 4. OVERLAY MODO CONCENTRACIÓN AESTHETIC -->
 <div id="focus-mode-overlay">
