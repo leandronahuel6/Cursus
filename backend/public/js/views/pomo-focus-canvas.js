@@ -32,7 +32,7 @@ class PomoFocusCanvas {
         this.splashes = [];
         
         // Pre-poblar partículas
-        const count = theme === 'rain' ? 80 : (theme === 'fire' ? 40 : 0);
+        const count = theme === 'rain' ? 80 : (theme === 'fire' ? 40 : (theme === 'forest' ? 50 : (theme === 'ocean' ? 60 : 0)));
         for (let i = 0; i < count; i++) {
             this.particles.push(this.createParticle(true));
         }
@@ -90,6 +90,29 @@ class PomoFocusCanvas {
                 opacity: 0.4 + Math.random() * 0.6,
                 decay: 0.001 + Math.random() * 0.0025,
                 color: Math.random() > 0.45 ? 'rgba(249, 115, 22, ' : (Math.random() > 0.4 ? 'rgba(239, 68, 68, ' : 'rgba(253, 224, 71, ') // Naranja, Rojo, Amarillo
+            };
+        } else if (this.currentTheme === 'forest') {
+            return {
+                x: Math.random() * w,
+                y: randomY ? Math.random() * h : -20,
+                size: 6 + Math.random() * 8,
+                speedY: 1 + Math.random() * 1.5,
+                speedX: 0.5 + Math.random() * 1,
+                angle: Math.random() * Math.PI * 2,
+                wiggleSpeed: 0.02 + Math.random() * 0.03,
+                opacity: 0.2 + Math.random() * 0.4,
+                color: Math.random() > 0.5 ? 'rgba(34, 197, 94, ' : (Math.random() > 0.4 ? 'rgba(234, 179, 8, ' : 'rgba(101, 163, 13, ')
+            };
+        } else if (this.currentTheme === 'ocean') {
+            return {
+                x: Math.random() * w,
+                y: randomY ? Math.random() * h : h + 20,
+                size: 2 + Math.random() * 6,
+                speedY: -(0.5 + Math.random() * 1.2),
+                wiggleSpeed: 0.01 + Math.random() * 0.02,
+                wiggleRange: 0.5 + Math.random() * 1,
+                angle: Math.random() * Math.PI * 2,
+                opacity: 0.15 + Math.random() * 0.3
             };
         }
         return {};
@@ -185,6 +208,48 @@ class PomoFocusCanvas {
             }
             
             this.ctx.shadowBlur = 0; // Desactivar sombras de glow para no ralentizar
+        } else if (this.currentTheme === 'forest') {
+            // Dibujar hojas flotantes cayendo
+            for (let i = 0; i < this.particles.length; i++) {
+                const p = this.particles[i];
+                this.ctx.beginPath();
+                if (this.ctx.ellipse) {
+                    this.ctx.ellipse(p.x, p.y, p.size, p.size * 0.5, p.angle, 0, Math.PI * 2);
+                } else {
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                }
+                this.ctx.fillStyle = p.color + p.opacity + ')';
+                this.ctx.fill();
+
+                p.y += p.speedY;
+                p.x += p.speedX + Math.sin(p.angle) * 0.5;
+                p.angle += p.wiggleSpeed;
+
+                if (p.y > h + 20 || p.x > w + 20) {
+                    this.particles[i] = this.createParticle(false);
+                }
+            }
+        } else if (this.currentTheme === 'ocean') {
+            // Dibujar burbujas transparentes subiendo
+            for (let i = 0; i < this.particles.length; i++) {
+                const p = this.particles[i];
+                this.ctx.beginPath();
+                this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                this.ctx.fillStyle = `rgba(186, 230, 253, ${p.opacity * 0.3})`;
+                this.ctx.fill();
+                
+                this.ctx.strokeStyle = `rgba(255, 255, 255, ${p.opacity})`;
+                this.ctx.lineWidth = 0.75;
+                this.ctx.stroke();
+
+                p.y += p.speedY;
+                p.angle += p.wiggleSpeed;
+                p.x += Math.sin(p.angle) * p.wiggleRange;
+
+                if (p.y < -20) {
+                    this.particles[i] = this.createParticle(false);
+                }
+            }
         }
 
         this.animationId = requestAnimationFrame(this.loop);

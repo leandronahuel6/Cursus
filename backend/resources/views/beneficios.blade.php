@@ -83,7 +83,7 @@
        ESTILOS DEL BOTÓN THEME TOGGLE
        ========================================================================== */
     .theme-toggle-btn {
-        background: rgba(255, 255, 255, 0.6);
+        background: #ffffff;
         border: 1px solid rgba(226, 232, 240, 0.8);
         border-radius: 50%;
         width: 38px;

@@ -43,6 +43,13 @@
       <svg class="pmenu-ic" aria-hidden="true" width="16" height="16"><use href="{{ asset('assets/icons/sprite.svg#message-square') }}"></use></svg>
       Contacto
     </button>
+    <button class="profile-menu-item" onclick="if(window.startOnboardingTour && window.location.pathname.endsWith('/dashboard')){ window.startOnboardingTour(); document.getElementById('profile-menu').classList.remove('open'); const userEl = document.querySelector('.sb-user'); if(userEl) userEl.classList.remove('menu-open'); } else { location.href='{{ route('dashboard') }}?start_tour=true'; }">
+      <svg class="pmenu-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.9;">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+      </svg>
+      Guía Rápida
+    </button>
     <div class="profile-menu-divider"></div>
     <div class="profile-menu-item profile-menu-switch-row" onclick="event.stopPropagation()">
       <span>Animaciones</span>
@@ -64,6 +71,7 @@
     <!-- Mobile header (Optional: Page specific or fallback) -->
     @yield('mobile-header')
     <div class="mob-header-actions">
+      @yield('mobile-header-actions')
       <button class="theme-toggle-btn theme-toggle-mobile" data-theme-toggle aria-label="Cambiar tema" title="Cambiar tema">
         <svg class="icon-sun" width="15" height="15"><use href="{{ asset('assets/icons/sprite.svg#sun') }}"></use></svg>
         <svg class="icon-moon" width="15" height="15"><use href="{{ asset('assets/icons/sprite.svg#moon') }}"></use></svg>
@@ -109,6 +117,10 @@
       <div class="bn {{ Request::routeIs('beneficios') ? 'on' : '' }}" onclick="location.href='{{ route('beneficios') }}'">
         <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#gift') }}"></use></svg>
         <span class="bn-lbl">Beneficios</span>
+      </div>
+      <div class="bn {{ Request::routeIs('flashcards') ? 'on' : '' }}" onclick="location.href='{{ route('flashcards') }}'">
+        <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#book-copy') }}"></use></svg>
+        <span class="bn-lbl">Flashcards</span>
       </div>
       <div class="bn {{ Request::routeIs('alertas') ? 'on' : '' }}" onclick="location.href='{{ route('alertas') }}'">
         <span class="bnav-icon-wrapper" style="position: relative; display: flex; align-items: center; justify-content: center;">
@@ -252,6 +264,9 @@
   </div>
 </div>
 
+<!-- Contenedor global de Toasts -->
+<div class="toast-container" id="toast-container"></div>
+
 <!-- Scripts -->
 <script src="{{ asset('js/theme.js') }}"></script>
 <script src="{{ asset('js/animations.js') }}"></script>
@@ -260,6 +275,9 @@
 <script src="{{ asset('js/script.js') }}"></script>
 <script src="{{ asset('js/profile.js') }}"></script>
 <script src="{{ asset('js/pomo-float.js') }}"></script>
+@if(Request::routeIs('dashboard') || Request::routeIs('area-estudio'))
+<script src="{{ asset('js/onboarding.js') }}"></script>
+@endif
 @stack('scripts')
 
 </body>

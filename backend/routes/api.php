@@ -20,6 +20,7 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
+Route::post('/contact', [AuthController::class, 'contact'])->middleware('throttle:10,1');
 Route::get('/materias', [MateriaController::class, 'index']);
 Route::get('/cuotas', [CuotaController::class, 'index']);
 
@@ -75,6 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/flashcards/decks', [FlashcardController::class, 'indexDecks']);
     Route::post('/flashcards/decks', [FlashcardController::class, 'storeDeck']);
     Route::post('/flashcards/decks/import', [FlashcardController::class, 'importDeck']);
+    Route::post('/flashcards/decks/generate-ia', [FlashcardController::class, 'generateFromIA']);
     Route::put('/flashcards/decks/{deck}', [FlashcardController::class, 'updateDeck']);
     Route::delete('/flashcards/decks/{deck}', [FlashcardController::class, 'destroyDeck']);
     Route::get('/flashcards/decks/{deck}/cards', [FlashcardController::class, 'indexCards']);
@@ -94,4 +96,5 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/plan-estudios/{id}', [AdminController::class, 'updateMateria']);
         Route::delete('/plan-estudios/{id}', [AdminController::class, 'destroyMateria']);
     });
+    Route::post('/flashcards/cards/generate-distractors', [FlashcardController::class, 'generateDistractors']);
 });

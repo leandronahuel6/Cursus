@@ -8,7 +8,7 @@ class Flashcard extends Model
 {
     protected $table = 'flashcards';
 
-    protected $fillable = ['mazo_id', 'pregunta', 'respuesta', 'correctas', 'incorrectas', 'ultimo_resultado', 'caja'];
+    protected $fillable = ['mazo_id', 'pregunta', 'respuesta', 'correctas', 'incorrectas', 'ultimo_resultado', 'caja', 'distractor_1', 'distractor_2', 'distractor_3'];
 
     public function deck()
     {

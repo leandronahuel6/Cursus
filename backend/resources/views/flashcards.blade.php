@@ -383,25 +383,52 @@
         width: 100%;
         height: 100%;
         backface-visibility: hidden;
-        border-radius: var(--r-lg);
-        padding: 2.5rem;
+        border-radius: 16px;
+        padding: 3rem 2.5rem 3.5rem 3.5rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        box-shadow: var(--sh-md);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
         border: 1px solid var(--border);
+        /* Lined index card effect (Ruled paper theme) */
+        background-color: #fcfcfc;
+        background-image: 
+            /* Red left vertical line */
+            linear-gradient(90deg, transparent 2.75rem, rgba(239, 68, 68, 0.35) 2.75rem, rgba(239, 68, 68, 0.35) 2.85rem, transparent 2.85rem),
+            /* Light blue horizontal lines */
+            linear-gradient(rgba(59, 130, 246, 0.12) 1px, transparent 1px);
+        background-size: 100% 100%, 100% 2.2rem;
+        background-position: 0 0, 0 1.2rem;
+        color: #1e293b; /* Premium slate color for text */
+        transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    body.dark-mode .flip-card-front, body.dark-mode .flip-card-back {
+        background-color: #1e293b; /* Slate background for dark mode index cards */
+        background-image: 
+            /* Subtle red left vertical line */
+            linear-gradient(90deg, transparent 2.75rem, rgba(239, 68, 68, 0.25) 2.75rem, rgba(239, 68, 68, 0.25) 2.85rem, transparent 2.85rem),
+            /* Subtle white horizontal lines */
+            linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+        background-size: 100% 100%, 100% 2.2rem;
+        background-position: 0 0, 0 1.2rem;
+        color: #f8fafc;
+        border-color: rgba(255, 255, 255, 0.06);
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
     }
 
     .flip-card-front {
-        background: var(--surface);
-        color: var(--t1);
+        /* standard front side */
     }
 
     .flip-card-back {
-        background: var(--surface);
-        color: var(--t1);
         transform: rotateY(180deg);
+    }
+
+    .flip-card-front:hover, .flip-card-back:hover {
+        box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.12);
+        border-color: var(--brand-dim);
     }
 
     /* Decorativos de tarjetas */
@@ -417,28 +444,49 @@
         border: 1px solid var(--border);
     }
 
-    .leitner-box-badge {
-        font-size: 0.72rem;
-        font-weight: 700;
-        background: rgba(99, 102, 241, 0.1);
-        color: var(--brand);
-        padding: 0.2rem 0.6rem;
-        border-radius: var(--r-sm);
-        border: 1px solid var(--brand-dim);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
     .card-text {
-        font-size: 1.35rem;
-        font-weight: 600;
-        line-height: 1.45;
-        max-height: 200px;
+        font-size: 1.45rem;
+        font-weight: 500;
+        line-height: 1.6;
+        text-align: center;
+        max-height: 220px;
         overflow-y: auto;
         padding: 0 0.5rem;
-        margin: 0;
+        margin: auto 0; /* Vertically center in the flexbox */
         word-break: break-word;
         width: 100%;
+        font-family: var(--font-display);
+    }
+
+    /* Teclas de atajos estilizadas (Keycaps) */
+    .key-hint {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.06);
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 4px;
+        padding: 0.15rem 0.35rem;
+        font-size: 0.72rem;
+        font-family: var(--font-display), monospace;
+        margin-left: 0.25rem;
+        color: rgba(0, 0, 0, 0.5);
+        font-weight: 700;
+        box-shadow: 0 1.5px 0 rgba(0, 0, 0, 0.08);
+    }
+
+    body.dark-mode .key-hint {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.7);
+        box-shadow: 0 1.5px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-outcome .key-hint {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: #ffffff;
+        box-shadow: 0 1.5px 0 rgba(0, 0, 0, 0.15);
     }
 
     .card-study-stats {
@@ -984,6 +1032,17 @@
         overflow: hidden;
     }
 
+    body.dark-mode .fc-modal-box {
+        background: #111827; /* Fondo completamente sólido en modo oscuro para legibilidad total */
+        border-color: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .category-header:hover {
+        background: var(--border) !important;
+        border-color: var(--brand-dim) !important;
+    }
+
     .fc-overlay.open .fc-modal-box {
         transform: scale(1);
     }
@@ -1138,8 +1197,127 @@
         from { opacity: 0; transform: translateY(8px); }
         to { opacity: 1; transform: translateY(0); }
     }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    .ai-loader-spinner {
+        box-sizing: border-box;
+    }
+
+    /* Estilos Premium para Text-To-Speech (TTS) */
+    .btn-card-tts {
+        position: absolute;
+        top: 1.15rem;
+        right: 1.25rem;
+        background: transparent;
+        border: none;
+        color: var(--t3);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.4rem;
+        border-radius: var(--r-sm);
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        z-index: 10;
+    }
+    
+    .btn-card-tts:hover {
+        color: var(--brand);
+        background: var(--border-light);
+        border-color: var(--border);
+        transform: scale(1.08);
+    }
+    
+    .btn-card-tts:active {
+        transform: scale(0.95);
+    }
+
+    /* Estilos de Carpetas/Contenedores de Mazos */
+    .category-group {
+        margin-top: 2.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .category-header {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.85rem 1.5rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 0 12px 12px 12px;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--sh);
+    }
+
+    /* Pestaña superior del archivador físico */
+    .category-header::before {
+        content: '';
+        position: absolute;
+        bottom: 100%;
+        left: -1px;
+        width: 140px;
+        height: 20px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-bottom: none;
+        border-radius: 8px 12px 0 0;
+        z-index: 1;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Ocultar borde superior del cuerpo de la carpeta debajo de la pestaña */
+    .category-header::after {
+        content: '';
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        width: 138px;
+        height: 4px;
+        background: var(--surface);
+        z-index: 2;
+        margin-bottom: -2px;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .category-header:hover {
+        background: var(--border-light);
+        border-color: var(--brand-dim);
+        transform: translateY(-2px);
+        box-shadow: var(--sh-md);
+    }
+    
+    .category-header:hover::before {
+        background: var(--border-light);
+        border-color: var(--brand-dim);
+    }
+    
+    .category-header:hover::after {
+        background: var(--border-light);
+    }
+
+    /* Ajustes para el Modo Carpeta colapsada */
+    .category-group.collapsed .category-header {
+        border-radius: 12px;
+    }
 </style>
 @endpush
+
+@section('mobile-header')
+<div class="mob-hdr">
+  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+    <div style="display: flex; flex-direction: column;">
+      <div class="mob-greet">Flashcards de Estudio 🧠</div>
+      <div class="mob-sub">Mis mazos y repaso</div>
+    </div>
+  </div>
+</div>
+@endsection
 
 @section('topbar-content')
     <div class="topbar-title">Flashcards de Estudio</div>
@@ -1162,6 +1340,11 @@
                 </button>
                 <input type="file" id="import-deck-file-input" style="display: none;" accept=".json" onchange="handleImportDeckFile(event)">
                 
+                <button class="btn-create-deck" style="background: linear-gradient(135deg, #4f46e5, #06b6d4); color: white; border: none; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);" onclick="openAIDeckModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                    Crear con IA ✨
+                </button>
+
                 <button class="btn-create-deck" onclick="openCreateDeckModal()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"/></svg>
                     Nuevo Mazo
@@ -1169,9 +1352,9 @@
             </div>
         </div>
 
-        <div class="decks-grid" id="decks-grid">
-            <!-- Cargado de mazos dinámicamente con AJAX -->
-            <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--t3);" id="decks-loader">
+        <div id="decks-container">
+            <!-- Cargado de mazos dinámicamente agrupados por categoría -->
+            <div style="text-align: center; padding: 3rem; color: var(--t3);" id="decks-loader">
                 Cargando tus mazos...
             </div>
         </div>
@@ -1200,8 +1383,10 @@
                         <div class="flip-card-front">
                             <div style="position: absolute; top: 1.25rem; left: 1.5rem; display: flex; gap: 0.5rem; align-items: center;">
                                 <span class="card-side-tag" style="position:static;">Pregunta</span>
-                                <span class="leitner-box-badge" id="card-leitner-badge-front">Caja 1</span>
                             </div>
+                            <button class="btn-card-tts" onclick="speakCardText(event, 'card-question-text')" title="Escuchar pregunta">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                            </button>
                             <div class="card-text" id="card-question-text">¿Cargando pregunta?</div>
                             <div class="card-action-hint">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
@@ -1211,8 +1396,10 @@
                         <div class="flip-card-back">
                             <div style="position: absolute; top: 1.25rem; left: 1.5rem; display: flex; gap: 0.5rem; align-items: center;">
                                 <span class="card-side-tag" style="position:static;">Respuesta</span>
-                                <span class="leitner-box-badge" id="card-leitner-badge-back">Caja 1</span>
                             </div>
+                            <button class="btn-card-tts" onclick="speakCardText(event, 'card-answer-text')" title="Escuchar respuesta">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                            </button>
                             <div class="card-text" id="card-answer-text">¿Cargando respuesta?</div>
                             <div class="card-study-stats" id="card-study-stats">Sin repaso previo</div>
                             <div class="card-action-hint">
@@ -1230,7 +1417,6 @@
                     <div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                             <span class="card-side-tag" style="position:static; background: var(--brand-light); color: var(--brand); border-color: var(--brand-dim);">Examen</span>
-                            <span class="leitner-box-badge" id="exam-card-leitner-badge">Caja 1</span>
                         </div>
                         <div class="card-text" id="exam-question-text" style="font-size: 1.25rem; margin-bottom: 1.5rem; max-height: 120px; overflow-y: auto; width: 100%; padding: 0;">¿Cargando pregunta?</div>
                     </div>
@@ -1255,11 +1441,15 @@
             <div class="study-controls" id="study-controls">
                 <button class="btn-outcome btn-outcome-incorrect" onclick="submitCardResult('incorrecto')">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
-                    No lo sé [1 / ←]
+                    <span>No lo sé</span>
+                    <kbd class="key-hint">1</kbd>
+                    <kbd class="key-hint">←</kbd>
                 </button>
                 <button class="btn-outcome btn-outcome-correct" onclick="submitCardResult('correcto')">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
-                    Lo sé [2 / →]
+                    <span>Lo sé</span>
+                    <kbd class="key-hint">2</kbd>
+                    <kbd class="key-hint">→</kbd>
                 </button>
             </div>
         </div>
@@ -1342,6 +1532,23 @@
                             <label for="card-input-answer">Respuesta (Reverso)</label>
                             <textarea id="card-input-answer" class="fc-input fc-textarea" placeholder="Escribe la respuesta... Usa `código` para resaltar." required></textarea>
                         </div>
+                        <div style="margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem; margin-bottom: 1.25rem;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                                <span style="font-size:0.85rem; font-weight:600; color:var(--t2);">Opciones incorrectas (Opcional)</span>
+                                <button type="button" id="btn-suggest-distractors" onclick="handleSuggestDistractors()" style="background:var(--border-light); border:1px solid var(--border); border-radius:var(--r-sm); padding:0.25rem 0.6rem; font-size:0.75rem; font-weight:600; color:var(--brand); cursor:pointer; display:flex; align-items:center; gap:0.25rem; transition:all 0.2s;">
+                                    <span>Sugerir con IA ✨</span>
+                                </button>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0.5rem;">
+                                <input type="text" id="card-input-d1" class="fc-input" placeholder="Opción incorrecta 1" style="font-size:0.8rem; padding:0.5rem;">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0.5rem;">
+                                <input type="text" id="card-input-d2" class="fc-input" placeholder="Opción incorrecta 2" style="font-size:0.8rem; padding:0.5rem;">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0.5rem;">
+                                <input type="text" id="card-input-d3" class="fc-input" placeholder="Opción incorrecta 3" style="font-size:0.8rem; padding:0.5rem;">
+                            </div>
+                        </div>
                         <button type="submit" class="btn-add-card">Guardar Tarjeta</button>
                     </form>
                 </div>
@@ -1386,6 +1593,17 @@
                     <input type="text" id="deck-input-desc" class="fc-input" placeholder="Ej: Repaso examen segundo parcial..." autocomplete="off">
                 </div>
                 <div class="form-group">
+                    <label for="deck-select-category">Contenedor / Carpeta</label>
+                    <select id="deck-select-category" class="fc-input" onchange="handleDeckSelectCategoryChange()">
+                        <option value="General">General (Sin contenedor)</option>
+                        <option value="__NEW__">+ Crear nuevo contenedor...</option>
+                    </select>
+                    <div id="new-category-input-wrapper" style="display: none; margin-top: 0.75rem;">
+                        <label for="deck-input-category" style="font-size: 0.8rem; opacity: 0.85; margin-bottom: 0.25rem; display: block;">Nombre del nuevo contenedor</label>
+                        <input type="text" id="deck-input-category" class="fc-input" placeholder="Ej: Programación, Matemáticas, Legislación..." autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-group">
                     <label>Estilo / Color de Mazo</label>
                     <div class="color-picker-grid" id="color-picker-grid">
                         <div class="color-option deck-color-indigo selected" data-color="indigo"></div>
@@ -1402,6 +1620,82 @@
                 <button type="submit" class="btn-modal-save" id="btn-deck-submit">Crear Mazo</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- ==================== OVERLAY MODAL: CREAR MAZO CON IA ==================== -->
+<div class="fc-overlay" id="ai-deck-modal" onclick="closeAIDeckModalOnOverlay(event)">
+    <div class="fc-modal-box" style="max-width: 440px;">
+        <div class="fc-modal-header">
+            <div class="fc-modal-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                <span>Generar Mazo con IA ✨</span>
+            </div>
+            <button class="fc-modal-close" onclick="closeAIDeckModal()">✕</button>
+        </div>
+        <form id="ai-deck-form" onsubmit="handleAICreateDeck(event)" enctype="multipart/form-data">
+            <div class="fc-modal-body">
+                <p style="font-size: 0.85rem; color: var(--t3); margin: 0 0 1.2rem 0; line-height: 1.45;">
+                    Sube un archivo de estudio (**PDF, Word, PowerPoint, Texto, Markdown o Imagen**) y nuestra IA analizará el contenido para extraer y generar automáticamente un mazo completo de preguntas y respuestas.
+                </p>
+                <div class="form-group">
+                    <label for="ai-deck-file" style="font-size: 0.85rem; font-weight: 600; color: var(--t2); display: block; margin-bottom: 0.4rem;">Seleccionar documento o imagen (.pdf, .docx, .pptx, .txt, .md, .jpg, .png)</label>
+                    <input type="file" id="ai-deck-file" name="file" accept=".pdf,.docx,.pptx,.txt,.md,.jpg,.jpeg,.png" required style="width: 100%; padding: 0.6rem; border: 2px dashed var(--border); border-radius: var(--r-sm); background: var(--border-light); font-size: 0.85rem; outline: none; cursor: pointer;">
+                </div>
+                <div class="form-group" style="margin-top: 1.25rem;">
+                    <label for="ai-deck-cards-count" style="font-size: 0.85rem; font-weight: 600; color: var(--t2); display: block; margin-bottom: 0.4rem;">Cantidad de flashcards a generar</label>
+                    <select id="ai-deck-cards-count" name="cantidad" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); color: var(--t1); font-size: 0.85rem; outline: none; cursor: pointer;">
+                        <option value="5">5 tarjetas (Rápido)</option>
+                        <option value="10" selected>10 tarjetas (Recomendado)</option>
+                        <option value="15">15 tarjetas (Completo)</option>
+                        <option value="20">20 tarjetas (Extenso)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-top: 1.25rem;">
+                    <label for="ai-deck-select-category" style="font-size: 0.85rem; font-weight: 600; color: var(--t2); display: block; margin-bottom: 0.4rem;">Contenedor / Carpeta de destino</label>
+                    <select id="ai-deck-select-category" class="fc-input" onchange="handleAIDeckSelectCategoryChange()" style="font-size: 0.85rem;">
+                        <option value="__AUTO__">Auto-detectar con IA ✨</option>
+                        <option value="General">General (Sin contenedor)</option>
+                    </select>
+                    <div id="ai-new-category-input-wrapper" style="display: none; margin-top: 0.75rem;">
+                        <label for="ai-deck-input-category" style="font-size: 0.8rem; opacity: 0.85; margin-bottom: 0.25rem; display: block;">Nombre del nuevo contenedor</label>
+                        <input type="text" id="ai-deck-input-category" class="fc-input" placeholder="Ej: Programación, Anatomía..." autocomplete="off">
+                    </div>
+                </div>
+            </div>
+            <div class="fc-modal-footer" style="display: flex; justify-content: flex-end; gap: 0.5rem; padding: 1rem 1.5rem; background: var(--border-light);">
+                <button type="button" class="btn-modal-cancel" onclick="closeAIDeckModal()">Cancelar</button>
+                <button type="submit" class="btn-modal-save" id="btn-ai-submit" style="background: linear-gradient(135deg, #4f46e5, #06b6d4);">Generar Mazo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==================== OVERLAY: CARGANDO GENERACIÓN IA ==================== -->
+<div class="fc-overlay" id="ai-loading-overlay" style="display: none; align-items: center; justify-content: center; z-index: 2000; background: rgba(11, 15, 25, 0.85); backdrop-filter: blur(8px);">
+    <div style="text-align: center; color: white; max-width: 320px; padding: 2rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--r-lg); box-shadow: var(--sh-md);">
+        <div class="ai-loader-spinner" style="width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: #06b6d4; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1.5rem;"></div>
+        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 0.5rem;" id="ai-loading-title">Procesando archivo...</h3>
+        <p style="font-size: 13px; color: var(--tm); line-height: 1.45;" id="ai-loading-text">La IA de Cursus está analizando tu documento para generar las flashcards.</p>
+    </div>
+</div>
+
+<!-- ==================== OVERLAY MODAL: CONFIRMACIÓN PERSONALIZADA ==================== -->
+<div class="fc-overlay" id="custom-confirm-modal" style="display: none; align-items: center; justify-content: center; z-index: 3000;">
+    <div class="fc-modal-box" style="max-width: 400px; transform: scale(0.9); opacity: 0; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);">
+        <div class="fc-modal-header" style="border-bottom: none; padding: 1.5rem 1.5rem 0.5rem 1.5rem;">
+            <div class="fc-modal-title" style="font-size: 1.2rem; font-weight: 700; color: var(--t1); display: flex; align-items: center; gap: 0.6rem;">
+                <span id="confirm-modal-icon-container"></span>
+                <span id="confirm-modal-title-text">Confirmar acción</span>
+            </div>
+        </div>
+        <div class="fc-modal-body" style="padding: 0.5rem 1.5rem 1.2rem 1.5rem;">
+            <p id="confirm-modal-body-text" style="font-size: 0.88rem; color: var(--t3); margin: 0; line-height: 1.5;"></p>
+        </div>
+        <div class="fc-modal-footer" style="background: var(--border-light); padding: 1rem 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--border-light);">
+            <button type="button" class="btn-modal-cancel" id="btn-confirm-cancel" style="padding: 0.55rem 1.25rem; font-size: 0.85rem; font-weight: 600;">Cancelar</button>
+            <button type="button" class="btn-modal-save" id="btn-confirm-accept" style="padding: 0.55rem 1.25rem; font-size: 0.85rem; font-weight: 600; border: none; border-radius: var(--r-sm); cursor: pointer; transition: all 0.2s;">Aceptar</button>
+        </div>
     </div>
 </div>
 
@@ -1426,14 +1720,7 @@
                         <span style="font-size: 0.8rem; color: var(--t3);">Repasa todas las tarjetas del mazo mezcladas aleatoriamente.</span>
                     </div>
                 </label>
-                
-                <label style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1px solid var(--border); border-radius: var(--r); cursor: pointer; transition: all 0.2s;" id="label-mode-leitner">
-                    <input type="radio" name="study-mode-choice" value="leitner" style="margin-top: 0.25rem;">
-                    <div>
-                        <strong style="display: block; font-size: 0.9rem; color: var(--t1); margin-bottom: 0.15rem;">Repaso Inteligente (Leitner)</strong>
-                        <span style="font-size: 0.8rem; color: var(--t3);">Prioriza tarjetas difíciles (Caja 1-4) y salta temporalmente las dominadas (Caja 5).</span>
-                    </div>
-                </label>
+
 
                 <label style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1px solid var(--border); border-radius: var(--r); cursor: pointer; transition: all 0.2s;" id="label-mode-exam">
                     <input type="radio" name="study-mode-choice" value="exam" style="margin-top: 0.25rem;">
@@ -1442,6 +1729,18 @@
                         <span style="font-size: 0.8rem; color: var(--t3);">Cuestionario de opción múltiple de 4 opciones generado automáticamente.</span>
                     </div>
                 </label>
+            </div>
+
+            <!-- Configuración de preguntas para Modo Examen -->
+            <div id="exam-quantity-wrapper" style="display: none; margin-top: 1.25rem; padding: 0.85rem; border: 1px solid var(--border); border-radius: var(--r); background: var(--border-light);">
+                <label for="exam-question-count" style="font-size: 0.85rem; font-weight: 600; color: var(--t2); display: block; margin-bottom: 0.4rem;">Cantidad de preguntas en el cuestionario</label>
+                <select id="exam-question-count" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); color: var(--t1); font-size: 0.85rem; outline: none; cursor: pointer;">
+                    <option value="all" selected>Todas las tarjetas del mazo</option>
+                    <option value="5">5 preguntas</option>
+                    <option value="10">10 preguntas</option>
+                    <option value="15">15 preguntas</option>
+                    <option value="20">20 preguntas</option>
+                </select>
             </div>
         </div>
         <div class="fc-modal-footer">
@@ -1472,6 +1771,60 @@
     let editingCardId = null;
     let selectedDeckIdForStudy = null;
     let currentStudyMode = 'all';
+    let confirmPromiseResolve = null;
+
+    function showCustomConfirm({ title, message, acceptText = 'Confirmar', cancelText = 'Cancelar', isDestructive = false }) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('custom-confirm-modal');
+            const modalBox = modal.querySelector('.fc-modal-box');
+            const titleEl = document.getElementById('confirm-modal-title-text');
+            const bodyEl = document.getElementById('confirm-modal-body-text');
+            const btnCancel = document.getElementById('btn-confirm-cancel');
+            const btnAccept = document.getElementById('btn-confirm-accept');
+            const iconContainer = document.getElementById('confirm-modal-icon-container');
+
+            titleEl.textContent = title;
+            bodyEl.textContent = message;
+            btnCancel.textContent = cancelText;
+            btnAccept.textContent = acceptText;
+
+            if (isDestructive) {
+                btnAccept.style.background = '#dc2626';
+                btnAccept.style.color = '#ffffff';
+                btnAccept.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.2)';
+                iconContainer.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>`;
+            } else {
+                btnAccept.style.background = 'linear-gradient(135deg, #4f46e5, #06b6d4)';
+                btnAccept.style.color = '#ffffff';
+                btnAccept.style.boxShadow = '0 4px 12px rgba(79, 70, 229, 0.2)';
+                iconContainer.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`;
+            }
+
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('open');
+                modalBox.style.transform = 'scale(1)';
+                modalBox.style.opacity = '1';
+            }, 10);
+
+            confirmPromiseResolve = resolve;
+        });
+    }
+
+    function closeCustomConfirm(result) {
+        const modal = document.getElementById('custom-confirm-modal');
+        const modalBox = modal.querySelector('.fc-modal-box');
+        modal.classList.remove('open');
+        modalBox.style.transform = 'scale(0.9)';
+        modalBox.style.opacity = '0';
+        setTimeout(() => {
+            modal.style.display = 'none';
+            if (confirmPromiseResolve) {
+                confirmPromiseResolve(result);
+                confirmPromiseResolve = null;
+            }
+        }, 250);
+    }
 
     // Elementos DOM de secciones
     const sectionDecks = document.getElementById('section-decks');
@@ -1489,6 +1842,15 @@
         loadDecks();
         initColorPicker();
         initStudyModeSelector();
+
+        // Listeners confirm modal
+        document.getElementById('btn-confirm-cancel').addEventListener('click', () => closeCustomConfirm(false));
+        document.getElementById('btn-confirm-accept').addEventListener('click', () => closeCustomConfirm(true));
+        document.getElementById('custom-confirm-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('custom-confirm-modal')) {
+                closeCustomConfirm(false);
+            }
+        });
     });
 
     // Configuración headers de la API
@@ -1541,7 +1903,7 @@
     // LÓGICA DE MAZOS (DECKS)
     // ==========================================================================
     async function loadDecks() {
-        const grid = document.getElementById('decks-grid');
+        const container = document.getElementById('decks-container');
         try {
             const response = await fetch('/api/flashcards/decks', {
                 method: 'GET',
@@ -1560,18 +1922,37 @@
             renderDecks(currentDecks);
         } catch (error) {
             console.error(error);
-            grid.innerHTML = `
-                <div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--red);">
+            container.innerHTML = `
+                <div style="text-align:center; padding:3rem; color:var(--red);">
                     ⚠️ Ocurrió un error al cargar tus mazos de estudio. Intenta recargar la página.
                 </div>
             `;
         }
     }
 
+    function toggleCategoryGroup(catId) {
+        const grid = document.getElementById('grid-' + catId);
+        const group = document.getElementById('group-' + catId);
+        const header = document.querySelector(`#group-${catId} .category-header`);
+        const chevron = header.querySelector('.category-chevron');
+        
+        if (grid.style.display === 'none') {
+            grid.style.display = 'grid';
+            if (group) group.classList.remove('collapsed');
+            chevron.style.transform = 'rotate(0deg)';
+            localStorage.setItem('collapsed_cat_' + catId, 'false');
+        } else {
+            grid.style.display = 'none';
+            if (group) group.classList.add('collapsed');
+            chevron.style.transform = 'rotate(-90deg)';
+            localStorage.setItem('collapsed_cat_' + catId, 'true');
+        }
+    }
+
     function renderDecks(decks) {
-        const grid = document.getElementById('decks-grid');
+        const container = document.getElementById('decks-container');
         if (decks.length === 0) {
-            grid.innerHTML = `
+            container.innerHTML = `
                 <div class="empty-state">
                     <svg class="empty-state-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
                     <h3 class="empty-state-title">No tienes mazos aún</h3>
@@ -1585,63 +1966,143 @@
             return;
         }
 
-        let html = '';
+        // Agrupar mazos por categoría
+        const groups = {};
         decks.forEach(deck => {
-            const hasCards = deck.cards_count > 0;
-            const accuracy = deck.porcentaje_acierto;
-            
-            let accuracyClass = 'accuracy-none';
-            let accuracyText = 'Sin datos';
-            if (accuracy !== null) {
-                accuracyText = `${accuracy}% aciertos`;
-                if (accuracy >= 80) accuracyClass = 'accuracy-high';
-                else if (accuracy >= 50) accuracyClass = 'accuracy-medium';
-                else accuracyClass = 'accuracy-low';
+            const cat = deck.categoria ? deck.categoria.trim() : 'General';
+            if (!groups[cat]) {
+                groups[cat] = [];
             }
+            groups[cat].push(deck);
+        });
+
+        // Poblar el selector de carpetas del modal de creación
+        const selectCategory = document.getElementById('deck-select-category');
+        if (selectCategory) {
+            const distinctCategories = Object.keys(groups).filter(cat => cat !== 'General');
+            const currentValue = selectCategory.value;
+            
+            let selectHtml = `<option value="General">General (Sin contenedor)</option>`;
+            distinctCategories.forEach(cat => {
+                selectHtml += `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`;
+            });
+            selectHtml += `<option value="__NEW__">+ Crear nuevo contenedor...</option>`;
+            
+            selectCategory.innerHTML = selectHtml;
+            
+            if (currentValue && selectCategory.querySelector(`option[value="${currentValue}"]`)) {
+                selectCategory.value = currentValue;
+            }
+        }
+
+        // Poblar el selector de carpetas del modal de IA
+        const aiSelectCategory = document.getElementById('ai-deck-select-category');
+        if (aiSelectCategory) {
+            const distinctCategories = Object.keys(groups).filter(cat => cat !== 'General');
+            const currentValue = aiSelectCategory.value;
+            
+            let selectHtml = `
+                <option value="__AUTO__">Auto-detectar con IA ✨</option>
+                <option value="General">General (Sin contenedor)</option>
+            `;
+            distinctCategories.forEach(cat => {
+                selectHtml += `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`;
+            });
+            selectHtml += `<option value="__NEW__">+ Crear nuevo contenedor...</option>`;
+            
+            aiSelectCategory.innerHTML = selectHtml;
+            
+            if (currentValue && aiSelectCategory.querySelector(`option[value="${currentValue}"]`)) {
+                aiSelectCategory.value = currentValue;
+            }
+        }
+
+        // Renderizar cada grupo de categoría colapsable
+        let html = '';
+        Object.keys(groups).sort().forEach(cat => {
+            const catDecks = groups[cat];
+            const catId = 'cat-' + cat.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            const isCollapsed = localStorage.getItem('collapsed_cat_' + catId) === 'true';
 
             html += `
-                <div class="deck-card" id="deck-card-${deck.id}" style="--mouse-x: 0px; --mouse-y: 0px;">
-                    <div class="deck-card-glow deck-color-${deck.color || 'indigo'}"></div>
-                    <div class="deck-info">
-                        <h3 class="deck-title">${escapeHtml(deck.nombre)}</h3>
-                        <p class="deck-desc">${deck.descripcion ? escapeHtml(deck.descripcion) : 'Sin descripción.'}</p>
-                        
-                        <div class="deck-stats-row">
-                            <div class="deck-stat-item" title="Cantidad de tarjetas">
-                                <svg class="deck-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
-                                <span>${deck.cards_count} ${deck.cards_count === 1 ? 'tarjeta' : 'tarjetas'}</span>
+                <div class="category-group ${isCollapsed ? 'collapsed' : ''}" id="group-${catId}">
+                    <div class="category-header" onclick="toggleCategoryGroup('${catId}')">
+                        <div style="display:flex; align-items:center; gap:0.6rem;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.85;">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            <span style="font-weight:700; font-size:1.02rem; color:var(--t1);">${escapeHtml(cat)}</span>
+                            <span style="font-size:0.75rem; font-weight:600; padding:0.15rem 0.5rem; background:var(--border); border-radius:9999px; color:var(--t3);">${catDecks.length} ${catDecks.length === 1 ? 'mazo' : 'mazos'}</span>
+                        </div>
+                        <svg class="category-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.25s ease; ${isCollapsed ? 'transform:rotate(-90deg);' : ''}">
+                            <path d="m6 9 6 6 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="decks-grid" id="grid-${catId}" style="display:${isCollapsed ? 'none' : 'grid'}; transition:all 0.3s ease;">
+            `;
+
+            catDecks.forEach(deck => {
+                const hasCards = deck.cards_count > 0;
+                const accuracy = deck.porcentaje_acierto;
+                
+                let accuracyClass = 'accuracy-none';
+                let accuracyText = 'Sin datos';
+                if (accuracy !== null) {
+                    accuracyText = `${accuracy}% aciertos`;
+                    if (accuracy >= 80) accuracyClass = 'accuracy-high';
+                    else if (accuracy >= 50) accuracyClass = 'accuracy-medium';
+                    else accuracyClass = 'accuracy-low';
+                }
+
+                html += `
+                    <div class="deck-card" id="deck-card-${deck.id}" style="--mouse-x: 0px; --mouse-y: 0px;">
+                        <div class="deck-card-glow deck-color-${deck.color || 'indigo'}"></div>
+                        <div class="deck-info">
+                            <h3 class="deck-title">${escapeHtml(deck.nombre)}</h3>
+                            <p class="deck-desc">${deck.descripcion ? escapeHtml(deck.descripcion) : 'Sin descripción.'}</p>
+                            
+                            <div class="deck-stats-row">
+                                <div class="deck-stat-item" title="Cantidad de tarjetas">
+                                    <svg class="deck-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+                                    <span>${deck.cards_count} ${deck.cards_count === 1 ? 'tarjeta' : 'tarjetas'}</span>
+                                </div>
+                                <span class="accuracy-badge ${accuracyClass}">
+                                    ${accuracyText}
+                                </span>
                             </div>
-                            <span class="accuracy-badge ${accuracyClass}">
-                                ${accuracyText}
-                            </span>
+                        </div>
+
+                        <div class="deck-actions">
+                            <button class="btn-study" onclick="startStudySession(${deck.id})" ${!hasCards ? 'disabled' : ''} title="${hasCards ? 'Comenzar a estudiar' : 'Agrega tarjetas primero para estudiar'}">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                                Estudiar
+                            </button>
+                            <button class="btn-deck-icon" onclick="openEditDeckModal(${deck.id}, event)" title="Editar mazo">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                            </button>
+                            <button class="btn-deck-icon" onclick="handleExportDeck(${deck.id}, event)" title="Exportar mazo (JSON)">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M10 16l4-4-4-4M14 16V4"/></svg>
+                            </button>
+                            <button class="btn-deck-icon" onclick="openManageSection(${deck.id}, '${escapeJs(deck.nombre)}')" title="Gestionar tarjetas">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+                            </button>
+                            <button class="btn-deck-icon delete-btn" onclick="handleDeleteDeck(${deck.id})" title="Eliminar mazo">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/></svg>
+                            </button>
                         </div>
                     </div>
+                `;
+            });
 
-                    <div class="deck-actions">
-                        <button class="btn-study" onclick="startStudySession(${deck.id})" ${!hasCards ? 'disabled' : ''} title="${hasCards ? 'Comenzar a estudiar' : 'Agrega tarjetas primero para estudiar'}">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-                            Estudiar
-                        </button>
-                        <button class="btn-deck-icon" onclick="openEditDeckModal(${deck.id}, event)" title="Editar mazo">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-                        </button>
-                        <button class="btn-deck-icon" onclick="handleExportDeck(${deck.id}, event)" title="Exportar mazo (JSON)">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M10 16l4-4-4-4M14 16V4"/></svg>
-                        </button>
-                        <button class="btn-deck-icon" onclick="openManageSection(${deck.id}, '${escapeJs(deck.nombre)}')" title="Gestionar tarjetas">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
-                        </button>
-                        <button class="btn-deck-icon delete-btn" onclick="handleDeleteDeck(${deck.id})" title="Eliminar mazo">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/></svg>
-                        </button>
+            html += `
                     </div>
                 </div>
             `;
         });
-        grid.innerHTML = html;
+        container.innerHTML = html;
 
         // Añadir efecto de brillo en movimiento del ratón
-        const cards = grid.querySelectorAll('.deck-card');
+        const cards = container.querySelectorAll('.deck-card');
         cards.forEach(card => {
             card.addEventListener('mousemove', (e) => {
                 const rect = card.getBoundingClientRect();
@@ -1653,9 +2114,33 @@
         });
     }
 
+    function handleDeckSelectCategoryChange() {
+        const select = document.getElementById('deck-select-category');
+        const wrapper = document.getElementById('new-category-input-wrapper');
+        const input = document.getElementById('deck-input-category');
+        if (select && wrapper && input) {
+            if (select.value === '__NEW__') {
+                wrapper.style.display = 'block';
+                input.focus();
+            } else {
+                wrapper.style.display = 'none';
+                input.value = '';
+            }
+        }
+    }
+
     // Modal de mazo
     function openCreateDeckModal() {
         document.getElementById('deck-edit-id').value = '';
+        document.getElementById('deck-input-name').value = '';
+        document.getElementById('deck-input-desc').value = '';
+        document.getElementById('deck-input-category').value = '';
+        
+        const select = document.getElementById('deck-select-category');
+        if (select) select.value = 'General';
+        const wrapper = document.getElementById('new-category-input-wrapper');
+        if (wrapper) wrapper.style.display = 'none';
+
         document.getElementById('deck-modal-title-text').innerText = 'Nuevo Mazo de Estudio';
         document.getElementById('btn-deck-submit').innerText = 'Crear Mazo';
         document.getElementById('create-deck-modal').classList.add('open');
@@ -1669,6 +2154,26 @@
         document.getElementById('deck-edit-id').value = deckId;
         document.getElementById('deck-input-name').value = deck.nombre;
         document.getElementById('deck-input-desc').value = deck.descripcion || '';
+        
+        const select = document.getElementById('deck-select-category');
+        const wrapper = document.getElementById('new-category-input-wrapper');
+        
+        if (select) {
+            const cat = deck.categoria || 'General';
+            const hasOption = Array.from(select.options).some(opt => opt.value === cat);
+            if (hasOption) {
+                select.value = cat;
+                if (wrapper) wrapper.style.display = 'none';
+            } else {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.innerText = cat;
+                select.insertBefore(opt, select.querySelector('option[value="__NEW__"]'));
+                select.value = cat;
+                if (wrapper) wrapper.style.display = 'none';
+            }
+        }
+        document.getElementById('deck-input-category').value = '';
         
         document.getElementById('deck-modal-title-text').innerText = 'Editar Mazo de Estudio';
         document.getElementById('btn-deck-submit').innerText = 'Guardar Cambios';
@@ -1685,6 +2190,11 @@
     function closeCreateDeckModal() {
         document.getElementById('create-deck-modal').classList.remove('open');
         document.getElementById('create-deck-form').reset();
+        document.getElementById('deck-input-category').value = '';
+        const select = document.getElementById('deck-select-category');
+        if (select) select.value = 'General';
+        const wrapper = document.getElementById('new-category-input-wrapper');
+        if (wrapper) wrapper.style.display = 'none';
         document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
         document.querySelector('.color-option[data-color="indigo"]').classList.add('selected');
     }
@@ -1710,6 +2220,15 @@
         const deckId = document.getElementById('deck-edit-id').value;
         const nombreInput = document.getElementById('deck-input-name');
         const descInput = document.getElementById('deck-input-desc');
+        const selectVal = document.getElementById('deck-select-category').value;
+        const categoriaInput = document.getElementById('deck-input-category');
+        let category = null;
+        if (selectVal === '__NEW__') {
+            category = categoriaInput.value.trim() || null;
+        } else if (selectVal !== 'General') {
+            category = selectVal;
+        }
+
         const selectedColorOpt = document.querySelector('.color-option.selected');
         const color = selectedColorOpt ? selectedColorOpt.getAttribute('data-color') : 'indigo';
 
@@ -1728,17 +2247,25 @@
                 body: JSON.stringify({
                     nombre: nombreInput.value.trim(),
                     descripcion: descInput.value.trim() || null,
-                    color: color
+                    color: color,
+                    categoria: category
                 })
             });
 
             if (!response.ok) throw new Error('Error al procesar mazo');
 
+            const createdOrUpdatedDeck = await response.json();
+
             closeCreateDeckModal();
             await loadDecks();
+
+            // Si es la creación de un nuevo mazo, redirigir directamente a la pantalla de gestión de tarjetas
+            if (method === 'POST') {
+                openManageSection(createdOrUpdatedDeck.id, createdOrUpdatedDeck.nombre);
+            }
         } catch (error) {
             console.error(error);
-            alert('No se pudo procesar el mazo. Intente de nuevo.');
+            showToast('No se pudo procesar el mazo. Intente de nuevo.', 'error');
         } finally {
             saveBtn.disabled = false;
             saveBtn.innerText = originalText;
@@ -1746,9 +2273,14 @@
     }
 
     async function handleDeleteDeck(deckId) {
-        if (!confirm('¿Estás seguro de que quieres eliminar este mazo? Se eliminarán también todas sus tarjetas asociadas.')) {
-            return;
-        }
+        const confirmed = await showCustomConfirm({
+            title: '¿Eliminar mazo?',
+            message: '¿Estás seguro de que quieres eliminar este mazo? Se eliminarán también todas sus tarjetas asociadas. Esta acción no se puede deshacer.',
+            acceptText: 'Eliminar',
+            cancelText: 'Cancelar',
+            isDestructive: true
+        });
+        if (!confirmed) return;
 
         try {
             const response = await fetch(`/api/flashcards/decks/${deckId}`, {
@@ -1758,9 +2290,10 @@
 
             if (!response.ok) throw new Error('Error al eliminar mazo');
             await loadDecks();
+            showToast('Mazo eliminado con éxito.', 'success');
         } catch (error) {
             console.error(error);
-            alert('No se pudo eliminar el mazo. Intente de nuevo.');
+            showToast('No se pudo eliminar el mazo. Intente de nuevo.', 'error');
         }
     }
 
@@ -1769,6 +2302,15 @@
     // ==========================================================================
     function startStudySession(deckId) {
         selectedDeckIdForStudy = deckId;
+        
+        // Restablecer la selección del modo de estudio a "all" al abrir el modal
+        const rAll = document.querySelector('input[name="study-mode-choice"][value="all"]');
+        if (rAll) {
+            rAll.checked = true;
+            // Disparar el evento change manualmente para actualizar la UI y ocultar el selector de cantidad
+            rAll.dispatchEvent(new Event('change'));
+        }
+        
         document.getElementById('study-mode-modal').classList.add('open');
     }
 
@@ -1784,24 +2326,34 @@
 
     function initStudyModeSelector() {
         const rAll = document.querySelector('input[name="study-mode-choice"][value="all"]');
-        const rLeitner = document.querySelector('input[name="study-mode-choice"][value="leitner"]');
         const rExam = document.querySelector('input[name="study-mode-choice"][value="exam"]');
         const lblAll = document.getElementById('label-mode-all');
-        const lblLeitner = document.getElementById('label-mode-leitner');
         const lblExam = document.getElementById('label-mode-exam');
 
-        const updateUI = (selected) => {
-            [lblAll, lblLeitner, lblExam].forEach(lbl => {
-                lbl.style.background = 'transparent';
-                lbl.style.borderColor = 'var(--border)';
+        const updateUI = (selected, mode) => {
+            [lblAll, lblExam].forEach(lbl => {
+                if (lbl) {
+                    lbl.style.background = 'transparent';
+                    lbl.style.borderColor = 'var(--border)';
+                }
             });
-            selected.style.background = 'var(--border-light)';
-            selected.style.borderColor = 'var(--brand)';
+            if (selected) {
+                selected.style.background = 'var(--border-light)';
+                selected.style.borderColor = 'var(--brand)';
+            }
+            
+            const examQtyWrapper = document.getElementById('exam-quantity-wrapper');
+            if (examQtyWrapper) {
+                if (mode === 'exam') {
+                    examQtyWrapper.style.display = 'block';
+                } else {
+                    examQtyWrapper.style.display = 'none';
+                }
+            }
         };
 
-        if(rAll) rAll.addEventListener('change', () => updateUI(lblAll));
-        if(rLeitner) rLeitner.addEventListener('change', () => updateUI(lblLeitner));
-        if(rExam) rExam.addEventListener('change', () => updateUI(lblExam));
+        if(rAll) rAll.addEventListener('change', () => updateUI(lblAll, 'all'));
+        if(rExam) rExam.addEventListener('change', () => updateUI(lblExam, 'exam'));
     }
 
     async function confirmStudySessionStart() {
@@ -1821,21 +2373,22 @@
 
             let cards = await response.json();
             if (cards.length === 0) {
-                alert('Este mazo no tiene tarjetas para estudiar.');
+                showToast('Este mazo no tiene tarjetas para estudiar.', 'error');
                 return;
             }
 
             currentStudyDeck = currentDecks.find(d => d.id === deckId);
             masterSessionCards = cards; // Guardar copia maestra para distractores
             
-            if (currentStudyMode === 'leitner') {
-                const activeCards = cards.filter(c => (c.caja || 1) < 5);
-                if (activeCards.length > 0) {
-                    cards = activeCards;
-                }
-                cards.sort((a, b) => (a.caja || 1) - (b.caja || 1));
-            } else if (currentStudyMode === 'exam') {
+            if (currentStudyMode === 'exam') {
                 cards = shuffleArray(cards);
+                const limitSelect = document.getElementById('exam-question-count');
+                if (limitSelect && limitSelect.value !== 'all') {
+                    const limit = parseInt(limitSelect.value, 10);
+                    if (!isNaN(limit)) {
+                        cards = cards.slice(0, limit);
+                    }
+                }
             } else {
                 cards = shuffleArray(cards);
             }
@@ -1858,7 +2411,7 @@
             }
         } catch (error) {
             console.error(error);
-            alert('Error al iniciar sesión de estudio.');
+            showToast('Error al iniciar sesión de estudio.', 'error');
         }
     }
 
@@ -1875,7 +2428,6 @@
             // Cargar datos del examen
             const qExamText = document.getElementById('exam-question-text');
             qExamText.innerHTML = parseCardText(card.pregunta);
-            document.getElementById('exam-card-leitner-badge').innerText = `Caja ${card.caja || 1}`;
 
             if (window.renderMathInElement) {
                 window.renderMathInElement(qExamText, {
@@ -1892,15 +2444,27 @@
 
             // Construir opciones de respuesta (Correcta + distractores)
             const correctAnswer = card.respuesta;
-            const distractors = masterSessionCards
-                .filter(c => c.id !== card.id)
-                .map(c => c.respuesta);
+            let options = [];
+
+            if (card.distractor_1) {
+                // Usar distractores de alta calidad generados por la IA y guardados en la DB
+                options = [
+                    correctAnswer,
+                    card.distractor_1,
+                    card.distractor_2,
+                    card.distractor_3
+                ];
+            } else {
+                // Fallback: extraer distractores al azar de otras tarjetas del mismo mazo (mazos manuales o antiguos)
+                const distractors = masterSessionCards
+                    .filter(c => c.id !== card.id)
+                    .map(c => c.respuesta);
+                
+                const shuffledDistractors = shuffleArray(distractors).slice(0, 3);
+                options = [correctAnswer, ...shuffledDistractors];
+            }
             
-            // Barajar distractores y tomar 3
-            const shuffledDistractors = shuffleArray(distractors).slice(0, 3);
-            
-            // Unir y volver a barajar
-            let options = [correctAnswer, ...shuffledDistractors];
+            // Barajar todas las opciones finales
             options = shuffleArray(options);
 
             // Pintar botones de opciones
@@ -1960,9 +2524,6 @@
                 });
             }
 
-            const box = card.caja || 1;
-            document.getElementById('card-leitner-badge-front').innerText = `Caja ${box}`;
-            document.getElementById('card-leitner-badge-back').innerText = `Caja ${box}`;
 
             const totalAttempts = (card.correctas || 0) + (card.incorrectas || 0);
             const accuracy = totalAttempts > 0 ? Math.round((card.correctas / totalAttempts) * 100) : null;
@@ -2089,6 +2650,9 @@
     }
 
     function triggerConfettiCelebration() {
+        if (typeof window.animacionesHabilitadas === 'function' && !window.animacionesHabilitadas()) {
+            return;
+        }
         if (typeof confetti === 'undefined') return;
 
         const duration = 3.5 * 1000;
@@ -2157,11 +2721,7 @@
     function restartStudySession() {
         sectionSummary.style.display = 'none';
         
-        if (currentStudyMode === 'leitner') {
-            currentStudyCards.sort((a, b) => (a.caja || 1) - (b.caja || 1));
-        } else {
-            currentStudyCards = shuffleArray(currentStudyCards);
-        }
+        currentStudyCards = shuffleArray(currentStudyCards);
 
         currentStudyIndex = 0;
         currentSessionCorrect = 0;
@@ -2175,8 +2735,18 @@
         }
     }
 
-    function exitStudySession() {
-        if (confirm('¿Estás seguro de que deseas salir del estudio activo? El progreso de esta sesión no se guardará.')) {
+    async function exitStudySession() {
+        const confirmed = await showCustomConfirm({
+            title: '¿Salir del estudio?',
+            message: '¿Estás seguro de que deseas salir del estudio activo? El progreso no guardado de esta sesión se perderá.',
+            acceptText: 'Salir',
+            cancelText: 'Cancelar',
+            isDestructive: true
+        });
+        if (confirmed) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
             disableKeyboardShortcuts();
             sectionStudy.style.display = 'none';
             sectionDecks.style.display = 'block';
@@ -2185,6 +2755,9 @@
     }
 
     function exitSummaryToDecks() {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
         sectionSummary.style.display = 'none';
         sectionDecks.style.display = 'block';
         loadDecks();
@@ -2206,7 +2779,7 @@
             try {
                 const data = JSON.parse(e.target.result);
                 if (!data.nombre || !data.cards || !Array.isArray(data.cards)) {
-                    alert('El archivo JSON no tiene el formato de mazo compatible con Cursus.');
+                    showToast('El archivo JSON no tiene el formato de mazo compatible con Cursus.', 'error');
                     return;
                 }
 
@@ -2218,11 +2791,11 @@
 
                 if (!response.ok) throw new Error('Error al importar');
 
-                alert('Mazo importado con éxito.');
+                showToast('Mazo importado con éxito. ✨', 'success');
                 loadDecks();
             } catch (err) {
                 console.error(err);
-                alert('No se pudo leer o importar el archivo JSON. Verifica su estructura.');
+                showToast('No se pudo leer o importar el archivo JSON. Verifica su estructura.', 'error');
             } finally {
                 event.target.value = '';
             }
@@ -2248,7 +2821,14 @@
                 nombre: deck.nombre,
                 descripcion: deck.descripcion,
                 color: deck.color,
-                cards: cards.map(c => ({ pregunta: c.pregunta, respuesta: c.respuesta }))
+                categoria: deck.categoria,
+                cards: cards.map(c => ({
+                    pregunta: c.pregunta,
+                    respuesta: c.respuesta,
+                    distractor_1: c.distractor_1,
+                    distractor_2: c.distractor_2,
+                    distractor_3: c.distractor_3
+                }))
             };
 
             const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
@@ -2260,9 +2840,10 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            showToast('Mazo exportado con éxito. ✨', 'success');
         } catch (err) {
             console.error(err);
-            alert('Error al exportar el mazo.');
+            showToast('Error al exportar el mazo.', 'error');
         }
     }
 
@@ -2356,7 +2937,18 @@
                             <label>Respuesta (Reverso)</label>
                             <textarea id="edit-textarea-a-${card.id}" class="fc-input fc-textarea" style="min-height:50px;" required>${escapeHtml(card.respuesta)}</textarea>
                         </div>
-                        <div class="card-edit-actions">
+                        <div style="margin-top: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                                <span style="font-size:0.8rem; font-weight:600; color:var(--t2);">Opciones incorrectas (Opcional)</span>
+                                <button type="button" id="btn-edit-suggest-${card.id}" onclick="handleEditSuggestDistractors(${card.id})" style="background:var(--border-light); border:1px solid var(--border); border-radius:4px; padding:0.15rem 0.4rem; font-size:0.7rem; font-weight:600; color:var(--brand); cursor:pointer; display:flex; align-items:center; gap:0.2rem; transition:all 0.2s;">
+                                    <span>Sugerir con IA ✨</span>
+                                </button>
+                            </div>
+                            <input type="text" id="edit-input-d1-${card.id}" class="fc-input" placeholder="Opción incorrecta 1" value="${escapeHtml(card.distractor_1 || '')}" style="font-size:0.75rem; padding:0.4rem; margin-bottom:0.4rem; width:100%;">
+                            <input type="text" id="edit-input-d2-${card.id}" class="fc-input" placeholder="Opción incorrecta 2" value="${escapeHtml(card.distractor_2 || '')}" style="font-size:0.75rem; padding:0.4rem; margin-bottom:0.4rem; width:100%;">
+                            <input type="text" id="edit-input-d3-${card.id}" class="fc-input" placeholder="Opción incorrecta 3" value="${escapeHtml(card.distractor_3 || '')}" style="font-size:0.75rem; padding:0.4rem; width:100%;">
+                        </div>
+                        <div class="card-edit-actions" style="margin-top: 0.75rem;">
                             <button class="btn-card-cancel" onclick="cancelEditCard(${card.id})">Cancelar</button>
                             <button class="btn-card-save" onclick="saveEditCard(${card.id})">Guardar</button>
                         </div>
@@ -2393,12 +2985,111 @@
         document.getElementById(`card-edit-form-${cardId}`).style.display = 'none';
     }
 
+    async function handleSuggestDistractors() {
+        const qVal = document.getElementById('card-input-question').value.trim();
+        const aVal = document.getElementById('card-input-answer').value.trim();
+        
+        if (!qVal || !aVal) {
+            showToast('Por favor, escribe la Pregunta y la Respuesta primero.', 'error');
+            return;
+        }
+
+        const btn = document.getElementById('btn-suggest-distractors');
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span>Generando... ⏳</span>';
+
+        try {
+            const currentDeck = currentDecks.find(d => d.id === manageDeckId);
+            const category = currentDeck ? currentDeck.categoria : 'General';
+
+            const response = await fetch('/api/flashcards/cards/generate-distractors', {
+                method: 'POST',
+                headers: getApiHeaders(),
+                body: JSON.stringify({
+                    pregunta: qVal,
+                    respuesta: aVal,
+                    categoria: category
+                })
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.message || 'Error al generar distractores.');
+            }
+
+            const data = await response.json();
+            document.getElementById('card-input-d1').value = data.distractor_1 || '';
+            document.getElementById('card-input-d2').value = data.distractor_2 || '';
+            document.getElementById('card-input-d3').value = data.distractor_3 || '';
+            showToast('¡Opciones incorrectas sugeridas con éxito! ✨', 'success');
+
+        } catch (error) {
+            console.error(error);
+            showToast('No se pudieron generar las opciones con IA. Inténtalo de nuevo.', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    }
+
+    async function handleEditSuggestDistractors(cardId) {
+        const qVal = document.getElementById(`edit-textarea-q-${cardId}`).value.trim();
+        const aVal = document.getElementById(`edit-textarea-a-${cardId}`).value.trim();
+        
+        if (!qVal || !aVal) {
+            showToast('Por favor, escribe la Pregunta y la Respuesta primero.', 'error');
+            return;
+        }
+
+        const btn = document.getElementById(`btn-edit-suggest-${cardId}`);
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span>Generando... ⏳</span>';
+
+        try {
+            const currentDeck = currentDecks.find(d => d.id === manageDeckId);
+            const category = currentDeck ? currentDeck.categoria : 'General';
+
+            const response = await fetch('/api/flashcards/cards/generate-distractors', {
+                method: 'POST',
+                headers: getApiHeaders(),
+                body: JSON.stringify({
+                    pregunta: qVal,
+                    respuesta: aVal,
+                    categoria: category
+                })
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.message || 'Error al generar distractores.');
+            }
+
+            const data = await response.json();
+            document.getElementById(`edit-input-d1-${cardId}`).value = data.distractor_1 || '';
+            document.getElementById(`edit-input-d2-${cardId}`).value = data.distractor_2 || '';
+            document.getElementById(`edit-input-d3-${cardId}`).value = data.distractor_3 || '';
+            showToast('¡Opciones incorrectas sugeridas con éxito! ✨', 'success');
+
+        } catch (error) {
+            console.error(error);
+            showToast('No se pudieron generar las opciones con IA. Inténtalo de nuevo.', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    }
+
     async function saveEditCard(cardId) {
         const pregunta = document.getElementById(`edit-textarea-q-${cardId}`).value.trim();
         const respuesta = document.getElementById(`edit-textarea-a-${cardId}`).value.trim();
+        const dist1 = document.getElementById(`edit-input-d1-${cardId}`).value.trim() || null;
+        const dist2 = document.getElementById(`edit-input-d2-${cardId}`).value.trim() || null;
+        const dist3 = document.getElementById(`edit-input-d3-${cardId}`).value.trim() || null;
         
         if (!pregunta || !respuesta) {
-            alert('Ambos campos son requeridos');
+            showToast('Ambos campos son requeridos', 'error');
             return;
         }
 
@@ -2406,16 +3097,23 @@
             const response = await fetch(`/api/flashcards/cards/${cardId}`, {
                 method: 'PUT',
                 headers: getApiHeaders(),
-                body: JSON.stringify({ pregunta, respuesta })
+                body: JSON.stringify({ 
+                    pregunta, 
+                    respuesta,
+                    distractor_1: dist1,
+                    distractor_2: dist2,
+                    distractor_3: dist3
+                })
             });
 
             if (!response.ok) throw new Error('Error al actualizar tarjeta');
 
             editingCardId = null;
             await loadManageCards();
+            showToast('Tarjeta guardada con éxito.', 'success');
         } catch (error) {
             console.error(error);
-            alert('No se pudo guardar la tarjeta. Intente de nuevo.');
+            showToast('No se pudo guardar la tarjeta. Intente de nuevo.', 'error');
         }
     }
 
@@ -2423,6 +3121,9 @@
         event.preventDefault();
         const preguntaInput = document.getElementById('card-input-question');
         const respuestaInput = document.getElementById('card-input-answer');
+        const d1Input = document.getElementById('card-input-d1');
+        const d2Input = document.getElementById('card-input-d2');
+        const d3Input = document.getElementById('card-input-d3');
         const submitBtn = event.target.querySelector('.btn-add-card');
 
         submitBtn.disabled = true;
@@ -2434,7 +3135,10 @@
                 headers: getApiHeaders(),
                 body: JSON.stringify({
                     pregunta: preguntaInput.value.trim(),
-                    respuesta: respuestaInput.value.trim()
+                    respuesta: respuestaInput.value.trim(),
+                    distractor_1: d1Input.value.trim() || null,
+                    distractor_2: d2Input.value.trim() || null,
+                    distractor_3: d3Input.value.trim() || null
                 })
             });
 
@@ -2442,11 +3146,15 @@
 
             preguntaInput.value = '';
             respuestaInput.value = '';
+            d1Input.value = '';
+            d2Input.value = '';
+            d3Input.value = '';
             preguntaInput.focus();
             await loadManageCards();
+            showToast('Tarjeta añadida con éxito.', 'success');
         } catch (error) {
             console.error(error);
-            alert('No se pudo guardar la tarjeta. Intenta de nuevo.');
+            showToast('No se pudo guardar la tarjeta. Intente de nuevo.', 'error');
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerText = 'Guardar Tarjeta';
@@ -2454,9 +3162,14 @@
     }
 
     async function handleDeleteCard(cardId) {
-        if (!confirm('¿Estás seguro de que quieres eliminar esta tarjeta?')) {
-            return;
-        }
+        const confirmed = await showCustomConfirm({
+            title: '¿Eliminar tarjeta?',
+            message: '¿Estás seguro de que quieres eliminar esta tarjeta? Esta acción no se puede deshacer.',
+            acceptText: 'Eliminar',
+            cancelText: 'Cancelar',
+            isDestructive: true
+        });
+        if (!confirmed) return;
 
         try {
             const response = await fetch(`/api/flashcards/cards/${cardId}`, {
@@ -2466,9 +3179,10 @@
 
             if (!response.ok) throw new Error('Error al eliminar tarjeta');
             await loadManageCards();
+            showToast('Tarjeta eliminada con éxito.', 'success');
         } catch (error) {
             console.error(error);
-            alert('No se pudo eliminar la tarjeta. Intente de nuevo.');
+            showToast('No se pudo eliminar la tarjeta. Intente de nuevo.', 'error');
         }
     }
 
@@ -2512,21 +3226,279 @@
                    .replace(/\r/g, '\\r');
     }
 
-    // Parsear Markdown (código) y saltos de línea
+    // Parsear Markdown (código, negrita, cursiva, listas) y saltos de línea
     function parseCardText(text) {
         if (!text) return '';
         let escaped = escapeHtml(text);
         
-        // Bloques de código
-        escaped = escaped.replace(/```(?:[a-zA-Z0-9]+)?\n([\s\S]*?)\n```/g, '<pre style="background:var(--border-light); padding:0.75rem; border-radius:var(--r-sm); overflow-x:auto; text-align:left; font-family:monospace; font-size:0.85rem; border:1px solid var(--border); width:100%; white-space:pre-wrap; margin: 1rem 0;"><code>$1</code></pre>');
+        // Bloques de código (multilínea) con look de terminal oscuro
+        escaped = escaped.replace(/```(?:[a-zA-Z0-9]+)?\n([\s\S]*?)\n```/g, '<pre style="background:#0f172a; color:#e2e8f0; padding:0.75rem; border-radius:8px; overflow-x:auto; text-align:left; font-family:monospace; font-size:0.82rem; border:1px solid rgba(255,255,255,0.08); width:100%; white-space:pre-wrap; margin: 0.75rem 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);"><code>$1</code></pre>');
         
         // Código inline
-        escaped = escaped.replace(/`([^`]+)`/g, '<code style="background:var(--border-light); padding:0.15rem 0.35rem; border-radius:var(--r-sm); font-family:monospace; font-size:0.88rem; border:1px solid var(--border); font-weight:500;">$1</code>');
+        escaped = escaped.replace(/`([^`]+)`/g, '<code style="background:rgba(99,102,241,0.08); color:var(--brand); padding:0.15rem 0.35rem; border-radius:4px; font-family:monospace; font-size:0.85rem; border:1px solid var(--brand-dim); font-weight:600;">$1</code>');
+        
+        // Negrita (**texto**)
+        escaped = escaped.replace(/\*\*([\s\S]*?)\*\*/g, '<strong style="font-weight:700;">$1</strong>');
+        
+        // Cursiva (*texto*)
+        escaped = escaped.replace(/\*([\s\S]*?)\*/g, '<em style="font-style:italic;">$1</em>');
+        
+        // Listas con viñetas:
+        // Procesar línea por línea para estructurar listas de forma semántica
+        let lines = escaped.split('\n');
+        let inList = false;
+        let processedLines = [];
+        
+        lines.forEach(line => {
+            let trimmed = line.trim();
+            if (trimmed.startsWith('- ')) {
+                if (!inList) {
+                    processedLines.push('<ul style="text-align: left; margin: 0.5rem 0 0.5rem 1.5rem; list-style-type: disc; width: 100%;">');
+                    inList = true;
+                }
+                processedLines.push('<li style="margin-bottom: 0.25rem; font-size: 0.95rem; line-height: 1.5; color: inherit;">' + trimmed.substring(2) + '</li>');
+            } else {
+                if (inList) {
+                    processedLines.push('</ul>');
+                    inList = false;
+                }
+                processedLines.push(line);
+            }
+        });
+        if (inList) {
+            processedLines.push('</ul>');
+        }
+        
+        escaped = processedLines.join('\n');
         
         // Saltos de línea
         escaped = escaped.replace(/\n/g, '<br>');
         
         return escaped;
+    }
+
+    // Lógica Text-To-Speech (Lectura en Voz Alta)
+    function speakCardText(event, elementId) {
+        if (event) event.stopPropagation(); // Evitar que gire la tarjeta
+        
+        if (!('speechSynthesis' in window)) {
+            showToast('Tu navegador no soporta síntesis de voz.', 'error');
+            return;
+        }
+        
+        window.speechSynthesis.cancel(); // Cancelar cualquier lectura activa
+        
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        
+        // Extraer texto plano libre de formato markdown
+        let cleanText = el.innerText
+            .replace(/```[\s\S]*?```/g, '') // Eliminar bloques de código
+            .replace(/`([^`]+)`/g, '$1')     // Código inline a texto
+            .replace(/\*\*([^*]+)\*\*/g, '$1') // Negrita a texto
+            .replace(/\*([^*]+)\*/g, '$1')     // Cursiva a texto
+            .replace(/[-*]\s+/g, '')          // Viñetas
+            .trim();
+            
+        if (!cleanText) return;
+        
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = 'es-ES'; // Configurar voz en Español
+        
+        // Intentar seleccionar la voz en español de mejor calidad
+        const voices = window.speechSynthesis.getVoices();
+        const esVoice = voices.find(v => v.lang.startsWith('es'));
+        if (esVoice) utterance.voice = esVoice;
+        
+        window.speechSynthesis.speak(utterance);
+    }
+
+    // Toast helper para notificaciones
+    function showToast(message, type = 'error') {
+        let container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            container.style.position = 'fixed';
+            container.style.top = '1.5rem';
+            container.style.right = '1.5rem';
+            container.style.zIndex = '9999';
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.gap = '0.5rem';
+            container.style.maxWidth = '320px';
+            document.body.appendChild(container);
+        }
+        
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.style.background = type === 'success' ? '#10b981' : '#ef4444'; // Fondo 100% sólido y de alto contraste
+        toast.style.color = '#ffffff';
+        toast.style.padding = '0.75rem 1.25rem';
+        toast.style.borderRadius = 'var(--r-sm)';
+        toast.style.fontSize = '0.85rem';
+        toast.style.fontWeight = '600';
+        toast.style.boxShadow = 'var(--sh-md)';
+        toast.style.display = 'flex';
+        toast.style.alignItems = 'center';
+        toast.style.gap = '0.5rem';
+        toast.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+        toast.style.animation = 'fadeInEffect 0.3s ease';
+        
+        let icon = type === 'success' ? '✓' : '✕';
+        toast.innerHTML = `<span style="font-size:1.1rem; line-height:1;">${icon}</span> <span>${message}</span>`;
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-10px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
+
+    function handleAIDeckSelectCategoryChange() {
+        const select = document.getElementById('ai-deck-select-category');
+        const wrapper = document.getElementById('ai-new-category-input-wrapper');
+        const input = document.getElementById('ai-deck-input-category');
+        if (select && wrapper && input) {
+            if (select.value === '__NEW__') {
+                wrapper.style.display = 'block';
+                input.focus();
+            } else {
+                wrapper.style.display = 'none';
+                input.value = '';
+            }
+        }
+    }
+
+    function openAIDeckModal() {
+        const select = document.getElementById('ai-deck-select-category');
+        if (select) select.value = '__AUTO__';
+        const wrapper = document.getElementById('ai-new-category-input-wrapper');
+        if (wrapper) wrapper.style.display = 'none';
+        document.getElementById('ai-deck-input-category').value = '';
+
+        document.getElementById('ai-deck-modal').classList.add('open');
+    }
+
+    // Modal de IA cerrar
+    function closeAIDeckModal() {
+        document.getElementById('ai-deck-modal').classList.remove('open');
+        document.getElementById('ai-deck-form').reset();
+        const select = document.getElementById('ai-deck-select-category');
+        if (select) select.value = '__AUTO__';
+        const wrapper = document.getElementById('ai-new-category-input-wrapper');
+        if (wrapper) wrapper.style.display = 'none';
+        document.getElementById('ai-deck-input-category').value = '';
+    }
+
+    function closeAIDeckModalOnOverlay(event) {
+        if (event.target === document.getElementById('ai-deck-modal')) {
+            closeAIDeckModal();
+        }
+    }
+
+    async function handleAICreateDeck(event) {
+        event.preventDefault();
+        
+        const fileInput = document.getElementById('ai-deck-file');
+        if (!fileInput.files.length) {
+            showToast('Por favor, selecciona un archivo.', 'error');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const countInput = document.getElementById('ai-deck-cards-count');
+        if (countInput) {
+            formData.append('cantidad', countInput.value);
+        }
+
+        const selectVal = document.getElementById('ai-deck-select-category').value;
+        const newCatInput = document.getElementById('ai-deck-input-category');
+        let category = '__AUTO__';
+        if (selectVal === '__NEW__') {
+            category = newCatInput.value.trim() || '__AUTO__';
+        } else {
+            category = selectVal;
+        }
+        formData.append('categoria', category);
+
+        // Cerrar modal de carga de archivos y abrir overlay de progreso
+        closeAIDeckModal();
+        
+        const loadingOverlay = document.getElementById('ai-loading-overlay');
+        const loadingTitle = document.getElementById('ai-loading-title');
+        const loadingText = document.getElementById('ai-loading-text');
+        
+        loadingOverlay.style.display = 'flex';
+        setTimeout(() => {
+            loadingOverlay.classList.add('open');
+        }, 10);
+        loadingTitle.textContent = 'Subiendo archivo...';
+        loadingText.textContent = 'Tu documento se está cargando en el servidor local.';
+
+        // Simular fases en la UI de carga para dar un look premium interactivo
+        const phases = [
+            { t: 1500, title: 'Procesando archivo...', text: 'Analizando el documento o imagen subida.' },
+            { t: 4000, title: 'Analizando contenido...', text: 'La IA de Cursus está leyendo y estructurando los conceptos principales.' },
+            { t: 8500, title: 'Diseñando flashcards...', text: 'Redactando las mejores preguntas y respuestas académicas para ti.' },
+            { t: 13000, title: 'Finalizando creación...', text: 'Guardando el mazo en la base de datos de tu panel.' }
+        ];
+
+        const timers = [];
+        phases.forEach(phase => {
+            timers.push(setTimeout(() => {
+                loadingTitle.textContent = phase.title;
+                loadingText.textContent = phase.text;
+            }, phase.t));
+        });
+
+        try {
+            const headers = getApiHeaders();
+            delete headers['Content-Type']; // Permitir al navegador añadir el boundary de FormData
+
+            const response = await fetch('/api/flashcards/decks/generate-ia', {
+                method: 'POST',
+                headers: headers,
+                body: formData
+            });
+
+            // Cancelar todos los timers de animación simulada
+            timers.forEach(t => clearTimeout(t));
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.message || 'Error en la generación con IA.');
+            }
+
+            const createdDeck = await response.json();
+            
+            showToast('¡Mazo generado con IA con éxito! ✨', 'success');
+            
+            // Recargar la lista y simular clic para estudiar
+            await loadDecks();
+            
+            // Cerrar carga
+            loadingOverlay.classList.remove('open');
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+            }, 250);
+
+            // Preguntar si quiere estudiar de inmediato
+            startStudySession(createdDeck.id);
+
+        } catch (error) {
+            timers.forEach(t => clearTimeout(t));
+            loadingOverlay.classList.remove('open');
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+            }, 250);
+            showToast(error.message || 'No se pudo generar el mazo.', 'error');
+            openAIDeckModal(); // Volver a abrir el modal de subida si falla
+        }
     }
 </script>
 @endpush

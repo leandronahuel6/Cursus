@@ -26,33 +26,8 @@
   </div>
 
   <nav class="sb-nav" id="sb-nav">
-    <div class="nav-item {{ Request::routeIs('dashboard') ? 'active' : '' }}" onclick="location.href='{{ route('dashboard') }}'" title="Inicio">
-      <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#layout-dashboard') }}"></use></svg>
-      <span class="nav-text">Inicio</span>
-    </div>
-    <div class="nav-item {{ Request::routeIs('materias') ? 'active' : '' }}" onclick="location.href='{{ route('materias') }}'" title="Mis Materias">
-      <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#library') }}"></use></svg>
-      <span class="nav-text">Mis Materias</span>
-    </div>
-    <div class="nav-item {{ Request::routeIs('area-estudio') ? 'active' : '' }}" onclick="location.href='{{ route('area-estudio') }}'" title="Área de Estudio">
-      <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#clock') }}"></use></svg>
-      <span class="nav-text">Área de Estudio</span>
-    </div>
 
-    <div class="nav-group">Académico</div>
-    <div class="nav-item {{ Request::routeIs('horarios') ? 'active' : '' }}" onclick="location.href='{{ route('horarios') }}'" title="Simulador de Horarios">
-      <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#calendar') }}"></use></svg>
-      <span class="nav-text">Simulador de Horarios</span>
-    </div>
-    <div class="nav-item {{ Request::routeIs('beneficios') ? 'active' : '' }}" onclick="location.href='{{ route('beneficios') }}'" title="Beneficios">
-      <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#gift') }}"></use></svg>
-      <span class="nav-text">Beneficios</span>
-    </div>
-    <div class="nav-item {{ Request::routeIs('flashcards') ? 'active' : '' }}" onclick="location.href='{{ route('flashcards') }}'" title="Flashcards">
-      <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#book-copy') }}"></use></svg>
-      <span class="nav-text">Flashcards</span>
-    </div>
-    <!-- Sección admin: visible solo si role === 'admin' (controlado por JS en profile.js) -->
+    <!-- Sección admin: visible solo si role === 'admin' (controlado por JS) -->
     <div class="nav-group" id="admin-nav-group" style="display:none">Administración</div>
     <div class="nav-item {{ Request::routeIs('admin.alumnos') ? 'active' : '' }}" id="admin-nav-alumnos" style="display:none" onclick="location.href='{{ route('admin.alumnos') }}'" title="Alumnos">
       <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#users') }}"></use></svg>
@@ -67,16 +42,55 @@
       <span class="nav-text">Plan de Estudios</span>
     </div>
 
-    <div class="nav-group">Personal</div>
-    <div class="nav-item {{ Request::routeIs('alertas') ? 'active' : '' }}" onclick="location.href='{{ route('alertas') }}'" title="Alertas">
-      <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#bell') }}"></use></svg>
-      <span class="nav-text">Alertas</span>
-      <span class="nav-badge" id="nav-badge-count">0</span>
+    <!-- Toggle "Vista Alumno": solo visible para admins, colapsa los ítems de alumno -->
+    <div class="nav-group nav-group-collapsible" id="sb-vista-alumno-toggle" style="display:none" onclick="window.toggleVistaAlumno()" title="Vista Alumno">
+      <span>Vista Alumno</span>
+      <svg class="va-chevron" id="va-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </div>
-    <div class="nav-item {{ Request::routeIs('progreso') ? 'active' : '' }}" onclick="location.href='{{ route('progreso') }}'" title="Mi Progreso">
-      <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#trending-up') }}"></use></svg>
-      <span class="nav-text">Mi Progreso</span>
+
+    <!-- Ítems de alumno: siempre visibles para usuarios normales, colapsables para admin -->
+    <div id="sb-alumno-items">
+      <div class="nav-item {{ Request::routeIs('dashboard') ? 'active' : '' }}" onclick="location.href='{{ route('dashboard') }}'" title="Inicio">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#layout-dashboard') }}"></use></svg>
+        <span class="nav-text">Inicio</span>
+      </div>
+      <div class="nav-item {{ Request::routeIs('materias') ? 'active' : '' }}" onclick="location.href='{{ route('materias') }}'" title="Mis Materias">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#library') }}"></use></svg>
+        <span class="nav-text">Mis Materias</span>
+      </div>
+      <div class="nav-item {{ Request::routeIs('area-estudio') ? 'active' : '' }}" onclick="location.href='{{ route('area-estudio') }}'" title="Área de Estudio">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#clock') }}"></use></svg>
+        <span class="nav-text">Área de Estudio</span>
+      </div>
+
+      <div class="nav-group">Académico</div>
+      <div class="nav-item {{ Request::routeIs('horarios') ? 'active' : '' }}" onclick="location.href='{{ route('horarios') }}'" title="Simulador de Horarios">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#calendar') }}"></use></svg>
+        <span class="nav-text">Simulador de Horarios</span>
+      </div>
+      <div class="nav-item {{ Request::routeIs('beneficios') ? 'active' : '' }}" onclick="location.href='{{ route('beneficios') }}'" title="Beneficios">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#gift') }}"></use></svg>
+        <span class="nav-text">Beneficios</span>
+      </div>
+      <div class="nav-item {{ Request::routeIs('flashcards') ? 'active' : '' }}" onclick="location.href='{{ route('flashcards') }}'" title="Flashcards">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#book-copy') }}"></use></svg>
+        <span class="nav-text">Flashcards</span>
+      </div>
+
+      <div class="nav-group">Personal</div>
+      <div class="nav-item {{ Request::routeIs('alertas') ? 'active' : '' }}" onclick="location.href='{{ route('alertas') }}'" title="Alertas">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#bell') }}"></use></svg>
+        <span class="nav-text">Alertas</span>
+        <span class="nav-badge" id="nav-badge-count">0</span>
+      </div>
+      <div class="nav-item {{ Request::routeIs('progreso') ? 'active' : '' }}" onclick="location.href='{{ route('progreso') }}'" title="Mi Progreso">
+        <svg class="nav-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#trending-up') }}"></use></svg>
+        <span class="nav-text">Mi Progreso</span>
+      </div>
     </div>
+
   </nav>
 
   <div class="sb-user" onclick="window.toggleProfileMenu(event)" title="Opciones de perfil">
