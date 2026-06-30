@@ -362,6 +362,13 @@
         </div>
       </div>
 
+      <div class="modal-field">
+        <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
+          <input type="checkbox" id="pomo-strict-toggle" style="width: 15px; height: 15px; cursor: pointer; margin: 0;">
+          <span style="font-weight: 500; font-size: 13px; color: var(--t1);">🔒 Modo Estricto (Penaliza si cambias de pestaña o sales)</span>
+        </label>
+      </div>
+
       <div id="pomo-validation-error" style="color: var(--red); font-size:12px; font-weight:600; display:none;"></div>
 
     </div>
@@ -423,6 +430,17 @@
         <button class="focus-goal-complete-btn" id="focus-goal-complete-btn" onclick="window.completeFocusActiveTask()" title="Marcar tarea como completada" style="display: none;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </button>
+        <button class="focus-goal-complete-btn" id="focus-subtasks-toggle" onclick="window.toggleFocusSubtasksDrawer()" title="Ver checklist de subtareas" style="display: none; background: rgba(255,255,255,0.15); margin-left: 0.35rem;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Cajón de Subtareas colapsable -->
+    <div id="focus-subtasks-drawer" class="focus-subtasks-drawer">
+      <div class="focus-subtasks-header">Checklist de Subtareas</div>
+      <div id="focus-subtasks-list" class="focus-subtasks-list">
+        <!-- Se inyecta por JS -->
       </div>
     </div>
     
@@ -460,26 +478,66 @@
   <div class="focus-bottom-bar">
     <!-- Selector de Temas -->
     <div class="focus-themes-wrapper">
-      <button class="focus-theme-btn active" id="theme-btn-aurora" onclick="window.changeFocusTheme('aurora')">🌌 Aurora</button>
-      <button class="focus-theme-btn" id="theme-btn-rain" onclick="window.changeFocusTheme('rain')">🌧️ Lluvia</button>
-      <button class="focus-theme-btn" id="theme-btn-fire" onclick="window.changeFocusTheme('fire')">🔥 Fogón</button>
+      <button class="focus-theme-btn active" id="theme-btn-aurora" onclick="window.changeFocusTheme('aurora')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Aurora</span>
+      </button>
+      <button class="focus-theme-btn" id="theme-btn-rain" onclick="window.changeFocusTheme('rain')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><path d="M8 16v4M12 14v6M16 16v4"/></svg>
+        <span>Lluvia</span>
+      </button>
+      <button class="focus-theme-btn" id="theme-btn-fire" onclick="window.changeFocusTheme('fire')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+        <span>Fogón</span>
+      </button>
+      <button class="focus-theme-btn" id="theme-btn-forest" onclick="window.changeFocusTheme('forest')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19 7-7H5l7 7Z"/><path d="m12 13 6-6H6l6 6Z"/><path d="m12 7 5-5H7l5 5Z"/><path d="M12 19v3"/></svg>
+        <span>Bosque</span>
+      </button>
+      <button class="focus-theme-btn" id="theme-btn-ocean" onclick="window.changeFocusTheme('ocean')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6 0 1.2-.2 1.6-.6L6.2 3c.8-.8 2-.8 2.8 0l2.6 2.6c.4.4 1 .6 1.6.6.6 0 1.2-.2 1.6-.6L17.4 3c.8-.8 2-.8 2.8 0l2.6 2.6c.4.4 1 .6 1.6.6M2 12c.6 0 1.2-.2 1.6-.6l2.6-2.6c.8-.8 2-.8 2.8 0l2.6 2.6c.4.4 1 .6 1.6.6.6 0 1.2-.2 1.6-.6l2.6-2.6c.8-.8 2-.8 2.8 0l2.6 2.6c.4.4 1 .6 1.6.6M2 18c.6 0 1.2-.2 1.6-.6l2.6-2.6c.8-.8 2-.8 2.8 0l2.6 2.6c.4.4 1 .6 1.6.6.6 0 1.2-.2 1.6-.6l2.6-2.6c.8-.8 2-.8 2.8 0l2.6 2.6c.4.4 1 .6 1.6.6"/></svg>
+        <span>Océano</span>
+      </button>
     </div>
 
     <!-- Mezclador de Sonidos Ambientales -->
     <div class="focus-audio-mixer">
-      <div class="focus-audio-control">
-        <span onclick="window.toggleRainAudio()" id="mixer-icon-rain" style="cursor: pointer;" title="Encender/Apagar sonido de lluvia">🌧️</span>
+      <div class="focus-audio-control" id="mixer-control-rain">
+        <span onclick="window.toggleRainAudio()" id="mixer-icon-rain" style="cursor: pointer; display: flex; align-items: center;" title="Encender/Apagar sonido de lluvia">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><path d="M8 16v4M12 14v6M16 16v4"/></svg>
+        </span>
         <input type="range" id="focus-vol-rain" min="0" max="1" step="0.05" value="0" oninput="window.setRainVolume(this.value)">
       </div>
-      <div class="focus-audio-control">
-        <span onclick="window.toggleFireAudio()" id="mixer-icon-fire" style="cursor: pointer;" title="Encender/Apagar sonido de fogón">🔥</span>
+      <div class="focus-audio-control" id="mixer-control-fire">
+        <span onclick="window.toggleFireAudio()" id="mixer-icon-fire" style="cursor: pointer; display: flex; align-items: center;" title="Encender/Apagar sonido de fogón">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+        </span>
         <input type="range" id="focus-vol-fire" min="0" max="1" step="0.05" value="0" oninput="window.setFireVolume(this.value)">
+      </div>
+      <div class="focus-audio-control" id="mixer-control-forest">
+        <span onclick="window.toggleForestAudio()" id="mixer-icon-forest" style="cursor: pointer; display: flex; align-items: center;" title="Encender/Apagar sonido de bosque">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19 7-7H5l7 7Z"/><path d="m12 13 6-6H6l6 6Z"/><path d="m12 7 5-5H7l5 5Z"/><path d="M12 19v3"/></svg>
+        </span>
+        <input type="range" id="focus-vol-forest" min="0" max="1" step="0.05" value="0" oninput="window.setForestVolume(this.value)">
+      </div>
+      <div class="focus-audio-control" id="mixer-control-ocean">
+        <span onclick="window.toggleOceanAudio()" id="mixer-icon-ocean" style="cursor: pointer; display: flex; align-items: center;" title="Encender/Apagar sonido de océano">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6 0 1.2-.2 1.6-.6L6.2 3c.8-.8 2-.8 2.8 0l2.6 2.6c.4.4 1 .6 1.6.6.6 0 1.2-.2 1.6-.6L17.4 3c.8-.8 2-.8 2.8 0l2.6 2.6c.4.4 1 .6 1.6.6M2 12c.6 0 1.2-.2 1.6-.6l2.6-2.6c.8-.8 2-.8 2.8 0l2.6 2.6c.4.4 1 .6 1.6.6.6 0 1.2-.2 1.6-.6l2.6-2.6c.8-.8 2-.8 2.8 0l2.6 2.6c.4.4 1 .6 1.6.6M2 18c.6 0 1.2-.2 1.6-.6l2.6-2.6c.8-.8 2-.8 2.8 0l2.6 2.6c.4.4 1 .6 1.6.6.6 0 1.2-.2 1.6-.6l2.6-2.6c.8-.8 2-.8 2.8 0l2.6 2.6c.4.4 1 .6 1.6.6"/></svg>
+        </span>
+        <input type="range" id="focus-vol-ocean" min="0" max="1" step="0.05" value="0" oninput="window.setOceanVolume(this.value)">
       </div>
     </div>
 
     <!-- Botón de Música Lofi -->
     <button class="focus-theme-btn" id="lofi-panel-toggle" onclick="window.toggleLofiPanel()" title="Música Lofi">
-      🎵 Música Lofi
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+      <span>Música Lofi</span>
+    </button>
+
+    <!-- Botón de Pantalla Completa -->
+    <button class="focus-theme-btn" id="focus-fullscreen-toggle" onclick="window.toggleFullscreen()" title="Pantalla Completa">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      <span id="focus-fullscreen-text">Pantalla Completa</span>
     </button>
 
     <!-- Botón de Salir -->
