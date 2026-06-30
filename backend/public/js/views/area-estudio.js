@@ -1781,6 +1781,11 @@ async function loadMateriasCursando() {
   if (materiasCursando.length === 0) {
     document.getElementById('mat-selector-name').textContent = 'Sin materias en curso';
     document.getElementById('mat-selector-badge').textContent = '—';
+    
+    // Evita bug de sesión guardada en materia huérfana
+    selectedMateriaId = null;
+    localStorage.removeItem('cursus_selected_materia');
+    
     return;
   }
 
