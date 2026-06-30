@@ -46,20 +46,55 @@
     document.getElementById('contact-overlay').classList.remove('open');
   }
 
-  function handleContactSubmit(e) {
+  async function handleContactSubmit(e) {
     e.preventDefault();
     const btn = document.querySelector('.contact-btn-send');
     const original = btn.textContent;
-    btn.textContent = '✓ Enviado';
     btn.disabled = true;
-    btn.style.background = 'var(--green)';
-    setTimeout(function () {
-      closeContactModal();
-      e.target.reset();
-      btn.textContent = original;
-      btn.disabled = false;
-      btn.style.background = '';
-    }, 1500);
+    btn.textContent = 'Enviando...';
+
+    const storedUser = getStoredUser();
+    let remitenteNombre = '';
+    let remitenteEmail = '';
+    if (storedUser) {
+      try {
+        const u = JSON.parse(storedUser);
+        remitenteNombre = u.nombre || '';
+        remitenteEmail = u.email || '';
+      } catch (_) {}
+    }
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          tipo: document.getElementById('contact-type').value,
+          asunto: document.getElementById('contact-subject').value,
+          descripcion: document.getElementById('contact-body-msg').value,
+          remitente_nombre: remitenteNombre,
+          remitente_email: remitenteEmail,
+        })
+      });
+      if (!res.ok) throw new Error('Error');
+      btn.textContent = '✓ Enviado';
+      btn.style.background = 'var(--green)';
+      setTimeout(function () {
+        closeContactModal();
+        e.target.reset();
+        btn.textContent = original;
+        btn.disabled = false;
+        btn.style.background = '';
+      }, 1500);
+    } catch (_) {
+      btn.textContent = 'Error al enviar';
+      btn.style.background = '#ef4444';
+      setTimeout(function () {
+        btn.textContent = original;
+        btn.disabled = false;
+        btn.style.background = '';
+      }, 2000);
+    }
   }
 
   document.addEventListener('click', function (e) {
@@ -147,6 +182,25 @@
       if (avEl) avEl.textContent = initials;
       if (bnAvEl) bnAvEl.textContent = initials;
       if (pmAvEl) pmAvEl.textContent = initials;
+    }
+
+    // Mostrar sección admin en sidebar solo si es admin
+    const isAdmin = user.role === 'admin';
+    ['admin-nav-group', 'admin-nav-alumnos', 'admin-nav-cuotas', 'admin-nav-plan'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = isAdmin ? '' : 'none';
+    });
+
+    // Toggle "Vista Alumno" para admin
+    const toggle = document.getElementById('sb-vista-alumno-toggle');
+    const alumnoItems = document.getElementById('sb-alumno-items');
+    if (toggle) toggle.style.display = isAdmin ? '' : 'none';
+    if (isAdmin && alumnoItems) {
+      // Por defecto colapsado para admin; restaurar estado guardado
+      const abierto = localStorage.getItem('sb_vista_alumno_open') === 'true';
+      alumnoItems.classList.toggle('collapsed', !abierto);
+      const chevron = document.getElementById('va-chevron');
+      if (chevron) chevron.classList.toggle('open', abierto);
     }
   }
 
@@ -400,4 +454,14 @@
   window.openChangePasswordModal   = openChangePasswordModal;
   window.closeChangePasswordModal  = closeChangePasswordModal;
   window.handleChangePasswordSubmit = handleChangePasswordSubmit;
+
+  window.toggleVistaAlumno = function () {
+    const items   = document.getElementById('sb-alumno-items');
+    const chevron = document.getElementById('va-chevron');
+    if (!items) return;
+    const abierto = items.classList.toggle('collapsed');
+    // toggle devuelve true si la clase fue AÑADIDA (collapsed), false si fue removida
+    localStorage.setItem('sb_vista_alumno_open', abierto ? 'false' : 'true');
+    if (chevron) chevron.classList.toggle('open', !abierto);
+  };
 })();

@@ -11,19 +11,23 @@
 <div class="mob-hdr">
   <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
     <div style="display: flex; flex-direction: column;">
-      <div class="mob-lbl">Área de Estudio 🕑</div>
-      <div class="mob-name">
-        <span id="mob-materia-name">—</span>
-        <span class="badge b-reg" id="mob-materia-badge">Regular</span>
-        <span style="font-size:11px;color:#6b7280" id="mob-materia-meta">Cargando...</span>
+      <div class="mob-greet">Área de Estudio 🕑</div>
+      <div class="mob-sub">
+        <span>Gestión de tiempo y tareas</span>
+        <span id="mob-materia-name" style="display: none;">—</span>
+        <span class="badge b-reg" id="mob-materia-badge" style="display: none;">Regular</span>
+        <span id="mob-materia-meta" style="display: none;">Cargando...</span>
       </div>
     </div>
-    <button class="btn-focus-mode-trigger" onclick="window.enterFocusMode()" style="padding: 0.4rem 0.7rem; font-size: 0.75rem; border-radius: 6px; margin-right: 8px;" title="Entrar a Modo Concentración">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/><path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5Z"/><path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1Z"/></svg>
-      <span>Concentración</span>
-    </button>
   </div>
 </div>
+@endsection
+
+@section('mobile-header-actions')
+  <button class="btn-focus-mode-trigger btn-focus-mobile-hdr" onclick="window.enterFocusMode()" title="Entrar a Modo Concentración">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/><path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5Z"/><path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1Z"/></svg>
+    <span>Concentración</span>
+  </button>
 @endsection
 
 @section('topbar-content')
@@ -448,6 +452,7 @@
       </svg>
       <div class="focus-timer-clock">
         <span class="focus-time-display" id="focus-time-display">25:00</span>
+        <span class="focus-phase-display" id="focus-phase-display">Enfoque</span>
         <span class="focus-session-display" id="focus-session-display">Sesión 1 de 4</span>
       </div>
     </div>

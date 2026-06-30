@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="{{ asset('css/main.css') }}">
   <link rel="stylesheet" href="{{ asset('css/layout/sidebar.css') }}">
   <link rel="icon" href="{{ asset('assets/icons/cursus-logo.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ asset('css/components/pomo-float.css') }}">
   @stack('styles')
 </head>
 
@@ -63,6 +64,7 @@
     <!-- Mobile header (Optional: Page specific or fallback) -->
     @yield('mobile-header')
     <div class="mob-header-actions">
+      @yield('mobile-header-actions')
       <button class="theme-toggle-btn theme-toggle-mobile" data-theme-toggle aria-label="Cambiar tema" title="Cambiar tema">
         <svg class="icon-sun" width="15" height="15"><use href="{{ asset('assets/icons/sprite.svg#sun') }}"></use></svg>
         <svg class="icon-moon" width="15" height="15"><use href="{{ asset('assets/icons/sprite.svg#moon') }}"></use></svg>
@@ -108,6 +110,10 @@
       <div class="bn {{ Request::routeIs('beneficios') ? 'on' : '' }}" onclick="location.href='{{ route('beneficios') }}'">
         <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#gift') }}"></use></svg>
         <span class="bn-lbl">Beneficios</span>
+      </div>
+      <div class="bn {{ Request::routeIs('flashcards') ? 'on' : '' }}" onclick="location.href='{{ route('flashcards') }}'">
+        <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#book-copy') }}"></use></svg>
+        <span class="bn-lbl">Flashcards</span>
       </div>
       <div class="bn {{ Request::routeIs('alertas') ? 'on' : '' }}" onclick="location.href='{{ route('alertas') }}'">
         <span class="bnav-icon-wrapper" style="position: relative; display: flex; align-items: center; justify-content: center;">

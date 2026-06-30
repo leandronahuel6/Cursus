@@ -494,9 +494,13 @@
     if (focusTimeEl) {
       focusTimeEl.textContent = `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
       
+      const focusPhaseEl = document.getElementById('focus-phase-display');
+      if (focusPhaseEl) {
+        focusPhaseEl.textContent = faseTxt;
+      }
       const focusSessionEl = document.getElementById('focus-session-display');
       if (focusSessionEl) {
-        focusSessionEl.textContent = `${faseTxt} · Sesión ${pomoCycles.ciclo_actual} de ${pomoSettings.sessionsPerCycle}`;
+        focusSessionEl.textContent = `Sesión ${pomoCycles.ciclo_actual} de ${pomoSettings.sessionsPerCycle}`;
       }
 
       // Toggles active class on focus phase tabs
@@ -634,12 +638,25 @@
       showToast("¡Buen trabajo! Sesión de enfoque completada. Hora de descansar.", "success");
       
       // [REAL API] Registrar sesión completada
-      if (selectedMateriaId) {
-          fetch(`${API_BASE}/pomodoro/sesiones`, { 
-            method: 'POST', 
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ materia_id: selectedMateriaId, duracion_segundos: pomoSettings.focusTime * 60 }) 
-          }).then(() => loadMateriaResumen()).catch(e => console.error(e));
+      const nowTime = Date.now();
+      const dedupKey = 'cursus_pomo_dedup_token';
+      const existingToken = localStorage.getItem(dedupKey);
+
+      if (!existingToken || (nowTime - parseInt(existingToken)) > 10000) {
+          localStorage.setItem(dedupKey, String(nowTime));
+          setTimeout(() => {
+              if (localStorage.getItem(dedupKey) === String(nowTime)) {
+                  localStorage.removeItem(dedupKey);
+              }
+          }, 30000);
+
+          if (selectedMateriaId) {
+              fetch(`${API_BASE}/pomodoro/sesiones`, { 
+                  method: 'POST', 
+                  headers: getAuthHeaders(),
+                  body: JSON.stringify({ materia_id: selectedMateriaId, duracion_segundos: pomoSettings.focusTime * 60 }) 
+              }).then(() => loadMateriaResumen()).catch(e => console.error(e));
+          }
       }
 
     } else {

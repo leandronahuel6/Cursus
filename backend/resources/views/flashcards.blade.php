@@ -1308,6 +1308,17 @@
 </style>
 @endpush
 
+@section('mobile-header')
+<div class="mob-hdr">
+  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+    <div style="display: flex; flex-direction: column;">
+      <div class="mob-greet">Flashcards de Estudio 🧠</div>
+      <div class="mob-sub">Mis mazos y repaso</div>
+    </div>
+  </div>
+</div>
+@endsection
+
 @section('topbar-content')
     <div class="topbar-title">Flashcards de Estudio</div>
 @endsection

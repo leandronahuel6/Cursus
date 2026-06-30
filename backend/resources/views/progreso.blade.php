@@ -186,11 +186,14 @@
 @endpush
 
 @section('mobile-header')
-  <!-- Mobile Header -->
-  <div class="mob-hdr mob-hdr-swapped">
-    <div class="mob-lbl">Mi Progreso 📈</div>
-    <div class="mob-name">Estadísticas</div>
+<div class="mob-hdr">
+  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+    <div style="display: flex; flex-direction: column;">
+      <div class="mob-greet">Mi Progreso 📈</div>
+      <div class="mob-sub">Estadísticas y rendimiento</div>
+    </div>
   </div>
+</div>
 @endsection
 
 @section('topbar-content')

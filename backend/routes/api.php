@@ -14,11 +14,13 @@ use App\Http\Controllers\AlertaController;
 use App\Http\Controllers\RecordatorioCuotaController;
 use App\Http\Controllers\PagoCuotaController;
 use App\Http\Controllers\FlashcardController;
+use App\Http\Controllers\AdminController;
 
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
+Route::post('/contact', [AuthController::class, 'contact'])->middleware('throttle:10,1');
 Route::get('/materias', [MateriaController::class, 'index']);
 Route::get('/cuotas', [CuotaController::class, 'index']);
 
@@ -82,5 +84,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/flashcards/cards/{card}', [FlashcardController::class, 'updateCard']);
     Route::delete('/flashcards/cards/{card}', [FlashcardController::class, 'destroyCard']);
     Route::post('/flashcards/cards/{card}/resultado', [FlashcardController::class, 'recordResult']);
+
+    // Rutas de administración
+    Route::middleware('admin')->prefix('admin')->group(function () {
+        Route::get('/alumnos/buscar', [AdminController::class, 'buscarAlumno']);
+        Route::delete('/alumnos/{id}', [AdminController::class, 'eliminarAlumno']);
+        Route::get('/cuotas/estado', [AdminController::class, 'cuotasEstado']);
+        Route::post('/cuotas', [AdminController::class, 'setCuota']);
+        Route::get('/plan-estudios', [AdminController::class, 'getPlanEstudios']);
+        Route::post('/plan-estudios', [AdminController::class, 'storeMateria']);
+        Route::put('/plan-estudios/{id}', [AdminController::class, 'updateMateria']);
+        Route::delete('/plan-estudios/{id}', [AdminController::class, 'destroyMateria']);
+    });
     Route::post('/flashcards/cards/generate-distractors', [FlashcardController::class, 'generateDistractors']);
 });

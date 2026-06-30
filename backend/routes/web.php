@@ -45,6 +45,19 @@ Route::get('/alertas', function () {
     return view('alertas');
 })->name('alertas');
 
+// Admin
+Route::get('/admin/alumnos', function () {
+    return view('admin.alumnos');
+})->name('admin.alumnos');
+
+Route::get('/admin/cuotas', function () {
+    return view('admin.cuotas');
+})->name('admin.cuotas');
+
+Route::get('/admin/plan-estudios', function () {
+    return view('admin.plan-estudios');
+})->name('admin.plan-estudios');
+
 Route::view('/login', 'login')->name('login');
 Route::view('/register', 'register')->name('register');
 

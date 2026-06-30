@@ -4,8 +4,8 @@
 
 @section('mobile-header')
   <div class="mob-hdr">
-    <div class="mob-lbl">Académico</div>
-    <div class="mob-name">{{ $title }}</div>
+    <div class="mob-greet">{{ $title }}</div>
+    <div class="mob-sub">Académico</div>
   </div>
 @endsection
 

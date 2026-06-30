@@ -52,7 +52,7 @@
   <div id="panel-manage-view">
     <div class="tree-container">
       <div class="tree-legend">
-        <div class="legend-item"><div class="legend-color disponible"></div> Disponible / Cursar</div>
+        <div class="legend-item"><div class="legend-color disponible"></div> Disponible</div>
         <div class="legend-item"><div class="legend-color cursando"></div> Cursando</div>
         <div class="legend-item"><div class="legend-color regular"></div> Regular (Pendiente Final)</div>
         <div class="legend-item"><div class="legend-color aprobada"></div> Aprobada</div>
@@ -82,6 +82,20 @@
       <!-- Cargado dinámicamente desde materias.js -->
     </div>
 
+  </div>
+
+  <!-- Toast de avisos (correlativas bloqueadas, etc.) -->
+  <div class="alert-popup-notification" id="materias-toast" aria-live="polite"></div>
+
+  <!-- ===================== MODAL DE DETALLE DE MATERIA ===================== -->
+  <div class="grade-modal-overlay" id="subject-info-modal" role="dialog" aria-modal="true" aria-labelledby="subject-info-modal-title">
+    <div class="grade-modal-box subject-info-modal-box">
+      <div class="grade-modal-header" id="subject-info-modal-title">Detalle de materia</div>
+      <div class="grade-modal-body" id="subject-info-modal-body"></div>
+      <div class="grade-modal-footer">
+        <button class="btn-modal-action cancel" type="button" onclick="window.closeSubjectInfoModal()">Cerrar</button>
+      </div>
+    </div>
   </div>
 
   <!-- ===================== MODAL DE CALIFICACIONES ===================== -->

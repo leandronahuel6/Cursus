@@ -1,0 +1,203 @@
+.admin-pe-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---- Header ---- */
+.pe-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pe-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.pe-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 4px 0 0;
+}
+
+.pe-btn-add { white-space: nowrap; }
+
+/* ---- Bloques por año ---- */
+.pe-anio-block {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.pe-anio-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.pe-anio-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+.pe-anio-count {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ---- Tabla ---- */
+.pe-td-nombre { font-weight: 500; min-width: 160px; }
+
+.pe-td-chips {
+  min-width: 180px;
+  max-width: 280px;
+}
+
+.pe-td-actions {
+  white-space: nowrap;
+  text-align: right;
+  width: 1%;
+}
+
+.pe-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  margin: 2px;
+  font-size: 11px;
+  border-radius: 99px;
+  background: rgba(66,153,225,.15);
+  color: #4299e1;
+}
+
+.pe-chip-ap {
+  background: rgba(56,161,105,.15);
+  color: #38a169;
+}
+
+.pe-none {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pe-btn-edit,
+.pe-btn-del {
+  padding: 5px 11px;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 500;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: opacity .15s;
+  margin-left: 4px;
+}
+
+.pe-btn-edit {
+  color: var(--brand);
+  background: var(--brand-light);
+  border: 1px solid var(--brand-dim);
+}
+.pe-btn-edit:hover { opacity: .8; }
+
+.pe-btn-del {
+  color: #e53e3e;
+  background: rgba(229,62,62,.08);
+  border: 1px solid rgba(229,62,62,.3);
+}
+.pe-btn-del:hover { opacity: .8; }
+
+/* ---- Modal ---- */
+.pe-modal-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 24px;
+  width: min(680px, 95vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+
+.pe-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.pe-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.pe-form-grid {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* ---- Prereq checkboxes ---- */
+.pe-prereq-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.pe-prereq-col {
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 12px;
+}
+
+.pe-prereq-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 10px;
+}
+
+.pe-prereq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.pe-check-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  padding: 3px 4px;
+  border-radius: 4px;
+  transition: background .1s;
+}
+.pe-check-item:hover { background: var(--border); }
+.pe-check-item input { accent-color: var(--brand); cursor: pointer; }
+
+@media (max-width: 600px) {
+  .pe-prereq-grid { grid-template-columns: 1fr; }
+  .pe-header { flex-direction: column; align-items: flex-start; }
+  .pe-btn-add { width: 100%; }
+}

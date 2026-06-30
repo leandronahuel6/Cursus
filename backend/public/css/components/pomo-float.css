@@ -1,0 +1,200 @@
+/*
+ * pomo-float.css
+ * Estilos BEM del widget flotante Pomodoro.
+ * Cargado globalmente desde layouts/app.blade.php.
+ *
+ * Nomenclatura BEM:
+ *   Bloque: .pomo-float
+ *   Elementos: __info, __icon, __time, __label, __session, __divider,
+ *              __actions, __btn
+ *   Modificadores: --minimized, --enfoque, --corto, --largo,
+ *                  --visible (en actions), --play, --nav, --min, --close
+ */
+
+/* Variables locales */
+.pomo-float {
+  --pf-bg:        rgba(17, 24, 39, 0.88);
+  --pf-border:    rgba(255, 255, 255, 0.12);
+  --pf-accent:    rgba(129, 140, 248, 0.35);
+  --pf-radius:    999px;
+  --pf-shadow:    0 10px 28px -5px rgba(0, 0, 0, 0.38),
+                  0 2px 8px -2px rgba(0, 0, 0, 0.24);
+  --pf-font:      'Outfit', system-ui, sans-serif;
+  --pf-transition: 0.22s ease;
+}
+
+.pomo-float {
+  display: none;
+  position: fixed;
+  bottom: 85px;
+  right: 20px;
+  z-index: 10000;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.38rem 0.8rem;
+  background: var(--pf-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--pf-border);
+  border-radius: var(--pf-radius);
+  box-shadow: var(--pf-shadow);
+  color: #ffffff;
+  font-family: var(--pf-font);
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+  transition:
+    border-color var(--pf-transition),
+    box-shadow   var(--pf-transition),
+    width        var(--pf-transition),
+    padding      var(--pf-transition);
+}
+
+.pomo-float.is-visible { display: flex; }
+
+.pomo-float--enfoque { --pf-accent: rgba(129, 140, 248, 0.35); border-color: rgba(129, 140, 248, 0.3); }
+.pomo-float--corto   { --pf-accent: rgba(52, 211, 153, 0.35);  border-color: rgba(52, 211, 153, 0.3);  }
+.pomo-float--largo   { --pf-accent: rgba(251, 191, 36, 0.35);  border-color: rgba(251, 191, 36, 0.3);  }
+
+.pomo-float__info {
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+  cursor: pointer;
+}
+
+.pomo-float__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #c7d2fe;
+  transition: color var(--pf-transition);
+}
+.pomo-float--corto .pomo-float__icon { color: #6ee7b7; }
+.pomo-float--largo .pomo-float__icon { color: #fcd34d; }
+
+.pomo-float__time {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  min-width: 3.6ch;
+}
+
+.pomo-float__label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #c7d2fe;
+  white-space: nowrap;
+  transition: color var(--pf-transition);
+}
+.pomo-float--corto .pomo-float__label { color: #6ee7b7; }
+.pomo-float--largo .pomo-float__label { color: #fcd34d; }
+
+.pomo-float__session {
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.pomo-float__divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--pf-transition);
+}
+
+.pomo-float__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.18rem;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-width 0.25s ease,
+    opacity   0.20s ease;
+}
+
+.pomo-float__actions--visible {
+  max-width: 160px;
+  opacity: 1;
+}
+
+.pomo-float:has(.pomo-float__actions--visible) .pomo-float__divider {
+  opacity: 1;
+}
+
+.pomo-float__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  padding: 0.22rem;
+  border-radius: 6px;
+  outline: none;
+  transition:
+    color            var(--pf-transition),
+    background-color var(--pf-transition);
+}
+.pomo-float__btn:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.08); }
+.pomo-float__btn:focus-visible { outline: 2px solid rgba(129, 140, 248, 0.7); outline-offset: 2px; }
+
+.pomo-float__btn--play  { color: rgba(255, 255, 255, 0.9); }
+.pomo-float__btn--play:hover { color: #ffffff; }
+
+.pomo-float__btn--nav   { color: rgba(165, 180, 252, 0.85); }
+.pomo-float__btn--nav:hover  { color: #a5b4fc; background-color: rgba(129, 140, 248, 0.12); }
+
+.pomo-float__btn--min   { color: rgba(255, 255, 255, 0.55); }
+.pomo-float__btn--min:hover { color: rgba(255, 255, 255, 0.85); }
+
+.pomo-float__btn--close { color: rgba(255, 255, 255, 0.45); }
+.pomo-float__btn--close:hover { color: #f87171; background-color: rgba(239, 68, 68, 0.1); }
+
+.pomo-float--minimized {
+  padding: 0;
+  gap: 0;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    width         0.28s ease,
+    height        0.28s ease,
+    border-radius 0.28s ease,
+    padding       0.28s ease,
+    box-shadow    var(--pf-transition);
+}
+.pomo-float--minimized:hover {
+  box-shadow: var(--pf-shadow), 0 0 0 2px var(--pf-accent);
+}
+
+.pomo-float--minimized .pomo-float__time,
+.pomo-float--minimized .pomo-float__label,
+.pomo-float--minimized .pomo-float__session,
+.pomo-float--minimized .pomo-float__divider,
+.pomo-float--minimized .pomo-float__actions { display: none; }
+
+.pomo-float--minimized .pomo-float__info { gap: 0; cursor: pointer; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pomo-float,
+  .pomo-float__actions,
+  .pomo-float__divider,
+  .pomo-float__btn,
+  .pomo-float__icon,
+  .pomo-float__label { transition: none; }
+}

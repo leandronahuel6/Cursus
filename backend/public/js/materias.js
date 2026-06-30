@@ -75,9 +75,108 @@ let state = {
 // Guardar nota temporalmente mientras se abre el modal
 let activeModalSubjectId = null;
 
+let materiasToastTimer = null;
+
+// Toast no intrusivo para avisos (reemplaza alert() nativo)
+function showMateriasToast(message, type = 'warn') {
+  const toast = document.getElementById('materias-toast');
+  if (!toast) return;
+
+  toast.className = `alert-popup-notification ${type}`;
+  toast.textContent = message;
+  toast.classList.add('show');
+
+  if (materiasToastTimer) clearTimeout(materiasToastTimer);
+  materiasToastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+}
+
+function getStatusLabel(status, isLocked) {
+  if (isLocked) return 'Bloqueada';
+  const labels = {
+    disponible: 'Disponible',
+    cursando: 'Cursando',
+    regular: 'Regular',
+    aprobada: 'Aprobada'
+  };
+  return labels[status] || status;
+}
+
+function buildSubjectPrereqsHTML(sub) {
+  if (sub.prereq.cursadas.length === 0 && sub.prereq.aprobadas.length === 0) {
+    return '<p class="subject-info-empty">Esta materia no tiene correlativas previas.</p>';
+  }
+
+  let html = '<div class="sub-prereqs-info">';
+
+  sub.prereq.cursadas.forEach(reqId => {
+    const reqState = state.subjects[reqId];
+    const isMet = reqState && (reqState.status === 'regular' || reqState.status === 'aprobada');
+    html += `
+      <div class="sub-prereq-item ${isMet ? 'met' : 'unmet'}">
+        ${isMet ? '✓' : '🔒'} Cursar: ${getSubjectNameById(reqId)}
+      </div>
+    `;
+  });
+
+  sub.prereq.aprobadas.forEach(reqId => {
+    const reqState = state.subjects[reqId];
+    const isMet = reqState && reqState.status === 'aprobada';
+    html += `
+      <div class="sub-prereq-item ${isMet ? 'met' : 'unmet'}">
+        ${isMet ? '✓' : '🔒'} Aprobar: ${getSubjectNameById(reqId)}
+      </div>
+    `;
+  });
+
+  html += '</div>';
+  return html;
+}
+
+window.openSubjectInfoModal = function(sub, subState) {
+  const modal = document.getElementById('subject-info-modal');
+  const titleEl = document.getElementById('subject-info-modal-title');
+  const bodyEl = document.getElementById('subject-info-modal-body');
+  if (!modal || !titleEl || !bodyEl) return;
+
+  const isLocked = isSubjectLocked(sub);
+  const statusClass = isLocked ? 'locked' : subState.status;
+  const gradeHTML = (subState.status === 'aprobada' && subState.grade)
+    ? `<div class="sub-grade-badge">Calificación: ${subState.grade}</div>`
+    : '';
+
+  titleEl.textContent = sub.name;
+  bodyEl.innerHTML = `
+    <div class="subject-info-meta">
+      <span class="subject-info-code">TUP${sub.id}</span>
+      <span class="sub-status-badge ${statusClass}">${getStatusLabel(subState.status, isLocked)}</span>
+      ${gradeHTML}
+    </div>
+    <div class="subject-info-prereqs-title">Correlatividades</div>
+    ${buildSubjectPrereqsHTML(sub)}
+  `;
+
+  modal.classList.add('open');
+};
+
+window.closeSubjectInfoModal = function() {
+  const modal = document.getElementById('subject-info-modal');
+  if (modal) modal.classList.remove('open');
+};
+
 // Inicialización de la vista
 document.addEventListener('DOMContentLoaded', async () => {
   await loadPlan();
+
+  // Cerrar modal de detalle al hacer clic fuera o con Escape
+  const subjectInfoModal = document.getElementById('subject-info-modal');
+  if (subjectInfoModal) {
+    subjectInfoModal.addEventListener('click', (e) => {
+      if (e.target === subjectInfoModal) window.closeSubjectInfoModal();
+    });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') window.closeSubjectInfoModal();
+  });
 
   // Si la URL tiene el hash '#plan', cambiar automáticamente a la pestaña del plan
   if (window.location.hash === '#plan' || window.location.search.includes('tab=plan')) {
@@ -131,7 +230,7 @@ window.changeSubjectStatus = function(id, newStatus) {
   
   // Si está bloqueada, no permitir cambiar
   if (isSubjectLocked(sub, newStatus) && newStatus !== 'disponible') {
-    alert('Esta materia se encuentra bloqueada. Debes cumplir sus correlativas primero.');
+    showMateriasToast('Esta materia está bloqueada. Cumplí sus correlativas primero.', 'warn');
     return;
   }
   
@@ -505,27 +604,9 @@ function renderTreeView() {
           </div>
         `;
 
-        // Al hacer clic en la info del nodo (no en los botones), explicar correlativas
+        // Al hacer clic en la info del nodo (no en los botones), mostrar detalle en modal
         node.querySelector('.tree-node-info').onclick = () => {
-          let msg = `Materia: ${sub.name}\nEstado: ${subState.status.toUpperCase()}\n`;
-          if (subState.grade) msg += `Calificación: ${subState.grade}\n`;
-
-          if (sub.prereq.cursadas.length > 0 || sub.prereq.aprobadas.length > 0) {
-            msg += `\nCorrelatividades para Cursar/Rendir:\n`;
-            sub.prereq.cursadas.forEach(reqId => {
-              const rState = state.subjects[reqId];
-              const ok = rState && (rState.status === 'regular' || rState.status === 'aprobada');
-              msg += ` - Cursada de ${getSubjectNameById(reqId)}: [${ok ? 'CUMPLIDO' : 'FALTA'}]\n`;
-            });
-            sub.prereq.aprobadas.forEach(reqId => {
-              const rState = state.subjects[reqId];
-              const ok = rState && rState.status === 'aprobada';
-              msg += ` - Examen de ${getSubjectNameById(reqId)}: [${ok ? 'CUMPLIDO' : 'FALTA'}]\n`;
-            });
-          } else {
-            msg += `\nEsta materia no tiene correlativas previas.`;
-          }
-          alert(msg);
+          window.openSubjectInfoModal(sub, subState);
         };
 
         nodesContainer.appendChild(node);
