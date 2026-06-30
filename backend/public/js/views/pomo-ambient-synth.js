@@ -7,12 +7,18 @@ class PomoAmbientSynth {
         this.ctx = null;
         this.rainNode = null;
         this.fireNode = null;
+        this.forestNode = null;
+        this.oceanNode = null;
         this.rainGain = null;
         this.fireGain = null;
+        this.forestGain = null;
+        this.oceanGain = null;
         
         // Estado del volumen de los canales (0 a 1)
         this.rainVol = parseFloat(localStorage.getItem('cursus_pomo_focus_vol_rain')) || 0.0;
         this.fireVol = parseFloat(localStorage.getItem('cursus_pomo_focus_vol_fire')) || 0.0;
+        this.forestVol = parseFloat(localStorage.getItem('cursus_pomo_focus_vol_forest')) || 0.0;
+        this.oceanVol = parseFloat(localStorage.getItem('cursus_pomo_focus_vol_ocean')) || 0.0;
     }
 
     init() {
@@ -52,7 +58,7 @@ class PomoAmbientSynth {
     startRain() {
         this.init();
         if (!this.ctx) return;
-        if (this.rainNode) return; // Ya está sonando
+        if (this.rainNode) return;
 
         const noiseSource = this.ctx.createBufferSource();
         noiseSource.buffer = this.createWhiteNoiseBuffer();
@@ -60,77 +66,97 @@ class PomoAmbientSynth {
 
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'bandpass';
-        filter.frequency.value = 600;
-        filter.Q.value = 0.8;
-
-        const lfo = this.ctx.createOscillator();
-        lfo.type = 'sine';
-        lfo.frequency.value = 0.12;
-
-        const lfoGain = this.ctx.createGain();
-        lfoGain.gain.value = 180;
+        filter.frequency.value = 500;
+        filter.Q.value = 0.6;
 
         const rainGain = this.ctx.createGain();
-        // Empezar en 0 para desvanecimiento inicial
         rainGain.gain.setValueAtTime(0, this.ctx.currentTime);
 
-        lfo.connect(lfoGain);
-        lfoGain.connect(filter.frequency);
-        
         noiseSource.connect(filter);
-        filter.connect(rainGain);
-        rainGain.connect(this.ctx.destination);
+        
+        const backgroundGain = this.ctx.createGain();
+        backgroundGain.gain.value = 0.18;
+        filter.connect(backgroundGain);
+        backgroundGain.connect(rainGain);
 
-        lfo.start();
         noiseSource.start();
 
-        // Desvanecimiento suave (fade-in) de 1.5 segundos
+        const rainInterval = setInterval(() => {
+            if (!this.rainNode || this.rainVol <= 0.05) return;
+            const density = 2 + Math.floor(Math.random() * 3);
+            for (let i = 0; i < density; i++) {
+                setTimeout(() => this.triggerRaindrop(rainGain), Math.random() * 180);
+            }
+        }, 200);
+
+        rainGain.connect(this.ctx.destination);
         rainGain.gain.linearRampToValueAtTime(this.rainVol, this.ctx.currentTime + 1.5);
 
-        this.rainNode = { source: noiseSource, lfo: lfo, filter: filter };
+        this.rainNode = { source: noiseSource, interval: rainInterval };
         this.rainGain = rainGain;
+    }
+
+    triggerRaindrop(destinationGain) {
+        if (!this.ctx || this.ctx.state === 'suspended') return;
+        
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        const startFreq = 1800 + Math.random() * 2200;
+        const duration = 0.01 + Math.random() * 0.015;
+
+        osc.frequency.setValueAtTime(startFreq, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + duration);
+
+        gain.gain.setValueAtTime(0, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.005 + Math.random() * 0.015, this.ctx.currentTime + 0.001);
+        gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+
+        osc.connect(gain).connect(destinationGain);
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration + 0.01);
     }
 
     stopRain() {
         if (!this.rainNode) return;
         const currentGain = this.rainGain;
         const currentSource = this.rainNode.source;
-        const currentLfo = this.rainNode.lfo;
+        const currentInterval = this.rainNode.interval;
 
         this.rainNode = null;
         this.rainGain = null;
 
+        clearInterval(currentInterval);
+
         if (this.ctx && this.ctx.state !== 'suspended') {
             try {
-                // Desvanecimiento suave (fade-out) de 1.5 segundos
                 currentGain.gain.setValueAtTime(currentGain.gain.value, this.ctx.currentTime);
                 currentGain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 1.5);
                 
                 setTimeout(() => {
                     try {
                         currentSource.stop();
-                        currentLfo.stop();
                     } catch(e){}
                 }, 1600);
             } catch(e) {
                 try {
                     currentSource.stop();
-                    currentLfo.stop();
                 } catch(err){}
             }
         } else {
             try {
                 currentSource.stop();
-                currentLfo.stop();
             } catch(e){}
         }
     }
 
     setRainVolume(volume) {
         this.rainVol = Math.max(0, Math.min(1, parseFloat(volume)));
-        localStorage.setItem('cursus_pomo_focus_vol_rain', String(this.rainVol));
+        if (this.rainVol > 0) {
+            localStorage.setItem('cursus_pomo_focus_vol_rain', String(this.rainVol));
+        }
         if (this.rainGain && this.ctx) {
-            // Rampa muy corta de 0.15s para evitar chasquidos
             this.rainGain.gain.linearRampToValueAtTime(this.rainVol, this.ctx.currentTime + 0.15);
         }
     }
@@ -150,7 +176,6 @@ class PomoAmbientSynth {
         rumbleFilter.frequency.value = 220;
 
         const fireGain = this.ctx.createGain();
-        // Empezar en 0 para desvanecimiento inicial
         fireGain.gain.setValueAtTime(0, this.ctx.currentTime);
 
         rumbleSource.connect(rumbleFilter);
@@ -166,7 +191,6 @@ class PomoAmbientSynth {
         rumbleSource.start();
         fireGain.connect(this.ctx.destination);
 
-        // Desvanecimiento suave (fade-in) de 1.5 segundos
         fireGain.gain.linearRampToValueAtTime(this.fireVol, this.ctx.currentTime + 1.5);
 
         this.fireNode = { source: rumbleSource, interval: crackleInterval };
@@ -205,7 +229,6 @@ class PomoAmbientSynth {
 
         if (this.ctx && this.ctx.state !== 'suspended') {
             try {
-                // Desvanecimiento suave (fade-out) de 1.5 segundos
                 currentGain.gain.setValueAtTime(currentGain.gain.value, this.ctx.currentTime);
                 currentGain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 1.5);
                 
@@ -228,10 +251,139 @@ class PomoAmbientSynth {
 
     setFireVolume(volume) {
         this.fireVol = Math.max(0, Math.min(1, parseFloat(volume)));
-        localStorage.setItem('cursus_pomo_focus_vol_fire', String(this.fireVol));
+        if (this.fireVol > 0) {
+            localStorage.setItem('cursus_pomo_focus_vol_fire', String(this.fireVol));
+        }
         if (this.fireGain && this.ctx) {
-            // Rampa muy corta de 0.15s para evitar chasquidos
             this.fireGain.gain.linearRampToValueAtTime(this.fireVol, this.ctx.currentTime + 0.15);
+        }
+    }
+
+    // --- SINTETIZADOR DE BOSQUE (VIENTO Y AVES - AUDIO REAL EN RUTA CDN) ---
+    startForest() {
+        this.init();
+        if (this.forestNode) return;
+
+        const audio = new Audio("https://raw.githubusercontent.com/karthiknvd/noctune/master/sounds/forest.mp3");
+        audio.loop = true;
+        audio.volume = 0; // Iniciar en 0 para fade-in
+
+        audio.play().catch(e => console.log("Audio play error", e));
+
+        // Rampa de volumen manual en JS para evitar CORS en Web Audio API
+        let currentVol = 0;
+        const targetVol = this.forestVol;
+        const fadeInterval = setInterval(() => {
+            if (!this.forestNode || currentVol >= targetVol) {
+                clearInterval(fadeInterval);
+                return;
+            }
+            currentVol = Math.min(targetVol, currentVol + 0.05);
+            audio.volume = currentVol;
+        }, 80);
+
+        this.forestNode = { audio: audio, fadeInterval: fadeInterval };
+    }
+
+    stopForest() {
+        if (!this.forestNode) return;
+        const currentAudio = this.forestNode.audio;
+        const currentFadeInterval = this.forestNode.fadeInterval;
+
+        this.forestNode = null;
+
+        clearInterval(currentFadeInterval);
+
+        let currentVol = currentAudio.volume;
+        const fadeOutInterval = setInterval(() => {
+            if (currentVol <= 0.02) {
+                clearInterval(fadeOutInterval);
+                try {
+                    currentAudio.pause();
+                    currentAudio.src = "";
+                } catch(e){}
+                return;
+            }
+            currentVol = Math.max(0, currentVol - 0.05);
+            try {
+                currentAudio.volume = currentVol;
+            } catch(e){}
+        }, 80);
+    }
+
+    setForestVolume(volume) {
+        this.forestVol = Math.max(0, Math.min(1, parseFloat(volume)));
+        if (this.forestVol > 0) {
+            localStorage.setItem('cursus_pomo_focus_vol_forest', String(this.forestVol));
+        }
+        if (this.forestNode) {
+            try {
+                this.forestNode.audio.volume = this.forestVol;
+            } catch(e){}
+        }
+    }
+
+    // --- SINTETIZADOR DE OCÉANO (OLAS DE MAR - AUDIO REAL EN RUTA CDN) ---
+    startOcean() {
+        this.init();
+        if (this.oceanNode) return;
+
+        const audio = new Audio("https://raw.githubusercontent.com/brarcher/baby-sleep-sounds/master/app/src/main/res/raw/ocean.mp3");
+        audio.loop = true;
+        audio.volume = 0; // Iniciar en 0 para fade-in
+
+        audio.play().catch(e => console.log("Audio play error", e));
+
+        // Rampa de volumen manual en JS para evitar CORS en Web Audio API
+        let currentVol = 0;
+        const targetVol = this.oceanVol;
+        const fadeInterval = setInterval(() => {
+            if (!this.oceanNode || currentVol >= targetVol) {
+                clearInterval(fadeInterval);
+                return;
+            }
+            currentVol = Math.min(targetVol, currentVol + 0.05);
+            audio.volume = currentVol;
+        }, 80);
+
+        this.oceanNode = { audio: audio, fadeInterval: fadeInterval };
+    }
+
+    stopOcean() {
+        if (!this.oceanNode) return;
+        const currentAudio = this.oceanNode.audio;
+        const currentFadeInterval = this.oceanNode.fadeInterval;
+
+        this.oceanNode = null;
+
+        clearInterval(currentFadeInterval);
+
+        let currentVol = currentAudio.volume;
+        const fadeOutInterval = setInterval(() => {
+            if (currentVol <= 0.02) {
+                clearInterval(fadeOutInterval);
+                try {
+                    currentAudio.pause();
+                    currentAudio.src = "";
+                } catch(e){}
+                return;
+            }
+            currentVol = Math.max(0, currentVol - 0.05);
+            try {
+                currentAudio.volume = currentVol;
+            } catch(e){}
+        }, 80);
+    }
+
+    setOceanVolume(volume) {
+        this.oceanVol = Math.max(0, Math.min(1, parseFloat(volume)));
+        if (this.oceanVol > 0) {
+            localStorage.setItem('cursus_pomo_focus_vol_ocean', String(this.oceanVol));
+        }
+        if (this.oceanNode) {
+            try {
+                this.oceanNode.audio.volume = this.oceanVol;
+            } catch(e){}
         }
     }
 
@@ -240,17 +392,36 @@ class PomoAmbientSynth {
         const tempFireGain = this.fireGain;
         const tempRainNode = this.rainNode;
         const tempFireNode = this.fireNode;
+        const tempForestNode = this.forestNode;
+        const tempOceanNode = this.oceanNode;
 
         this.rainNode = null;
         this.rainGain = null;
         this.fireNode = null;
         this.fireGain = null;
+        this.forestNode = null;
+        this.oceanNode = null;
 
         if (tempFireNode) clearInterval(tempFireNode.interval);
+        if (tempRainNode) clearInterval(tempRainNode.interval);
+
+        if (tempForestNode) {
+            clearInterval(tempForestNode.fadeInterval);
+            try {
+                tempForestNode.audio.pause();
+                tempForestNode.audio.src = "";
+            } catch(e){}
+        }
+        if (tempOceanNode) {
+            clearInterval(tempOceanNode.fadeInterval);
+            try {
+                tempOceanNode.audio.pause();
+                tempOceanNode.audio.src = "";
+            } catch(e){}
+        }
 
         if (this.ctx && this.ctx.state !== 'suspended') {
             try {
-                // Desvanecer ambos canales simultáneamente
                 const now = this.ctx.currentTime;
                 if (tempRainGain) {
                     tempRainGain.gain.setValueAtTime(tempRainGain.gain.value, now);
@@ -261,12 +432,10 @@ class PomoAmbientSynth {
                     tempFireGain.gain.linearRampToValueAtTime(0, now + 1.5);
                 }
 
-                // Cerrar AudioContext y parar nodos después del fade
                 setTimeout(() => {
                     try {
                         if (tempRainNode) {
                             tempRainNode.source.stop();
-                            tempRainNode.lfo.stop();
                         }
                         if (tempFireNode) {
                             tempFireNode.source.stop();

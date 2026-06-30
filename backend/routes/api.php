@@ -74,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/flashcards/decks', [FlashcardController::class, 'indexDecks']);
     Route::post('/flashcards/decks', [FlashcardController::class, 'storeDeck']);
     Route::post('/flashcards/decks/import', [FlashcardController::class, 'importDeck']);
+    Route::post('/flashcards/decks/generate-ia', [FlashcardController::class, 'generateFromIA']);
     Route::put('/flashcards/decks/{deck}', [FlashcardController::class, 'updateDeck']);
     Route::delete('/flashcards/decks/{deck}', [FlashcardController::class, 'destroyDeck']);
     Route::get('/flashcards/decks/{deck}/cards', [FlashcardController::class, 'indexCards']);
@@ -81,4 +82,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/flashcards/cards/{card}', [FlashcardController::class, 'updateCard']);
     Route::delete('/flashcards/cards/{card}', [FlashcardController::class, 'destroyCard']);
     Route::post('/flashcards/cards/{card}/resultado', [FlashcardController::class, 'recordResult']);
+    Route::post('/flashcards/cards/generate-distractors', [FlashcardController::class, 'generateDistractors']);
 });

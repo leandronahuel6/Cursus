@@ -830,6 +830,11 @@
     const savedSound = localStorage.getItem('cursus_pomo_alarm_sound') || 'chime';
     const soundSelect = document.getElementById('custom-pomo-sound');
     if (soundSelect) soundSelect.value = savedSound;
+
+    const strictToggle = document.getElementById('pomo-strict-toggle');
+    if (strictToggle) {
+      strictToggle.checked = localStorage.getItem('cursus_pomo_strict_mode') === 'true';
+    }
     
     document.getElementById('pomo-validation-error').style.display = 'none';
     document.getElementById('pomo-custom-modal').classList.add('show');
@@ -897,6 +902,11 @@
     if (soundSelect) {
       localStorage.setItem('cursus_pomo_alarm_sound', soundSelect.value);
       window.dispatchEvent(new Event('storage'));
+    }
+
+    const strictToggle = document.getElementById('pomo-strict-toggle');
+    if (strictToggle) {
+      localStorage.setItem('cursus_pomo_strict_mode', String(strictToggle.checked));
     }
 
     localStorage.setItem('cursus_pomo_custom_settings', JSON.stringify({
@@ -1707,6 +1717,25 @@
     await loadMateriasCursando();
     initPomodoro();
     // renderSocial(); // Panel "Estudiando ahora" comentado (ver arriba)
+
+    // Detector de pérdida de foco en Modo Estricto
+    document.addEventListener('visibilitychange', () => {
+      const strictMode = localStorage.getItem('cursus_pomo_strict_mode') === 'true';
+      if (document.hidden && strictMode && pomoState.estado_reloj === 'corriendo') {
+        let distractCount = parseInt(sessionStorage.getItem('cursus_strict_distractions') || '0', 10);
+        distractCount++;
+        sessionStorage.setItem('cursus_strict_distractions', String(distractCount));
+        
+        // Sonar alarma beep para avisarle
+        playPomoAlarm('beep');
+      } else if (!document.hidden && strictMode && pomoState.estado_reloj === 'corriendo') {
+        const distractCount = sessionStorage.getItem('cursus_strict_distractions') || '0';
+        if (distractCount !== '0') {
+          showToast(`¡Atención! Te has distraído cambiando de pestaña. Distracciones: ${distractCount}. Mantén el enfoque para completar tu sesión.`, 'warn');
+          sessionStorage.setItem('cursus_strict_distractions', '0');
+        }
+      }
+    });
   });
 
 // Exponer funciones globales para que funcionen los eventos inline en Blade con type='module'
@@ -1867,6 +1896,7 @@ window.toggleMateriaDropdown = toggleMateriaDropdown;
   function updateFocusActiveGoal() {
     const focusGoalTitle = document.getElementById('focus-goal-title');
     const completeBtn = document.getElementById('focus-goal-complete-btn');
+    const subtasksToggleBtn = document.getElementById('focus-subtasks-toggle');
     const prevBtn = document.getElementById('focus-goal-prev-btn');
     const nextBtn = document.getElementById('focus-goal-next-btn');
     if (!focusGoalTitle) return;
@@ -1881,6 +1911,7 @@ window.toggleMateriaDropdown = toggleMateriaDropdown;
       focusGoalTitle.textContent = activeTask.title;
       focusGoalTitle.title = activeTask.title;
       if (completeBtn) completeBtn.style.display = 'inline-flex';
+      if (subtasksToggleBtn) subtasksToggleBtn.style.display = 'inline-flex';
 
       // Toggle navigation arrows visibility
       if (progressTasks.length > 1) {
@@ -1890,13 +1921,19 @@ window.toggleMateriaDropdown = toggleMateriaDropdown;
         if (prevBtn) prevBtn.style.display = 'none';
         if (nextBtn) nextBtn.style.display = 'none';
       }
+
+      renderFocusSubtasks();
     } else {
       activeFocusTaskIndex = 0;
       focusGoalTitle.textContent = "Ninguna tarea en curso";
       focusGoalTitle.title = "";
       if (completeBtn) completeBtn.style.display = 'none';
+      if (subtasksToggleBtn) subtasksToggleBtn.style.display = 'none';
       if (prevBtn) prevBtn.style.display = 'none';
       if (nextBtn) nextBtn.style.display = 'none';
+
+      const drawer = document.getElementById('focus-subtasks-drawer');
+      if (drawer) drawer.classList.remove('show');
     }
   }
 
@@ -1911,6 +1948,8 @@ window.toggleMateriaDropdown = toggleMateriaDropdown;
     // 2. Inicializar mezclador de sonido (cargar volúmenes previos)
     const volRainInput = document.getElementById('focus-vol-rain');
     const volFireInput = document.getElementById('focus-vol-fire');
+    const volForestInput = document.getElementById('focus-vol-forest');
+    const volOceanInput = document.getElementById('focus-vol-ocean');
     
     if (volRainInput) {
       volRainInput.value = window.pomoAmbientSynth.rainVol;
@@ -1919,6 +1958,14 @@ window.toggleMateriaDropdown = toggleMateriaDropdown;
     if (volFireInput) {
       volFireInput.value = window.pomoAmbientSynth.fireVol;
       updateMixerIcon('fire', window.pomoAmbientSynth.fireVol);
+    }
+    if (volForestInput) {
+      volForestInput.value = window.pomoAmbientSynth.forestVol;
+      updateMixerIcon('forest', window.pomoAmbientSynth.forestVol);
+    }
+    if (volOceanInput) {
+      volOceanInput.value = window.pomoAmbientSynth.oceanVol;
+      updateMixerIcon('ocean', window.pomoAmbientSynth.oceanVol);
     }
 
     // 3. Cargar el tema preferido (por defecto aurora)
@@ -1934,8 +1981,27 @@ window.toggleMateriaDropdown = toggleMateriaDropdown;
   }
 
   function exitFocusMode() {
+    const strictMode = localStorage.getItem('cursus_pomo_strict_mode') === 'true';
+    if (strictMode && pomoState.estado_reloj === 'corriendo') {
+      openConfirm("¡Estás en modo estricto! Salir ahora anulará tu ciclo de concentración actual y registrará una sesión fallida. ¿Realmente quieres rendirte?", () => {
+        resetToDefaultPomoState();
+        updatePomoUI();
+        window.dispatchEvent(new Event('storage'));
+        performExitFocusMode();
+      });
+      return;
+    }
+    performExitFocusMode();
+  }
+
+  function performExitFocusMode() {
     const overlay = document.getElementById('focus-mode-overlay');
     if (!overlay) return;
+
+    // Salir de pantalla completa si estaba activa al salir del modo concentración
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(err => console.log("Exit fullscreen error on exit", err));
+    }
 
     // Iniciar animación de salida
     overlay.classList.add('leaving');
@@ -1975,26 +2041,50 @@ window.toggleMateriaDropdown = toggleMateriaDropdown;
     const activeBtn = document.getElementById('theme-btn-' + theme);
     if (activeBtn) activeBtn.classList.add('active');
 
-    // Manejar chispas o lluvia física del canvas
+    // Manejar chispas o lluvia física del canvas y silenciar otros canales mutuamente
     if (theme === 'rain') {
       window.pomoFocusCanvas.start('focus-canvas', 'rain');
-      if (window.pomoAmbientSynth.rainVol === 0) {
-        setRainVolume(0.3);
-      } else {
-        window.pomoAmbientSynth.startRain();
-      }
-      window.pomoAmbientSynth.stopFire();
+      
+      // Obtener el último volumen guardado positivo o por defecto
+      let lastVol = parseFloat(localStorage.getItem('cursus_pomo_focus_vol_rain')) || 0.3;
+      setRainVolume(lastVol);
+      
+      setFireVolume(0);
+      setForestVolume(0);
+      setOceanVolume(0);
     } else if (theme === 'fire') {
       window.pomoFocusCanvas.start('focus-canvas', 'fire');
-      if (window.pomoAmbientSynth.fireVol === 0) {
-        setFireVolume(0.35);
-      } else {
-        window.pomoAmbientSynth.startFire();
-      }
-      window.pomoAmbientSynth.stopRain();
+      
+      let lastVol = parseFloat(localStorage.getItem('cursus_pomo_focus_vol_fire')) || 0.35;
+      setFireVolume(lastVol);
+      
+      setRainVolume(0);
+      setForestVolume(0);
+      setOceanVolume(0);
+    } else if (theme === 'forest') {
+      window.pomoFocusCanvas.start('focus-canvas', 'forest');
+      
+      let lastVol = parseFloat(localStorage.getItem('cursus_pomo_focus_vol_forest')) || 0.3;
+      setForestVolume(lastVol);
+      
+      setRainVolume(0);
+      setFireVolume(0);
+      setOceanVolume(0);
+    } else if (theme === 'ocean') {
+      window.pomoFocusCanvas.start('focus-canvas', 'ocean');
+      
+      let lastVol = parseFloat(localStorage.getItem('cursus_pomo_focus_vol_ocean')) || 0.3;
+      setOceanVolume(lastVol);
+      
+      setRainVolume(0);
+      setFireVolume(0);
+      setForestVolume(0);
     } else {
       window.pomoFocusCanvas.stop();
-      window.pomoAmbientSynth.stopAll();
+      setRainVolume(0);
+      setFireVolume(0);
+      setForestVolume(0);
+      setOceanVolume(0);
     }
   }
 
@@ -2030,6 +2120,38 @@ window.toggleMateriaDropdown = toggleMateriaDropdown;
     }
   }
 
+  function setForestVolume(val) {
+    const volume = parseFloat(val);
+    window.pomoAmbientSynth.setForestVolume(volume);
+    
+    const input = document.getElementById('focus-vol-forest');
+    if (input) input.value = volume;
+    
+    updateMixerIcon('forest', volume);
+
+    if (volume > 0) {
+      window.pomoAmbientSynth.startForest();
+    } else {
+      window.pomoAmbientSynth.stopForest();
+    }
+  }
+
+  function setOceanVolume(val) {
+    const volume = parseFloat(val);
+    window.pomoAmbientSynth.setOceanVolume(volume);
+    
+    const input = document.getElementById('focus-vol-ocean');
+    if (input) input.value = volume;
+    
+    updateMixerIcon('ocean', volume);
+
+    if (volume > 0) {
+      window.pomoAmbientSynth.startOcean();
+    } else {
+      window.pomoAmbientSynth.stopOcean();
+    }
+  }
+
   function toggleRainAudio() {
     if (window.pomoAmbientSynth.rainVol > 0) {
       setRainVolume(0);
@@ -2046,16 +2168,30 @@ window.toggleMateriaDropdown = toggleMateriaDropdown;
     }
   }
 
+  function toggleForestAudio() {
+    if (window.pomoAmbientSynth.forestVol > 0) {
+      setForestVolume(0);
+    } else {
+      setForestVolume(0.3);
+    }
+  }
+
+  function toggleOceanAudio() {
+    if (window.pomoAmbientSynth.oceanVol > 0) {
+      setOceanVolume(0);
+    } else {
+      setOceanVolume(0.35);
+    }
+  }
+
   function updateMixerIcon(type, volume) {
-    const iconSpan = document.getElementById('mixer-icon-' + type);
-    if (!iconSpan) return;
+    const controlDiv = document.getElementById('mixer-control-' + type);
+    if (!controlDiv) return;
 
     if (volume === 0) {
-      iconSpan.textContent = type === 'rain' ? '🔇🌧' : '🔇🔥';
-      iconSpan.style.opacity = '0.5';
+      controlDiv.classList.add('muted');
     } else {
-      iconSpan.textContent = type === 'rain' ? '🌧' : '🔥';
-      iconSpan.style.opacity = '1';
+      controlDiv.classList.remove('muted');
     }
   }
 
@@ -2122,8 +2258,12 @@ window.toggleMateriaDropdown = toggleMateriaDropdown;
   window.changeFocusTheme = changeFocusTheme;
   window.setRainVolume = setRainVolume;
   window.setFireVolume = setFireVolume;
+  window.setForestVolume = setForestVolume;
+  window.setOceanVolume = setOceanVolume;
   window.toggleRainAudio = toggleRainAudio;
   window.toggleFireAudio = toggleFireAudio;
+  window.toggleForestAudio = toggleForestAudio;
+  window.toggleOceanAudio = toggleOceanAudio;
   function prevFocusTask() {
     const progressTasks = tasks.filter(t => t.column === 'progress');
     if (progressTasks.length <= 1) return;
@@ -2196,3 +2336,94 @@ window.toggleMateriaDropdown = toggleMateriaDropdown;
   window.completeFocusActiveTask = completeFocusActiveTask;
   window.prevFocusTask = prevFocusTask;
   window.nextFocusTask = nextFocusTask;
+
+  function toggleFocusSubtasksDrawer() {
+    const drawer = document.getElementById('focus-subtasks-drawer');
+    if (drawer) {
+      drawer.classList.toggle('show');
+      if (drawer.classList.contains('show')) {
+        renderFocusSubtasks();
+      }
+    }
+  }
+
+  function renderFocusSubtasks() {
+    const listContainer = document.getElementById('focus-subtasks-list');
+    if (!listContainer) return;
+
+    const progressTasks = tasks.filter(t => t.column === 'progress');
+    if (progressTasks.length === 0) {
+      listContainer.innerHTML = '<div style="color: rgba(255,255,255,0.4); font-size: 0.8rem; text-align: center; padding: 0.5rem 0;">No hay tareas en curso</div>';
+      return;
+    }
+
+    const activeTask = progressTasks[activeFocusTaskIndex];
+    if (!activeTask || !activeTask.subtasks || activeTask.subtasks.length === 0) {
+      listContainer.innerHTML = '<div style="color: rgba(255,255,255,0.4); font-size: 0.8rem; text-align: center; padding: 0.5rem 0;">Esta tarea no tiene subtareas</div>';
+      return;
+    }
+
+    listContainer.innerHTML = '';
+    activeTask.subtasks.forEach((sub, index) => {
+      const item = document.createElement('div');
+      item.className = 'focus-subtask-item';
+      item.innerHTML = `
+        <input type="checkbox" class="focus-subtask-chk" ${sub.completed ? 'checked' : ''} onchange="window.toggleFocusSubtaskStatus(${index})">
+        <span class="focus-subtask-txt ${sub.completed ? 'done' : ''}" onclick="window.toggleFocusSubtaskStatus(${index})">${escapeHTML(sub.text)}</span>
+      `;
+      listContainer.appendChild(item);
+    });
+  }
+
+  function toggleFocusSubtaskStatus(index) {
+    const progressTasks = tasks.filter(t => t.column === 'progress');
+    if (progressTasks.length === 0) return;
+    const activeTask = progressTasks[activeFocusTaskIndex];
+    if (!activeTask || !activeTask.subtasks || !activeTask.subtasks[index]) return;
+
+    activeTask.subtasks[index].completed = !activeTask.subtasks[index].completed;
+    
+    saveTasksToLocal();
+    renderKanban();
+    renderFocusSubtasks();
+
+    mockFetch(`/api/subtareas/${activeTask.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ subtasks: activeTask.subtasks })
+    })
+    .catch(err => {
+      activeTask.subtasks[index].completed = !activeTask.subtasks[index].completed;
+      saveTasksToLocal();
+      renderKanban();
+      renderFocusSubtasks();
+      showToast(err.message, "error");
+    });
+  }
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        showToast("Error al activar pantalla completa", "error");
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  }
+
+  document.addEventListener('fullscreenchange', () => {
+    const btn = document.getElementById('focus-fullscreen-toggle');
+    if (btn) {
+      if (document.fullscreenElement) {
+        btn.innerHTML = '🔍 Salir Completa';
+      } else {
+        btn.innerHTML = '📺 Pantalla Completa';
+      }
+    }
+  });
+
+  window.toggleFocusSubtasksDrawer = toggleFocusSubtasksDrawer;
+  window.renderFocusSubtasks = renderFocusSubtasks;
+  window.toggleFocusSubtaskStatus = toggleFocusSubtaskStatus;
+  window.toggleFullscreen = toggleFullscreen;
