@@ -113,12 +113,12 @@ window.toggleFaq = function(questionElement) {
 };
 
 // ================= FORMULARIO DE CONTACTO =================
-window.handleContactSubmit = function() {
+window.handleContactSubmit = async function() {
     const nameInput = document.getElementById('contact-name');
     const emailInput = document.getElementById('contact-email');
     const subjectSelect = document.getElementById('contact-subject');
     const msgInput = document.getElementById('contact-msg');
-    
+
     const errName = document.getElementById('err-name');
     const errEmail = document.getElementById('err-email');
     const errMsg = document.getElementById('err-msg');
@@ -126,7 +126,7 @@ window.handleContactSubmit = function() {
     errName.style.display = 'none';
     errEmail.style.display = 'none';
     errMsg.style.display = 'none';
-    
+
     let isValid = true;
 
     if (nameInput.value.trim() === '') {
@@ -149,8 +149,24 @@ window.handleContactSubmit = function() {
 
     if (isValid) {
         const subjectVal = subjectSelect.value;
+        const asunto = subjectSelect.options[subjectSelect.selectedIndex].text;
+
+        try {
+            await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    tipo: subjectVal,
+                    asunto: asunto,
+                    descripcion: msgInput.value.trim(),
+                    remitente_nombre: nameInput.value.trim(),
+                    remitente_email: emailValue,
+                })
+            });
+        } catch (_) { /* no bloqueamos el modal si falla */ }
+
         const modalDesc = document.getElementById('js-modal-feedback-desc');
-        
+
         if (subjectVal === 'academica') {
             modalDesc.textContent = `Hemos recibido tu Consulta Académica. Estudiantes avanzados y coordinadores del plan TUP 2024 responderán a la brevedad en tu correo ${emailValue}.`;
         } else if (subjectVal === 'soporte') {
