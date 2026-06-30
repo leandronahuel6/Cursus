@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ContactMail;
+use App\Mail\WelcomeMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Password;
 
@@ -55,6 +58,12 @@ class AuthController extends Controller
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        try {
+            Mail::to($user->email)->send(new WelcomeMail($user));
+        } catch (\Throwable $e) {
+            // No bloqueamos el registro si el mail falla
+        }
 
         return response()->json([
             'user' => $user,
@@ -147,5 +156,27 @@ class AuthController extends Controller
         $user->tokens()->where('id', '!=', $request->user()->currentAccessToken()->id)->delete();
 
         return response()->json(['message' => 'Contraseña actualizada correctamente.']);
+    }
+
+    public function contact(Request $request)
+    {
+        $data = $request->validate([
+            'tipo'             => 'required|string|max:50',
+            'asunto'           => 'required|string|max:255',
+            'descripcion'      => 'required|string|max:2000',
+            'remitente_nombre' => 'required|string|max:255',
+            'remitente_email'  => 'required|email|max:255',
+        ]);
+
+        Mail::to(config('mail.from.address'))
+            ->send(new ContactMail(
+                $data['tipo'],
+                $data['asunto'],
+                $data['descripcion'],
+                $data['remitente_nombre'],
+                $data['remitente_email'],
+            ));
+
+        return response()->json(['message' => 'Mensaje enviado correctamente.']);
     }
 }
