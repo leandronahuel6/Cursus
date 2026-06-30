@@ -179,9 +179,16 @@
     if (user.nombre) {
       const parts = user.nombre.trim().split(' ');
       const initials = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
-      if (avEl) avEl.textContent = initials;
-      if (bnAvEl) bnAvEl.textContent = initials;
-      if (pmAvEl) pmAvEl.textContent = initials;
+      [avEl, bnAvEl, pmAvEl, document.getElementById('profile-avatar-preview')].forEach(el => {
+        if (!el) return;
+        if (user.avatar_url) {
+          el.style.backgroundImage = `url('${user.avatar_url}')`;
+          el.textContent = '';
+        } else {
+          el.style.backgroundImage = '';
+          el.textContent = initials;
+        }
+      });
     }
 
     // Mostrar sección admin en sidebar solo si es admin
@@ -231,6 +238,60 @@
 
   function closeProfileModal() {
     document.getElementById('profile-edit-overlay').classList.remove('open');
+  }
+
+  async function handleAvatarFileChange(e) {
+    const file = e.target.files[0];
+    const errorEl = document.getElementById('profile-avatar-error');
+    errorEl.textContent = '';
+    if (!file) return;
+
+    const allowedTypes = ['image/png', 'image/jpeg'];
+    if (!allowedTypes.includes(file.type)) {
+      errorEl.textContent = 'Solo se permiten imágenes PNG o JPG.';
+      e.target.value = '';
+      return;
+    }
+
+    const token = getStoredToken();
+    if (!token) return;
+
+    const preview = document.getElementById('profile-avatar-preview');
+    const originalBg = preview.style.backgroundImage;
+    preview.style.opacity = '0.5';
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+      const response = await fetch('/api/profile/avatar', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        errorEl.textContent = data.errors?.avatar?.[0] || data.message || 'No se pudo actualizar la foto.';
+        preview.style.backgroundImage = originalBg;
+        return;
+      }
+
+      const storage = localStorage.getItem('token') ? localStorage : sessionStorage;
+      storage.setItem('user', JSON.stringify(data));
+      applyUserToDOM(data);
+    } catch (error) {
+      console.error('No se pudo actualizar la foto de perfil', error);
+      errorEl.textContent = 'Error de conexión.';
+      preview.style.backgroundImage = originalBg;
+    } finally {
+      preview.style.opacity = '';
+      e.target.value = '';
+    }
   }
 
   async function handleProfileSubmit(e) {
@@ -449,6 +510,7 @@
   window.openProfileModal          = openProfileModal;
   window.closeProfileModal         = closeProfileModal;
   window.handleProfileSubmit       = handleProfileSubmit;
+  window.handleAvatarFileChange    = handleAvatarFileChange;
   window.handleLogout              = handleLogout;
   window.updateAlertsBadge         = updateAlertsBadge;
   window.openChangePasswordModal   = openChangePasswordModal;

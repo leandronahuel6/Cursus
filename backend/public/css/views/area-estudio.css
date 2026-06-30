@@ -497,7 +497,7 @@
       background: rgba(17, 24, 39, 0.4);
       backdrop-filter: blur(4px);
       align-items: center; justify-content: center;
-      z-index: 200;
+      z-index: 20100;
       padding: 16px;
     }
     .modal-overlay.show { display: flex; }

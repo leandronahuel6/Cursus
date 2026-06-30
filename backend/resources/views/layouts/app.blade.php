@@ -185,11 +185,20 @@
       <div class="contact-title">
         <img class="contact-title-ic" src="{{ asset('assets/icons/user.svg') }}" alt="Perfil" style="width: 16px; height: 16px; opacity: 0.9;">
         Editar perfil
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.6; margin-left: 2px;"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
       </div>
       <button class="contact-close" onclick="window.closeProfileModal()">✕</button>
     </div>
     <div class="contact-body">
       <p class="contact-subtitle">Actualizá tus datos personales.</p>
+      <div class="profile-avatar-edit">
+        <div class="profile-avatar-preview" id="profile-avatar-preview">{{ $viewerInitials ?? '' }}</div>
+        <button type="button" class="profile-avatar-pencil" onclick="document.getElementById('profile-avatar-input').click()" title="Cambiar foto de perfil">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </button>
+        <input type="file" id="profile-avatar-input" accept="image/png,image/jpeg" style="display:none;" onchange="window.handleAvatarFileChange(event)">
+      </div>
+      <span id="profile-avatar-error" class="error-message" style="display:block; text-align:center; margin-bottom: 0.5rem;"></span>
       <form id="profile-edit-form" onsubmit="window.handleProfileSubmit(event)">
         <div class="contact-field">
           <label for="profile-nombre">Nombre completo</label>
