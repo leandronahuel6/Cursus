@@ -3,16 +3,25 @@
 @section('title', 'Cursus - Simulador de Horarios')
 
 @section('mobile-header')
-  <div class="mob-hdr mob-hdr-swapped">
-    <div class="mob-lbl">Simulador de Horarios 📅</div>
-    <div class="mob-row">
-      <div class="mob-name">Académico</div>
-      <div class="mob-tb-actions">
-        <button class="btn-secondary btn-mob-action" onclick="document.getElementById('btn-clear-grid').click()">♻ Limpiar</button>
-        <button class="btn-primary btn-mob-action" onclick="document.getElementById('btn-save-schedule').click()">💾 Guardar</button>
-      </div>
+<div class="mob-hdr">
+  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+    <div style="display: flex; flex-direction: column;">
+      <div class="mob-greet">Simulador de Horarios 📅</div>
+      <div class="mob-sub">Planificación del cuatrimestre</div>
     </div>
   </div>
+</div>
+@endsection
+
+@section('mobile-header-actions')
+<div class="horarios-mobile-hdr-actions">
+  <button class="btn-rect-mobile btn-rect-mobile-purple btn-rect-mobile-hdr" onclick="document.getElementById('btn-save-schedule').click()" title="Guardar Horario">
+    <span>💾 Guardar</span>
+  </button>
+  <button class="btn-rect-mobile btn-rect-mobile-hdr" onclick="document.getElementById('btn-clear-grid').click()" title="Limpiar Grilla">
+    <span>♻ Limpiar</span>
+  </button>
+</div>
 @endsection
 
 @section('topbar-content')

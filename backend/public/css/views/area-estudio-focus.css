@@ -339,10 +339,19 @@
     line-height: 1;
 }
 
+.focus-phase-display {
+    font-size: 0.8rem;
+    color: #a5b4fc;
+    margin-top: 0.4rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
 .focus-session-display {
-    font-size: 0.78rem;
+    font-size: 0.68rem;
     color: rgba(255, 255, 255, 0.5);
-    margin-top: 0.5rem;
+    margin-top: 0.15rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -575,6 +584,16 @@
 
     .focus-time-display {
         font-size: 2.8rem;
+    }
+
+    .focus-phase-display {
+        font-size: 0.68rem;
+        margin-top: 0.15rem;
+    }
+
+    .focus-session-display {
+        font-size: 0.58rem;
+        margin-top: 0.05rem;
     }
 
     .focus-bottom-bar {
