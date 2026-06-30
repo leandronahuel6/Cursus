@@ -1,6 +1,9 @@
 (function() {
     const isAreaEstudioPage = window.location.pathname.includes('/area-estudio');
-    if (isAreaEstudioPage) return; // No mostrar el flotante en la propia página de estudio
+    if (isAreaEstudioPage) {
+        localStorage.removeItem('cursus_pomo_float_dismissed'); // Resetear despido cuando vuelven a la página de estudio
+        return; 
+    }
 
     let pomoState = null;
     let pomoSettings = { focusTime: 25, shortBreak: 5, longBreak: 15, sessionsPerCycle: 4 };
@@ -96,7 +99,12 @@
     }
 
     function syncWithStorage() {
-        if (widgetDismissed) return;
+        const dismissed = localStorage.getItem('cursus_pomo_float_dismissed') === 'true';
+        if (widgetDismissed || dismissed) {
+            widget.classList.remove('is-visible');
+            stopTicker();
+            return;
+        }
 
         const localState = localStorage.getItem('cursus_pomo_estado_v2');
         if (!localState) {
@@ -113,19 +121,14 @@
             return;
         }
 
-        // Si el reloj está detenido, no mostrar el reproductor flotante
-        if (pomoState.estado_reloj === 'detenido') {
+        // El flotante SOLO debe mostrarse si el reloj está corriendo activamente (corriendo)
+        if (pomoState.estado_reloj !== 'corriendo') {
             widget.classList.remove('is-visible');
             stopTicker();
         } else {
             widget.classList.add('is-visible');
             updateWidgetUI();
-            
-            if (pomoState.estado_reloj === 'corriendo') {
-                startTicker();
-            } else {
-                stopTicker();
-            }
+            startTicker();
         }
     }
 
@@ -405,6 +408,7 @@
     closeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         widgetDismissed = true;
+        localStorage.setItem('cursus_pomo_float_dismissed', 'true'); // Persistir despido del widget
         widget.classList.remove('is-visible');
         stopTicker();
     });

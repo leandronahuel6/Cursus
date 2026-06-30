@@ -592,7 +592,7 @@ function renderTreeView() {
           </div>
           <div class="status-buttons-row">
             <button class="btn-status-toggle ${!lockedDisponible && subState.status === 'disponible' ? 'active disponible' : ''}"
-                    ${lockedDisponible ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'disponible')">D</button>
+                    ${lockedDisponible ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'disponible')">Disponible</button>
             <button class="btn-status-toggle ${!lockedCursando && subState.status === 'cursando' ? 'active cursando' : ''}"
                     ${lockedCursando ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'cursando')">Cursar</button>
             <button class="btn-status-toggle ${!lockedRegular && subState.status === 'regular' ? 'active regular' : ''}"
