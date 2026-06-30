@@ -494,9 +494,13 @@
     if (focusTimeEl) {
       focusTimeEl.textContent = `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
       
+      const focusPhaseEl = document.getElementById('focus-phase-display');
+      if (focusPhaseEl) {
+        focusPhaseEl.textContent = faseTxt;
+      }
       const focusSessionEl = document.getElementById('focus-session-display');
       if (focusSessionEl) {
-        focusSessionEl.textContent = `${faseTxt} · Sesión ${pomoCycles.ciclo_actual} de ${pomoSettings.sessionsPerCycle}`;
+        focusSessionEl.textContent = `Sesión ${pomoCycles.ciclo_actual} de ${pomoSettings.sessionsPerCycle}`;
       }
 
       // Toggles active class on focus phase tabs
