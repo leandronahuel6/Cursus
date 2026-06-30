@@ -43,6 +43,13 @@
       <svg class="pmenu-ic" aria-hidden="true" width="16" height="16"><use href="{{ asset('assets/icons/sprite.svg#message-square') }}"></use></svg>
       Contacto
     </button>
+    <button class="profile-menu-item" onclick="if(window.startOnboardingTour && window.location.pathname.endsWith('/dashboard')){ window.startOnboardingTour(); document.getElementById('profile-menu').classList.remove('open'); const userEl = document.querySelector('.sb-user'); if(userEl) userEl.classList.remove('menu-open'); } else { location.href='{{ route('dashboard') }}?start_tour=true'; }">
+      <svg class="pmenu-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.9;">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+      </svg>
+      Guía Rápida
+    </button>
     <div class="profile-menu-divider"></div>
     <div class="profile-menu-item profile-menu-switch-row" onclick="event.stopPropagation()">
       <span>Animaciones</span>
@@ -265,6 +272,9 @@
 <script src="{{ asset('js/script.js') }}"></script>
 <script src="{{ asset('js/profile.js') }}"></script>
 <script src="{{ asset('js/pomo-float.js') }}"></script>
+@if(Request::routeIs('dashboard') || Request::routeIs('area-estudio'))
+<script src="{{ asset('js/onboarding.js') }}"></script>
+@endif
 @stack('scripts')
 
 </body>
