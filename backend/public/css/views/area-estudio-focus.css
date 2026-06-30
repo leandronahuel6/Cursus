@@ -252,6 +252,7 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 28px;
     padding: 2.5rem 2rem;
+    margin-bottom: 110px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -533,6 +534,10 @@
 
 /* Botón de Salida */
 .focus-exit-btn {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 20;
     background: rgba(239, 68, 68, 0.12);
     border: 1px solid rgba(239, 68, 68, 0.25);
     color: #f87171;
@@ -647,6 +652,13 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
         width: 100%;
         justify-content: center;
     }
+
+    .focus-exit-btn {
+        top: 14px;
+        right: 14px;
+        width: 32px;
+        height: 32px;
+    }
 }
 
 /* Banner de Meta / Tarea Activa */
@@ -684,15 +696,45 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
    ESTILOS DE TABS DE FASE Y PANEL LOFI
    ========================================================================== */
 
+.focus-phase-tabs-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
 .focus-phase-tabs {
     display: inline-flex;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 999px;
     padding: 0.25rem;
-    margin-bottom: 1.5rem;
     gap: 0.25rem;
     z-index: 12;
+}
+
+.focus-card-close-btn {
+    flex-shrink: 0;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #f87171;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.focus-card-close-btn:hover {
+    background: rgba(239, 68, 68, 0.25);
+    color: #ffffff;
+    transform: scale(1.05);
 }
 
 .focus-phase-tab {

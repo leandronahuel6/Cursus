@@ -27,6 +27,7 @@ Route::get('/cuotas', [CuotaController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);
+    Route::post('/profile/avatar', [AuthController::class, 'updateAvatar']);
     Route::put('/change-password', [AuthController::class, 'changePassword']);
     Route::get('/user', function (Request $request) {
         return $request->user();

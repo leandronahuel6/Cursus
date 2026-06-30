@@ -408,10 +408,15 @@
 
   <!-- Tarjeta central con el reloj y controles -->
   <div class="focus-central-card">
-    <div class="focus-phase-tabs">
-      <button class="focus-phase-tab active" id="phase-tab-enfoque" onclick="window.changeFocusPhase('enfoque')">Pomodoro</button>
-      <button class="focus-phase-tab" id="phase-tab-corto" onclick="window.changeFocusPhase('descanso_corto')">Recreo Corto</button>
-      <button class="focus-phase-tab" id="phase-tab-largo" onclick="window.changeFocusPhase('descanso_largo')">Recreo Largo</button>
+    <div class="focus-phase-tabs-row">
+      <div class="focus-phase-tabs">
+        <button class="focus-phase-tab active" id="phase-tab-enfoque" onclick="window.changeFocusPhase('enfoque')">Pomodoro</button>
+        <button class="focus-phase-tab" id="phase-tab-corto" onclick="window.changeFocusPhase('descanso_corto')">Recreo Corto</button>
+        <button class="focus-phase-tab" id="phase-tab-largo" onclick="window.changeFocusPhase('descanso_largo')">Recreo Largo</button>
+      </div>
+      <button class="focus-card-close-btn" onclick="window.exitFocusMode()" title="Salir del Modo Concentración">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
     
     <!-- Banner de Meta / Tarea Activa -->
@@ -536,11 +541,6 @@
     <button class="focus-theme-btn" id="focus-fullscreen-toggle" onclick="window.toggleFullscreen()" title="Pantalla Completa">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
       <span id="focus-fullscreen-text">Pantalla Completa</span>
-    </button>
-
-    <!-- Botón de Salir -->
-    <button class="focus-exit-btn" onclick="window.exitFocusMode()" title="Salir del Modo Concentración">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
 
