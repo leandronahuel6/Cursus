@@ -287,8 +287,7 @@
 <script src="{{ asset('js/celebracion.js') }}"></script>
 <script src="{{ asset('js/shared/sidebar.js') }}"></script>
 <script src="{{ asset('js/profile.js') }}"></script>
-<script src="{{ asset('js/pomo-shared.js') }}?v={{ filemtime(public_path('js/pomo-shared.js')) }}"></script>
-<script src="{{ asset('js/pomo-float.js') }}?v={{ filemtime(public_path('js/pomo-float.js')) }}"></script>
+<script type="module" src="{{ asset('js/pomo-float.js') }}?v={{ filemtime(public_path('js/pomo-float.js')) }}"></script>
 @if(Request::routeIs('dashboard') || Request::routeIs('area-estudio'))
 <script src="{{ asset('js/onboarding.js') }}"></script>
 @endif

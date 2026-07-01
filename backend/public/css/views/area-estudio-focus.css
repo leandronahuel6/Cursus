@@ -783,11 +783,18 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
     box-shadow: 0 0 10px rgba(99, 102, 241, 0.15);
 }
 
-#phase-tab-corto.active, #phase-tab-largo.active {
+#phase-tab-corto.active {
     background: rgba(16, 185, 129, 0.25);
     color: #6ee7b7;
     border: 1px solid rgba(16, 185, 129, 0.3);
     box-shadow: 0 0 10px rgba(16, 185, 129, 0.15);
+}
+
+#phase-tab-largo.active {
+    background: rgba(96, 165, 250, 0.25);
+    color: #93c5fd;
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    box-shadow: 0 0 10px rgba(96, 165, 250, 0.15);
 }
 
 /* Panel Lofi Lateral */
