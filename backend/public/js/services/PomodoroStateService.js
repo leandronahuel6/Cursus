@@ -577,7 +577,15 @@ class PomodoroStateService extends EventTarget {
             duracionSegundos: this._settings.focusTime * 60,
         });
 
+        // Emitir cambio de estado para que la UI se repinte inmediatamente con la nueva fase
+        this._emitir('pomo:estadoCambiado');
+
         this._iniciarTicker();
+
+        // 6. Si fue fase de enfoque, registrar globalmente con deduplicación
+        if (faseFinalizadaKey === 'enfoque') {
+            this._registrarSesionEnBackend(this._settings.focusTime * 60);
+        }
     }
 
     /* =========================================================================
@@ -646,6 +654,69 @@ class PomodoroStateService extends EventTarget {
                 ...extraDetail,
             },
         }));
+    }
+
+    /**
+     * Registra de forma global y atómica la sesión en el backend.
+     * Utiliza Web Locks API para garantizar exclusión mutua entre pestañas.
+     * @param {number} duracionSegundos 
+     */
+    _registrarSesionEnBackend(duracionSegundos) {
+        const rawMateria = localStorage.getItem('cursus_selected_materia');
+        if (!rawMateria) return;
+        const materiaId = parseInt(rawMateria, 10);
+        if (isNaN(materiaId)) return;
+
+        if (!navigator.locks) {
+            this._registrarConTokenLegacy(materiaId, duracionSegundos);
+            return;
+        }
+
+        navigator.locks.request('cursus_pomo_dedup', { mode: 'exclusive' }, async () => {
+            const dedupKey      = LS_KEYS.DEDUP_TOKEN;
+            const ahora         = Date.now();
+            const existingToken = localStorage.getItem(dedupKey);
+
+            if (existingToken && (ahora - parseInt(existingToken, 10)) <= 10000) return;
+
+            localStorage.setItem(dedupKey, String(ahora));
+            setTimeout(() => {
+                if (localStorage.getItem(dedupKey) === String(ahora)) {
+                    localStorage.removeItem(dedupKey);
+                }
+            }, 30000);
+
+            try {
+                await ApiService.registrarSesionCompletada(materiaId, duracionSegundos);
+                this._emitir('pomo:sesionRegistradaBackend');
+            } catch (e) {
+                console.error('Error registrando sesión completada global', e);
+            }
+        });
+    }
+
+    /**
+     * Fallback de deduplicación sin garantía atómica para Safari < 15.4
+     * @param {number} materiaId 
+     * @param {number} duracionSegundos 
+     */
+    _registrarConTokenLegacy(materiaId, duracionSegundos) {
+        const dedupKey      = LS_KEYS.DEDUP_TOKEN;
+        const ahora         = Date.now();
+        const existingToken = localStorage.getItem(dedupKey);
+
+        if (existingToken && (ahora - parseInt(existingToken, 10)) <= 10000) return;
+
+        localStorage.setItem(dedupKey, String(ahora));
+        setTimeout(() => {
+            if (localStorage.getItem(dedupKey) === String(ahora)) {
+                localStorage.removeItem(dedupKey);
+            }
+        }, 30000);
+
+        ApiService.registrarSesionCompletada(materiaId, duracionSegundos)
+            .then(() => this._emitir('pomo:sesionRegistradaBackend'))
+            .catch(e => console.error('Error registrando sesión completada global (legacy)', e));
     }
 }
 

@@ -20,9 +20,10 @@
 
 'use strict';
 
-import { pomodoroService, LS_KEYS } from '../services/PomodoroStateService.js';
-import { ApiService }                from '../services/ApiService.js';
-import { ESTADOS_POMO }              from '../models/PomodoroStates.js';
+import { pomodoroService, LS_KEYS }    from '../services/PomodoroStateService.js';
+import { ApiService }                  from '../services/ApiService.js';
+import { ESTADOS_POMO }                from '../models/PomodoroStates.js';
+import { playPomoAlarm, unlockPomoAudio } from '../shared/pomo-audio-player.js';
 
 /* ==========================================================================
    CONSTANTES DE PRESENTACIÓN
@@ -60,106 +61,13 @@ let materiasCursando = [];
    SISTEMA DE AUDIO
    ========================================================================== */
 
-/** Instancia compartida del AudioContext para evitar múltiples instancias. */
-let pomoAudioCtx = null;
-
-/**
- * Obtiene o crea el AudioContext del sistema de alarmas del Pomodoro.
- * Se llama de forma diferida (al primer gesto del usuario) para cumplir con
- * la política de autoplay de los navegadores modernos.
- * @returns {AudioContext|null} El contexto de audio, o null si no está disponible.
- */
-function getPomoAudioCtx() {
-    if (!pomoAudioCtx) {
-        const AudioCtor = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtor) return null;
-        pomoAudioCtx = new AudioCtor();
-    }
-    if (pomoAudioCtx.state === 'suspended') pomoAudioCtx.resume();
-    return pomoAudioCtx;
-}
-
-/**
- * Reproduce un sonido de chime de dos notas (ideal para fin de enfoque).
- * @param {AudioContext} ctx - Contexto de audio activo.
- */
-function playChime(ctx) {
-    [880, 1175].forEach((freq, i) => {
-        const start = ctx.currentTime + i * 0.16;
-        const osc   = ctx.createOscillator();
-        const gain  = ctx.createGain();
-        osc.type            = 'sine';
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(0.12, start + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.7);
-        osc.connect(gain).connect(ctx.destination);
-        osc.start(start);
-        osc.stop(start + 0.75);
-    });
-}
-
-/**
- * Reproduce tres beeps cortos (ideal para el Modo Estricto).
- * @param {AudioContext} ctx - Contexto de audio activo.
- */
-function playBeep(ctx) {
-    [0, 0.2, 0.4].forEach((delay) => {
-        const start = ctx.currentTime + delay;
-        const osc   = ctx.createOscillator();
-        const gain  = ctx.createGain();
-        osc.type            = 'square';
-        osc.frequency.value = 987.77; // Si5
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(0.08, start + 0.01);
-        gain.gain.setValueAtTime(0.08, start + 0.09);
-        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.12);
-        osc.connect(gain).connect(ctx.destination);
-        osc.start(start);
-        osc.stop(start + 0.15);
-    });
-}
-
-/**
- * Reproduce un acorde zen relajante (ideal para fin de descanso).
- * @param {AudioContext} ctx - Contexto de audio activo.
- */
-function playZen(ctx) {
-    const frequencies = [440, 554.37, 659.25, 880];
-    frequencies.forEach((freq, index) => {
-        const osc  = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type            = index % 2 === 0 ? 'sine' : 'triangle';
-        osc.frequency.value = freq;
-        const start = ctx.currentTime;
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(0.05, start + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.001, start + 1.8 - (index * 0.2));
-        osc.connect(gain).connect(ctx.destination);
-        osc.start(start);
-        osc.stop(start + 2.0);
-    });
-}
-
-/**
- * Reproduce la alarma configurada por el usuario al finalizar una fase.
- * @param {string} soundName - Nombre del sonido ('chime' | 'beep' | 'zen' | 'none').
- */
-function playPomoAlarm(soundName) {
-    if (!soundName || soundName === 'none') return;
-    const ctx = getPomoAudioCtx();
-    if (!ctx) return;
-    if (soundName === 'chime')      playChime(ctx);
-    else if (soundName === 'beep') playBeep(ctx);
-    else if (soundName === 'zen')  playZen(ctx);
-}
-
 /**
  * Prueba el sonido seleccionado en el modal de configuración del Pomodoro.
  * Se expone en window para ser llamada desde el botón inline del modal.
+ * Delega la síntesis a `pomo-audio-player.js` (SRP).
  */
 function testSelectedSound() {
-    getPomoAudioCtx();
+    unlockPomoAudio();
     const select = document.getElementById('custom-pomo-sound');
     if (select) playPomoAlarm(select.value);
 }
@@ -390,7 +298,8 @@ function togglePomo() {
         pomodoroService.pausar();
     } else {
         // Desbloquear el AudioContext con el gesto del usuario antes de iniciar
-        getPomoAudioCtx();
+        // (delega al módulo de audio centralizado)
+        unlockPomoAudio();
         pomodoroService.iniciar();
     }
 }
@@ -1829,19 +1738,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderFocusMode(e.detail);
     });
 
-    pomodoroService.addEventListener('pomo:faseCompletada', (e) => {
-        // 1. Reproducir alarma en la UI (el servicio no conoce el audio)
+    pomodoroService.addEventListener('pomo:faseCompletada', () => {
+        // 1. Reproducir alarma via módulo de audio centralizado (pomo-audio-player.js)
         const alarmSound = localStorage.getItem(LS_KEYS.SONIDO_ALARMA) || 'chime';
         playPomoAlarm(alarmSound);
+    });
 
-        // 2. Registrar sesión completada en el backend si era fase de enfoque
-        if (e.detail.faseCompletada === 'enfoque' && selectedMateriaId) {
-            _registrarSesionConDedup(e.detail.duracionSegundos);
+    pomodoroService.addEventListener('pomo:sesionRegistradaBackend', () => {
+        // Refrescar el resumen de la materia (stats, etc) en la vista activa
+        if (selectedMateriaId) {
+            loadMateriaResumen();
         }
-
-        // 3. Re-renderizar ambos paneles con el snapshot post-completación
-        renderTimerPrincipal(e.detail);
-        renderFocusMode(e.detail);
     });
 
     // --- Inicializar el Servicio del Pomodoro (SSOT) ---
@@ -1866,12 +1773,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.addEventListener('visibilitychange', () => {
         const strictMode = localStorage.getItem(LS_KEYS.MODO_ESTRICTO) === 'true';
         const snapshot   = pomodoroService.obtenerSnapshot();
-        if (document.hidden && strictMode && snapshot.state.estado_reloj === 'corriendo') {
+        
+        // CORRECCIÓN: Solo aplicar la regla si el reloj corre Y estamos en fase de enfoque.
+        const enEnfoqueCorriendo = snapshot.state.estado_reloj === 'corriendo' && snapshot.state.fase_actual === 'enfoque';
+
+        if (document.hidden && strictMode && enEnfoqueCorriendo) {
             let distractCount = parseInt(sessionStorage.getItem('cursus_strict_distractions') || '0', 10);
             distractCount++;
             sessionStorage.setItem('cursus_strict_distractions', String(distractCount));
+            // Llamada al módulo de audio centralizado (SRP)
             playPomoAlarm('beep');
-        } else if (!document.hidden && strictMode && snapshot.state.estado_reloj === 'corriendo') {
+        } else if (!document.hidden && strictMode && enEnfoqueCorriendo) {
             const distractCount = sessionStorage.getItem('cursus_strict_distractions') || '0';
             if (distractCount !== '0') {
                 showToast(`¡Atención! Te has distraído cambiando de pestaña. Distracciones: ${distractCount}. Mantén el enfoque.`, 'warn');
@@ -1890,42 +1802,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Cargar materias y estado inicial ---
     await loadMateriasCursando();
 });
-
-/* ==========================================================================
-   HELPERS PRIVADOS (Internos al módulo)
-   ========================================================================== */
-
-/**
- * Registra una sesión de enfoque completada en el backend usando un token de
- * deduplicación para evitar registros dobles si el evento se dispara múltiples veces
- * por condiciones de carrera (ej: recarga rápida al momento exacto de finalización).
- *
- * Usa una ventana de 10 segundos: si ya existe un token reciente, descarta el request.
- *
- * @param {number} duracionSegundos - Duración de la sesión a registrar.
- */
-function _registrarSesionConDedup(duracionSegundos) {
-    const dedupKey      = LS_KEYS.DEDUP_TOKEN;
-    const ahora         = Date.now();
-    const existingToken = localStorage.getItem(dedupKey);
-
-    if (existingToken && (ahora - parseInt(existingToken)) <= 10000) {
-        // Sesión duplicada dentro de la ventana de dedup: ignorar
-        return;
-    }
-
-    localStorage.setItem(dedupKey, String(ahora));
-    // Limpiar el token después de 30 s por si el request falla silenciosamente
-    setTimeout(() => {
-        if (localStorage.getItem(dedupKey) === String(ahora)) {
-            localStorage.removeItem(dedupKey);
-        }
-    }, 30000);
-
-    ApiService.registrarSesionCompletada(selectedMateriaId, duracionSegundos)
-        .then(() => loadMateriaResumen())
-        .catch(e => console.error('Error registrando sesión completada', e));
-}
 
 /* ==========================================================================
    EXPORTS — window.* para handlers inline del HTML (Blade y dinámico)
