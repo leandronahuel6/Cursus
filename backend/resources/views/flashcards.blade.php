@@ -1833,12 +1833,13 @@
     const sectionManage = document.getElementById('section-manage');
 
     // Carga inicial
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
         if (!activeToken) {
             window.location.replace('/login');
             return;
         }
 
+        await loadMateriasCursandoFlashcards();
         loadDecks();
         initColorPicker();
         initStudyModeSelector();
@@ -1902,6 +1903,19 @@
     // ==========================================================================
     // LÓGICA DE MAZOS (DECKS)
     // ==========================================================================
+    let materiasCursandoFlashcards = [];
+
+    async function loadMateriasCursandoFlashcards() {
+        try {
+            const response = await fetch('/api/mis-materias', { headers: getApiHeaders() });
+            if (!response.ok) throw new Error('No se pudieron cargar las materias');
+            const data = await response.json();
+            materiasCursandoFlashcards = data.filter(m => m.estado === 'cursando');
+        } catch (err) {
+            materiasCursandoFlashcards = [];
+        }
+    }
+
     async function loadDecks() {
         const container = document.getElementById('decks-container');
         try {
@@ -1951,7 +1965,7 @@
 
     function renderDecks(decks) {
         const container = document.getElementById('decks-container');
-        if (decks.length === 0) {
+        if (decks.length === 0 && materiasCursandoFlashcards.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <svg class="empty-state-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
@@ -1976,20 +1990,44 @@
             groups[cat].push(deck);
         });
 
+        // Mostrar también las materias en curso que todavía no tienen ningún mazo,
+        // para que el alumno pueda elegirlas aunque estén vacías.
+        materiasCursandoFlashcards.forEach(m => {
+            if (!groups[m.nombre]) {
+                groups[m.nombre] = [];
+            }
+        });
+
+        // Materias que el alumno está cursando ahora mismo (vienen de la base de datos vía /api/mis-materias)
+        const materiaNombres = materiasCursandoFlashcards.map(m => m.nombre);
+        let materiasOptionsHtml = '';
+        if (materiaNombres.length > 0) {
+            materiasOptionsHtml += `<optgroup label="Mis materias en curso">`;
+            materiaNombres.forEach(nombre => {
+                materiasOptionsHtml += `<option value="${escapeHtml(nombre)}">${escapeHtml(nombre)}</option>`;
+            });
+            materiasOptionsHtml += `</optgroup>`;
+        }
+
         // Poblar el selector de carpetas del modal de creación
         const selectCategory = document.getElementById('deck-select-category');
         if (selectCategory) {
-            const distinctCategories = Object.keys(groups).filter(cat => cat !== 'General');
+            const distinctCategories = Object.keys(groups).filter(cat => cat !== 'General' && !materiaNombres.includes(cat));
             const currentValue = selectCategory.value;
-            
+
             let selectHtml = `<option value="General">General (Sin contenedor)</option>`;
-            distinctCategories.forEach(cat => {
-                selectHtml += `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`;
-            });
+            selectHtml += materiasOptionsHtml;
+            if (distinctCategories.length > 0) {
+                selectHtml += `<optgroup label="Otros contenedores">`;
+                distinctCategories.forEach(cat => {
+                    selectHtml += `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`;
+                });
+                selectHtml += `</optgroup>`;
+            }
             selectHtml += `<option value="__NEW__">+ Crear nuevo contenedor...</option>`;
-            
+
             selectCategory.innerHTML = selectHtml;
-            
+
             if (currentValue && selectCategory.querySelector(`option[value="${currentValue}"]`)) {
                 selectCategory.value = currentValue;
             }
@@ -1998,20 +2036,25 @@
         // Poblar el selector de carpetas del modal de IA
         const aiSelectCategory = document.getElementById('ai-deck-select-category');
         if (aiSelectCategory) {
-            const distinctCategories = Object.keys(groups).filter(cat => cat !== 'General');
+            const distinctCategories = Object.keys(groups).filter(cat => cat !== 'General' && !materiaNombres.includes(cat));
             const currentValue = aiSelectCategory.value;
-            
+
             let selectHtml = `
                 <option value="__AUTO__">Auto-detectar con IA ✨</option>
                 <option value="General">General (Sin contenedor)</option>
             `;
-            distinctCategories.forEach(cat => {
-                selectHtml += `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`;
-            });
+            selectHtml += materiasOptionsHtml;
+            if (distinctCategories.length > 0) {
+                selectHtml += `<optgroup label="Otros contenedores">`;
+                distinctCategories.forEach(cat => {
+                    selectHtml += `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`;
+                });
+                selectHtml += `</optgroup>`;
+            }
             selectHtml += `<option value="__NEW__">+ Crear nuevo contenedor...</option>`;
-            
+
             aiSelectCategory.innerHTML = selectHtml;
-            
+
             if (currentValue && aiSelectCategory.querySelector(`option[value="${currentValue}"]`)) {
                 aiSelectCategory.value = currentValue;
             }
@@ -2019,7 +2062,11 @@
 
         // Renderizar cada grupo de categoría colapsable
         let html = '';
-        Object.keys(groups).sort().forEach(cat => {
+        Object.keys(groups).sort((a, b) => {
+            if (a === 'General') return -1;
+            if (b === 'General') return 1;
+            return a.localeCompare(b);
+        }).forEach(cat => {
             const catDecks = groups[cat];
             const catId = 'cat-' + cat.toLowerCase().replace(/[^a-z0-9]/g, '-');
             const isCollapsed = localStorage.getItem('collapsed_cat_' + catId) === 'true';
@@ -2040,6 +2087,18 @@
                     </div>
                     <div class="decks-grid" id="grid-${catId}" style="display:${isCollapsed ? 'none' : 'grid'}; transition:all 0.3s ease;">
             `;
+
+            if (catDecks.length === 0) {
+                html += `
+                    <div class="empty-state" style="grid-column: 1 / -1; padding: 1.5rem;">
+                        <p class="empty-state-desc" style="margin: 0 0 0.8rem 0;">Todavía no tienes mazos para esta materia.</p>
+                        <button class="btn-create-deck" style="margin: 0 auto;" onclick="openCreateDeckModalForMateria('${escapeJs(cat)}')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"/></svg>
+                            Crear Mazo
+                        </button>
+                    </div>
+                `;
+            }
 
             catDecks.forEach(deck => {
                 const hasCards = deck.cards_count > 0;
@@ -2144,6 +2203,15 @@
         document.getElementById('deck-modal-title-text').innerText = 'Nuevo Mazo de Estudio';
         document.getElementById('btn-deck-submit').innerText = 'Crear Mazo';
         document.getElementById('create-deck-modal').classList.add('open');
+    }
+
+    function openCreateDeckModalForMateria(materiaNombre) {
+        openCreateDeckModal();
+        const select = document.getElementById('deck-select-category');
+        if (select && select.querySelector(`option[value="${CSS.escape(materiaNombre)}"]`)) {
+            select.value = materiaNombre;
+            handleDeckSelectCategoryChange();
+        }
     }
 
     function openEditDeckModal(deckId, event) {

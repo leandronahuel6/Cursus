@@ -765,9 +765,10 @@
         pomoState.tiempo_restante = pomoSettings.focusTime * 60;
       }
 
-      pomoState.estado_reloj = 'detenido';
+      pomoState.estado_reloj = 'corriendo';
       savePomoStateToLocal();
       updatePomoUI();
+      startTicker();
       showToast("Fase salteada", "success");
     });
   }
