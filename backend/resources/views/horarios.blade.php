@@ -36,7 +36,7 @@
 
 @section('topbar-content')
   <div class="topbar-title" style="display: flex; align-items: center; gap: 15px;">
-    <span>Simulador de Horarios 📅</span>
+    Simulador de Horarios <span>📅</span>
     <div class="version-tabs">
       <button class="btn-version active" id="btn-version-A" onclick="switchVersion('A')">Versión A</button>
       <button class="btn-version" id="btn-version-B" onclick="switchVersion('B')">Versión B</button>

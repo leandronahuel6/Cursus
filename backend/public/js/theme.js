@@ -3,6 +3,11 @@
     const isDark = theme === 'dark';
     document.body.classList.toggle('dark-mode', isDark);
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+    // Sin esto, los controles nativos (el popup de <select>, por ejemplo)
+    // pueden seguir el tema del sistema operativo en vez del tema del sitio.
+    const meta = document.getElementById('color-scheme-meta');
+    if (meta) meta.setAttribute('content', isDark ? 'dark' : 'light');
   }
 
   function resolveInitialTheme() {

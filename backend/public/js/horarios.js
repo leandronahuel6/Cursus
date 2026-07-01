@@ -591,7 +591,9 @@ function renderBlocksOnTracks() {
 
     const blockDiv = document.createElement('div');
     
-    // Mapeo de color personalizado
+    // Mapeo de color personalizado. `b.color` puede venir como código hex
+    // (elegido a mano en el editor) o como nombre de tema (los presets del
+    // curso oficial, ver UTN_SCHEDULE_PRESETS, guardan directamente el nombre).
     const colorMap = {
       '#4f46e5': 'indigo',
       '#9333ea': 'purple',
@@ -600,8 +602,11 @@ function renderBlocksOnTracks() {
       '#f59e0b': 'amber',
       '#0ea5e9': 'sky'
     };
-    const colorHex = b.color || (b.tipo === 'materia' ? '#4f46e5' : '#9333ea');
-    const colorName = colorMap[colorHex] || (b.tipo === 'materia' ? 'indigo' : 'purple');
+    const colorNames = Object.values(colorMap);
+    const rawColor = b.color || (b.tipo === 'materia' ? '#4f46e5' : '#9333ea');
+    const colorName = colorNames.includes(rawColor)
+      ? rawColor
+      : (colorMap[rawColor] || (b.tipo === 'materia' ? 'indigo' : 'purple'));
     const colorClass = `theme-color-${colorName}`;
 
     let classes = `sched-time-block ${colorClass}`;
@@ -1513,6 +1518,18 @@ const UTN_SCHEDULE_PRESETS = {
   ]
 };
 
+// Los presets guardan el color como nombre de tema (ver arriba); acá se
+// convierte a hex porque el resto de la app (editor manual, render de
+// bloques) siempre trabaja con códigos hex para el color de un bloque.
+const THEME_NAME_TO_HEX = {
+  indigo: '#4f46e5',
+  purple: '#9333ea',
+  emerald: '#10b981',
+  rose: '#f43f5e',
+  amber: '#f59e0b',
+  sky: '#0ea5e9'
+};
+
 window.loadUTNPresetSchedule = function() {
   const select = document.getElementById('utn-presets-select');
   if (!select) return;
@@ -1551,7 +1568,7 @@ window.loadUTNPresetSchedule = function() {
           dia: preset.dia,
           inicio: preset.inicio,
           fin: preset.fin,
-          color: preset.color,
+          color: THEME_NAME_TO_HEX[preset.color] || preset.color,
           version: schedState.currentVersion
         };
         
