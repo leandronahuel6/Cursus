@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);
     Route::post('/profile/avatar', [AuthController::class, 'updateAvatar']);
+    Route::delete('/profile/avatar', [AuthController::class, 'deleteAvatar']);
     Route::put('/change-password', [AuthController::class, 'changePassword']);
     Route::get('/user', function (Request $request) {
         return $request->user();
@@ -45,9 +46,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/horarios', [HorarioController::class, 'index']);
     Route::post('/horarios/sync', [HorarioController::class, 'sync']);
+    Route::get('/horarios/compartido/{userId}', [HorarioController::class, 'sharedSchedule']);
+    Route::get('/horarios/buscar-usuario', [HorarioController::class, 'findUser']);
 
     Route::post('/pomodoro/sesiones', [SesionPomodoroController::class, 'store']);
     Route::get('/pomodoro/resumen', [SesionPomodoroController::class, 'resumenUsuario']);
+    Route::get('/pomodoro/productividad', [SesionPomodoroController::class, 'productividad']);
     Route::get('/materias/{materia}/pomodoro-resumen', [SesionPomodoroController::class, 'resumenMateria']);
 
     Route::get('/tareas/proximas', [TareaController::class, 'proximas']);

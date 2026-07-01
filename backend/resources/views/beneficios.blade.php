@@ -452,10 +452,9 @@
     <div class="advice-banner-content">
       <span style="font-size: 24px;">💡</span>
       <div class="advice-banner-text">
-        <strong>Consejo Cursus:</strong> Tu <strong>Constancia de Alumno Regular</strong> es la llave de acceso a casi todos estos beneficios. Podés descargarla en formato PDF al instante desde el SIU Guaraní.
+        <strong>Consejo Cursus:</strong> Tu <strong>Constancia de Alumno Regular</strong> es la llave de acceso a casi todos estos beneficios, contactate con el departamento de alumnos de la TUP.
       </div>
     </div>
-    <button class="advice-banner-btn" onclick="window.open('https://guarani.frh.utn.edu.ar/haedo/', '_blank')">Ir al SIU Guaraní</button>
   </div>
 
   <div class="filter-tabs-container">

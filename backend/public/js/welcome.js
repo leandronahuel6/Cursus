@@ -453,6 +453,104 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // 7.5. Subpestaña Horarios: Simular Versiones A/B y Resolutor
+    const mockResolveBtn = document.getElementById('mock-resolve-btn');
+    const mockOverlapBlock = document.getElementById('mock-overlap-block');
+    const mockClashResolverBar = document.getElementById('mock-clash-resolver-bar');
+    const mockVerA = document.getElementById('mock-ver-a');
+    const mockVerB = document.getElementById('mock-ver-b');
+    const mockScheduleList = document.getElementById('mock-schedule-list');
+
+    function attachResolveEvent(btn) {
+        if (!btn) return;
+        btn.addEventListener('click', () => {
+            const overlap = document.getElementById('mock-overlap-block');
+            if (overlap) {
+                overlap.style.transition = 'all 0.3s ease';
+                overlap.style.opacity = '0';
+                setTimeout(() => {
+                    overlap.style.display = 'none';
+                }, 300);
+            }
+            if (mockClashResolverBar) {
+                mockClashResolverBar.innerHTML = `
+                    <span style="font-size: 10px; font-weight: 700; color: #047857; display: flex; align-items: center; gap: 4px;">
+                        ✓ Solapamiento resuelto: Inglés I movida a Miércoles.
+                    </span>
+                    <span style="font-size: 9px; color: #047857; background: #d1fae5; padding: 2px 6px; border-radius: 2px; font-weight: 700;">Seguro</span>
+                `;
+                mockClashResolverBar.style.background = '#d1fae5';
+                mockClashResolverBar.style.borderColor = '#a7f3d0';
+            }
+        });
+    }
+
+    if (mockResolveBtn) {
+        attachResolveEvent(mockResolveBtn);
+    }
+
+    if (mockVerA && mockVerB && mockScheduleList) {
+        mockVerA.addEventListener('click', () => {
+            mockVerA.style.background = 'var(--brand)';
+            mockVerA.style.color = '#fff';
+            mockVerB.style.background = 'rgba(0,0,0,0.05)';
+            mockVerB.style.color = 'var(--text-muted)';
+            
+            mockScheduleList.innerHTML = `
+                <div style="display: grid; grid-template-columns: 55px 1fr; gap: 8px; align-items: center; background: var(--mock-widget-bg); border: 1px solid var(--mock-border); padding: 6px 8px; border-radius: 4px; position: relative; overflow: hidden;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--brand);">Lunes</span>
+                    <div style="display: flex; flex-direction: column; gap: 3px;">
+                        <span style="font-size: 11px; font-weight: 600; color: var(--text-heading);">Programación II <small style="color:var(--text-muted); font-weight: 500;">(18:30 - 22:30)</small></span>
+                        <span id="mock-overlap-block" style="font-size: 10px; color: #047857; background: rgba(16, 185, 129, 0.1); border-left: 2px dashed #10b981; padding: 2px 6px; border-radius: 3px; font-weight: 700;">⚡ Solapamiento: Inglés I (Leandro)</span>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 55px 1fr; gap: 8px; align-items: center; background: var(--mock-widget-bg); border: 1px solid var(--mock-border); padding: 6px 8px; border-radius: 4px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--brand);">Martes</span>
+                    <span style="font-size: 11px; font-weight: 600; color: var(--text-heading);">Base de Datos I <small style="color:var(--text-muted); font-weight: 500;">(18:30 - 21:30)</small></span>
+                </div>
+                <div style="display: grid; grid-template-columns: 55px 1fr; gap: 8px; align-items: center; background: var(--mock-widget-bg); border: 1px solid var(--mock-border); padding: 6px 8px; border-radius: 4px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--brand);">Jueves</span>
+                    <span style="font-size: 11px; font-weight: 600; color: var(--text-heading);">Prob. y Estadística <small style="color:var(--text-muted); font-weight: 500;">(18:30 - 21:30)</small></span>
+                </div>
+            `;
+            if (mockClashResolverBar) {
+                mockClashResolverBar.style.display = 'flex';
+                mockClashResolverBar.style.background = '#fffbeb';
+                mockClashResolverBar.style.borderColor = '#fef3c7';
+                mockClashResolverBar.innerHTML = `
+                    <span style="font-size: 10px; font-weight: 700; color: #b45309;">💡 Resolutor: Usar Com. N1-2 para Inglés I</span>
+                    <button id="mock-resolve-btn-new" style="background: #f59e0b; color: #fff; border: none; font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 700; cursor: pointer; transition: all 0.2s;">Resolver</button>
+                `;
+                attachResolveEvent(document.getElementById('mock-resolve-btn-new'));
+            }
+        });
+
+        mockVerB.addEventListener('click', () => {
+            mockVerB.style.background = 'var(--brand)';
+            mockVerB.style.color = '#fff';
+            mockVerA.style.background = 'rgba(0,0,0,0.05)';
+            mockVerA.style.color = 'var(--text-muted)';
+            
+            mockScheduleList.innerHTML = `
+                <div style="display: grid; grid-template-columns: 55px 1fr; gap: 8px; align-items: center; background: var(--mock-widget-bg); border: 1px solid var(--mock-border); padding: 6px 8px; border-radius: 4px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--brand);">Lunes</span>
+                    <span style="font-size: 11px; font-weight: 600; color: var(--text-heading);">Programación II <small style="color:var(--text-muted); font-weight: 500;">(18:30 - 22:30)</small></span>
+                </div>
+                <div style="display: grid; grid-template-columns: 55px 1fr; gap: 8px; align-items: center; background: var(--mock-widget-bg); border: 1px solid var(--mock-border); padding: 6px 8px; border-radius: 4px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--brand);">Miércoles</span>
+                    <span style="font-size: 11px; font-weight: 600; color: var(--text-heading);">Inglés I <small style="color:var(--text-muted); font-weight: 500;">(18:30 - 20:30)</small></span>
+                </div>
+                <div style="display: grid; grid-template-columns: 55px 1fr; gap: 8px; align-items: center; background: var(--mock-widget-bg); border: 1px solid var(--mock-border); padding: 6px 8px; border-radius: 4px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--brand);">Viernes</span>
+                    <span style="font-size: 11px; font-weight: 600; color: var(--text-heading);">Metodología I <small style="color:var(--text-muted); font-weight: 500;">(18:30 - 21:30)</small></span>
+                </div>
+            `;
+            if (mockClashResolverBar) {
+                mockClashResolverBar.style.display = 'none';
+            }
+        });
+    }
+
     // 8. Botón Volver Arriba (Floating Scroll-To-Top Button)
     const scrollTopBtn = document.getElementById('scroll-top-btn');
     if (scrollTopBtn) {

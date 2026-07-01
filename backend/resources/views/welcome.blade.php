@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Cursus es el organizador académico y asistente de productividad definitivo para estudiantes de la UTN Regional Haedo. Controlá tu promedio, correlatividades, cronómetro Pomodoro y cuotas en un solo lugar.">
-    <meta name="keywords" content="Cursus, UTN Haedo, UTN, TUP, Tecnicatura Programación, Estudiantes, Pomodoro, Correlatividades, SIU Guaraní, Universidad">
+    <meta name="description" content="Cursus es el organizador académico y asistente de productividad definitivo para la Tecnicatura en Programación de la UTN Regional Haedo. Controlá tu promedio, correlatividades, cronómetro Pomodoro y cuotas en un solo lugar.">
+    <meta name="keywords" content="Cursus, UTN Haedo, UTN, TUP, Tecnicatura Programación, Estudiantes, Pomodoro, Correlatividades, Autogestión, Campus Virtual, Universidad">
     
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website">
@@ -1527,73 +1527,73 @@
                     <span class="dot red"></span>
                     <span class="dot yellow"></span>
                     <span class="dot green"></span>
-                    <span class="mock-title">Cursus - Asistente Académico</span>
+                    <span class="mock-title">Cursus — Demo Interactiva 🧪</span>
                 </div>
-                <div class="mock-body" style="height: 290px;">
+                <div class="mock-body" style="height: 350px;">
                     <!-- App-like Sidebar (Interactivo) -->
-                    <div class="mock-sidebar" style="width: 70px; gap: 8px; padding: 12px 0;">
-                        <div class="mock-sb-item active" data-mock-tab="inicio" style="font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; height: auto; width: 100%; cursor: pointer;">
+                    <div class="mock-sidebar" style="width: 75px; gap: 12px; padding: 16px 0;">
+                        <div class="mock-sb-item active" data-mock-tab="inicio" style="font-size: 15px; display: flex; flex-direction: column; align-items: center; gap: 3px; height: auto; width: 100%; cursor: pointer;">
                             <span>⊞</span>
-                            <span style="font-size: 6px; font-weight: 500;">Inicio</span>
+                            <span style="font-size: 10px; font-weight: 500;">Inicio</span>
                         </div>
-                        <div class="mock-sb-item" data-mock-tab="materias" style="font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; height: auto; width: 100%; color: #475569; cursor: pointer;">
+                        <div class="mock-sb-item" data-mock-tab="materias" style="font-size: 15px; display: flex; flex-direction: column; align-items: center; gap: 3px; height: auto; width: 100%; color: #475569; cursor: pointer;">
                             <span>📚</span>
-                            <span style="font-size: 6px; font-weight: 500;">Materias</span>
+                            <span style="font-size: 10px; font-weight: 500;">Materias</span>
                         </div>
-                        <div class="mock-sb-item" data-mock-tab="estudio" style="font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; height: auto; width: 100%; color: #475569; cursor: pointer;">
+                        <div class="mock-sb-item" data-mock-tab="estudio" style="font-size: 15px; display: flex; flex-direction: column; align-items: center; gap: 3px; height: auto; width: 100%; color: #475569; cursor: pointer;">
                             <span>⏱️</span>
-                            <span style="font-size: 6px; font-weight: 500;">Estudio</span>
+                            <span style="font-size: 10px; font-weight: 500;">Estudio</span>
                         </div>
-                        <div class="mock-sb-item" data-mock-tab="horarios" style="font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; height: auto; width: 100%; color: #475569; cursor: pointer;">
+                        <div class="mock-sb-item" data-mock-tab="horarios" style="font-size: 15px; display: flex; flex-direction: column; align-items: center; gap: 3px; height: auto; width: 100%; color: #475569; cursor: pointer;">
                             <span>📅</span>
-                            <span style="font-size: 6px; font-weight: 500;">Horarios</span>
+                            <span style="font-size: 10px; font-weight: 500;">Horarios</span>
                         </div>
-                        <div class="mock-sb-item" data-mock-tab="alertas" style="font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; height: auto; width: 100%; color: #475569; cursor: pointer;">
+                        <div class="mock-sb-item" data-mock-tab="alertas" style="font-size: 15px; display: flex; flex-direction: column; align-items: center; gap: 3px; height: auto; width: 100%; color: #475569; cursor: pointer;">
                             <span>🔔</span>
-                            <span style="font-size: 6px; font-weight: 500;">Alertas</span>
+                            <span style="font-size: 10px; font-weight: 500;">Alertas</span>
                         </div>
                     </div>
-                    <div class="mock-main" style="padding: 12px; gap: 10px; overflow-y: auto;">
+                    <div class="mock-main" style="padding: 16px; gap: 12px; overflow-y: auto;">
                         <!-- Mock App Topbar -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 8px;">
-                            <span style="font-size: 10px; font-weight: 800; color: var(--text-heading);" id="mock-user-welcome">Hola, Estudiante! 👋</span>
-                            <span style="font-size: 8px; background: rgba(99, 102, 241, 0.1); color: var(--brand); padding: 2px 6px; border-radius: 10px; font-weight: 700;">TUP 2024</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 10px;">
+                            <span style="font-size: 13px; font-weight: 800; color: var(--text-heading);" id="mock-user-welcome">Hola, Estudiante! 👋</span>
+                            <span style="font-size: 10px; background: rgba(99, 102, 241, 0.1); color: var(--brand); padding: 3px 8px; border-radius: 10px; font-weight: 700;">TUP 2024</span>
                         </div>
 
                         <!-- VISTA: INICIO -->
-                        <div class="mock-tab-content active" id="mock-tab-inicio" style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="mock-tab-content active" id="mock-tab-inicio" style="display: flex; flex-direction: column; gap: 10px;">
                             <!-- Mock Widgets Layout -->
-                            <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 8px;">
-                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 10px;">
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
                                     <!-- Widget Progreso -->
-                                    <div class="mock-widget" style="padding: 8px;">
-                                        <div class="widget-title" style="font-size: 7px; margin-bottom: 4px;">📈 Progreso Académico</div>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div style="font-size: 12px; font-weight: 800; color: var(--brand);" id="mock-dash-avg">8.45 <span style="font-size: 7px; color: #64748b; font-weight: 500;">Promedio</span></div>
-                                            <div style="flex: 1; height: 4px; background: #e2e8f0; border-radius: 2px;">
-                                                <div style="width: 35%; height: 100%; background: var(--brand); border-radius: 2px;" id="mock-dash-progress-bar"></div>
+                                    <div class="mock-widget" style="padding: 10px;">
+                                        <div class="widget-title" style="font-size: 10px; margin-bottom: 6px;">📈 Progreso Académico</div>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <div style="font-size: 15px; font-weight: 800; color: var(--brand);" id="mock-dash-avg">8.45 <span style="font-size: 10px; color: #64748b; font-weight: 500;">Promed.</span></div>
+                                            <div style="flex: 1; height: 6px; background: #e2e8f0; border-radius: 3px;">
+                                                <div style="width: 35%; height: 100%; background: var(--brand); border-radius: 3px;" id="mock-dash-progress-bar"></div>
                                             </div>
-                                            <div style="font-size: 8px; font-weight: 700; color: var(--text-muted);" id="mock-dash-progress-text">35%</div>
+                                            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted);" id="mock-dash-progress-text">35%</div>
                                         </div>
                                     </div>
                                     <!-- Widget Pomodoro -->
-                                    <div class="mock-widget" style="padding: 8px; display: flex; align-items: center; justify-content: space-between;">
+                                    <div class="mock-widget" style="padding: 10px; display: flex; align-items: center; justify-content: space-between;">
                                         <div>
-                                            <div class="widget-title" style="font-size: 7px; margin-bottom: 2px;">⏱️ Enfoque Pomodoro</div>
-                                            <div style="font-size: 13px; font-weight: 800; color: var(--text-heading);" id="mock-dash-pomodoro-timer">25:00</div>
+                                            <div class="widget-title" style="font-size: 10px; margin-bottom: 4px;">⏱️ Enfoque Pomodoro</div>
+                                            <div style="font-size: 16px; font-weight: 800; color: var(--text-heading);" id="mock-dash-pomodoro-timer">25:00</div>
                                         </div>
-                                        <div style="font-size: 8px; background: #10b981; color: #fff; padding: 2px 6px; border-radius: 10px; font-weight: 700;" id="mock-dash-pomodoro-status">Estudiando</div>
+                                        <div style="font-size: 10px; background: #10b981; color: #fff; padding: 3px 8px; border-radius: 10px; font-weight: 700;" id="mock-dash-pomodoro-status">Estudiando</div>
                                     </div>
                                 </div>
-                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
                                     <!-- Widget Kanban/Tareas -->
-                                    <div class="mock-widget" style="padding: 8px; height: 100%;">
-                                        <div class="widget-title" style="font-size: 7px; margin-bottom: 4px;">📋 Entregas</div>
-                                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                                            <div style="border-left: 2px solid #ef4444; background: #fee2e2; padding: 3px 5px; border-radius: 0 3px 3px 0; font-size: 8px; font-weight: 600; color: #991b1b;">
+                                    <div class="mock-widget" style="padding: 10px; height: 100%;">
+                                        <div class="widget-title" style="font-size: 10px; margin-bottom: 6px;">📋 Entregas</div>
+                                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                                            <div style="border-left: 2px solid #ef4444; background: #fee2e2; padding: 4px 6px; border-radius: 0 4px 4px 0; font-size: 11px; font-weight: 600; color: #991b1b;">
                                                 TP Álgebra
                                             </div>
-                                            <div style="border-left: 2px solid #f59e0b; background: #fef3c7; padding: 3px 5px; border-radius: 0 3px 3px 0; font-size: 8px; font-weight: 600; color: #92400e;">
+                                            <div style="border-left: 2px solid #f59e0b; background: #fef3c7; padding: 4px 6px; border-radius: 0 4px 4px 0; font-size: 11px; font-weight: 600; color: #92400e;">
                                                 Proyecto BD
                                             </div>
                                         </div>
@@ -1602,86 +1602,114 @@
                             </div>
                             
                             <!-- Alerta Academica Widget -->
-                            <div class="mock-widget" style="padding: 6px 8px; background: #eef2ff; border-color: rgba(99,102,241,0.2); display: flex; align-items: center; justify-content: space-between;">
-                                <span style="font-size: 8px; font-weight: 600; color: var(--brand);">🔔 Vence cuota arancelaria: N° 4 Junio</span>
-                                <span style="font-size: 8px; font-weight: 700; color: #ef4444;">$80.000</span>
+                            <div class="mock-widget" style="padding: 8px 10px; background: #eef2ff; border-color: rgba(99,102,241,0.2); display: flex; align-items: center; justify-content: space-between;">
+                                <span style="font-size: 11px; font-weight: 600; color: var(--brand);">🔔 Vence cuota arancelaria: N° 4 Junio</span>
+                                <span style="font-size: 11px; font-weight: 700; color: #ef4444;">$80.000</span>
                             </div>
                         </div>
 
                         <!-- VISTA: MATERIAS -->
-                        <div class="mock-tab-content" id="mock-tab-materias" style="display: none; flex-direction: column; gap: 6px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
-                                <span style="font-size: 8px; font-weight: 700; color: var(--text-heading);">Plan de Estudios (TUP)</span>
-                                <span style="font-size: 7px; color: var(--brand); font-weight: 600;">Haz clic para aprobar:</span>
+                        <div class="mock-tab-content" id="mock-tab-materias" style="display: none; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                <span style="font-size: 12px; font-weight: 700; color: var(--text-heading);">Plan de Estudios (TUP)</span>
+                                <span style="font-size: 10px; color: var(--brand); font-weight: 600;">Haz clic para aprobar:</span>
                             </div>
-                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
-                                <div class="mock-subject-card approved" data-subject="prog1" style="border: 1px solid #10b981; background: rgba(16, 185, 129, 0.05); padding: 5px; border-radius: 4px; cursor: pointer; transition: all 0.2s;">
-                                    <div style="font-size: 7px; font-weight: 700; color: var(--text-heading);">Prog. I</div>
-                                    <div style="font-size: 6px; color: #10b981; font-weight: 600;" class="status">Aprobada (9)</div>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                                <div class="mock-subject-card approved" data-subject="prog1" style="border: 1px solid #10b981; background: rgba(16, 185, 129, 0.05); padding: 7px; border-radius: 4px; cursor: pointer; transition: all 0.2s;">
+                                    <div style="font-size: 11px; font-weight: 700; color: var(--text-heading);">Prog. I</div>
+                                    <div style="font-size: 10px; color: #10b981; font-weight: 600;" class="status">Aprobada (9)</div>
                                 </div>
-                                <div class="mock-subject-card approved" data-subject="lab1" style="border: 1px solid #10b981; background: rgba(16, 185, 129, 0.05); padding: 5px; border-radius: 4px; cursor: pointer; transition: all 0.2s;">
-                                    <div style="font-size: 7px; font-weight: 700; color: var(--text-heading);">Laboratorio I</div>
-                                    <div style="font-size: 6px; color: #10b981; font-weight: 600;" class="status">Aprobada (10)</div>
+                                <div class="mock-subject-card approved" data-subject="lab1" style="border: 1px solid #10b981; background: rgba(16, 185, 129, 0.05); padding: 7px; border-radius: 4px; cursor: pointer; transition: all 0.2s;">
+                                    <div style="font-size: 11px; font-weight: 700; color: var(--text-heading);">Laboratorio I</div>
+                                    <div style="font-size: 10px; color: #10b981; font-weight: 600;" class="status">Aprobada (10)</div>
                                 </div>
-                                <div class="mock-subject-card approved" data-subject="spd" style="border: 1px solid #10b981; background: rgba(16, 185, 129, 0.05); padding: 5px; border-radius: 4px; cursor: pointer; transition: all 0.2s;">
-                                    <div style="font-size: 7px; font-weight: 700; color: var(--text-heading);">Sist. Proc. Datos</div>
-                                    <div style="font-size: 6px; color: #10b981; font-weight: 600;" class="status">Aprobada (8)</div>
+                                <div class="mock-subject-card approved" data-subject="spd" style="border: 1px solid #10b981; background: rgba(16, 185, 129, 0.05); padding: 7px; border-radius: 4px; cursor: pointer; transition: all 0.2s;">
+                                    <div style="font-size: 11px; font-weight: 700; color: var(--text-heading);">Sist. Proc. Datos</div>
+                                    <div style="font-size: 10px; color: #10b981; font-weight: 600;" class="status">Aprobada (8)</div>
                                 </div>
-                                <div class="mock-subject-card" data-subject="prog2" style="border: 1px solid var(--mock-border); background: var(--mock-widget-bg); padding: 5px; border-radius: 4px; cursor: pointer; transition: all 0.2s;">
-                                    <div style="font-size: 7px; font-weight: 700; color: var(--text-heading);">Prog. II</div>
-                                    <div style="font-size: 6px; color: #ef4444; font-weight: 600;" class="status">Cursando</div>
+                                <div class="mock-subject-card" data-subject="prog2" style="border: 1px solid var(--mock-border); background: var(--mock-widget-bg); padding: 7px; border-radius: 4px; cursor: pointer; transition: all 0.2s;">
+                                    <div style="font-size: 11px; font-weight: 700; color: var(--text-heading);">Prog. II</div>
+                                    <div style="font-size: 10px; color: #ef4444; font-weight: 600;" class="status">Cursando</div>
                                 </div>
                             </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 7px; padding: 4px; background: rgba(99, 102, 241, 0.05); border-radius: 4px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 11px; padding: 6px; background: rgba(99, 102, 241, 0.05); border-radius: 4px;">
                                 <span style="font-weight: 600;">Promedio: <strong id="mock-subject-avg">9.00</strong></span>
                                 <span style="font-weight: 600;">Progreso: <strong id="mock-subject-percent">75%</strong></span>
                             </div>
                         </div>
 
                         <!-- VISTA: ESTUDIO -->
-                        <div class="mock-tab-content" id="mock-tab-estudio" style="display: none; flex-direction: column; gap: 8px; text-align: center; padding: 10px 0;">
-                            <div style="font-size: 9px; font-weight: 700; color: var(--text-heading);">Sesión de Enfoque Pomodoro</div>
-                            <div style="font-size: 32px; font-weight: 800; color: var(--brand); font-family: monospace; letter-spacing: 1px; margin: 4px 0;" id="mock-pomo-timer">25:00</div>
-                            <div style="display: flex; justify-content: center; gap: 10px;">
-                                <button id="mock-pomo-play-btn" style="background: var(--brand); color: #fff; border: none; font-size: 8px; padding: 4px 12px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">Iniciar</button>
-                                <button id="mock-pomo-reset-btn" style="background: rgba(99,102,241,0.1); color: var(--brand); border: 1px solid rgba(99,102,241,0.2); font-size: 8px; padding: 4px 12px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">Reiniciar</button>
+                        <div class="mock-tab-content" id="mock-tab-estudio" style="display: none; flex-direction: column; gap: 10px; text-align: center; padding: 12px 0;">
+                            <div style="font-size: 12px; font-weight: 700; color: var(--text-heading);">Sesión de Enfoque Pomodoro</div>
+                            <div style="font-size: 36px; font-weight: 800; color: var(--brand); font-family: monospace; letter-spacing: 1px; margin: 6px 0;" id="mock-pomo-timer">25:00</div>
+                            <div style="display: flex; justify-content: center; gap: 12px;">
+                                <button id="mock-pomo-play-btn" style="background: var(--brand); color: #fff; border: none; font-size: 11px; padding: 6px 16px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">Iniciar</button>
+                                <button id="mock-pomo-reset-btn" style="background: rgba(99,102,241,0.1); color: var(--brand); border: 1px solid rgba(99,102,241,0.2); font-size: 11px; padding: 6px 16px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">Reiniciar</button>
                             </div>
-                            <div style="font-size: 7px; color: var(--text-muted); margin-top: 6px;" id="mock-pomo-desc">Haz clic en Iniciar para simular el temporizador Pomodoro.</div>
+                            <div style="font-size: 10px; color: var(--text-muted); margin-top: 8px;" id="mock-pomo-desc">Haz clic en Iniciar para simular el temporizador Pomodoro.</div>
                         </div>
 
                         <!-- VISTA: HORARIOS -->
-                        <div class="mock-tab-content" id="mock-tab-horarios" style="display: none; flex-direction: column; gap: 6px;">
-                            <div style="font-size: 8px; font-weight: 700; color: var(--text-heading); margin-bottom: 2px;">Cronograma Semanal (TUP)</div>
-                            <div style="display: flex; flex-direction: column; gap: 4px;">
-                                <div style="display: grid; grid-template-columns: 60px 1fr; gap: 8px; align-items: center; background: var(--mock-widget-bg); border: 1px solid var(--mock-border); padding: 4px 6px; border-radius: 4px;">
-                                    <span style="font-size: 7px; font-weight: 700; color: var(--brand);">Lunes</span>
-                                    <span style="font-size: 7px; font-weight: 600; color: var(--text-heading);">Programación II <small style="color:var(--text-muted); font-weight: 500;">(18:30 - 22:30)</small></span>
+                        <div class="mock-tab-content" id="mock-tab-horarios" style="display: none; flex-direction: column; gap: 8px;">
+                            <!-- Header de Simulación -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--mock-border); padding-bottom: 6px; margin-bottom: 4px;">
+                                <div style="display: flex; gap: 6px; font-size: 10px;">
+                                    <span style="background: var(--brand); color: #fff; padding: 2px 6px; border-radius: 3px; font-weight: 700; cursor: pointer;" id="mock-ver-a">Versión A</span>
+                                    <span style="background: rgba(0,0,0,0.05); color: var(--text-muted); padding: 2px 6px; border-radius: 3px; font-weight: 700; cursor: pointer;" id="mock-ver-b">Versión B</span>
                                 </div>
-                                <div style="display: grid; grid-template-columns: 60px 1fr; gap: 8px; align-items: center; background: var(--mock-widget-bg); border: 1px solid var(--mock-border); padding: 4px 6px; border-radius: 4px;">
-                                    <span style="font-size: 7px; font-weight: 700; color: var(--brand);">Martes</span>
-                                    <span style="font-size: 7px; font-weight: 600; color: var(--text-heading);">Estadística <small style="color:var(--text-muted); font-weight: 500;">(18:30 - 21:30)</small></span>
+                                <span style="font-size: 10px; font-weight: 700; color: var(--text-heading); background: rgba(99,102,241,0.1); padding: 2px 6px; border-radius: 3px;">Curso N1_1 📅</span>
+                            </div>
+                            
+                            <!-- Chips de Compañeros -->
+                            <div style="display: flex; gap: 8px; font-size: 10px; margin-bottom: 4px;">
+                                <span style="display: inline-flex; align-items: center; gap: 3px; color: #4f46e5; font-weight: 700;">
+                                    <span style="width: 5px; height: 5px; border-radius: 50%; background: #4f46e5;"></span>Vos
+                                </span>
+                                <span style="display: inline-flex; align-items: center; gap: 3px; color: #10b981; font-weight: 700;" id="mock-compare-chip">
+                                    <span style="width: 5px; height: 5px; border-radius: 50%; background: #10b981;"></span>Leandro (Comparando)
+                                </span>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 6px;" id="mock-schedule-list">
+                                <div style="display: grid; grid-template-columns: 55px 1fr; gap: 8px; align-items: center; background: var(--mock-widget-bg); border: 1px solid var(--mock-border); padding: 6px 8px; border-radius: 4px; position: relative; overflow: hidden;">
+                                    <span style="font-size: 11px; font-weight: 700; color: var(--brand);">Lunes</span>
+                                    <div style="display: flex; flex-direction: column; gap: 3px;">
+                                        <span style="font-size: 11px; font-weight: 600; color: var(--text-heading);">Programación II <small style="color:var(--text-muted); font-weight: 500;">(18:30 - 22:30)</small></span>
+                                        <!-- Solapamiento dashed overlay de Leandro -->
+                                        <span id="mock-overlap-block" style="font-size: 10px; color: #047857; background: rgba(16, 185, 129, 0.1); border-left: 2px dashed #10b981; padding: 2px 6px; border-radius: 3px; font-weight: 700;">⚡ Solapamiento: Inglés I (Leandro)</span>
+                                    </div>
                                 </div>
-                                <div style="display: grid; grid-template-columns: 60px 1fr; gap: 8px; align-items: center; background: var(--mock-widget-bg); border: 1px solid var(--mock-border); padding: 4px 6px; border-radius: 4px;">
-                                    <span style="font-size: 7px; font-weight: 700; color: var(--brand);">Jueves</span>
-                                    <span style="font-size: 7px; font-weight: 600; color: var(--text-heading);">Metodología <small style="color:var(--text-muted); font-weight: 500;">(18:30 - 21:30)</small></span>
+                                <div style="display: grid; grid-template-columns: 55px 1fr; gap: 8px; align-items: center; background: var(--mock-widget-bg); border: 1px solid var(--mock-border); padding: 6px 8px; border-radius: 4px;">
+                                    <span style="font-size: 11px; font-weight: 700; color: var(--brand);">Martes</span>
+                                    <span style="font-size: 11px; font-weight: 600; color: var(--text-heading);">Base de Datos I <small style="color:var(--text-muted); font-weight: 500;">(18:30 - 21:30)</small></span>
                                 </div>
+                                <div style="display: grid; grid-template-columns: 55px 1fr; gap: 8px; align-items: center; background: var(--mock-widget-bg); border: 1px solid var(--mock-border); padding: 6px 8px; border-radius: 4px;">
+                                    <span style="font-size: 11px; font-weight: 700; color: var(--brand);">Jueves</span>
+                                    <span style="font-size: 11px; font-weight: 600; color: var(--text-heading);">Prob. y Estadística <small style="color:var(--text-muted); font-weight: 500;">(18:30 - 21:30)</small></span>
+                                </div>
+                            </div>
+
+                            <!-- Clash Resolver Sugerencia -->
+                            <div id="mock-clash-resolver-bar" style="display: flex; justify-content: space-between; align-items: center; background: #fffbeb; border: 1px solid #fef3c7; padding: 6px 8px; border-radius: 4px; margin-top: 4px;">
+                                <span style="font-size: 10px; font-weight: 700; color: #b45309;">💡 Resolutor: Usar Com. N1-2 para Inglés I</span>
+                                <button id="mock-resolve-btn" style="background: #f59e0b; color: #fff; border: none; font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 700; cursor: pointer; transition: all 0.2s;">Resolver</button>
                             </div>
                         </div>
 
                         <!-- VISTA: ALERTAS -->
-                        <div class="mock-tab-content" id="mock-tab-alertas" style="display: none; flex-direction: column; gap: 6px;">
-                            <div style="font-size: 8px; font-weight: 700; color: var(--text-heading); margin-bottom: 2px;">Notificaciones y Alertas</div>
-                            <div style="display: flex; flex-direction: column; gap: 4px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; background: #fee2e2; border: 1px solid rgba(239,68,68,0.2); padding: 4px 6px; border-radius: 4px;" id="mock-alert-payment-card">
+                        <div class="mock-tab-content" id="mock-tab-alertas" style="display: none; flex-direction: column; gap: 8px;">
+                            <div style="font-size: 12px; font-weight: 700; color: var(--text-heading); margin-bottom: 4px;">Notificaciones y Alertas</div>
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: #fee2e2; border: 1px solid rgba(239,68,68,0.2); padding: 6px 10px; border-radius: 4px;" id="mock-alert-payment-card">
                                     <div style="display: flex; flex-direction: column;">
-                                        <span style="font-size: 7px; font-weight: 700; color: #ef4444;">Cuota Arancelaria N° 4</span>
-                                        <span style="font-size: 6px; color: #7f1d1d; font-weight: 600;">Vence en 5 días • $80.000</span>
+                                        <span style="font-size: 11px; font-weight: 700; color: #ef4444;">Cuota Arancelaria N° 4</span>
+                                        <span style="font-size: 10px; color: #7f1d1d; font-weight: 600;">Vence en 5 días • $80.000</span>
                                     </div>
-                                    <button id="mock-pay-btn" style="background: #ef4444; color: #fff; border: none; font-size: 6px; padding: 2px 8px; border-radius: 8px; font-weight: 700; cursor: pointer;">Pagar</button>
+                                    <button id="mock-pay-btn" style="background: #ef4444; color: #fff; border: none; font-size: 10px; padding: 3px 10px; border-radius: 8px; font-weight: 700; cursor: pointer;">Pagar</button>
                                 </div>
-                                <div style="display: flex; flex-direction: column; background: var(--mock-widget-bg); border: 1px solid var(--mock-border); padding: 4px 6px; border-radius: 4px;">
-                                    <span style="font-size: 7px; font-weight: 700; color: #ea580c;">Inscripción a Finales</span>
-                                    <span style="font-size: 6px; color: var(--text-muted);">Cierre del sistema SIU Guaraní el 30/06.</span>
+                                <div style="display: flex; flex-direction: column; background: var(--mock-widget-bg); border: 1px solid var(--mock-border); padding: 6px 10px; border-radius: 4px;">
+                                    <span style="font-size: 11px; font-weight: 700; color: #ea580c;">Inscripción a Finales</span>
+                                    <span style="font-size: 10px; color: var(--text-muted);">Inscripciones abiertas en Autogestión hasta el 30/06.</span>
                                 </div>
                             </div>
                         </div>
@@ -1748,7 +1776,7 @@
                     <i data-lucide="user-plus" style="width: 32px; height: 32px; stroke-width: 1.75;"></i>
                 </div>
                 <h4 class="step-title">Registrate</h4>
-                <p class="step-desc">Creá tu cuenta institucional y seleccioná tu carrera de la Regional Haedo.</p>
+                <p class="step-desc">Creá tu cuenta y accedé al plan de la Tecnicatura en Programación de la UTN Haedo.</p>
             </div>
             <div class="step-card">
                 <div class="step-num">02</div>
@@ -1825,6 +1853,26 @@
                     <p class="benefit-desc">Controlá los vencimientos de finales y alertas académicas. Si cursás una tecnicatura, simulá tus pagos y recibí avisos de aumentos de cuota.</p>
                 </div>
             </div>
+
+            <div class="benefit-card">
+                <div class="benefit-icon-box">
+                    <i data-lucide="calendar" style="width: 26px; height: 26px; stroke-width: 2;"></i>
+                </div>
+                <div class="benefit-info">
+                    <h4 class="benefit-title">Simulador de Horarios</h4>
+                    <p class="benefit-desc">Grilla semanal interactiva. Organizá tu cuatrimestre arrastrando bloques, asigná colores temáticos y gestioná dos versiones de horario (A/B) de forma paralela.</p>
+                </div>
+            </div>
+
+            <div class="benefit-card">
+                <div class="benefit-icon-box">
+                    <i data-lucide="users" style="width: 26px; height: 26px; stroke-width: 2;"></i>
+                </div>
+                <div class="benefit-info">
+                    <h4 class="benefit-title">Plantillas y Comparación</h4>
+                    <p class="benefit-desc">Cargá el horario oficial de tu curso UTN en 1 clic. Compará tu grilla con hasta 3 compañeros y resolvé solapamientos de comisión al instante con el asistente.</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -1832,8 +1880,8 @@
     <section class="section" style="padding-top: 50px; padding-bottom: 60px;">
         <div class="section-header">
             <span class="section-lbl">Diferencias</span>
-            <h2 class="section-title">¿Por qué usar Cursus si ya existe el SIU Guaraní?</h2>
-            <p class="section-desc">El SIU Guaraní es el portal administrativo oficial de la UTN. Cursus es tu organizador diario de cursada. Se complementan perfectamente:</p>
+            <h2 class="section-title">¿Por qué usar Cursus si ya existe Autogestión y el Campus Virtual?</h2>
+            <p class="section-desc">Autogestión y el Campus Virtual son los portales institucionales oficiales de la UTN Haedo para trámites y material académico. Cursus es tu organizador diario de cursada. Se complementan perfectamente:</p>
         </div>
 
         <div class="table-wrapper reveal" style="background: var(--gray-card-bg); backdrop-filter: blur(8px); border-radius: var(--r); border: 1px solid var(--gray-card-border); box-shadow: 0 10px 30px var(--card-shadow); padding: 10px;">
@@ -1841,7 +1889,7 @@
                 <thead>
                     <tr style="border-bottom: 2px solid var(--gray-card-border);">
                         <th style="padding: 16px 20px; font-weight: 700; color: var(--text-heading); width: 34%;">Características</th>
-                        <th style="padding: 16px 20px; font-weight: 700; color: var(--text-desc); background: var(--table-th-bg);">SIU Guaraní (UTN)</th>
+                        <th style="padding: 16px 20px; font-weight: 700; color: var(--text-desc); background: var(--table-th-bg);">Autogestión y Campus (UTN)</th>
                         <th style="padding: 16px 20px; font-weight: 700; color: var(--brand); background: var(--table-td-bg-cursus);">Cursus (Tu Asistente)</th>
                     </tr>
                 </thead>
@@ -1850,13 +1898,13 @@
                         <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">
                             <div style="display: inline-flex; align-items: center; gap: 6px;">
                                 Inscripción oficial a cursadas y exámenes
-                                <span class="tooltip-trigger" data-tooltip="El SIU Guaraní registra legalmente tus actas de materias. Cursus no reemplaza este registro, sino que te ayuda a planificarlo.">
+                                <span class="tooltip-trigger" data-tooltip="Autogestión registra legalmente tus actas de materias. Cursus no reemplaza este registro, sino que te ayuda a planificarlo de forma interactiva.">
                                     <i data-lucide="help-circle" style="width: 14px; height: 14px; color: var(--text-desc); cursor: help;"></i>
                                 </span>
                             </div>
                         </td>
                         <td style="padding: 16px 20px; color: #10b981; background: var(--table-td-bg-siu);">Sí (Es obligatorio y legal)</td>
-                        <td style="padding: 16px 20px; color: var(--text-desc); background: var(--table-td-bg-cursus);">No (Debes inscribirte en el SIU)</td>
+                        <td style="padding: 16px 20px; color: var(--text-desc); background: var(--table-td-bg-cursus);">No (Debes inscribirte en Autogestión)</td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--gray-card-border);">
                         <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">
@@ -1867,7 +1915,7 @@
                                 </span>
                             </div>
                         </td>
-                        <td style="padding: 16px 20px; color: #ef4444; background: var(--table-td-bg-siu);">No (Solo listado de texto plano)</td>
+                        <td style="padding: 16px 20px; color: #ef4444; background: var(--table-td-bg-siu);">No (Solo listados de texto plano)</td>
                         <td style="padding: 16px 20px; color: #10b981; font-weight: 600; background: var(--table-td-bg-cursus);">Sí (Interactivo y en cascada)</td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--gray-card-border);">
@@ -1891,7 +1939,7 @@
                                 </span>
                             </div>
                         </td>
-                        <td style="padding: 16px 20px; color: #ef4444; background: var(--table-td-bg-siu);">No (Es ajeno al estudio diario)</td>
+                        <td style="padding: 16px 20px; color: #ef4444; background: var(--table-td-bg-siu);">No (Los profesores casi nunca suben los temas)</td>
                         <td style="padding: 16px 20px; color: #10b981; font-weight: 600; background: var(--table-td-bg-cursus);">Sí (Temporizador integrado con logs)</td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--gray-card-border);">
@@ -1906,6 +1954,42 @@
                         <td style="padding: 16px 20px; color: #ef4444; background: var(--table-td-bg-siu);">No (No avisa aranceles ni vencimientos)</td>
                         <td style="padding: 16px 20px; color: #10b981; font-weight: 600; background: var(--table-td-bg-cursus);">Sí (Simulador de cuotas TUP)</td>
                     </tr>
+                    <tr style="border-bottom: 1px solid var(--gray-card-border);">
+                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">
+                            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                Planificación en múltiples versiones (A/B)
+                                <span class="tooltip-trigger" data-tooltip="Crea dos versiones independientes de horarios de cursada para comparar alternativas antes de inscribirte.">
+                                    <i data-lucide="help-circle" style="width: 14px; height: 14px; color: var(--text-desc); cursor: help;"></i>
+                                </span>
+                            </div>
+                        </td>
+                        <td style="padding: 16px 20px; color: #ef4444; background: var(--table-td-bg-siu);">No (Solo muestra tu horario definitivo)</td>
+                        <td style="padding: 16px 20px; color: #10b981; font-weight: 600; background: var(--table-td-bg-cursus);">Sí (Dos borradores A/B independientes)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--gray-card-border);">
+                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">
+                            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                Coordinación en grupo (Comparación multiusuario)
+                                <span class="tooltip-trigger" data-tooltip="Superpone los horarios de hasta 3 compañeros a la vez en tu grilla para encontrar huecos libres en común.">
+                                    <i data-lucide="help-circle" style="width: 14px; height: 14px; color: var(--text-desc); cursor: help;"></i>
+                                </span>
+                            </div>
+                        </td>
+                        <td style="padding: 16px 20px; color: #ef4444; background: var(--table-td-bg-siu);">No (Debes coordinar con capturas por chat)</td>
+                        <td style="padding: 16px 20px; color: #10b981; font-weight: 600; background: var(--table-td-bg-cursus);">Sí (Superposición de hasta 3 compañeros)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--gray-card-border);">
+                        <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">
+                            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                Resolutor de solapamientos (Clash Resolver)
+                                <span class="tooltip-trigger" data-tooltip="Busca y sugiere comisiones sin conflicto de forma automática cuando se pisa una materia.">
+                                    <i data-lucide="help-circle" style="width: 14px; height: 14px; color: var(--text-desc); cursor: help;"></i>
+                                </span>
+                            </div>
+                        </td>
+                        <td style="padding: 16px 20px; color: #ef4444; background: var(--table-td-bg-siu);">No (Solo da error al intentar inscribirte)</td>
+                        <td style="padding: 16px 20px; color: #10b981; font-weight: 600; background: var(--table-td-bg-cursus);">Sí (Sugiere y aplica comisiones viables)</td>
+                    </tr>
                     <tr>
                         <td style="padding: 16px 20px; font-weight: 700; color: var(--text-heading);">
                             <div style="display: inline-flex; align-items: center; gap: 6px;">
@@ -1915,7 +1999,7 @@
                                 </span>
                             </div>
                         </td>
-                        <td style="padding: 16px 20px; color: #f59e0b; background: var(--table-td-bg-siu);">No (Lento y requiere recaptcha)</td>
+                        <td style="padding: 16px 20px; color: #f59e0b; background: var(--table-td-bg-siu);">No (Requiere loguearse seguido, interfaz rígida)</td>
                         <td style="padding: 16px 20px; color: #10b981; font-weight: 600; background: var(--table-td-bg-cursus);">Sí (Carga instantánea, responsivo)</td>
                     </tr>
                 </tbody>

@@ -9,12 +9,22 @@
       <div class="mob-greet">Simulador de Horarios 📅</div>
       <div class="mob-sub">Planificación del cuatrimestre</div>
     </div>
+    <div class="version-tabs">
+      <button class="btn-version active" id="mob-btn-version-A" onclick="switchVersion('A')">A</button>
+      <button class="btn-version" id="mob-btn-version-B" onclick="switchVersion('B')">B</button>
+    </div>
   </div>
 </div>
 @endsection
 
 @section('mobile-header-actions')
-<div class="horarios-mobile-hdr-actions">
+<div class="horarios-mobile-hdr-actions" style="gap: 5px;">
+  <button class="btn-rect-mobile btn-rect-mobile-hdr" onclick="exportToICS()" title="Exportar iCal">
+    <span>📅 iCal</span>
+  </button>
+  <button class="btn-rect-mobile btn-rect-mobile-hdr" onclick="printSchedule()" title="Imprimir PDF">
+    <span>🖨️ PDF</span>
+  </button>
   <button class="btn-rect-mobile btn-rect-mobile-purple btn-rect-mobile-hdr" onclick="document.getElementById('btn-save-schedule').click()" title="Guardar Horario">
     <span>💾 Guardar</span>
   </button>
@@ -25,8 +35,16 @@
 @endsection
 
 @section('topbar-content')
-  <div class="topbar-title">Simulador de Horarios 📅</div>
+  <div class="topbar-title" style="display: flex; align-items: center; gap: 15px;">
+    Simulador de Horarios <span>📅</span>
+    <div class="version-tabs">
+      <button class="btn-version active" id="btn-version-A" onclick="switchVersion('A')">Versión A</button>
+      <button class="btn-version" id="btn-version-B" onclick="switchVersion('B')">Versión B</button>
+    </div>
+  </div>
   <div class="tb-actions">
+    <button class="btn-secondary" id="btn-export-ical" onclick="exportToICS()">📅 Exportar iCal</button>
+    <button class="btn-secondary" id="btn-print-pdf" onclick="printSchedule()">🖨️ PDF / Imprimir</button>
     <button class="btn-secondary" id="btn-clear-grid">♻ Limpiar Grilla</button>
     <button class="btn-primary" id="btn-save-schedule">💾 Guardar Horario</button>
   </div>
@@ -38,6 +56,39 @@
     
     <!-- LEFT SIDE: Available Elements (30% width) -->
     <div class="sched-sidebar-panel">
+      <div class="sched-panel-section">
+        <div class="sched-section-hd">
+          <span>Plantillas Oficiales UTN 🏫</span>
+        </div>
+        <div class="sched-compare-box">
+          <select id="utn-presets-select" onchange="loadUTNPresetSchedule()">
+            <option value="">📅 Elegir curso oficial...</option>
+            <optgroup label="1° Cuatrimestre (Mañana)">
+              <option value="M1A_1">1° Año M1A (1° Cuat.)</option>
+              <option value="M1B_1">1° Año M1B (1° Cuat.)</option>
+              <option value="M2_1">2° Año M2 (1° Cuat.)</option>
+              <option value="M3_1">3° Año M3 (1° Cuat.)</option>
+              <option value="M4_1">4° Año M4 (1° Cuat.)</option>
+            </optgroup>
+            <optgroup label="1° Cuatrimestre (Noche)">
+              <option value="N1_1">1° Año N1 (1° Cuat.)</option>
+              <option value="N3_1">3° Año N3 (1° Cuat.)</option>
+            </optgroup>
+            <optgroup label="2° Cuatrimestre (Mañana)">
+              <option value="M1A_2">1° Año M1A (2° Cuat.)</option>
+              <option value="M1B_2">1° Año M1B (2° Cuat.)</option>
+              <option value="M2_2">2° Año M2 (2° Cuat.)</option>
+              <option value="M3_2">3° Año M3 (2° Cuat.)</option>
+              <option value="M4_2">4° Año M4 (2° Cuat.)</option>
+            </optgroup>
+            <optgroup label="2° Cuatrimestre (Noche - Rotativo)">
+              <option value="N1_2">1° Año N1 (2° Cuat. - Rotativo)</option>
+              <option value="N3_2">3° Año N3 (2° Cuat. - Rotativo)</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+
       <div class="sched-panel-section">
         <div class="sched-section-hd">
           <span>Materias Disponibles (A cursar)</span>
@@ -57,10 +108,42 @@
           <!-- Se poblará dinámicamente con JS -->
         </div>
       </div>
+
+      <div class="sched-panel-section">
+        <div class="sched-section-hd">
+          <span>Comparar con Compañero 👥</span>
+        </div>
+        <div class="sched-compare-box">
+          <div class="compare-input-group">
+            <input type="text" id="compare-search-input" placeholder="Email o Legajo">
+            <button id="btn-compare-search" onclick="searchCompareUser()">Buscar</button>
+          </div>
+          <div id="compare-status-list" style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: rgba(255,255,255,0.6); min-height: 20px;">
+            <div style="color: rgba(255,255,255,0.45); padding: 4px 0;">Sin comparación activa</div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- RIGHT SIDE: Weekly Grid (70% width) -->
     <div class="sched-timeline-container">
+      <!-- Cabecera de impresión (oculta por defecto en pantalla) -->
+      <div class="print-only-header">
+        <div class="print-brand-row">
+          <span class="print-logo">Cursus 🎓</span>
+          <span class="print-subtitle">Simulador de Horarios UTN</span>
+        </div>
+        <div class="print-title-row">
+          <h1>Planificación de Horarios Semanal</h1>
+          <div class="print-badge" id="print-active-version-badge">Versión A</div>
+        </div>
+        <div class="print-info-row">
+          <span><strong>Alumno:</strong> {{ Auth::user()->name ?? 'Estudiante UTN' }} ({{ Auth::user()->email ?? '' }})</span>
+          <span><strong>Generado el:</strong> <span id="print-generated-date">30/06/2026</span></span>
+        </div>
+      </div>
+
       <div class="sched-canvas-card">
         <div class="sched-weekly-grid">
           
@@ -118,7 +201,7 @@
           <span class="editor-block-title" id="editor-selected-title">Selección: Ninguno</span>
           <span class="editor-block-type-badge" id="editor-selected-type">MATERIA</span>
         </div>
-        <div class="editor-center">
+        <div class="editor-center" style="gap: 12px;">
           <label class="editor-time-lbl">
             Inicio:
             <input type="time" class="editor-time-input" id="editor-start-time">
@@ -127,6 +210,17 @@
             Fin:
             <input type="time" class="editor-time-input" id="editor-end-time">
           </label>
+
+          <!-- Paleta de colores -->
+          <div class="editor-color-picker" style="display: flex; align-items: center; gap: 6px; margin: 0 10px; padding-left: 10px; border-left: 1px solid rgba(255,255,255,0.15);">
+            <button class="color-dot" data-color="#4f46e5" onclick="changeBlockColor('#4f46e5')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: #4f46e5; cursor: pointer;"></button>
+            <button class="color-dot" data-color="#9333ea" onclick="changeBlockColor('#9333ea')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: #9333ea; cursor: pointer;"></button>
+            <button class="color-dot" data-color="#10b981" onclick="changeBlockColor('#10b981')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: #10b981; cursor: pointer;"></button>
+            <button class="color-dot" data-color="#f43f5e" onclick="changeBlockColor('#f43f5e')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: #f43f5e; cursor: pointer;"></button>
+            <button class="color-dot" data-color="#f59e0b" onclick="changeBlockColor('#f59e0b')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: #f59e0b; cursor: pointer;"></button>
+            <button class="color-dot" data-color="#0ea5e9" onclick="changeBlockColor('#0ea5e9')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: #0ea5e9; cursor: pointer;"></button>
+          </div>
+
           <button class="editor-btn-delete" id="editor-btn-delete-block" title="Eliminar bloque">🗑️ Eliminar</button>
         </div>
         <div class="editor-right" id="editor-notification-area">

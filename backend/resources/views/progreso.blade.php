@@ -366,11 +366,11 @@
         <!-- Tarjetas rápidas de racha -->
         <div class="stat-badge-group">
           <div class="stat-badge-card">
-            <div class="stat-badge-val" id="prod-streak-now">8 días</div>
+            <div class="stat-badge-val" id="prod-streak-now">–</div>
             <div class="stat-badge-lbl">Racha Actual</div>
           </div>
           <div class="stat-badge-card">
-            <div class="stat-badge-val" id="prod-streak-best">15 días</div>
+            <div class="stat-badge-val" id="prod-streak-best">–</div>
             <div class="stat-badge-lbl">Mejor Racha</div>
           </div>
         </div>
@@ -379,7 +379,7 @@
         <div class="chart-card">
           <div class="chart-header">
             <span class="chart-title">Horas de Concentración (Últimos 7 días)</span>
-            <span class="stat-badge-lbl" id="total-weekly-hours-lbl">Total: 12h 40m</span>
+            <span class="stat-badge-lbl" id="total-weekly-hours-lbl">Total: 0h 0m</span>
           </div>
           <div class="chart-container" id="container-chart-weekly">
             <div class="chart-tooltip" id="tooltip-chart-weekly"></div>
@@ -432,15 +432,15 @@
         <!-- Tarjeta de Análisis de Hábitos -->
         <div class="chart-card" style="margin-top: 16px;">
           <div class="chart-title" style="margin-bottom: 12px;">Estimación de Enfoque</div>
-          <p style="font-size: 12.5px; color: var(--t2); line-height: 1.5; margin: 0 0 12px 0;">
-            Según tu racha e historial de concentración de los últimos días, tu hora más productiva es de <strong>18:00 a 20:00 hs</strong>. 
+          <p id="prod-focus-hour-text" style="font-size: 12.5px; color: var(--t2); line-height: 1.5; margin: 0 0 12px 0;">
+            Cargando...
           </p>
           <div class="tip-box">
             <div class="tip-title">
               <span>💡 Tip de Rendimiento</span>
             </div>
-            <div class="tip-body">
-              Si mantienes el ritmo promedio de 1.8 horas diarias, completarás el tiempo de preparación sugerido para los finales de <em>Laboratorio II</em> y <em>Estadística</em> en 8 días.
+            <div class="tip-body" id="prod-tip-body">
+              Cargando...
             </div>
           </div>
         </div>
