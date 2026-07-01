@@ -17,14 +17,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 18px 14px 14px;
+  gap: 6px;
+  padding: 18px 12px 14px;
   border-bottom: 1px solid rgba(255,255,255,.07);
 }
 .sb-logo-link {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   text-decoration: none;
   flex: 1;
   overflow: hidden;
@@ -52,8 +52,9 @@
   white-space: nowrap;
 }
 .sb-logo-text small {
-  display: block; font-size: 12px; font-weight: 400;
-  color: #4b5563; letter-spacing: 0;
+  display: block; font-size: 10px; font-weight: 500;
+  color: #4b5563; letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 
 .sb-toggle-btn {
