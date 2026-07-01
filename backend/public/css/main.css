@@ -475,6 +475,7 @@ body.dark-mode .btn-modal-action.cancel:hover {
 html, body {
   max-width: 100%;
   overflow-x: hidden;
+  scrollbar-gutter: stable;
 }
 html { font-size: 15px; }
 body {
