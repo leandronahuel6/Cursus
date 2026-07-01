@@ -16,6 +16,8 @@ class HorarioUsuario extends Model
         'dia_semana',
         'hora_inicio',
         'hora_fin',
+        'color',
+        'version',
     ];
 
     public function usuario()

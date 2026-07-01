@@ -45,6 +45,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/horarios', [HorarioController::class, 'index']);
     Route::post('/horarios/sync', [HorarioController::class, 'sync']);
+    Route::get('/horarios/compartido/{userId}', [HorarioController::class, 'sharedSchedule']);
+    Route::get('/horarios/buscar-usuario', [HorarioController::class, 'findUser']);
 
     Route::post('/pomodoro/sesiones', [SesionPomodoroController::class, 'store']);
     Route::get('/pomodoro/resumen', [SesionPomodoroController::class, 'resumenUsuario']);

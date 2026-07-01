@@ -35,8 +35,33 @@ let state = {
 
 // ================= CARGA Y GUARDADO DE ESTADOS =================
 
-function init() {
-  loadSubjectsState();
+const API_BASE = window.location.origin + '/api';
+
+function getAuthHeaders() {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': 'Bearer ' + token
+  };
+}
+
+let backendPomodoroData = null;
+
+async function loadPomodoroStats() {
+  try {
+    const response = await fetch(`${API_BASE}/pomodoro/resumen`, { headers: getAuthHeaders() });
+    if (!response.ok) throw new Error('Error al cargar resumen de pomodoros');
+    const data = await response.json();
+    backendPomodoroData = data;
+  } catch (e) {
+    console.error('Error fetching pomodoro stats, using simulated fallback', e);
+    backendPomodoroData = null;
+  }
+}
+
+async function init() {
+  await loadSubjectsState();
   loadSimulationState();
   
   // Registrar eventos
@@ -45,36 +70,53 @@ function init() {
     btnSave.addEventListener('click', saveSimulationState);
   }
 
+  // Cargar estadísticas reales de pomodoro
+  await loadPomodoroStats();
+
   // Inicializar vistas y gráficos
   updateUI();
 }
 
-function loadSubjectsState() {
-  const saved = localStorage.getItem('cursus_subjects_state');
-  if (saved) {
-    state.subjects = JSON.parse(saved);
-  } else {
-    // Estado inicial ficticio si no existe (estudiante en mitad del plan)
-    TUP_PLAN.forEach(sub => {
-      let status = 'disponible';
-      let grade = null;
-      if (sub.id === 1) { status = 'aprobada'; grade = 9; }
-      else if (sub.id === 2) { status = 'aprobada'; grade = 8; }
-      else if (sub.id === 3) { status = 'aprobada'; grade = 7; }
-      else if (sub.id === 4) { status = 'aprobada'; grade = 8; }
-      else if (sub.id === 8) { status = 'aprobada'; grade = 9; }
-      else if (sub.id === 5) { status = 'regular'; }
-      else if (sub.id === 6) { status = 'regular'; }
-      else if (sub.id === 7) { status = 'regular'; }
-      else if (sub.id === 9) { status = 'cursando'; }
-      else if (sub.id === 10) { status = 'cursando'; }
-      else if (sub.id === 11) { status = 'cursando'; }
-      else if (sub.id === 12) { status = 'cursando'; }
-      
-      state.subjects[sub.id] = { status, grade };
+async function loadSubjectsState() {
+  try {
+    const response = await fetch(`${API_BASE}/mis-materias`, { headers: getAuthHeaders() });
+    if (!response.ok) throw new Error('No se pudieron cargar las materias');
+    const data = await response.json();
+    
+    // Mapear al formato que usa state.subjects: id -> { status, grade }
+    state.subjects = {};
+    data.forEach(m => {
+      state.subjects[m.id] = {
+        status: m.estado,
+        grade: m.nota ? parseFloat(m.nota) : null
+      };
     });
-    // Guardar para que "Mis Materias" también lo use
-    localStorage.setItem('cursus_subjects_state', JSON.stringify(state.subjects));
+  } catch (e) {
+    console.error('Error al cargar materias del backend, usando fallback local', e);
+    const saved = localStorage.getItem('cursus_subjects_state');
+    if (saved) {
+      state.subjects = JSON.parse(saved);
+    } else {
+      TUP_PLAN.forEach(sub => {
+        let status = 'disponible';
+        let grade = null;
+        if (sub.id === 1) { status = 'aprobada'; grade = 9; }
+        else if (sub.id === 2) { status = 'aprobada'; grade = 8; }
+        else if (sub.id === 3) { status = 'aprobada'; grade = 7; }
+        else if (sub.id === 4) { status = 'aprobada'; grade = 8; }
+        else if (sub.id === 8) { status = 'aprobada'; grade = 9; }
+        else if (sub.id === 5) { status = 'regular'; }
+        else if (sub.id === 6) { status = 'regular'; }
+        else if (sub.id === 7) { status = 'regular'; }
+        else if (sub.id === 9) { status = 'cursando'; }
+        else if (sub.id === 10) { status = 'cursando'; }
+        else if (sub.id === 11) { status = 'cursando'; }
+        else if (sub.id === 12) { status = 'cursando'; }
+        
+        state.subjects[sub.id] = { status, grade };
+      });
+      localStorage.setItem('cursus_subjects_state', JSON.stringify(state.subjects));
+    }
   }
 }
 
@@ -412,6 +454,10 @@ function renderAcademicCharts() {
 }
 
 function renderProductivityCharts() {
+  if (backendPomodoroData) {
+    document.getElementById('prod-streak-now').textContent = `${backendPomodoroData.racha_dias} días`;
+    document.getElementById('prod-streak-best').textContent = `${backendPomodoroData.racha_maxima} días`;
+  }
   renderWeeklyChart();
   renderDonutChart();
   renderHeatmap();
@@ -647,16 +693,18 @@ function renderWeeklyChart() {
   const container = document.getElementById('container-chart-weekly');
   if (!container) return;
 
-  // Horas estudiadas de Lunes a Domingo (Simulación de Pomodoro)
-  const studyHours = [
-    { day: 'Lun', hours: 1.5 },
-    { day: 'Mar', hours: 2.0 },
-    { day: 'Mié', hours: 0.5 },
-    { day: 'Jue', hours: 3.0 },
-    { day: 'Vie', hours: 1.0 },
-    { day: 'Sáb', hours: 4.0 },
-    { day: 'Dom', hours: 0.8 }
-  ];
+  // Horas estudiadas en los últimos 7 días
+  const studyHours = (backendPomodoroData && backendPomodoroData.horas_diarias)
+    ? backendPomodoroData.horas_diarias
+    : [
+        { day: 'Lun', hours: 1.5 },
+        { day: 'Mar', hours: 2.0 },
+        { day: 'Mié', hours: 0.5 },
+        { day: 'Jue', hours: 3.0 },
+        { day: 'Vie', hours: 1.0 },
+        { day: 'Sáb', hours: 4.0 },
+        { day: 'Dom', hours: 0.8 }
+      ];
 
   const totalMinutes = studyHours.reduce((acc, d) => acc + (d.hours * 60), 0);
   const totalH = Math.floor(totalMinutes / 60);
@@ -734,18 +782,40 @@ function renderDonutChart() {
   const legendContainer = document.getElementById('donut-legend-container');
   if (!container || !legendContainer) return;
 
-  // Datos mock de distribución de horas de concentración
-  const distribution = [
-    { name: 'Programación III', hours: 5.0, color: '#4f46e5' },
-    { name: 'Base de Datos II', hours: 3.2, color: '#3b82f6' },
-    { name: 'Metodología de Sistemas I', hours: 2.5, color: '#10b981' },
-    { name: 'Inglés II', hours: 1.9, color: '#f59e0b' }
-  ];
+  const presetColors = ['#4f46e5', '#10b981', '#f59e0b', '#0ea5e9', '#f43f5e', '#9333ea'];
+  let distribution = [];
+  
+  if (backendPomodoroData && backendPomodoroData.distribucion_materias && backendPomodoroData.distribucion_materias.length > 0) {
+    distribution = backendPomodoroData.distribucion_materias.map((m, idx) => ({
+      name: m.name,
+      hours: m.hours,
+      color: presetColors[idx % presetColors.length]
+    }));
+  } else {
+    // Datos mock de distribución de horas de concentración
+    distribution = [
+      { name: 'Programación III', hours: 5.0, color: '#4f46e5' },
+      { name: 'Base de Datos II', hours: 3.2, color: '#3b82f6' },
+      { name: 'Metodología de Sistemas I', hours: 2.5, color: '#10b981' },
+      { name: 'Inglés II', hours: 1.9, color: '#f59e0b' }
+    ];
+  }
 
   const total = distribution.reduce((acc, d) => acc + d.hours, 0);
+  const radius = 60;
+
+  if (total === 0) {
+    container.innerHTML = `
+      <svg width="200" height="180" viewBox="0 0 200 180">
+        <circle cx="100" cy="90" r="${radius}" fill="transparent" stroke="#e2e8f0" stroke-width="16" />
+        <text x="100" y="90" fill="#64748b" font-size="11" font-weight="700" text-anchor="middle">Sin sesiones</text>
+      </svg>
+    `;
+    legendContainer.innerHTML = '<div style="color: var(--t2); font-size: 12.5px; text-align: center; margin-top: 10px;">Completá sesiones de Pomodoro para ver tu distribución de estudio.</div>';
+    return;
+  }
 
   // Dibujar donut
-  const radius = 60;
   const circumference = 2 * Math.PI * radius;
   const cx = 100;
   const cy = 90;
@@ -822,28 +892,42 @@ function renderHeatmap() {
 
   grid.innerHTML = '';
 
-  // Generar 45 días simulados. 
-  // La intensidad del estudio se simula aleatoriamente, pero con racha reciente fuerte.
+  const activityMap = (backendPomodoroData && backendPomodoroData.actividad) ? backendPomodoroData.actividad : {};
+
+  // Generar 45 días
   for (let i = 0; i < 45; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() - (44 - i)); // De hace 44 días a hoy
+    const dateStr = date.toISOString().split('T')[0];
+
     const day = document.createElement('div');
     day.className = 'heatmap-day';
     
-    // Simular un patrón realista: algunos fines de semana libres, racha los últimos 8 días
     let lvl = 0;
-    if (i >= 37) { // últimos 8 días activos
-      lvl = Math.floor(Math.random() * 3) + 2; // niveles 2, 3 o 4
-    } else {
-      const rand = Math.random();
-      if (rand > 0.8) lvl = 3;
-      else if (rand > 0.6) lvl = 2;
-      else if (rand > 0.35) lvl = 1;
+    if (activityMap[dateStr]) {
+      const qty = activityMap[dateStr];
+      if (qty >= 4) lvl = 4;
+      else if (qty >= 3) lvl = 3;
+      else if (qty >= 2) lvl = 2;
+      else if (qty >= 1) lvl = 1;
+    } else if (!backendPomodoroData) {
+      // Fallback mock
+      if (i >= 37) {
+        lvl = Math.floor(Math.random() * 3) + 2;
+      } else {
+        const rand = Math.random();
+        if (rand > 0.8) lvl = 3;
+        else if (rand > 0.6) lvl = 2;
+        else if (rand > 0.35) lvl = 1;
+      }
     }
 
     if (lvl > 0) {
       day.classList.add(`lvl-${lvl}`);
     }
     
-    day.title = `Día -${45 - i}: ${lvl * 2} pomodoros completados`;
+    const count = activityMap[dateStr] || (lvl * 2);
+    day.title = `${dateStr}: ${count} pomodoros completados`;
     grid.appendChild(day);
   }
 }

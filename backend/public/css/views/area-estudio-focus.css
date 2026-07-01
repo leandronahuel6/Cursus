@@ -699,7 +699,7 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
 .focus-phase-tabs-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
@@ -716,25 +716,40 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
 }
 
 .focus-card-close-btn {
-    flex-shrink: 0;
-    background: rgba(239, 68, 68, 0.12);
-    border: 1px solid rgba(239, 68, 68, 0.25);
-    color: #f87171;
-    width: 30px;
-    height: 30px;
+    position: fixed;
+    top: 32px;
+    right: 32px;
+    z-index: 25000;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: rgba(255, 255, 255, 0.6);
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     outline: none;
 }
 
 .focus-card-close-btn:hover {
-    background: rgba(239, 68, 68, 0.25);
-    color: #ffffff;
-    transform: scale(1.05);
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    transform: rotate(90deg) scale(1.08);
+}
+
+@media (max-width: 768px) {
+    .focus-card-close-btn {
+        top: 20px;
+        right: 20px;
+        width: 38px;
+        height: 38px;
+    }
 }
 
 .focus-phase-tab {
@@ -1100,5 +1115,51 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
     text-decoration: line-through;
     color: rgba(255, 255, 255, 0.35);
 }
+
+/* ==========================================================================
+   ENFOQUE & RECREO GRADIENT OUTLINES / GLOWS
+   ========================================================================== */
+.focus-timer-ring-progress {
+    transition: stroke-dashoffset 1s linear, stroke 0.3s ease !important;
+}
+.focus-timer-ring-progress.descanso-corto {
+    stroke: #34d399 !important; /* Verde esmeralda */
+}
+.focus-timer-ring-progress.descanso-largo {
+    stroke: #60a5fa !important; /* Azul océano */
+}
+
+/* Transiciones de la tarjeta central según fase */
+.focus-central-card {
+    transition: border-color 0.4s ease, box-shadow 0.4s ease !important;
+}
+#focus-mode-overlay.focus-phase-enfoque .focus-central-card {
+    border-color: rgba(129, 140, 248, 0.4) !important;
+    box-shadow: 0 0 25px rgba(129, 140, 248, 0.15), 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+#focus-mode-overlay.focus-phase-corto .focus-central-card {
+    border-color: rgba(52, 211, 153, 0.4) !important;
+    box-shadow: 0 0 25px rgba(52, 211, 153, 0.15), 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+#focus-mode-overlay.focus-phase-largo .focus-central-card {
+    border-color: rgba(96, 165, 250, 0.4) !important;
+    box-shadow: 0 0 25px rgba(96, 165, 250, 0.15), 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Transiciones de color del indicador de fase */
+.focus-phase-display {
+    transition: color 0.4s ease !important;
+}
+#focus-mode-overlay.focus-phase-enfoque .focus-phase-display {
+    color: #818cf8 !important;
+}
+#focus-mode-overlay.focus-phase-corto .focus-phase-display {
+    color: #34d399 !important;
+}
+#focus-mode-overlay.focus-phase-largo .focus-phase-display {
+    color: #60a5fa !important;
+}
+
+
 
 

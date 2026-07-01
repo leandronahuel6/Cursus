@@ -529,11 +529,20 @@
         rpFocus.style.strokeDasharray = CIRC_FOCUS;
         rpFocus.style.strokeDashoffset = CIRC_FOCUS * (1 - pct);
         
-        // Cambiar color de la barra según fase
+        // Cambiar color de la barra según fase y agregar clases al overlay
+        const overlay = document.getElementById('focus-mode-overlay');
+        if (overlay) {
+          overlay.classList.remove('focus-phase-enfoque', 'focus-phase-corto', 'focus-phase-largo');
+        }
         if (pomoState.fase_actual === 'enfoque') {
           rpFocus.setAttribute('class', 'focus-timer-ring-progress enfoque');
-        } else {
-          rpFocus.setAttribute('class', 'focus-timer-ring-progress recreo');
+          if (overlay) overlay.classList.add('focus-phase-enfoque');
+        } else if (pomoState.fase_actual === 'descanso_corto') {
+          rpFocus.setAttribute('class', 'focus-timer-ring-progress descanso-corto');
+          if (overlay) overlay.classList.add('focus-phase-corto');
+        } else if (pomoState.fase_actual === 'descanso_largo') {
+          rpFocus.setAttribute('class', 'focus-timer-ring-progress descanso-largo');
+          if (overlay) overlay.classList.add('focus-phase-largo');
         }
       }
 
@@ -2049,6 +2058,12 @@ window.toggleMateriaDropdown = toggleMateriaDropdown;
     const bgContainer = document.getElementById('focus-bg-container');
     if (!bgContainer) return;
 
+    // Si el tema guardado ya no es válido, restaurar a 'aurora'
+    const validThemes = ['aurora', 'rain', 'fire', 'forest', 'ocean'];
+    if (!validThemes.includes(theme)) {
+      theme = 'aurora';
+    }
+
     // Resetear clases de fondo
     bgContainer.className = '';
     bgContainer.classList.add('theme-' + theme);
@@ -2255,7 +2270,8 @@ window.toggleMateriaDropdown = toggleMateriaDropdown;
       if (btn) btn.classList.add('active');
       const select = document.getElementById('focus-lofi-select');
       const videoId = select ? select.value : currentLofiVideoId;
-      iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=0`;
+      const separator = videoId.includes('?') ? '&' : '?';
+      iframe.src = `https://www.youtube.com/embed/${videoId}${separator}enablejsapi=1&autoplay=1&mute=0`;
     }
   }
 
@@ -2266,7 +2282,8 @@ window.toggleMateriaDropdown = toggleMateriaDropdown;
     if (!panel || !iframe) return;
 
     if (panel.classList.contains('show')) {
-      iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=0`;
+      const separator = videoId.includes('?') ? '&' : '?';
+      iframe.src = `https://www.youtube.com/embed/${videoId}${separator}enablejsapi=1&autoplay=1&mute=0`;
     }
   }
 
