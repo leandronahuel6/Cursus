@@ -22,5 +22,5 @@ for (let i = 0; i < 91; i++) {
 
   cell.className = 'hm-cell' + (lv > 0 ? ' l' + lv : '');
   cell.title     = labels[lv];
-  hm.appendChild(cell);
+  hm.appendChild(cell); // Corregir error de esta línea: Uncaught TypeError: Cannot read properties of null (reading 'appendChild')
 }

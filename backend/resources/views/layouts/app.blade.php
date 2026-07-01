@@ -183,7 +183,7 @@
   <div class="contact-box">
     <div class="contact-header">
       <div class="contact-title">
-        <img class="contact-title-ic" src="{{ asset('assets/icons/user.svg') }}" alt="Perfil" style="width: 16px; height: 16px; opacity: 0.9;">
+        <img class="contact-title-ic" src="{{ asset('assets/icons/user.svg') }}" alt="Perfil" style="width: 16px; height: 16px; opacity: 0.9;"> <!-- Corregir esta línea, cargar icono desde el sprite SVG -->
         Editar perfil
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.6; margin-left: 2px;"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
       </div>

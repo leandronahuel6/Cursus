@@ -9,7 +9,7 @@
 
 ## PRE-REQUISITO: Verificación de Carga de Módulos
 
-### P0 — Carga sin errores de consola
+### P0 — Carga sin errores de consola ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Confirmar que los módulos ES6 se resuelven correctamente en el navegador. |
@@ -19,7 +19,7 @@
 
 ---
 
-## BLOQUE A: State Pattern — Máquina de Estados
+## BLOQUE A: State Pattern — Máquina de Estados ✅
 
 ### A1 — Transición de Fase Enfoque → Descanso Corto (Sesiones 1-3)
 | Campo | Detalle |
@@ -31,7 +31,7 @@
 | **Edge case** | Repetir el Saltar para avanzar a Sesión 2 de enfoque → debe volver a Descanso Corto para Sesión 3. |
 | **Troubleshooting** | Si el timer no cambia de fase: abrir Console → verificar que `pomo:faseCompletada` se emita correctamente (añadir temporalmente `pomodoroService.addEventListener('pomo:faseCompletada', console.log)` en la consola del navegador). |
 
-### A2 — Transición de Fase Enfoque → Descanso LARGO (Sesión 4)
+### A2 — Transición de Fase Enfoque → Descanso LARGO (Sesión 4) ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que la FaseEnfoque transiciona a Descanso Largo en la última sesión y reinicia el contador. |
@@ -40,7 +40,7 @@
 | **Resultado esperado** | ✅ Timer muestra `20:00`. Subtítulo muestra `Descanso Largo · Sesión 1 de 4`. Todos los dots reseteados. El reloj arranca automáticamente. |
 | **Troubleshooting** | Si el ciclo no reinicia a Sesión 1: verificar en DevTools → Application → localStorage la clave `cursus_pomo_ciclos_v2`; el campo `ciclo_actual` debe ser `1` después del salto. |
 
-### A3 — Transición de Descanso (Corto o Largo) → Enfoque
+### A3 — Transición de Descanso (Corto o Largo) → Enfoque ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que cualquier fase de descanso siempre vuelve a Enfoque. |
@@ -53,7 +53,7 @@
 
 ## BLOQUE B: Observer Pattern — Desacoplamiento Timer / Focus Mode
 
-### B1 — Sincronización del Timer Principal con el Modo Concentración
+### B1 — Sincronización del Timer Principal con el Modo Concentración ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que ambos paneles se actualizan de forma independiente sin el hack de `window.dispatchEvent(new Event('storage'))`. |
@@ -61,7 +61,7 @@
 | **Resultado esperado** | ✅ El reloj del overlay muestra el mismo tiempo que el timer principal (con máximo 1 segundo de diferencia por el poll de 500 ms). Los dots y la fase se mantienen sincronizados. |
 | **Troubleshooting** | Si el overlay no se actualiza: verificar en Console que el evento `pomo:tick` se dispare. Buscar `pomodoroService.addEventListener` en el Network tab para confirmar que el módulo cargó. |
 
-### B2 — Cambio de Fase desde los Tabs del Modo Concentración
+### B2 — Cambio de Fase desde los Tabs del Modo Concentración ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que `changeFocusPhase()` llama a `pomodoroService.forzarFase()` y ambos paneles reflejan el cambio. |
@@ -69,7 +69,7 @@
 | **Resultado esperado** | ✅ El timer principal también muestra la fase de Descanso Corto y el tiempo correspondiente. El reloj queda **pausado** (el usuario debe reanudar manualmente). |
 | **Troubleshooting** | Si el timer principal no refleja el cambio: verificar que `pomo:estadoCambiado` se emite en `forzarFase()` y que el listener del DOMContentLoaded lo captura. |
 
-### B3 — Ausencia del hack `window.dispatchEvent(new Event('storage'))`
+### B3 — Ausencia del hack `window.dispatchEvent(new Event('storage'))` ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que ya no se usa el evento `storage` para comunicación intra-pestaña. |
@@ -81,7 +81,7 @@
 
 ## BLOQUE C: Time Deltas — Resistencia al Throttling
 
-### C1 — Precisión del timer en pestaña activa
+### C1 — Precisión del timer en pestaña activa ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que el timer cuenta correctamente segundo a segundo. |
@@ -89,7 +89,7 @@
 | **Resultado esperado** | ✅ El timer muestra exactamente `14:30` ± 1 segundo (la variación de 1 s es aceptable por la granularidad de 500 ms del poll). |
 | **Troubleshooting** | Si hay deriva de > 2 segundos en 30 segundos: verificar `_iniciarTicker()` en `PomodoroStateService.js`. Los valores `_tickerInicioTs` y `_tickerInicioSeg` deben anclarse correctamente al inicio del periodo. |
 
-### C2 — Recuperación tras cambiar de pestaña (throttling simulado) — EDGE CASE CRÍTICO
+### C2 — Recuperación tras cambiar de pestaña (throttling simulado) — EDGE CASE CRÍTICO ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que el timer no pierde tiempo cuando el navegador aplica throttling en segundo plano. |
@@ -98,7 +98,7 @@
 | **Comportamiento anterior (bug)** | ❌ Con `setInterval` decrementing 1s/tick, el timer habría perdido entre 5 y 14 segundos si Chrome aplicó throttling de 1 s entre ticks. |
 | **Troubleshooting** | Si el timer descontó menos de 14 segundos: la lógica de Time Deltas no está funcionando. Verificar que `_tickerInicioTs` no se resetea al volver a la pestaña. También verificar que `visibilitychange` no pausa el ticker. |
 
-### C3 — Auto-Pausa por ausencia prolongada (> 120 segundos) — EDGE CASE
+### C3 — Auto-Pausa por ausencia prolongada (> 120 segundos) — EDGE CASE ✅ (Corregido)
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que el timer aplica auto-pausa con descuento de 120 s al detectar ausencia > 2 minutos. |
@@ -107,7 +107,7 @@
 | **Resultado esperado** | ✅ Aparece el toast de advertencia "Auto-Pausa: se detectó inactividad prolongada. Se descontaron 120 segundos." El timer muestra `10:00` (12:00 - 120 s = 10:00). El estado del reloj es 'pausado'. |
 | **Troubleshooting** | Si no aparece el toast: revisar la rama `else` dentro del bloque `if (segundosAusente <= 120)` en `PomodoroStateService.init()`. Si el tiempo descontado es incorrecto: verificar que sea exactamente 120 s (no la diferencia real). |
 
-### C4 — Expiración por abandono prolongado (> 4 horas) — EDGE CASE
+### C4 — Expiración por abandono prolongado (> 4 horas) — EDGE CASE ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que una sesión de más de 4 horas de inactividad se reinicia automáticamente. |
@@ -119,7 +119,7 @@
 
 ## BLOQUE D: Repository Pattern — Capa de Red Aislada
 
-### D1 — Creación de tarea (fetch delegado a ApiService)
+### D1 — Creación de tarea (fetch delegado a ApiService) ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que la creación de tareas funciona exactamente igual pero ahora delega a `ApiService.createTarea()`. |
@@ -127,7 +127,7 @@
 | **Resultado esperado** | ✅ La tarjeta aparece en la columna. Toast de éxito "Tarea agregada exitosamente". En DevTools → Network: se debe ver una petición `POST /api/tareas`. |
 | **Troubleshooting** | Si aparece error: abrir Console → buscar `Error creando tarea`. Verificar que `ApiService.createTarea()` recibe los parámetros correctos (`materiaId`, `titulo`, `columna`). |
 
-### D2 — Rollback visual del Drag & Drop en error de red
+### D2 — Rollback visual del Drag & Drop en error de red ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que el rollback visual del Kanban funciona al simular error de red. |
@@ -137,7 +137,7 @@
 | **Restauración** | Comentar nuevamente el `reject` en `mockFetch` y recargar. |
 | **Troubleshooting** | Si la tarjeta no vuelve: verificar el bloque `.catch()` en `dropCard()` y que `dragOriginalCol` y `dragOriginalSibling` se capturen correctamente en `dragStart()`. |
 
-### D3 — Ausencia de fetch directo en funciones del DOM
+### D3 — Ausencia de fetch directo en funciones del DOM ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que no quedan llamadas `fetch()` directas en `area-estudio.js`. |
@@ -149,7 +149,7 @@
 
 ## BLOQUE E: Funcionalidades de UI — Preservación de Comportamiento
 
-### E1 — Presets del Pomodoro
+### E1 — Presets del Pomodoro ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que los tres presets predefinidos aplican sus tiempos correctamente. |
@@ -157,7 +157,7 @@
 | **Resultado esperado** | ✅ Cada preset actualiza el timer al tiempo correcto y muestra el toast "Preset aplicado: NOMBRE". El preset activo queda marcado visualmente con la clase `active`. |
 | **Edge case** | Intentar cambiar preset con el reloj corriendo → debe mostrar toast de advertencia "Pausa el temporizador antes de cambiar de modo". |
 
-### E2 — Modal de Ajustes Personalizados y Validaciones
+### E2 — Modal de Ajustes Personalizados y Validaciones ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que las validaciones de negocio del modal son correctas. |
@@ -165,7 +165,7 @@
 | **Resultado esperado** | ✅ Paso 2: mensaje de error inline "Restricción: El descanso corto debe ser estrictamente menor que el tiempo de enfoque." Paso 4: modal se cierra, toast de éxito, timer muestra `06:00`. |
 | **Troubleshooting** | Si el modal no valida: verificar la función `saveCustomPomoSettings()` en `area-estudio.js` y la condición `if (short >= focus)`. |
 
-### E3 — Reinicio del Temporizador con sesión parcial
+### E3 — Reinicio del Temporizador con sesión parcial ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que al Reiniciar con progreso parcial, el log muestra la entrada "⚠ Parcial". |
@@ -174,21 +174,21 @@
 | **Edge case** | Si el progreso fue < 1 minuto (elapsedMin = 0), NO debe aparecer entrada en el log. |
 | **Troubleshooting** | Si no aparece el log parcial: verificar `_agregarLogParcial()` en `PomodoroStateService.js` y que `elapsedMin > 0` antes de llamarla. |
 
-### E4 — Reiniciar Ciclo de Sesiones
+### E4 — Reiniciar Ciclo de Sesiones ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que reiniciar el ciclo vuelve a Sesión 1. |
 | **Pasos** | 1. Avanzar a Sesión 3 (saltando 2 fases de enfoque). 2. Clic en el botón Reiniciar Ciclo (confirmar). |
 | **Resultado esperado** | ✅ Subtítulo muestra `Enfoque · Sesión 1 de 4`. Dots de progreso reseteados. Timer muestra `25:00`. Toast "Ciclo de sesiones reiniciado". |
 
-### E5 — Selector de Materia
+### E5 — Selector de Materia ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que cambiar de materia recarga el Kanban y los marcadores correctamente. |
 | **Pasos** | 1. Seleccionar Materia A → verificar que el Kanban carga sus tareas. 2. Seleccionar Materia B → verificar que el Kanban muestra las tareas de B. |
 | **Resultado esperado** | ✅ Cada cambio de materia dispara `loadAppState()` y `loadMateriaResumen()`. El nombre de la materia se actualiza en el header y en el dropdown. |
 
-### E6 — Modo Estricto: detección de distracción
+### E6 — Modo Estricto: detección de distracción ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que el Modo Estricto detecta el cambio de pestaña y reproduce el beep de alerta. |
@@ -197,7 +197,7 @@
 | **Resultado esperado** | ✅ Al volver: toast de advertencia mostrando la cantidad de distracciones detectadas. Al cambiar de pestaña: debe sonar el beep (si el audio está desbloqueado). |
 | **Troubleshooting** | Si no suena el beep: el AudioContext puede estar suspendido por no haber interacción previa. Asegurarse de haber hecho clic en Play al menos una vez antes del test. |
 
-### E7 — Modo Concentración: sincronía completa
+### E7 — Modo Concentración: sincronía completa ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que el overlay funciona correctamente sin el monolito `updatePomoUI()`. |
@@ -209,7 +209,7 @@
 
 ## BLOQUE F: LocalStorage — Integridad del Caché
 
-### F1 — Recuperación de estado tras recarga rápida (< 120 s)
+### F1 — Recuperación de estado tras recarga rápida (< 120 s) ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que al recargar la página, el timer retoma desde el tiempo correcto. |
@@ -217,7 +217,7 @@
 | **Resultado esperado** | ✅ El timer retoma automáticamente desde aproximadamente `22:45` menos los segundos que tomó recargar la página. El reloj vuelve a correr solo. |
 | **Troubleshooting** | Si el timer vuelve a `25:00`: verificar que `localStorage.getItem(LS_KEYS.ESTADO)` tiene el estado guardado y que `init()` lo procesa correctamente. |
 
-### F2 — Clave de LocalStorage única declarada
+### F2 — Clave de LocalStorage única declarada ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que no hay strings de claves de localStorage dispersos en `area-estudio.js`. |
@@ -229,21 +229,21 @@
 
 ## BLOQUE G: Pruebas de Regresión General
 
-### G1 — Flujo completo de la vista sin errores
+### G1 — Flujo completo de la vista sin errores ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Smoke test completo de todas las funcionalidades visibles. |
 | **Pasos** | 1. Seleccionar materia. 2. Crear una tarea en "Pendiente". 3. Arrastrarla a "En Curso". 4. Agregar un marcador. 5. Iniciar el Pomodoro. 6. Abrir Modo Concentración. 7. Cambiar tema a "Rain". 8. Marcar la tarea como completada desde el overlay. 9. Cerrar el overlay. |
 | **Resultado esperado** | ✅ Cada paso funciona sin errores en Console y con el feedback visual correcto (toasts de éxito, actualizaciones del DOM). |
 
-### G2 — Verificación de ausencia de `var` en los nuevos módulos
+### G2 — Verificación de ausencia de `var` en los nuevos módulos ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Cumplir la directiva del skill `frontend-performance-expert`: prohibición absoluta de `var`. |
 | **Pasos** | Buscar `var ` en cada uno de los cuatro archivos JS con Ctrl+F. |
 | **Resultado esperado** | ✅ **Cero ocurrencias** de `var ` en `PomodoroStates.js`, `ApiService.js`, `PomodoroStateService.js` y `area-estudio.js`. |
 
-### G3 — Documentación JSDoc completa
+### G3 — Documentación JSDoc completa ✅
 | Campo | Detalle |
 |-------|---------|
 | **Objetivo** | Verificar que todas las funciones públicas tienen JSDoc en español. |

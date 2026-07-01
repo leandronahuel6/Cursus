@@ -1836,9 +1836,6 @@ function closeConfirmModal() {
 
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // --- Inicializar el Servicio del Pomodoro (SSOT) ---
-    pomodoroService.init(showToast);
-
     // --- Suscribirse a eventos del Observer ---
     // El Timer Principal y el Modo Concentración se actualizan de forma independiente.
 
@@ -1866,6 +1863,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderTimerPrincipal(e.detail);
         renderFocusMode(e.detail);
     });
+
+    // --- Inicializar el Servicio del Pomodoro (SSOT) ---
+    pomodoroService.init(showToast);
 
     // --- Botón de confirmación del modal genérico ---
     const confirmYesBtn = document.getElementById('confirm-yes-btn');
