@@ -3505,6 +3505,22 @@ h1, h2, h3, h4, h5, h6, .display-text {
   flex-direction: column;
   gap: 8px;
   min-height: 50px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.sched-draggable-list::-webkit-scrollbar {
+  width: 5px;
+}
+.sched-draggable-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sched-draggable-list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+.sched-draggable-list::-webkit-scrollbar-thumb:hover {
+  background: var(--t2);
 }
 .sched-empty-note {
   border: 1px dashed var(--border);
@@ -4599,4 +4615,531 @@ body.dark-mode .alert-popup-notification.warn {
 }
 @keyframes toastOut {
   to { transform: translateY(12px) scale(0.95); opacity: 0; }
+}
+
+/* ==========================================================================
+   ESTILOS DE COMPARACIÓN Y VISTA IMPRIMIBLE (PDF)
+   ========================================================================== */
+
+/* Bloques de horario del compañero (Comparación) */
+.sched-time-block.comparison {
+  box-shadow: none !important;
+  cursor: default !important;
+  pointer-events: none !important;
+  opacity: 0.85;
+  z-index: 5;
+  border-width: 1.5px !important;
+  border-style: dashed !important;
+}
+
+/* Ocultar elementos de resize e interactividad en bloques de comparación */
+.sched-time-block.comparison .resize-handle,
+.sched-time-block.comparison .block-btn-delete-x {
+  display: none !important;
+}
+
+/* Reglas de impresión y PDF */
+/* Reglas de impresión y PDF */
+.print-only-header {
+  display: none;
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Mostrar la cabecera de impresión */
+  .print-only-header {
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #000000;
+    padding-bottom: 12px;
+    color: #000000 !important;
+  }
+  
+  .print-brand-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #4f46e5 !important;
+  }
+  
+  .print-logo {
+    font-size: 16px;
+  }
+  
+  .print-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .print-title-row h1 {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0;
+    color: #000000 !important;
+  }
+  
+  .print-badge {
+    background: #e0e7ff !important;
+    color: #4f46e5 !important;
+    border: 1px solid #4f46e5 !important;
+    padding: 3px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 700;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  
+  .print-info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #374151 !important;
+  }
+
+  /* Ocultar barra lateral de navegación de Cursus, barra lateral de elementos del simulador, editor manual, botones de cabecera y alertas */
+  #app-sidebar,
+  .topbar,
+  .mob-hdr,
+  .sched-sidebar-panel,
+  .sched-editor-bar,
+  .tb-actions,
+  .sched-alert-banner,
+  #sched-toast,
+  .horarios-mobile-hdr-actions {
+    display: none !important;
+  }
+
+  .app {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .app-main {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Ajustar contenedor de grilla para impresión */
+  .sched-main-split {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .sched-timeline-container {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .sched-canvas-card {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .sched-weekly-grid {
+    width: 100% !important;
+    border: 1px solid #000000 !important;
+    background: #ffffff !important;
+  }
+
+  /* Forzar fondos e impresión exacta */
+  .sched-time-block {
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    border-radius: 6px !important;
+    padding: 6px !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    color: #000000 !important;
+    text-shadow: none !important;
+  }
+
+  .sched-time-block .block-code-row {
+    font-size: 9.5px !important;
+    font-weight: bold !important;
+    color: #1e1b4b !important;
+    margin-bottom: 2px !important;
+  }
+
+  .sched-time-block .block-title-row {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #000000 !important;
+    line-height: 1.25 !important;
+    margin-bottom: 2px !important;
+  }
+
+  .sched-time-block .block-meta-row {
+    font-size: 9px !important;
+    font-weight: 500 !important;
+    color: #4b5563 !important;
+  }
+
+  .sched-time-block.act {
+    background-color: #f3e8ff !important;
+    border-color: #a855f7 !important;
+  }
+
+  .sched-time-block.comparison {
+    display: none !important;
+  }
+
+  .sched-time-block:not(.act):not(.comparison) {
+    background-color: #e0e7ff !important;
+    border-color: #6366f1 !important;
+  }
+
+  /* Asegurar legibilidad de cabeceras en impresión */
+  .grid-header-row {
+    background: #f3f4f6 !important;
+    border-bottom: 2px solid #000000 !important;
+    display: flex !important;
+  }
+  
+  .grid-hdr-cell {
+    color: #000000 !important;
+    font-weight: 700 !important;
+    border-right: 1px solid #d1d5db !important;
+    border-bottom: 2px solid #000000 !important;
+    padding: 8px 4px !important;
+    text-align: center !important;
+    background: #f3f4f6 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  
+  .grid-hdr-cell:last-child {
+    border-right: none !important;
+  }
+  
+  .time-col-hdr {
+    background: #e5e7eb !important;
+  }
+
+  /* Ejes y etiquetas de hora en impresión */
+  .grid-time-lbl-cell {
+    color: #374151 !important;
+  }
+  .grid-time-lbl-cell.half-hour span {
+    color: #4b5563 !important;
+    opacity: 1 !important;
+  }
+
+  .grid-day-col {
+    border-right: 1px solid #e5e7eb !important;
+    background: transparent !important;
+  }
+
+  .grid-day-col:last-child {
+    border-right: none !important;
+  }
+
+  .grid-bg-line-hour {
+    background: #e5e7eb !important;
+  }
+
+  .grid-bg-line-half {
+    border-top: 1px dashed #f3f4f6 !important;
+  }
+
+  /* Configuración de tamaño de página en formato apaisado (Landscape) */
+  @page {
+    size: landscape;
+    margin: 0.5cm;
+  }
+}
+
+/* ==========================================================================
+   ESTILOS DE PERSONALIZACIÓN Y TRASLADOS (MÓDULO SIMULADOR)
+   ========================================================================== */
+
+/* Indicador de color activo en el selector manual */
+.color-dot {
+  transition: all 0.2s ease-in-out;
+}
+.color-dot.active {
+  border-color: #ffffff !important;
+  transform: scale(1.25);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+/* Clases de colores personalizados para los bloques */
+.sched-time-block.theme-color-indigo {
+  border-left: 4px solid #4f46e5 !important;
+  background: rgba(79, 70, 229, 0.12) !important;
+}
+.sched-time-block.theme-color-purple {
+  border-left: 4px solid #9333ea !important;
+  background: rgba(147, 51, 234, 0.12) !important;
+}
+.sched-time-block.theme-color-emerald {
+  border-left: 4px solid #10b981 !important;
+  background: rgba(16, 185, 129, 0.12) !important;
+}
+.sched-time-block.theme-color-rose {
+  border-left: 4px solid #f43f5e !important;
+  background: rgba(244, 63, 94, 0.12) !important;
+}
+.sched-time-block.theme-color-amber {
+  border-left: 4px solid #f59e0b !important;
+  background: rgba(245, 158, 11, 0.12) !important;
+}
+.sched-time-block.theme-color-sky {
+  border-left: 4px solid #0ea5e9 !important;
+  background: rgba(14, 165, 233, 0.12) !important;
+}
+
+/* Mapeo de impresión para colores personalizados */
+@media print {
+  .sched-time-block.theme-color-indigo {
+    background-color: #e0e7ff !important;
+    border-color: #4f46e5 !important;
+    border-left: 5px solid #4f46e5 !important;
+  }
+  .sched-time-block.theme-color-purple {
+    background-color: #f3e8ff !important;
+    border-color: #9333ea !important;
+    border-left: 5px solid #9333ea !important;
+  }
+  .sched-time-block.theme-color-emerald {
+    background-color: #d1fae5 !important;
+    border-color: #10b981 !important;
+    border-left: 5px solid #10b981 !important;
+  }
+  .sched-time-block.theme-color-rose {
+    background-color: #ffe4e6 !important;
+    border-color: #f43f5e !important;
+    border-left: 5px solid #f43f5e !important;
+  }
+  .sched-time-block.theme-color-amber {
+    background-color: #fef3c7 !important;
+    border-color: #f59e0b !important;
+    border-left: 5px solid #f59e0b !important;
+  }
+  .sched-time-block.theme-color-sky {
+    background-color: #e0f2fe !important;
+    border-color: #0ea5e9 !important;
+    border-left: 5px solid #0ea5e9 !important;
+  }
+}
+
+/* ==========================================================================
+   ESTILOS DE MAQUETADO: PESTAÑAS DE VERSIONES, COMPARADOR Y TRASLADOS
+   ========================================================================== */
+
+/* Pestañas de versiones (A / B) */
+.version-tabs {
+  display: inline-flex;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  align-items: center;
+  box-sizing: border-box;
+  height: 34px;
+}
+
+body.dark-mode .version-tabs {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.btn-version {
+  background: transparent;
+  color: var(--t2);
+  border: none;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease-in-out;
+  box-sizing: border-box;
+}
+
+.btn-version.active {
+  background: var(--brand) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+}
+
+.btn-version:hover:not(.active) {
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--t1);
+}
+
+body.dark-mode .btn-version:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Ajustes de tamaño responsivo para pestañas en móviles */
+@media (max-width: 768px) {
+  .version-tabs {
+    height: 28px;
+    padding: 2px;
+    margin-right: 8px;
+  }
+  .btn-version {
+    height: 22px;
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+}
+
+/* Panel de Comparación en Sidebar */
+.sched-compare-box {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.015);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.sched-compare-box select {
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-hover, rgba(0, 0, 0, 0.03));
+  color: var(--t1);
+  font-size: 12.5px;
+  font-weight: 550;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.sched-compare-box select:focus {
+  border-color: var(--brand);
+}
+
+.sched-compare-box select option {
+  background-color: var(--sidebar-bg, #0f172a) !important;
+  color: var(--t1) !important;
+}
+
+body.dark-mode .sched-compare-box {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.compare-input-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.compare-input-group input {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-hover, rgba(0, 0, 0, 0.03));
+  color: var(--t1);
+  font-size: 12.5px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.compare-input-group button {
+  background: var(--brand);
+  color: #fff;
+  border: 1px solid var(--brand);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 7px 12px;
+  font-size: 12.5px;
+  font-weight: 550;
+  transition: all 0.15s ease;
+}
+
+.compare-input-group button:hover {
+  background: var(--brand-hover);
+}
+
+
+/* Custom Confirm Modal styling */
+.custom-confirm-backdrop {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+.custom-confirm-backdrop.show {
+  opacity: 1;
+}
+.custom-confirm-card {
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  transform: scale(0.9);
+  transition: transform 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--t1);
+}
+.custom-confirm-backdrop.show .custom-confirm-card {
+  transform: scale(1);
+}
+.custom-confirm-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--t1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.custom-confirm-body {
+  font-size: 13.5px;
+  color: var(--t2);
+  line-height: 1.5;
+}
+.custom-confirm-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+.btn-confirm-delete {
+  background: #dc2626 !important;
+  color: #fff !important;
+  border: 1px solid #dc2626 !important;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.btn-confirm-delete:hover {
+  background: #b91c1c !important;
 }
