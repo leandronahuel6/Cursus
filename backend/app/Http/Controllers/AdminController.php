@@ -101,12 +101,15 @@ class AdminController extends Controller
             'fecha_pago' => $pagos[$u->id] ?? null,
         ]);
 
-        $cuotaVigente = Cuota::orderBy('vigente_desde', 'desc')->first();
+        $hoy          = now()->toDateString();
+        $cuotaVigente = Cuota::where('vigente_desde', '<=', $hoy)->orderBy('vigente_desde', 'desc')->first();
+        $cuotaProxima = Cuota::where('vigente_desde', '>', $hoy)->orderBy('vigente_desde', 'asc')->first();
         $carreras     = Carrera::all(['id', 'nombre']);
 
         return response()->json([
             'periodo'       => $periodoActual,
             'cuota_vigente' => $cuotaVigente,
+            'cuota_proxima' => $cuotaProxima,
             'carreras'      => $carreras,
             'alumnos'       => $data->values(),
             'resumen'       => [
@@ -124,6 +127,15 @@ class AdminController extends Controller
             'valor_mensual' => 'required|numeric|min:0',
             'vigente_desde' => 'required|date',
         ]);
+
+        $hoy = now()->toDateString();
+
+        // Si la fecha es futura, reemplazar cuotas futuras existentes para esa carrera
+        if ($request->vigente_desde > $hoy) {
+            Cuota::where('carrera_id', $request->carrera_id)
+                 ->where('vigente_desde', '>', $hoy)
+                 ->delete();
+        }
 
         $cuota = Cuota::create($request->only(['carrera_id', 'valor_mensual', 'vigente_desde']));
 

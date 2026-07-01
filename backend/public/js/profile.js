@@ -10,6 +10,11 @@
     return;
   }
 
+  // Las páginas de admin se revelan después del chequeo de rol en su propio JS
+  if (!window.location.pathname.startsWith('/admin')) {
+    document.body.style.visibility = 'visible';
+  }
+
   function getStoredUser() {
     return localStorage.getItem('user') || sessionStorage.getItem('user');
   }

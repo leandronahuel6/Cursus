@@ -96,6 +96,7 @@
             <input type="text" id="cuota-monto" class="alert-form-input currency-input" readonly tabindex="-1" placeholder="—">
           </div>
         </div>
+        <div id="cuota-proxima-notice" style="display:none; margin-bottom:10px; font-size:12px; color:#d97706; background:rgba(217,119,6,.08); border:1px solid rgba(217,119,6,.25); border-radius:6px; padding:6px 10px;"></div>
         <button type="button" class="btn-alert-submit" id="btn-abrir-pago" style="width: 100%; background: var(--green);" onclick="window.openPagoModal()">
           💳 Pagar
         </button>

@@ -45,9 +45,14 @@ class AuthController extends Controller
         //(los admin no se registran solos,hay que cargarlos a mano)
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'legajo' => 'required|string|max:255|unique:users,legajo',
+            'legajo' => 'required|digits:5|unique:users,legajo',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8',
+        ], [
+            'legajo.required' => 'El legajo es obligatorio.',
+            'legajo.digits'   => 'El legajo debe ser un número de 5 dígitos.',
+            'legajo.unique'   => 'El legajo ya está registrado.',
+            'email.unique'    => 'El email ya está registrado.',
         ]);
 
         $user = User::create([
@@ -62,7 +67,7 @@ class AuthController extends Controller
 
         try {
             Mail::to($user->email)->send(new WelcomeMail($user));
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             // No bloqueamos el registro si el mail falla
         }
 

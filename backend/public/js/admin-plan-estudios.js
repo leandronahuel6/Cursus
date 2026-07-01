@@ -8,9 +8,33 @@
     try { return JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user')); } catch { return null; }
   }
 
+  function mostrarAccesoRestringido(mensaje, destino) {
+    const el = document.createElement('div');
+    el.style.cssText = 'position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0f172a;z-index:9999;gap:12px;';
+    el.innerHTML = `
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <p style="color:#f1f5f9;font-size:20px;font-weight:700;margin:0;">Acceso restringido</p>
+      <p style="color:#94a3b8;font-size:14px;margin:0;text-align:center;max-width:320px;">${mensaje}</p>
+      <p style="color:#475569;font-size:12px;margin:0;">Redirigiendo...</p>
+    `;
+    document.body.appendChild(el);
+    document.body.style.visibility = 'visible';
+    setTimeout(() => window.location.replace(destino), 2500);
+  }
+
   const token = getToken(), user = getUser();
-  if (!token || !user) { window.location.replace('/login'); return; }
-  if (user.role !== 'admin') { window.location.replace('/dashboard'); return; }
+  if (!token || !user) {
+    mostrarAccesoRestringido('Debés iniciar sesión para acceder a esta sección.', '/login');
+    return;
+  }
+  if (user.role !== 'admin') {
+    mostrarAccesoRestringido('No tenés permisos para acceder al panel de administración.', '/dashboard');
+    return;
+  }
+
+  document.body.style.visibility = 'visible';
 
   // ---- State ----
   let todasMaterias  = [];
@@ -201,7 +225,15 @@
         headers: { Authorization: `Bearer ${getToken()}` },
       });
       if (res.ok) {
-        todasMaterias = todasMaterias.filter(m => m.id !== eliminandoId);
+        todasMaterias = todasMaterias
+          .filter(m => m.id !== eliminandoId)
+          .map(m => ({
+            ...m,
+            prereq: {
+              cursadas:  (m.prereq.cursadas  || []).filter(id => id !== eliminandoId),
+              aprobadas: (m.prereq.aprobadas || []).filter(id => id !== eliminandoId),
+            },
+          }));
         peCancelarEliminar();
         renderTablas();
       } else {

@@ -11,7 +11,7 @@
   @stack('styles')
 </head>
 
-<body>
+<body style="visibility:hidden">
   <script>
     if (localStorage.getItem('sidebar_collapsed') === 'true') {
       document.body.classList.add('sidebar-collapsed');

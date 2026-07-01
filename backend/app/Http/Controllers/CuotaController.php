@@ -10,7 +10,8 @@ class CuotaController extends Controller
     // Ver la cuota vigente. Si se pasa carrera_id filtra por carrera; si no, devuelve la más reciente.
     public function index(Request $request)
     {
-        $query = Cuota::orderBy('vigente_desde', 'desc');
+        $query = Cuota::where('vigente_desde', '<=', now()->toDateString())
+                      ->orderBy('vigente_desde', 'desc');
 
         if ($request->filled('carrera_id')) {
             $request->validate(['carrera_id' => 'exists:carreras,id']);
@@ -23,7 +24,15 @@ class CuotaController extends Controller
             return response()->json(['message' => 'No hay cuota cargada'], 404);
         }
 
-        return response()->json($cuota);
+        $proximaQuery = Cuota::where('vigente_desde', '>', now()->toDateString())
+                             ->orderBy('vigente_desde', 'asc');
+        if ($request->filled('carrera_id')) {
+            $proximaQuery->where('carrera_id', $request->carrera_id);
+        }
+
+        return response()->json(array_merge($cuota->toArray(), [
+            'cuota_proxima' => $proximaQuery->first(),
+        ]));
     }
 
     // Cargar una cuota nueva (uso de admin)
