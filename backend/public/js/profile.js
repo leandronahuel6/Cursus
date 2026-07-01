@@ -191,6 +191,9 @@
       });
     }
 
+    const deleteBtn = document.getElementById('profile-avatar-delete-btn');
+    if (deleteBtn) deleteBtn.style.display = user.avatar_url ? 'flex' : 'none';
+
     // Mostrar sección admin en sidebar solo si es admin
     const isAdmin = user.role === 'admin';
     ['admin-nav-group', 'admin-nav-alumnos', 'admin-nav-cuotas', 'admin-nav-plan'].forEach(id => {
@@ -236,11 +239,54 @@
     document.getElementById('profile-edit-overlay').classList.add('open');
   }
 
+  // Foto pendiente de confirmación: se previsualiza localmente y sólo se sube
+  // (o se elimina) contra la API cuando el usuario toca "Guardar cambios".
+  // Si cancela, todo se descarta y se restaura el avatar realmente guardado.
+  let pendingAvatarFile = null;
+  let pendingAvatarPreviewUrl = null;
+  let pendingAvatarRemove = false;
+
+  function discardPendingAvatar() {
+    pendingAvatarFile = null;
+    pendingAvatarRemove = false;
+    if (pendingAvatarPreviewUrl) {
+      URL.revokeObjectURL(pendingAvatarPreviewUrl);
+      pendingAvatarPreviewUrl = null;
+    }
+    const input = document.getElementById('profile-avatar-input');
+    if (input) input.value = '';
+    const errorEl = document.getElementById('profile-avatar-error');
+    if (errorEl) errorEl.textContent = '';
+
+    // Restaurar la vista previa al avatar realmente guardado (o iniciales).
+    const preview = document.getElementById('profile-avatar-preview');
+    const deleteBtn = document.getElementById('profile-avatar-delete-btn');
+    if (!preview) return;
+    const cached = getStoredUser();
+    let user = null;
+    if (cached) {
+      try { user = JSON.parse(cached); } catch (e) { /* cache corrupto, se ignora */ }
+    }
+    if (user && user.avatar_url) {
+      preview.style.backgroundImage = `url('${user.avatar_url}')`;
+      preview.textContent = '';
+      if (deleteBtn) deleteBtn.style.display = 'flex';
+    } else {
+      preview.style.backgroundImage = '';
+      if (user && user.nombre) {
+        const parts = user.nombre.trim().split(' ');
+        preview.textContent = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
+      }
+      if (deleteBtn) deleteBtn.style.display = 'none';
+    }
+  }
+
   function closeProfileModal() {
+    discardPendingAvatar();
     document.getElementById('profile-edit-overlay').classList.remove('open');
   }
 
-  async function handleAvatarFileChange(e) {
+  function handleAvatarFileChange(e) {
     const file = e.target.files[0];
     const errorEl = document.getElementById('profile-avatar-error');
     errorEl.textContent = '';
@@ -253,45 +299,82 @@
       return;
     }
 
-    const token = getStoredToken();
-    if (!token) return;
+    if (pendingAvatarPreviewUrl) {
+      URL.revokeObjectURL(pendingAvatarPreviewUrl);
+    }
+    pendingAvatarFile = file;
+    pendingAvatarPreviewUrl = URL.createObjectURL(file);
+    pendingAvatarRemove = false;
 
     const preview = document.getElementById('profile-avatar-preview');
-    const originalBg = preview.style.backgroundImage;
-    preview.style.opacity = '0.5';
+    preview.style.backgroundImage = `url('${pendingAvatarPreviewUrl}')`;
+    preview.textContent = '';
 
-    const formData = new FormData();
-    formData.append('avatar', file);
+    const deleteBtn = document.getElementById('profile-avatar-delete-btn');
+    if (deleteBtn) deleteBtn.style.display = 'flex';
+  }
 
-    try {
-      const response = await fetch('/api/profile/avatar', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer ' + token
-        },
-        body: formData
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        errorEl.textContent = data.errors?.avatar?.[0] || data.message || 'No se pudo actualizar la foto.';
-        preview.style.backgroundImage = originalBg;
-        return;
-      }
-
-      const storage = localStorage.getItem('token') ? localStorage : sessionStorage;
-      storage.setItem('user', JSON.stringify(data));
-      applyUserToDOM(data);
-    } catch (error) {
-      console.error('No se pudo actualizar la foto de perfil', error);
-      errorEl.textContent = 'Error de conexión.';
-      preview.style.backgroundImage = originalBg;
-    } finally {
-      preview.style.opacity = '';
-      e.target.value = '';
+  function handleAvatarDelete() {
+    if (pendingAvatarPreviewUrl) {
+      URL.revokeObjectURL(pendingAvatarPreviewUrl);
+      pendingAvatarPreviewUrl = null;
     }
+    pendingAvatarFile = null;
+    pendingAvatarRemove = true;
+
+    const input = document.getElementById('profile-avatar-input');
+    if (input) input.value = '';
+    const errorEl = document.getElementById('profile-avatar-error');
+    if (errorEl) errorEl.textContent = '';
+
+    const preview = document.getElementById('profile-avatar-preview');
+    const nombre = document.getElementById('profile-nombre')?.value || '';
+    const parts = nombre.trim().split(' ');
+    preview.style.backgroundImage = '';
+    preview.textContent = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
+
+    const deleteBtn = document.getElementById('profile-avatar-delete-btn');
+    if (deleteBtn) deleteBtn.style.display = 'none';
+  }
+
+  async function uploadPendingAvatar(token) {
+    const formData = new FormData();
+    formData.append('avatar', pendingAvatarFile);
+
+    const response = await fetch('/api/profile/avatar', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: formData
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      const errorEl = document.getElementById('profile-avatar-error');
+      if (errorEl) errorEl.textContent = data.errors?.avatar?.[0] || data.message || 'No se pudo actualizar la foto.';
+      throw new Error('avatar-upload-failed');
+    }
+    return data;
+  }
+
+  async function deleteAvatarNow(token) {
+    const response = await fetch('/api/profile/avatar', {
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + token
+      }
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      const errorEl = document.getElementById('profile-avatar-error');
+      if (errorEl) errorEl.textContent = data.message || 'No se pudo eliminar la foto.';
+      throw new Error('avatar-delete-failed');
+    }
+    return data;
   }
 
   async function handleProfileSubmit(e) {
@@ -320,7 +403,7 @@
         body: JSON.stringify({ nombre, legajo: legajo || null, email })
       });
 
-      const data = await response.json();
+      let data = await response.json();
 
       if (!response.ok) {
         if (data.errors?.nombre) document.getElementById('profile-nombre-error').textContent = data.errors.nombre[0];
@@ -330,6 +413,19 @@
         return;
       }
 
+      // Si el usuario eligió una foto nueva o marcó eliminarla, recién ahora se aplica.
+      if (pendingAvatarFile) {
+        data = await uploadPendingAvatar(token);
+        pendingAvatarFile = null;
+        if (pendingAvatarPreviewUrl) {
+          URL.revokeObjectURL(pendingAvatarPreviewUrl);
+          pendingAvatarPreviewUrl = null;
+        }
+      } else if (pendingAvatarRemove) {
+        data = await deleteAvatarNow(token);
+        pendingAvatarRemove = false;
+      }
+
       // Guardar en el mismo storage donde ya vive el token y refrescar la UI.
       const storage = localStorage.getItem('token') ? localStorage : sessionStorage;
       storage.setItem('user', JSON.stringify(data));
@@ -337,7 +433,7 @@
 
       btn.textContent = '✓ Guardado';
       setTimeout(() => {
-        closeProfileModal();
+        document.getElementById('profile-edit-overlay').classList.remove('open');
         btn.textContent = original;
         btn.disabled = false;
       }, 900);
@@ -511,6 +607,7 @@
   window.closeProfileModal         = closeProfileModal;
   window.handleProfileSubmit       = handleProfileSubmit;
   window.handleAvatarFileChange    = handleAvatarFileChange;
+  window.handleAvatarDelete        = handleAvatarDelete;
   window.handleLogout              = handleLogout;
   window.updateAlertsBadge         = updateAlertsBadge;
   window.openChangePasswordModal   = openChangePasswordModal;

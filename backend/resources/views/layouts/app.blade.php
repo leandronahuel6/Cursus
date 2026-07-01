@@ -183,9 +183,8 @@
   <div class="contact-box">
     <div class="contact-header">
       <div class="contact-title">
-        <img class="contact-title-ic" src="{{ asset('assets/icons/user.svg') }}" alt="Perfil" style="width: 16px; height: 16px; opacity: 0.9;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.6; margin-right: 2px;"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
         Editar perfil
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.6; margin-left: 2px;"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
       </div>
       <button class="contact-close" onclick="window.closeProfileModal()">✕</button>
     </div>
@@ -195,6 +194,9 @@
         <div class="profile-avatar-preview" id="profile-avatar-preview">{{ $viewerInitials ?? '' }}</div>
         <button type="button" class="profile-avatar-pencil" onclick="document.getElementById('profile-avatar-input').click()" title="Cambiar foto de perfil">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </button>
+        <button type="button" class="profile-avatar-trash" id="profile-avatar-delete-btn" onclick="window.handleAvatarDelete()" title="Eliminar foto de perfil" style="display:none;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z"/></svg>
         </button>
         <input type="file" id="profile-avatar-input" accept="image/png,image/jpeg" style="display:none;" onchange="window.handleAvatarFileChange(event)">
       </div>
@@ -216,17 +218,19 @@
           <span id="profile-email-error" class="error-message"></span>
         </div>
         <div class="contact-footer">
-          <button type="button" class="contact-btn-cancel" onclick="window.closeProfileModal()">Cancelar</button>
-          <button type="submit" class="contact-btn-send">Guardar cambios</button>
+          <button type="button" class="btn-change-pwd" onclick="window.openChangePasswordModal()">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+              <rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="8" cy="10.5" r="1" fill="currentColor"/>
+            </svg>
+            Cambiar contraseña
+          </button>
+          <div class="contact-footer-actions">
+            <button type="button" class="contact-btn-cancel" onclick="window.closeProfileModal()">Cancelar</button>
+            <button type="submit" class="contact-btn-send">Guardar cambios</button>
+          </div>
         </div>
-        <button type="button" class="btn-change-pwd" onclick="window.openChangePasswordModal()">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
-            <rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <circle cx="8" cy="10.5" r="1" fill="currentColor"/>
-          </svg>
-          Cambiar contraseña
-        </button>
       </form>
     </div>
   </div>
@@ -281,9 +285,9 @@
 <script src="{{ asset('js/animations.js') }}"></script>
 <script src="{{ asset('js/celebracion.js') }}"></script>
 <script src="{{ asset('js/shared/sidebar.js') }}"></script>
-<script src="{{ asset('js/script.js') }}"></script>
 <script src="{{ asset('js/profile.js') }}"></script>
-<script src="{{ asset('js/pomo-float.js') }}"></script>
+<script src="{{ asset('js/pomo-shared.js') }}?v={{ filemtime(public_path('js/pomo-shared.js')) }}"></script>
+<script src="{{ asset('js/pomo-float.js') }}?v={{ filemtime(public_path('js/pomo-float.js')) }}"></script>
 @if(Request::routeIs('dashboard') || Request::routeIs('area-estudio'))
 <script src="{{ asset('js/onboarding.js') }}"></script>
 @endif

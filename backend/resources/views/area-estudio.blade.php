@@ -575,5 +575,5 @@
 @push('scripts')
   <script src="{{ asset('js/views/pomo-ambient-synth.js') }}"></script>
   <script src="{{ asset('js/views/pomo-focus-canvas.js') }}"></script>
-  <script src="{{ asset('js/views/area-estudio.js') }}" type="module"></script>
+  <script src="{{ asset('js/views/area-estudio.js') }}?v={{ filemtime(public_path('js/views/area-estudio.js')) }}" type="module"></script>
 @endpush

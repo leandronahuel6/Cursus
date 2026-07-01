@@ -156,6 +156,18 @@ class AuthController extends Controller
         return response()->json($user);
     }
 
+    public function deleteAvatar(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+            $user->update(['avatar' => null]);
+        }
+
+        return response()->json($user);
+    }
+
     public function changePassword(Request $request){
         $request->validate([
         'current_password' => 'required',
