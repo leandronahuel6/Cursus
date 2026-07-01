@@ -8,6 +8,7 @@ const nameValidation = (name) => {
 
 const legajoValidation = (legajo) => {
     if (!legajo) return 'Ingrese su número de legajo';
+    if (!/^\d{5}$/.test(legajo)) return 'El legajo debe ser un número de 5 dígitos';
     return null;
 }
 

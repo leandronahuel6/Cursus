@@ -12,10 +12,34 @@
     } catch { return null; }
   }
 
+  function mostrarAccesoRestringido(mensaje, destino) {
+    const el = document.createElement('div');
+    el.style.cssText = 'position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0f172a;z-index:9999;gap:12px;';
+    el.innerHTML = `
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <p style="color:#f1f5f9;font-size:20px;font-weight:700;margin:0;">Acceso restringido</p>
+      <p style="color:#94a3b8;font-size:14px;margin:0;text-align:center;max-width:320px;">${mensaje}</p>
+      <p style="color:#475569;font-size:12px;margin:0;">Redirigiendo...</p>
+    `;
+    document.body.appendChild(el);
+    document.body.style.visibility = 'visible';
+    setTimeout(() => window.location.replace(destino), 2500);
+  }
+
   const token = getToken();
   const user  = getUser();
-  if (!token || !user) { window.location.replace('/login'); return; }
-  if (user.role !== 'admin') { window.location.replace('/dashboard'); return; }
+  if (!token || !user) {
+    mostrarAccesoRestringido('Debés iniciar sesión para acceder a esta sección.', '/login');
+    return;
+  }
+  if (user.role !== 'admin') {
+    mostrarAccesoRestringido('No tenés permisos para acceder al panel de administración.', '/dashboard');
+    return;
+  }
+
+  document.body.style.visibility = 'visible';
 
   // ---- State ----
   let todosAlumnos = [];
@@ -63,6 +87,15 @@
     } else {
       document.getElementById('ac-monto-actual').textContent  = 'Sin cuota cargada';
       document.getElementById('ac-vigente-desde').textContent = '';
+    }
+
+    // Cuota próxima programada
+    const proximaEl = document.getElementById('ac-proxima-notice');
+    if (data.cuota_proxima) {
+      proximaEl.textContent = `Próxima: ${formatMonto(data.cuota_proxima.valor_mensual)} a partir del ${formatFecha(data.cuota_proxima.vigente_desde)}`;
+      proximaEl.hidden = false;
+    } else {
+      proximaEl.hidden = true;
     }
 
     // Carreras en el select
@@ -159,9 +192,8 @@
       const data = await res.json();
       if (res.ok) {
         document.getElementById('ac-form').hidden = true;
-        document.getElementById('ac-monto-actual').textContent  = formatMonto(data.valor_mensual);
-        document.getElementById('ac-vigente-desde').textContent = 'Vigente desde ' + formatFecha(data.vigente_desde);
         document.getElementById('ac-valor').value = '';
+        await cargarDatos();
       } else {
         alert(data.message ?? 'Error al guardar la cuota.');
       }

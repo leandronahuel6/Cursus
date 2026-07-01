@@ -25,6 +25,7 @@
       <div class="ac-vigente-info">
         <div class="ac-monto" id="ac-monto-actual">—</div>
         <div class="ac-vigente-desde" id="ac-vigente-desde"></div>
+        <div class="ac-proxima-notice" id="ac-proxima-notice" hidden></div>
       </div>
       <button class="ac-btn-edit" id="ac-btn-edit" onclick="window.acToggleForm()">
         <svg width="14" height="14" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#pencil') }}"></use></svg>
