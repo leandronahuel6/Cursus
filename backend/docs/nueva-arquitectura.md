@@ -51,15 +51,20 @@ public/
 │       └── auth.css        # Pantallas de login, registro, recuperación de contraseña
 │
 ├── js/
+│   ├── models/             # Modelos de dominio y máquinas de estado (ES6 Modules)
+│   │   └── PomodoroStates.js # State Pattern: FaseEnfoque, FaseDescansoCorto, FaseDescansoLargo
+│   ├── services/           # Servicios desacoplados de la UI (ES6 Modules)
+│   │   ├── ApiService.js     # Repository Pattern: abstrae TODOS los fetch de la app
+│   │   └── PomodoroStateService.js # Observer/SSOT: estado canónico del Pomodoro + motor Time Deltas
 │   ├── shared/             # Scripts transversales a toda la app
 │   │   ├── api.js          # Utilidades para llamadas fetch al backend
 │   │   ├── router.js       # Manejo de navegación/historial
 │   │   ├── utils.js        # Funciones auxiliares (fechas, toasts, cálculo de alertas)
 │   │   └── profile.js      # Lógica del menú de perfil de usuario
-│   └── views/              # Lógica específica por página
+│   └── views/              # Lógica específica por página (orquestadores)
 │       ├── welcome.js      # Animaciones de la landing
 │       ├── dashboard.js    # Lógica del panel de inicio
-│       ├── area-estudio.js # Pomodoro, gestión de tableros Kanban
+│       ├── area-estudio.js # Orquestador: Kanban, Marcadores, suscriptor del Observer Pomodoro
 │       ├── materias.js     # Interacciones del árbol de materias
 │       ├── alertas/        # Lógica compleja de la página de alertas dividida
 │       │   ├── alertas-data.js     # Manejo de datos y mocks
@@ -111,14 +116,27 @@ resources/views/
 
 ---
 
-## 3. Reglas de Oro Post-Refactorización
+## 3. Patrones de Diseño Implementados (Lote 1 — Área de Estudio)
+
+| Patrón | Módulo | Descripción |
+|--------|--------|-------------|
+| **State Pattern** | `js/models/PomodoroStates.js` | Cada fase (Enfoque, DescansoCorto, DescansoLargo) es un objeto inmutable con sus propias reglas de duración y transición. Elimina todos los `if (fase === 'enfoque')` dispersos. |
+| **Observer / Pub-Sub** | `js/services/PomodoroStateService.js` | Extiende `EventTarget`. Emite `pomo:tick`, `pomo:estadoCambiado`, `pomo:faseCompletada`. El Timer Principal y el Modo Concentración se suscriben y renderizan de forma totalmente independiente. |
+| **Repository Pattern** | `js/services/ApiService.js` | Abstrae TODOS los `fetch` de la vista. Ninguna función del DOM hace peticiones HTTP directamente. Retorna promesas limpias al llamador. Permite migrar de mock a real cambiando un único punto. |
+| **Time Deltas** | `PomodoroStateService._iniciarTicker()` | El tiempo restante se calcula como `Date.now() - tsInicio` en cada tick (500 ms). Inmune al throttling de navegadores en pestañas inactivas donde `setInterval` puede demorar 1+ segundo. |
+| **Singleton** | `pomodoroService` (exportado) | Una única instancia del servicio para garantizar el SSOT. Consumidores futuros (`pomo-float.js`) deben importarlo directamente. |
+
+---
+
+## 4. Reglas de Oro Post-Refactorización
 
 Para el equipo de desarrollo, estas son las nuevas normativas a cumplir al agregar código:
 
 1. **PROHIBIDO el CSS Monolítico:** No agregues clases indiscriminadamente a `main.css`. Busca la capa correspondiente (`components/`, `layout/` o `views/`). Si es un estilo genérico de un botón, va en `buttons.css`. Si es un padding raro de la página "Materias", va en `materias.css`.
 2. **Carga Bajo Demanda:** Las hojas de estilo de las vistas (`views/*.css`) y los scripts específicos (`views/*.js`) **SOLO** deben cargarse en el Blade de esa vista usando las directivas `@push('styles')` y `@push('scripts')`. No las coloques globalmente en el layout `app.blade.php`.
 3. **JS Desacoplado:** Si un script supera las 200-300 líneas, es un síntoma de que mezcla responsabilidades. Separa la obtención de datos (API/Mocks), la manipulación del DOM (Render) y la inicialización (Main).
-4. **Vistas Ligeras:** Ningún archivo `.blade.php` debe superar las 300 líneas. Si una vista tiene una sección muy larga (como un modal gigante o un bloque informativo denso), extráela a un componente o partial usando `@include('partials.nombre')`.
-5. **Cero Lógica en Plantillas:** Evita incrustar `<style>` o `<script>` directamente dentro de un archivo `.blade.php`. Esto impide el cacheo de los navegadores y fomenta el "spaghetti code".
+4. **Servicios y Modelos Globales:** Los módulos en `js/models/` y `js/services/` son reutilizables entre vistas. Futuras vistas que necesiten el Pomodoro (ej: `pomo-float.js`) deben importar `PomodoroStateService` directamente, no duplicar la lógica.
+5. **Vistas Ligeras:** Ningún archivo `.blade.php` debe superar las 300 líneas. Si una vista tiene una sección muy larga, extráela a un partial usando `@include('partials.nombre')`.
+6. **Cero Lógica en Plantillas:** Evita incrustar `<style>` o `<script>` directamente dentro de un archivo `.blade.php`. Esto impide el cacheo y fomenta el código espagueti.
 
 ¡Adherirse a estas reglas mantendrá el código limpio, veloz y fácil de escalar a largo plazo!
