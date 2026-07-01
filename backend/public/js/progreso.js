@@ -37,41 +37,27 @@ let state = {
 
 const API_BASE = window.location.origin + '/api';
 
+function getStoredToken() {
+  return localStorage.getItem('token') || sessionStorage.getItem('token');
+}
+
 function getAuthHeaders() {
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
   return {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'Authorization': 'Bearer ' + token
+    'Authorization': 'Bearer ' + getStoredToken()
   };
-}
-
-let backendPomodoroData = null;
-
-async function loadPomodoroStats() {
-  try {
-    const response = await fetch(`${API_BASE}/pomodoro/resumen`, { headers: getAuthHeaders() });
-    if (!response.ok) throw new Error('Error al cargar resumen de pomodoros');
-    const data = await response.json();
-    backendPomodoroData = data;
-  } catch (e) {
-    console.error('Error fetching pomodoro stats, using simulated fallback', e);
-    backendPomodoroData = null;
-  }
 }
 
 async function init() {
   await loadSubjectsState();
   loadSimulationState();
-  
+
   // Registrar eventos
   const btnSave = document.getElementById('btn-save-progress');
   if (btnSave) {
     btnSave.addEventListener('click', saveSimulationState);
   }
-
-  // Cargar estadísticas reales de pomodoro
-  await loadPomodoroStats();
 
   // Inicializar vistas y gráficos
   updateUI();
@@ -453,14 +439,55 @@ function renderAcademicCharts() {
   renderHistoChart();
 }
 
-function renderProductivityCharts() {
-  if (backendPomodoroData) {
-    document.getElementById('prod-streak-now').textContent = `${backendPomodoroData.racha_dias} días`;
-    document.getElementById('prod-streak-best').textContent = `${backendPomodoroData.racha_maxima} días`;
+async function renderProductivityCharts() {
+  if (!state.productivity) {
+    const token = getStoredToken();
+    if (!token) return;
+    try {
+      const response = await fetch('/api/pomodoro/productividad', { headers: getAuthHeaders() });
+      if (!response.ok) throw new Error('No se pudo cargar la productividad');
+      state.productivity = await response.json();
+    } catch (e) {
+      console.error('No se pudo cargar la productividad', e);
+      return;
+    }
   }
-  renderWeeklyChart();
-  renderDonutChart();
-  renderHeatmap();
+
+  const data = state.productivity;
+
+  const streakNow = document.getElementById('prod-streak-now');
+  if (streakNow) streakNow.textContent = `${data.racha_actual} día${data.racha_actual !== 1 ? 's' : ''}`;
+  const streakBest = document.getElementById('prod-streak-best');
+  if (streakBest) streakBest.textContent = `${data.racha_mejor} día${data.racha_mejor !== 1 ? 's' : ''}`;
+
+  renderWeeklyChart(data.horas_por_dia || []);
+  renderDonutChart(data.distribucion_materias || []);
+  renderHeatmap(data.actividad || {});
+  renderFocusInsights(data);
+}
+
+function renderFocusInsights(data) {
+  const focusText = document.getElementById('prod-focus-hour-text');
+  if (focusText) {
+    focusText.innerHTML = data.hora_pico
+      ? `Según tu racha e historial de concentración de los últimos días, tu hora más productiva es de <strong>${data.hora_pico} hs</strong>.`
+      : 'Todavía no registramos suficientes sesiones de Pomodoro para estimar tu hora más productiva.';
+  }
+
+  const tipBody = document.getElementById('prod-tip-body');
+  if (tipBody) {
+    const materias = data.materias_cursando || [];
+    if (data.promedio_diario > 0 && materias.length > 0) {
+      const listado = materias.length > 1
+        ? `${materias.slice(0, -1).map(m => `<em>${m}</em>`).join(', ')} y <em>${materias[materias.length - 1]}</em>`
+        : `<em>${materias[0]}</em>`;
+      tipBody.innerHTML = `Si mantenés el ritmo promedio de ${data.promedio_diario} horas diarias, seguí reforzando ${listado} en tus próximas sesiones de estudio.`;
+    } else if (materias.length > 0) {
+      tipBody.innerHTML = `Registrá sesiones de Pomodoro en ${materias.length > 1 ? 'tus materias en curso' : `<em>${materias[0]}</em>`} para ver acá tu ritmo de estudio.`;
+    } else {
+      tipBody.textContent = 'No tenés materias en curso registradas todavía.';
+    }
+  }
 }
 
 // 1. Gráfico de línea: Evolución del Promedio
@@ -689,22 +716,12 @@ function renderHistoChart() {
 }
 
 // 3. Gráfico de Barras: Horas de concentración semanales
-function renderWeeklyChart() {
+function renderWeeklyChart(horasPorDia) {
   const container = document.getElementById('container-chart-weekly');
   if (!container) return;
 
-  // Horas estudiadas en los últimos 7 días
-  const studyHours = (backendPomodoroData && backendPomodoroData.horas_diarias)
-    ? backendPomodoroData.horas_diarias
-    : [
-        { day: 'Lun', hours: 1.5 },
-        { day: 'Mar', hours: 2.0 },
-        { day: 'Mié', hours: 0.5 },
-        { day: 'Jue', hours: 3.0 },
-        { day: 'Vie', hours: 1.0 },
-        { day: 'Sáb', hours: 4.0 },
-        { day: 'Dom', hours: 0.8 }
-      ];
+  // Horas estudiadas de Lunes a Domingo, traídas de las sesiones de Pomodoro reales
+  const studyHours = (horasPorDia || []).map(d => ({ day: d.dia, hours: d.horas }));
 
   const totalMinutes = studyHours.reduce((acc, d) => acc + (d.hours * 60), 0);
   const totalH = Math.floor(totalMinutes / 60);
@@ -777,28 +794,24 @@ function renderWeeklyChart() {
 }
 
 // 4. Gráfico de Donut: Distribución de tiempo de estudio por materia
-function renderDonutChart() {
+const DONUT_COLORS = ['#4f46e5', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'];
+
+function renderDonutChart(distribucionMaterias) {
   const container = document.getElementById('container-chart-donut');
   const legendContainer = document.getElementById('donut-legend-container');
   if (!container || !legendContainer) return;
 
-  const presetColors = ['#4f46e5', '#10b981', '#f59e0b', '#0ea5e9', '#f43f5e', '#9333ea'];
-  let distribution = [];
-  
-  if (backendPomodoroData && backendPomodoroData.distribucion_materias && backendPomodoroData.distribucion_materias.length > 0) {
-    distribution = backendPomodoroData.distribucion_materias.map((m, idx) => ({
-      name: m.name,
-      hours: m.hours,
-      color: presetColors[idx % presetColors.length]
-    }));
-  } else {
-    // Datos mock de distribución de horas de concentración
-    distribution = [
-      { name: 'Programación III', hours: 5.0, color: '#4f46e5' },
-      { name: 'Base de Datos II', hours: 3.2, color: '#3b82f6' },
-      { name: 'Metodología de Sistemas I', hours: 2.5, color: '#10b981' },
-      { name: 'Inglés II', hours: 1.9, color: '#f59e0b' }
-    ];
+  // Distribución de horas de concentración por materia (últimos 30 días), desde la BD
+  const distribution = (distribucionMaterias || []).map((d, idx) => ({
+    name: d.materia,
+    hours: d.horas,
+    color: DONUT_COLORS[idx % DONUT_COLORS.length]
+  }));
+
+  if (distribution.length === 0) {
+    container.innerHTML = '';
+    legendContainer.innerHTML = '<div style="font-size:12.5px;color:var(--t3);">Todavía no hay sesiones de Pomodoro registradas por materia.</div>';
+    return;
   }
 
   const total = distribution.reduce((acc, d) => acc + d.hours, 0);
@@ -885,49 +898,35 @@ function renderDonutChart() {
   });
 }
 
-// 5. Heatmap de hábitos (últimos 45 días)
-function renderHeatmap() {
+// 5. Heatmap de hábitos (últimos 45 días), con la cantidad real de Pomodoros por día
+function renderHeatmap(actividad) {
   const grid = document.getElementById('activity-heatmap-grid');
   if (!grid) return;
 
   grid.innerHTML = '';
 
-  const activityMap = (backendPomodoroData && backendPomodoroData.actividad) ? backendPomodoroData.actividad : {};
+  const dias = 45;
+  const hoy = new Date();
 
-  // Generar 45 días
-  for (let i = 0; i < 45; i++) {
-    const date = new Date();
-    date.setDate(date.getDate() - (44 - i)); // De hace 44 días a hoy
-    const dateStr = date.toISOString().split('T')[0];
+  for (let i = dias - 1; i >= 0; i--) {
+    const fecha = new Date(hoy);
+    fecha.setDate(hoy.getDate() - i);
+    const clave = fecha.toISOString().slice(0, 10);
+    const cantidad = actividad[clave] || 0;
+
+    let lvl = 0;
+    if (cantidad >= 8) lvl = 4;
+    else if (cantidad >= 5) lvl = 3;
+    else if (cantidad >= 3) lvl = 2;
+    else if (cantidad >= 1) lvl = 1;
 
     const day = document.createElement('div');
     day.className = 'heatmap-day';
-    
-    let lvl = 0;
-    if (activityMap[dateStr]) {
-      const qty = activityMap[dateStr];
-      if (qty >= 4) lvl = 4;
-      else if (qty >= 3) lvl = 3;
-      else if (qty >= 2) lvl = 2;
-      else if (qty >= 1) lvl = 1;
-    } else if (!backendPomodoroData) {
-      // Fallback mock
-      if (i >= 37) {
-        lvl = Math.floor(Math.random() * 3) + 2;
-      } else {
-        const rand = Math.random();
-        if (rand > 0.8) lvl = 3;
-        else if (rand > 0.6) lvl = 2;
-        else if (rand > 0.35) lvl = 1;
-      }
-    }
-
     if (lvl > 0) {
       day.classList.add(`lvl-${lvl}`);
     }
-    
-    const count = activityMap[dateStr] || (lvl * 2);
-    day.title = `${dateStr}: ${count} pomodoros completados`;
+
+    day.title = `${clave}: ${cantidad} pomodoro${cantidad !== 1 ? 's' : ''} completado${cantidad !== 1 ? 's' : ''}`;
     grid.appendChild(day);
   }
 }

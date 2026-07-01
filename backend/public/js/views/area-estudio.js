@@ -410,11 +410,11 @@
 
   function savePomoStateToLocal() {
     pomoState.timestamp_ultimo_cambio = Date.now();
-    localStorage.setItem('cursus_pomo_estado_v2', JSON.stringify(pomoState));
+    PomoShared.saveState(pomoState);
   }
 
   function savePomoCyclesToLocal() {
-    localStorage.setItem('cursus_pomo_ciclos_v2', JSON.stringify(pomoCycles));
+    PomoShared.saveCycles(pomoCycles);
   }
 
   function updatePomoUI() {
@@ -571,23 +571,41 @@
     }
   }
 
+  function tickPomo() {
+    if (pomoState.estado_reloj !== 'corriendo') return;
+
+    if (pomoState.tiempo_restante <= 0) {
+      handleFaseComplete();
+      return;
+    }
+
+    // Basado en reloj real (no en un simple contador de ticks) para que
+    // coincida con el widget flotante y no se desincronicen entre pestañas.
+    const delta = PomoShared.elapsedSeconds(pomoState);
+    if (delta < 1) return;
+
+    pomoState.tiempo_restante -= delta;
+    pomoState.timestamp_ultimo_cambio = Date.now();
+    PomoShared.saveState(pomoState);
+
+    if (pomoState.tiempo_restante <= 0) {
+      handleFaseComplete();
+    } else {
+      updatePomoUI();
+    }
+  }
+
   function startTicker() {
     clearInterval(pomoTicker);
-    pomoTicker = setInterval(() => {
-      if (pomoState.tiempo_restante > 0) {
-        pomoState.tiempo_restante--;
-        // Guardar estado cada segundo en memoria RAM, y defensivamente al recargar
-        pomoState.timestamp_ultimo_cambio = Date.now();
-        // Para no degradar LocalStorage escribiendo cada segundo, escribimos cada 10s
-        if (pomoState.tiempo_restante % 10 === 0) {
-          localStorage.setItem('cursus_pomo_estado_v2', JSON.stringify(pomoState));
-        }
-        updatePomoUI();
-      } else {
-        handleFaseComplete();
-      }
-    }, 1000);
+    pomoTicker = setInterval(tickPomo, 1000);
   }
+
+  // Si el navegador retrasó/pausó el intervalo por tener la pestaña en
+  // segundo plano, al volver a mostrarla recalculamos al instante en vez de
+  // esperar el próximo tick (que puede tardar bastante más de 1 segundo).
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) tickPomo();
+  });
 
   function togglePomo() {
     if (pomoState.estado_reloj === 'corriendo') {
@@ -621,66 +639,17 @@
     const alarmSound = localStorage.getItem('cursus_pomo_alarm_sound') || 'chime';
     playPomoAlarm(alarmSound);
 
-    if (pomoState.fase_actual === 'enfoque') {
-      // Completó enfoque
-      pomoCycles.sesiones_completadas_hoy++;
-      
-      const now = new Date();
-      const hhmm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-      pomoCycles.log.unshift({
-        time: hhmm,
-        duration: `${pomoSettings.focusTime}:00`,
-        status: "✓ Completada"
-      });
+    const faseAnterior = pomoState.fase_actual;
 
-      // Validar si toca descanso corto o largo
-      if (pomoCycles.ciclo_actual < pomoSettings.sessionsPerCycle) {
-        pomoState.fase_actual = 'descanso_corto';
-        pomoState.tiempo_restante = pomoSettings.shortBreak * 60;
-        pomoCycles.ciclo_actual++;
-      } else {
-        pomoState.fase_actual = 'descanso_largo';
-        pomoState.tiempo_restante = pomoSettings.longBreak * 60;
-        pomoCycles.ciclo_actual = 1; // Resetea ciclo al terminar descanso largo
-      }
+    // Misma lógica de avance de fase, registro de sesión y anti-duplicación
+    // que usa el widget flotante: una sola fuente de verdad para ambos.
+    const mensaje = PomoShared.avanzarFase(pomoState, pomoSettings, pomoCycles);
+    showToast(mensaje, "success");
 
-      showToast("¡Buen trabajo! Sesión de enfoque completada. Hora de descansar.", "success");
-      
-      // [REAL API] Registrar sesión completada
-      const nowTime = Date.now();
-      const dedupKey = 'cursus_pomo_dedup_token';
-      const existingToken = localStorage.getItem(dedupKey);
-
-      if (!existingToken || (nowTime - parseInt(existingToken)) > 10000) {
-          localStorage.setItem(dedupKey, String(nowTime));
-          setTimeout(() => {
-              if (localStorage.getItem(dedupKey) === String(nowTime)) {
-                  localStorage.removeItem(dedupKey);
-              }
-          }, 30000);
-
-          if (selectedMateriaId) {
-              fetch(`${API_BASE}/pomodoro/sesiones`, { 
-                  method: 'POST', 
-                  headers: getAuthHeaders(),
-                  body: JSON.stringify({ materia_id: selectedMateriaId, duracion_segundos: pomoSettings.focusTime * 60 }) 
-              }).then(() => loadMateriaResumen()).catch(e => console.error(e));
-          }
-      }
-
-    } else {
-      // Completó descanso
-      pomoState.fase_actual = 'enfoque';
-      pomoState.tiempo_restante = pomoSettings.focusTime * 60;
-      showToast("El descanso ha terminado. ¡A enfocar nuevamente!", "success");
+    if (faseAnterior === 'enfoque') {
+      loadMateriaResumen();
     }
 
-    // Continuar automáticamente con la siguiente fase, sin esperar a que el
-    // usuario la arranque a mano.
-    pomoState.estado_reloj = 'corriendo';
-
-    savePomoStateToLocal();
-    savePomoCyclesToLocal();
     updatePomoUI();
     startTicker();
   }

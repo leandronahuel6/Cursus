@@ -88,14 +88,8 @@
     });
 
     function loadSettings() {
-        const localSettings = localStorage.getItem('cursus_pomo_settings_v2');
-        if (localSettings) {
-            try { pomoSettings = JSON.parse(localSettings); } catch(e){}
-        }
-        const localCycles = localStorage.getItem('cursus_pomo_ciclos_v2');
-        if (localCycles) {
-            try { pomoCycles = JSON.parse(localCycles); } catch(e){}
-        }
+        pomoSettings = PomoShared.loadSettings(pomoSettings);
+        pomoCycles = PomoShared.loadCycles(pomoCycles);
     }
 
     function syncWithStorage() {
@@ -106,20 +100,13 @@
             return;
         }
 
-        const localState = localStorage.getItem('cursus_pomo_estado_v2');
-        if (!localState) {
+        const nuevoEstado = PomoShared.loadState();
+        if (!nuevoEstado) {
             widget.classList.remove('is-visible');
             stopTicker();
             return;
         }
-
-        try {
-            pomoState = JSON.parse(localState);
-        } catch (e) {
-            widget.classList.remove('is-visible');
-            stopTicker();
-            return;
-        }
+        pomoState = nuevoEstado;
 
         // El flotante SOLO debe mostrarse si el reloj está corriendo activamente (corriendo)
         if (pomoState.estado_reloj !== 'corriendo') {
@@ -181,30 +168,36 @@
         }
     }
 
+    function tickPomo() {
+        if (!pomoState || pomoState.estado_reloj !== 'corriendo') return;
+
+        const delta = PomoShared.elapsedSeconds(pomoState);
+        if (delta < 1) return;
+
+        pomoState.tiempo_restante -= delta;
+        pomoState.timestamp_ultimo_cambio = Date.now();
+
+        if (pomoState.tiempo_restante <= 0) {
+            handleFaseComplete();
+        } else {
+            // Guardamos en cada tick para que otras pestañas/páginas siempre
+            // lean un timestamp reciente y no se desincronicen entre sí.
+            PomoShared.saveState(pomoState);
+            updateWidgetUI();
+        }
+    }
+
     function startTicker() {
         if (tickerInterval) return;
-        tickerInterval = setInterval(() => {
-            if (pomoState && pomoState.estado_reloj === 'corriendo') {
-                const now = Date.now();
-                const delta = Math.floor((now - pomoState.timestamp_ultimo_cambio) / 1000);
-                
-                if (delta >= 1) {
-                    pomoState.tiempo_restante -= delta;
-                    pomoState.timestamp_ultimo_cambio = now;
-
-                    if (pomoState.tiempo_restante <= 0) {
-                        handleFaseComplete();
-                    } else {
-                        // Guardamos intermitentemente en localStorage para no sobresaturar
-                        if (pomoState.tiempo_restante % 5 === 0) {
-                            localStorage.setItem('cursus_pomo_estado_v2', JSON.stringify(pomoState));
-                        }
-                        updateWidgetUI();
-                    }
-                }
-            }
-        }, 1000);
+        tickerInterval = setInterval(tickPomo, 1000);
     }
+
+    // Si el navegador puso en pausa/retrasó el intervalo por tener la pestaña
+    // en segundo plano, al volver a mostrarla recalculamos al instante en vez
+    // de esperar a que el próximo tick (posiblemente demorado) se dispare.
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) tickPomo();
+    });
 
     function stopTicker() {
         if (tickerInterval) {
@@ -266,88 +259,19 @@
         } catch (e) {}
     }
 
-    function getAuthHeaders() {
-        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-        return {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ' + token
-        };
-    }
-
     function handleFaseComplete() {
         stopTicker();
-        
+
         const alarmSound = localStorage.getItem('cursus_pomo_alarm_sound') || 'chime';
         playPomoAlarm(alarmSound);
 
-        if (pomoState.fase_actual === 'enfoque') {
-            // Lógica Anti-Duplicación de Sesiones
-            const nowTime = Date.now();
-            const dedupKey = 'cursus_pomo_dedup_token';
-            const existingToken = localStorage.getItem(dedupKey);
-            
-            // Si no hay token o es muy viejo (>10 segs), registramos
-            if (!existingToken || (nowTime - parseInt(existingToken)) > 10000) {
-                localStorage.setItem(dedupKey, String(nowTime));
-                
-                // Limpiar el token después de 30 segundos por seguridad
-                setTimeout(() => {
-                    if (localStorage.getItem(dedupKey) === String(nowTime)) {
-                        localStorage.removeItem(dedupKey);
-                    }
-                }, 30000);
+        // Misma lógica de avance de fase, registro de sesión y anti-duplicación
+        // que usa Área de Estudio: una sola fuente de verdad para ambos.
+        const mensaje = PomoShared.avanzarFase(pomoState, pomoSettings, pomoCycles);
+        showNotificationToast(mensaje, "success");
 
-                const materiaId = localStorage.getItem('cursus_selected_materia');
-                if (materiaId) {
-                    fetch('/api/pomodoro/sesiones', {
-                        method: 'POST',
-                        headers: getAuthHeaders(),
-                        body: JSON.stringify({
-                            materia_id: materiaId,
-                            duracion_segundos: pomoSettings.focusTime * 60
-                        })
-                    }).catch(e => console.error('Error registrando sesión de Pomodoro desde widget', e));
-                }
-            }
-
-            // Actualizar ciclos
-            if (!pomoCycles.sesiones_completadas_hoy) pomoCycles.sesiones_completadas_hoy = 0;
-            pomoCycles.sesiones_completadas_hoy++;
-            
-            if (!pomoCycles.log) pomoCycles.log = [];
-            const d = new Date();
-            const hhmm = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-            pomoCycles.log.unshift({
-                time: hhmm,
-                duration: `${pomoSettings.focusTime}:00`,
-                status: "✓ Completada"
-            });
-
-            if (pomoCycles.ciclo_actual < pomoSettings.sessionsPerCycle) {
-                pomoState.fase_actual = 'descanso_corto';
-                pomoState.tiempo_restante = pomoSettings.shortBreak * 60;
-                pomoCycles.ciclo_actual++;
-            } else {
-                pomoState.fase_actual = 'descanso_largo';
-                pomoState.tiempo_restante = pomoSettings.longBreak * 60;
-                pomoCycles.ciclo_actual = 1;
-            }
-            showNotificationToast("¡Fase de Enfoque Completada! Tómate un recreo.", "success");
-            
-            localStorage.setItem('cursus_pomo_ciclos_v2', JSON.stringify(pomoCycles));
-
-        } else {
-            pomoState.fase_actual = 'enfoque';
-            pomoState.tiempo_restante = pomoSettings.focusTime * 60;
-            showNotificationToast("¡El descanso ha terminado! A enfocar nuevamente.", "success");
-        }
-        
-        pomoState.estado_reloj = 'pausado'; 
-        pomoState.timestamp_ultimo_cambio = Date.now();
-        
-        localStorage.setItem('cursus_pomo_estado_v2', JSON.stringify(pomoState));
         updateWidgetUI();
+        startTicker();
         triggerPomoChangeEvent();
     }
 
@@ -389,7 +313,7 @@
         }
 
         pomoState.timestamp_ultimo_cambio = Date.now();
-        localStorage.setItem('cursus_pomo_estado_v2', JSON.stringify(pomoState));
+        PomoShared.saveState(pomoState);
         updateWidgetUI();
         triggerPomoChangeEvent();
     });

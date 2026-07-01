@@ -4394,6 +4394,19 @@ body.no-animations *::after {
   transition: transform .15s;
 }
 .profile-avatar-pencil:hover { transform: scale(1.08); }
+.profile-avatar-trash {
+  position: absolute;
+  bottom: -2px; left: -2px;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: #ef4444;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--surface);
+  cursor: pointer;
+  transition: transform .15s;
+}
+.profile-avatar-trash:hover { transform: scale(1.08); }
 .contact-field label { display: block; font-size: 12px; font-weight: 600; color: var(--t2); margin-bottom: 5px; }
 .contact-input {
   width: 100%;
@@ -4413,6 +4426,8 @@ body.no-animations *::after {
 }
 .contact-textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
 .contact-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+.contact-footer:has(.btn-change-pwd) { justify-content: space-between; }
+.contact-footer-actions { display: flex; gap: 10px; }
 .contact-btn-cancel {
   padding: 8px 16px;
   font-size: 13px; font-weight: 500;
@@ -4438,8 +4453,6 @@ body.no-animations *::after {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  width: 100%;
-  margin-top: 10px;
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 500;
