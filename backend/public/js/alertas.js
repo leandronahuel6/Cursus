@@ -80,6 +80,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const dateInput = document.getElementById('alert-date');
   if (dateInput) dateInput.value = todayDateStr();
 
+  // Refrescar cuota si el admin la cambió mientras la pestaña estaba en segundo plano
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) loadRecordatorioCuota();
+  });
+
   const colorInput = document.getElementById('alert-color');
   if (colorInput) colorInput.value = ALERT_COLOR_PALETTE[0];
 
@@ -136,6 +141,19 @@ async function loadRecordatorioCuota() {
     const data = await response.json();
     if (data.valor_mensual != null) {
       input.value = parseFloat(data.valor_mensual).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+    }
+
+    const proximaEl = document.getElementById('cuota-proxima-notice');
+    if (proximaEl) {
+      if (data.cuota_proxima) {
+        const monto  = parseFloat(data.cuota_proxima.valor_mensual).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+        const partes = data.cuota_proxima.vigente_desde.split('T')[0].split('-');
+        const fecha  = `${partes[2]}/${partes[1]}/${partes[0]}`;
+        proximaEl.textContent    = `A partir del ${fecha} la cuota será $${monto}`;
+        proximaEl.style.display  = 'block';
+      } else {
+        proximaEl.style.display = 'none';
+      }
     }
   } catch (e) {
     console.error(e);

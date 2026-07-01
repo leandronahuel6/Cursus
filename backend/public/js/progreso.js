@@ -35,10 +35,24 @@ let state = {
 
 // ================= CARGA Y GUARDADO DE ESTADOS =================
 
-function init() {
-  loadSubjectsState();
+const API_BASE = window.location.origin + '/api';
+
+function getStoredToken() {
+  return localStorage.getItem('token') || sessionStorage.getItem('token');
+}
+
+function getAuthHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': 'Bearer ' + getStoredToken()
+  };
+}
+
+async function init() {
+  await loadSubjectsState();
   loadSimulationState();
-  
+
   // Registrar eventos
   const btnSave = document.getElementById('btn-save-progress');
   if (btnSave) {
@@ -49,32 +63,46 @@ function init() {
   updateUI();
 }
 
-function loadSubjectsState() {
-  const saved = localStorage.getItem('cursus_subjects_state');
-  if (saved) {
-    state.subjects = JSON.parse(saved);
-  } else {
-    // Estado inicial ficticio si no existe (estudiante en mitad del plan)
-    TUP_PLAN.forEach(sub => {
-      let status = 'disponible';
-      let grade = null;
-      if (sub.id === 1) { status = 'aprobada'; grade = 9; }
-      else if (sub.id === 2) { status = 'aprobada'; grade = 8; }
-      else if (sub.id === 3) { status = 'aprobada'; grade = 7; }
-      else if (sub.id === 4) { status = 'aprobada'; grade = 8; }
-      else if (sub.id === 8) { status = 'aprobada'; grade = 9; }
-      else if (sub.id === 5) { status = 'regular'; }
-      else if (sub.id === 6) { status = 'regular'; }
-      else if (sub.id === 7) { status = 'regular'; }
-      else if (sub.id === 9) { status = 'cursando'; }
-      else if (sub.id === 10) { status = 'cursando'; }
-      else if (sub.id === 11) { status = 'cursando'; }
-      else if (sub.id === 12) { status = 'cursando'; }
-      
-      state.subjects[sub.id] = { status, grade };
+async function loadSubjectsState() {
+  try {
+    const response = await fetch(`${API_BASE}/mis-materias`, { headers: getAuthHeaders() });
+    if (!response.ok) throw new Error('No se pudieron cargar las materias');
+    const data = await response.json();
+    
+    // Mapear al formato que usa state.subjects: id -> { status, grade }
+    state.subjects = {};
+    data.forEach(m => {
+      state.subjects[m.id] = {
+        status: m.estado,
+        grade: m.nota ? parseFloat(m.nota) : null
+      };
     });
-    // Guardar para que "Mis Materias" también lo use
-    localStorage.setItem('cursus_subjects_state', JSON.stringify(state.subjects));
+  } catch (e) {
+    console.error('Error al cargar materias del backend, usando fallback local', e);
+    const saved = localStorage.getItem('cursus_subjects_state');
+    if (saved) {
+      state.subjects = JSON.parse(saved);
+    } else {
+      TUP_PLAN.forEach(sub => {
+        let status = 'disponible';
+        let grade = null;
+        if (sub.id === 1) { status = 'aprobada'; grade = 9; }
+        else if (sub.id === 2) { status = 'aprobada'; grade = 8; }
+        else if (sub.id === 3) { status = 'aprobada'; grade = 7; }
+        else if (sub.id === 4) { status = 'aprobada'; grade = 8; }
+        else if (sub.id === 8) { status = 'aprobada'; grade = 9; }
+        else if (sub.id === 5) { status = 'regular'; }
+        else if (sub.id === 6) { status = 'regular'; }
+        else if (sub.id === 7) { status = 'regular'; }
+        else if (sub.id === 9) { status = 'cursando'; }
+        else if (sub.id === 10) { status = 'cursando'; }
+        else if (sub.id === 11) { status = 'cursando'; }
+        else if (sub.id === 12) { status = 'cursando'; }
+        
+        state.subjects[sub.id] = { status, grade };
+      });
+      localStorage.setItem('cursus_subjects_state', JSON.stringify(state.subjects));
+    }
   }
 }
 
@@ -409,17 +437,6 @@ window.adjustPace = function(direction) {
 function renderAcademicCharts() {
   renderLineChart();
   renderHistoChart();
-}
-
-function getStoredToken() {
-  return localStorage.getItem('token') || sessionStorage.getItem('token');
-}
-
-function getAuthHeaders() {
-  return {
-    'Accept': 'application/json',
-    'Authorization': 'Bearer ' + getStoredToken()
-  };
 }
 
 async function renderProductivityCharts() {
@@ -798,9 +815,20 @@ function renderDonutChart(distribucionMaterias) {
   }
 
   const total = distribution.reduce((acc, d) => acc + d.hours, 0);
+  const radius = 60;
+
+  if (total === 0) {
+    container.innerHTML = `
+      <svg width="200" height="180" viewBox="0 0 200 180">
+        <circle cx="100" cy="90" r="${radius}" fill="transparent" stroke="#e2e8f0" stroke-width="16" />
+        <text x="100" y="90" fill="#64748b" font-size="11" font-weight="700" text-anchor="middle">Sin sesiones</text>
+      </svg>
+    `;
+    legendContainer.innerHTML = '<div style="color: var(--t2); font-size: 12.5px; text-align: center; margin-top: 10px;">Completá sesiones de Pomodoro para ver tu distribución de estudio.</div>';
+    return;
+  }
 
   // Dibujar donut
-  const radius = 60;
   const circumference = 2 * Math.PI * radius;
   const cx = 100;
   const cy = 90;

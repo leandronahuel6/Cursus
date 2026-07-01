@@ -3,8 +3,8 @@
 @section('title', 'Cursus - Área de Concentración')
 
 @push('styles')
-  <link rel="stylesheet" href="{{ asset('css/views/area-estudio.css') }}">
-  <link rel="stylesheet" href="{{ asset('css/views/area-estudio-focus.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/views/area-estudio.css') }}?v=2">
+  <link rel="stylesheet" href="{{ asset('css/views/area-estudio-focus.css') }}?v=2">
 @endpush
 
 @section('mobile-header')
@@ -400,6 +400,11 @@
 
 <!-- 4. OVERLAY MODO CONCENTRACIÓN AESTHETIC -->
 <div id="focus-mode-overlay">
+  <!-- Botón de Salida Flotante -->
+  <button class="focus-card-close-btn" onclick="window.exitFocusMode()" title="Salir del Modo Concentración">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+
   <!-- Contenedor del fondo animado -->
   <div id="focus-bg-container" class="theme-aurora"></div>
   
@@ -414,9 +419,6 @@
         <button class="focus-phase-tab" id="phase-tab-corto" onclick="window.changeFocusPhase('descanso_corto')">Recreo Corto</button>
         <button class="focus-phase-tab" id="phase-tab-largo" onclick="window.changeFocusPhase('descanso_largo')">Recreo Largo</button>
       </div>
-      <button class="focus-card-close-btn" onclick="window.exitFocusMode()" title="Salir del Modo Concentración">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
     </div>
     
     <!-- Banner de Meta / Tarea Activa -->

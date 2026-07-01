@@ -31,7 +31,10 @@ let schedState = {
     { id: 'p_work', nombre: 'Trabajo' },
     { id: 'p_gym', nombre: 'Gimnasio' }
   ],
-  selectedBlockId: null
+  selectedBlockId: null,
+  comparisonBlocks: [],
+  comparisonUsers: [], // Array de compañeros agregados a la comparación
+  currentVersion: 'A'
 };
 
 // Headers de autenticación (token Sanctum guardado por login.js, en
@@ -121,6 +124,8 @@ async function loadScheduleState() {
       dia: b.dia,
       inicio: b.inicio,
       fin: b.fin,
+      color: b.color || null,
+      version: b.version || 'A',
       comision: b.tipo === 'materia' ? getCommissionByTime(b.inicio) : 'Actividad Personal'
     }));
   } catch (e) {
@@ -249,11 +254,18 @@ function renderAvailablePanels() {
 
 window.deletePersonalActivityTemplate = function(id, event) {
   event.stopPropagation();
-  if (confirm('¿Estás seguro de que deseas eliminar esta actividad de la lista de plantillas?')) {
-    schedState.personalActivities = schedState.personalActivities.filter(a => a.id !== id);
-    saveScheduleState();
-    renderAvailablePanels();
-  }
+  const act = schedState.personalActivities.find(a => a.id === id);
+  const nombre = act ? act.nombre : 'esta actividad';
+  
+  showCustomConfirm(
+    'Eliminar Actividad',
+    `¿Estás seguro de que deseas eliminar "${nombre}" de tu lista de plantillas disponibles?`,
+    () => {
+      schedState.personalActivities = schedState.personalActivities.filter(a => a.id !== id);
+      saveScheduleState();
+      renderAvailablePanels();
+    }
+  );
 };
 
 // Drag & Drop HTML5
@@ -312,6 +324,8 @@ function setupDropZones() {
         dia: dayId,
         inicio: inicioStr,
         fin: finStr,
+        color: null,
+        version: schedState.currentVersion,
         comision: dragData.tipo === 'materia' ? getCommissionByTime(inicioStr) : 'Actividad Personal'
       };
 
@@ -490,6 +504,8 @@ window.submitAddModal = function() {
     dia: dayId,
     inicio: startVal,
     fin: endVal,
+    color: null,
+    version: schedState.currentVersion,
     comision: comision
   };
 
@@ -544,7 +560,24 @@ function renderBlocksOnTracks() {
     document.getElementById(`col-day-${d}`).innerHTML = '';
   }
 
-  schedState.blocks.forEach(b => {
+  // Si no está definida la versión por defecto, usar 'A'
+  if (!schedState.currentVersion) {
+    schedState.currentVersion = 'A';
+  }
+
+  // Combinar bloques normales y de comparación para renderizar, filtrados por versión activa
+  const normalBlocks = schedState.blocks
+    .filter(b => (b.version || 'A') === schedState.currentVersion)
+    .map(b => ({ ...b, isComparison: false }));
+    
+  const compBlocks = (schedState.comparisonBlocks || [])
+    .filter(b => (b.version || 'A') === schedState.currentVersion)
+    .map(b => ({ ...b, isComparison: true }));
+    
+  const allBlocks = [...normalBlocks, ...compBlocks];
+
+  // Renderizar bloques reales
+  allBlocks.forEach(b => {
     const col = document.getElementById(`col-day-${b.dia}`);
     if (!col) return; // Por si es Domingo (id 7) y no está en la grilla
 
@@ -557,48 +590,80 @@ function renderBlocksOnTracks() {
     const heightPx = durMin * PX_PER_MINUTE;
 
     const blockDiv = document.createElement('div');
-    blockDiv.className = `sched-time-block ${b.tipo === 'actividad' ? 'act' : ''} ${schedState.selectedBlockId === b.id ? 'selected' : ''}`;
+    
+    // Mapeo de color personalizado
+    const colorMap = {
+      '#4f46e5': 'indigo',
+      '#9333ea': 'purple',
+      '#10b981': 'emerald',
+      '#f43f5e': 'rose',
+      '#f59e0b': 'amber',
+      '#0ea5e9': 'sky'
+    };
+    const colorHex = b.color || (b.tipo === 'materia' ? '#4f46e5' : '#9333ea');
+    const colorName = colorMap[colorHex] || (b.tipo === 'materia' ? 'indigo' : 'purple');
+    const colorClass = `theme-color-${colorName}`;
+
+    let classes = `sched-time-block ${colorClass}`;
+    if (b.tipo === 'actividad') classes += ' act';
+    if (b.isComparison) classes += ' comparison';
+    if (!b.isComparison && schedState.selectedBlockId === b.id) classes += ' selected';
+    
+    blockDiv.className = classes;
     blockDiv.style.top = `${topPx}px`;
     blockDiv.style.height = `${heightPx}px`;
     blockDiv.dataset.blockId = b.id;
 
-    blockDiv.innerHTML = `
-      <div class="resize-handle top-handle"></div>
-      <div class="block-content">
-        <span class="block-code-row">${b.codigo || 'PERS'}</span>
-        <span class="block-title-row">${b.codigo ? b.nombre.replace('Computación ', '') : b.nombre}</span>
-        <span class="block-meta-row">${b.comision}</span>
-        <span class="block-overlap-indicator" style="display: none;">[SOLAPADO]</span>
-      </div>
-      <div class="resize-handle bottom-handle"></div>
-      <button class="block-btn-delete-x" onclick="deleteBlockInline('${b.id}', event)">×</button>
-    `;
+    if (b.isComparison) {
+      blockDiv.style.borderColor = b.userColor;
+      blockDiv.style.background = `repeating-linear-gradient(45deg, transparent, transparent 4px, ${b.userColor}14 4px, ${b.userColor}14 8px)`;
+      blockDiv.innerHTML = `
+        <div class="block-content">
+          <span class="block-code-row" style="color: ${b.userColor} !important; font-weight: 700;">${b.codigo || 'PERS'} (${b.userName})</span>
+          <span class="block-title-row" style="color: var(--t1) !important;">${b.codigo ? b.nombre.replace('Computación ', '') : b.nombre}</span>
+          <span class="block-meta-row" style="color: var(--t2) !important;">${b.inicio} - ${b.fin} hs</span>
+        </div>
+      `;
+    } else {
+      blockDiv.innerHTML = `
+        <div class="resize-handle top-handle"></div>
+        <div class="block-content">
+          <span class="block-code-row">${b.codigo || 'PERS'}</span>
+          <span class="block-title-row">${b.codigo ? b.nombre.replace('Computación ', '') : b.nombre}</span>
+          <span class="block-meta-row">${b.comision}</span>
+          <span class="block-overlap-indicator" style="display: none;">[SOLAPADO]</span>
+        </div>
+        <div class="resize-handle bottom-handle"></div>
+        <button class="block-btn-delete-x" onclick="deleteBlockInline('${b.id}', event)">×</button>
+      `;
 
-    // Eventos de movimiento (Drag con Mouse)
-    blockDiv.addEventListener('mousedown', e => {
-      if (e.target.classList.contains('block-btn-delete-x') || e.target.classList.contains('resize-handle')) {
-        return;
-      }
-      selectBlock(b.id);
-      initBlockVerticalDrag(b.id, e);
-    });
+      // Eventos de movimiento (Drag con Mouse)
+      blockDiv.addEventListener('mousedown', e => {
+        if (e.target.classList.contains('block-btn-delete-x') || e.target.classList.contains('resize-handle')) {
+          return;
+        }
+        selectBlock(b.id);
+        initBlockVerticalDrag(b.id, e);
+      });
 
-    // Eventos de redimensionamiento vertical (top & bottom handles)
-    const topH = blockDiv.querySelector('.top-handle');
-    const bottomH = blockDiv.querySelector('.bottom-handle');
+      // Eventos de redimensionamiento vertical (top & bottom handles)
+      const topH = blockDiv.querySelector('.top-handle');
+      const bottomH = blockDiv.querySelector('.bottom-handle');
 
-    topH.addEventListener('mousedown', e => {
-      e.stopPropagation();
-      initBlockVerticalResize(b.id, 'top', e);
-    });
+      topH.addEventListener('mousedown', e => {
+        e.stopPropagation();
+        initBlockVerticalResize(b.id, 'top', e);
+      });
 
-    bottomH.addEventListener('mousedown', e => {
-      e.stopPropagation();
-      initBlockVerticalResize(b.id, 'bottom', e);
-    });
+      bottomH.addEventListener('mousedown', e => {
+        e.stopPropagation();
+        initBlockVerticalResize(b.id, 'bottom', e);
+      });
+    }
 
     col.appendChild(blockDiv);
   });
+
 }
 
 // Seleccionar bloque
@@ -623,6 +688,21 @@ function selectBlock(id) {
     
     document.getElementById('editor-start-time').value = block.inicio;
     document.getElementById('editor-end-time').value = block.fin;
+
+    // Actualizar paleta de colores activa en el editor flotante
+    const activeColor = block.color || (block.tipo === 'materia' ? '#4f46e5' : '#9333ea');
+    document.querySelectorAll('.editor-color-picker .color-dot').forEach(dot => {
+      if (dot.dataset.color === activeColor) {
+        dot.classList.add('active');
+        dot.style.borderColor = '#ffffff';
+      } else {
+        dot.classList.remove('active');
+        dot.style.borderColor = 'transparent';
+      }
+    });
+    
+    // Buscar alternativas si hay solapamiento
+    checkAlternativeCommissions(block);
   }
 }
 
@@ -671,6 +751,7 @@ function handleManualTimeChange() {
 
     renderBlocksOnTracks();
     checkOverlaps();
+    checkAlternativeCommissions(block);
   }
 }
 
@@ -761,6 +842,9 @@ function initBlockVerticalDrag(id, startEvent) {
       openEditModal(id);
     } else {
       renderBlocksOnTracks(); // Re-renderizado final
+      if (schedState.selectedBlockId === id) {
+        checkAlternativeCommissions(block);
+      }
     }
   }
 
@@ -823,6 +907,9 @@ function initBlockVerticalResize(id, handle, startEvent) {
     window.removeEventListener('mousemove', handleMouseMove);
     window.removeEventListener('mouseup', handleMouseUp);
     renderBlocksOnTracks();
+    if (schedState.selectedBlockId === id) {
+      checkAlternativeCommissions(block);
+    }
   }
 
   window.addEventListener('mousemove', handleMouseMove);
@@ -886,9 +973,9 @@ function checkOverlaps() {
 // Limpiar bloques del día activo
 document.getElementById('btn-clear-grid').addEventListener('click', () => {
   // Para limpiar de forma lógica: limpia todos los bloques de la grilla
-  const userConfirm = confirm('¿Seguro que deseas vaciar toda tu grilla horaria semanal?');
+  const userConfirm = confirm(`¿Seguro que deseas vaciar toda tu grilla horaria semanal (Versión ${schedState.currentVersion || 'A'})?`);
   if (userConfirm) {
-    schedState.blocks = [];
+    schedState.blocks = schedState.blocks.filter(b => (b.version || 'A') !== (schedState.currentVersion || 'A'));
     deselectBlock();
     renderBlocksOnTracks();
     checkOverlaps();
@@ -954,14 +1041,18 @@ document.getElementById('btn-save-schedule').addEventListener('click', async () 
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({
-        blocks: schedState.blocks.map(b => ({
-          tipo: b.tipo,
-          materia_id: b.tipo === 'materia' ? b.materia_id : null,
-          titulo_actividad: b.tipo === 'actividad' ? b.nombre : null,
-          dia_semana: b.dia,
-          hora_inicio: b.inicio,
-          hora_fin: b.fin
-        }))
+        version: schedState.currentVersion || 'A',
+        blocks: schedState.blocks
+          .filter(b => (b.version || 'A') === (schedState.currentVersion || 'A'))
+          .map(b => ({
+            tipo: b.tipo,
+            materia_id: b.tipo === 'materia' ? b.materia_id : null,
+            titulo_actividad: b.tipo === 'actividad' ? b.nombre : null,
+            dia_semana: b.dia,
+            hora_inicio: b.inicio,
+            hora_fin: b.fin,
+            color: b.color || null
+          }))
       })
     });
 
@@ -1005,6 +1096,19 @@ function showToastConflict(message) {
 
 // Inicialización de la página
 document.addEventListener('DOMContentLoaded', async () => {
+  // Configurar fecha de generación para impresión
+  const printDateEl = document.getElementById('print-generated-date');
+  if (printDateEl) {
+    const today = new Date();
+    printDateEl.textContent = today.toLocaleDateString('es-AR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
   await Promise.all([loadAvailableSubjects(), loadScheduleState()]);
   renderTimeLabels();
   renderGridLines();
@@ -1013,3 +1117,587 @@ document.addEventListener('DOMContentLoaded', async () => {
   checkOverlaps();
   setupDropZones();
 });
+
+// Exportar a formato iCal (.ics) para Google Calendar u Outlook
+window.exportToICS = function() {
+  if (schedState.blocks.length === 0) {
+    alert('No hay bloques en la grilla para exportar.');
+    return;
+  }
+  
+  let icsLines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Cursus//Simulador de Horarios//ES',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH'
+  ];
+
+  // Mapear días a RRULE y base de fechas (Lunes 29 de Junio de 2026 como base recurrente)
+  const rruleDays = { 1: 'MO', 2: 'TU', 3: 'WE', 4: 'TH', 5: 'FR', 6: 'SA' };
+  const baseDays = { 1: '29', 2: '30', 3: '01', 4: '02', 5: '03', 6: '04' };
+  const baseMonths = { 1: '06', 2: '06', 3: '07', 4: '07', 5: '07', 6: '07' };
+
+  schedState.blocks.forEach(b => {
+    const dayCode = rruleDays[b.dia];
+    const dayStr = baseDays[b.dia];
+    const monthStr = baseMonths[b.dia];
+    const yearStr = '2026';
+
+    const startFormatted = b.inicio.replace(':', '') + '00';
+    const endFormatted = b.fin.replace(':', '') + '00';
+
+    const dtStart = `${yearStr}${monthStr}${dayStr}T${startFormatted}`;
+    const dtEnd = `${yearStr}${monthStr}${dayStr}T${endFormatted}`;
+
+    const dtStamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+    icsLines.push('BEGIN:VEVENT');
+    icsLines.push(`UID:${b.id}@cursus.com`);
+    icsLines.push(`DTSTAMP:${dtStamp}`);
+    icsLines.push(`DTSTART:${dtStart}`);
+    icsLines.push(`DTEND:${dtEnd}`);
+    icsLines.push(`RRULE:FREQ=WEEKLY;BYDAY=${dayCode}`);
+    icsLines.push(`SUMMARY:${b.nombre}${b.codigo ? ' (' + b.comision + ')' : ''}`);
+    icsLines.push(`DESCRIPTION:Sincronizado desde Cursus. Tipo: ${b.tipo === 'materia' ? 'Materia UTN' : 'Actividad Personal'}`);
+    icsLines.push('END:VEVENT');
+  });
+
+  icsLines.push('END:VCALENDAR');
+
+  const icsString = icsLines.join('\r\n');
+  const blob = new Blob([icsString], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'horario_cursus.ics';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  showToastConflict('¡Archivo iCal (.ics) descargado con éxito!');
+};
+
+// Imprimir y guardar en PDF
+window.printSchedule = function() {
+  window.print();
+};
+
+// Buscar y agregar usuario para comparar (Multiusuario)
+window.searchCompareUser = async function() {
+  const input = document.getElementById('compare-search-input');
+  const searchVal = input.value.trim();
+  const listArea = document.getElementById('compare-status-list');
+  
+  if (!searchVal) {
+    alert('Ingresa un email o legajo para buscar.');
+    return;
+  }
+
+  if (schedState.comparisonUsers.length >= 3) {
+    alert('Límite alcanzado: solo puedes comparar con hasta 3 compañeros a la vez.');
+    return;
+  }
+
+  listArea.innerHTML = '<span style="color: #60a5fa; font-size: 11.5px; padding: 4px 0;">Buscando compañero...</span>';
+
+  try {
+    const response = await fetch(`${API_BASE}/horarios/buscar-usuario?search=${encodeURIComponent(searchVal)}`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Error al buscar usuario');
+    const data = await response.json();
+
+    if (data.length === 0) {
+      renderComparisonSidebar();
+      alert('Compañero no encontrado.');
+      return;
+    }
+
+    const user = data[0]; // Tomar la primera coincidencia
+
+    // Verificar duplicado
+    if (schedState.comparisonUsers.some(u => String(u.id) === String(user.id))) {
+      renderComparisonSidebar();
+      alert('Este compañero ya está agregado a la comparación.');
+      return;
+    }
+
+    // Asignar color de slot disponible
+    const presetColors = ['#4f46e5', '#10b981', '#f59e0b'];
+    const usedColors = schedState.comparisonUsers.map(u => u.color);
+    const color = presetColors.find(c => !usedColors.includes(c)) || '#f43f5e';
+
+    // Cargar horario del compañero
+    const scheduleResponse = await fetch(`${API_BASE}/horarios/compartido/${user.id}`, {
+      headers: getAuthHeaders()
+    });
+    if (!scheduleResponse.ok) throw new Error('No se pudo cargar el horario');
+    const scheduleData = await scheduleResponse.json();
+
+    // Agregar usuario y sus bloques
+    schedState.comparisonUsers.push({ id: user.id, nombre: user.nombre, color: color });
+
+    const newCompBlocks = scheduleData.bloques.map(b => ({
+      id: `comp_${user.id}_${b.id}`,
+      userId: user.id,
+      userName: user.nombre,
+      userColor: color,
+      tipo: b.tipo,
+      nombre: b.nombre,
+      codigo: b.tipo === 'materia' ? buildCodigo(b.nombre) : null,
+      materia_id: b.materia_id,
+      dia: b.dia,
+      inicio: b.inicio,
+      fin: b.fin,
+      version: b.version || 'A',
+      comision: b.tipo === 'materia' ? getCommissionByTime(b.inicio) : 'Actividad Personal'
+    }));
+
+    schedState.comparisonBlocks.push(...newCompBlocks);
+
+    input.value = '';
+    renderComparisonSidebar();
+    renderBlocksOnTracks();
+    showToastConflict(`Comparando horario con ${user.nombre}`);
+  } catch (e) {
+    console.error(e);
+    renderComparisonSidebar();
+    alert('Error al buscar o cargar el horario del compañero.');
+  }
+};
+
+// Renderizar la lista lateral de compañeros en comparación
+function renderComparisonSidebar() {
+  const container = document.getElementById('compare-status-list');
+  if (!container) return;
+
+  if (schedState.comparisonUsers.length === 0) {
+    container.innerHTML = `<div style="color: rgba(255,255,255,0.45); padding: 4px 0;">Sin comparación activa</div>`;
+    return;
+  }
+
+  let html = '';
+  schedState.comparisonUsers.forEach(user => {
+    html += `
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid var(--border);">
+        <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+          <span style="display: inline-block; width: 9px; height: 9px; border-radius: 50%; background-color: ${user.color}; border: 1px solid rgba(255,255,255,0.2); flex-shrink: 0;"></span>
+          <span style="font-weight: 550; color: var(--t1); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; font-size: 12px;" title="${user.nombre}">${user.nombre}</span>
+        </div>
+        <button onclick="removeComparedUser('${user.id}')" style="background: transparent; border: none; color: #f43f5e; cursor: pointer; padding: 2px 4px; font-weight: bold; font-size: 11.5px; transition: opacity 0.15s; flex-shrink: 0;">Quitar</button>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+// Quitar compañero individualmente de la comparación
+window.removeComparedUser = function(userId) {
+  schedState.comparisonUsers = schedState.comparisonUsers.filter(u => String(u.id) !== String(userId));
+  schedState.comparisonBlocks = schedState.comparisonBlocks.filter(b => String(b.userId) !== String(userId));
+
+  renderComparisonSidebar();
+  renderBlocksOnTracks();
+  showToastConflict('Compañero quitado de la comparación');
+};
+
+// Limpiar toda la comparación
+window.clearComparison = function() {
+  schedState.comparisonUsers = [];
+  schedState.comparisonBlocks = [];
+  
+  renderComparisonSidebar();
+  renderBlocksOnTracks();
+  showToastConflict('Comparación desactivada');
+};
+
+// Cambiar de Versión (A o B) de Horario
+window.switchVersion = function(version) {
+  if (schedState.currentVersion === version) return;
+  
+  schedState.currentVersion = version;
+  deselectBlock();
+
+  // Actualizar clases activas en los botones de versión (tanto desktop como mobile)
+  document.querySelectorAll('.version-tabs .btn-version').forEach(btn => {
+    if (btn.id === `btn-version-${version}` || btn.id === `mob-btn-version-${version}`) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  // Actualizar indicador de versión en cabecera de impresión
+  const printBadge = document.getElementById('print-active-version-badge');
+  if (printBadge) printBadge.textContent = `Versión ${version}`;
+
+  renderBlocksOnTracks();
+  checkOverlaps();
+  showToastConflict(`Cargada la Versión ${version}`);
+};
+
+// Cambiar el color de un bloque seleccionado
+window.changeBlockColor = function(colorHex) {
+  if (!schedState.selectedBlockId) return;
+
+  const block = schedState.blocks.find(b => b.id === schedState.selectedBlockId);
+  if (block) {
+    block.color = colorHex;
+    
+    // Guardar cambio de color en base de datos local temporal si aplica
+    saveScheduleState();
+    renderBlocksOnTracks();
+    
+    // Actualizar paleta activa
+    document.querySelectorAll('.editor-color-picker .color-dot').forEach(dot => {
+      if (dot.dataset.color === colorHex) {
+        dot.classList.add('active');
+        dot.style.borderColor = '#ffffff';
+      } else {
+        dot.classList.remove('active');
+        dot.style.borderColor = 'transparent';
+      }
+    });
+    
+    showToastConflict('Color de bloque actualizado');
+  }
+};
+
+
+// Diálogo de confirmación personalizado
+window.showCustomConfirm = function(title, message, onConfirm) {
+  const backdrop = document.createElement('div');
+  backdrop.className = 'custom-confirm-backdrop';
+  
+  backdrop.innerHTML = `
+    <div class="custom-confirm-card">
+      <div class="custom-confirm-title">
+        <span>⚠️</span>
+        <span>${title}</span>
+      </div>
+      <div class="custom-confirm-body">${message}</div>
+      <div class="custom-confirm-footer">
+        <button class="btn-secondary" id="confirm-btn-cancel" style="padding: 7px 16px; border-radius: 8px; font-size: 13px;">Cancelar</button>
+        <button class="btn-confirm-delete" id="confirm-btn-ok">Eliminar</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(backdrop);
+  
+  // Animación de aparición
+  setTimeout(() => backdrop.classList.add('show'), 10);
+  
+  const close = () => {
+    backdrop.classList.remove('show');
+    setTimeout(() => backdrop.remove(), 200);
+  };
+  
+  backdrop.querySelector('#confirm-btn-cancel').addEventListener('click', close);
+  backdrop.querySelector('#confirm-btn-ok').addEventListener('click', () => {
+    onConfirm();
+    close();
+  });
+};
+
+// ==========================================================================
+// PRESETS DE HORARIOS OFICIALES UTN HAEDO (TECNICATURA EN PROGRAMACIÓN)
+// ==========================================================================
+
+const UTN_SCHEDULE_PRESETS = {
+  M1A_1: [
+    { nombre: 'Programación I', dia: 1, inicio: '08:30', fin: '12:30', comision: 'M1A', color: 'indigo' },
+    { nombre: 'Matemática', dia: 2, inicio: '08:30', fin: '12:30', comision: 'M1A', color: 'emerald' },
+    { nombre: 'Programación I', dia: 3, inicio: '08:30', fin: '12:30', comision: 'M1A', color: 'indigo' },
+    { nombre: 'Arquitectura y Sistemas Operativos', dia: 4, inicio: '08:30', fin: '12:30', comision: 'M1A', color: 'purple' },
+    { nombre: 'Organización Empresarial', dia: 5, inicio: '08:30', fin: '12:30', comision: 'M1A', color: 'amber' }
+  ],
+  M1B_1: [
+    { nombre: 'Organización Empresarial', dia: 1, inicio: '08:30', fin: '12:30', comision: 'M1B', color: 'amber' },
+    { nombre: 'Arquitectura y Sistemas Operativos', dia: 2, inicio: '08:30', fin: '12:30', comision: 'M1B', color: 'purple' },
+    { nombre: 'Programación I', dia: 3, inicio: '08:30', fin: '12:30', comision: 'M1B', color: 'indigo' },
+    { nombre: 'Matemática', dia: 4, inicio: '08:30', fin: '12:30', comision: 'M1B', color: 'emerald' },
+    { nombre: 'Programación I', dia: 5, inicio: '08:30', fin: '12:30', comision: 'M1B', color: 'indigo' }
+  ],
+  M2_1: [
+    { nombre: 'Inglés I', dia: 1, inicio: '08:30', fin: '12:30', comision: 'M2', color: 'rose' },
+    { nombre: 'Programación II', dia: 2, inicio: '08:30', fin: '12:30', comision: 'M2', color: 'indigo' },
+    { nombre: 'Probabilidad y Estadística', dia: 3, inicio: '08:30', fin: '12:30', comision: 'M2', color: 'emerald' },
+    { nombre: 'Programación II', dia: 4, inicio: '08:30', fin: '12:30', comision: 'M2', color: 'indigo' },
+    { nombre: 'Base de Datos I', dia: 5, inicio: '08:30', fin: '12:30', comision: 'M2', color: 'sky' }
+  ],
+  M3_1: [
+    { nombre: 'Programación III', dia: 1, inicio: '08:30', fin: '12:30', comision: 'M3', color: 'indigo' },
+    { nombre: 'Base de Datos II', dia: 2, inicio: '08:30', fin: '12:30', comision: 'M3', color: 'sky' },
+    { nombre: 'Inglés II', dia: 3, inicio: '08:30', fin: '12:30', comision: 'M3', color: 'rose' },
+    { nombre: 'Programación III', dia: 4, inicio: '08:30', fin: '12:30', comision: 'M3', color: 'indigo' },
+    { nombre: 'Metodología de Sistemas I', dia: 5, inicio: '08:30', fin: '12:30', comision: 'M3', color: 'purple' }
+  ],
+  M4_1: [
+    { nombre: 'Metodología de Sistemas II', dia: 1, inicio: '08:30', fin: '12:30', comision: 'M4', color: 'purple' },
+    { nombre: 'Programación IV', dia: 2, inicio: '08:30', fin: '12:30', comision: 'M4', color: 'indigo' },
+    { nombre: 'Programación IV', dia: 3, inicio: '08:30', fin: '12:30', comision: 'M4', color: 'indigo' },
+    { nombre: 'Introducción al Análisis de Datos', dia: 4, inicio: '08:30', fin: '10:30', comision: 'M4', color: 'sky' },
+    { nombre: 'Legislación', dia: 4, inicio: '10:30', fin: '12:30', comision: 'M4', color: 'amber' },
+    { nombre: 'Gestión de Desarrollo de Software', dia: 5, inicio: '08:30', fin: '12:30', comision: 'M4', color: 'emerald' }
+  ],
+  N1_1: [
+    { nombre: 'Organización Empresarial', dia: 1, inicio: '18:30', fin: '22:30', comision: 'N1', color: 'amber' },
+    { nombre: 'Programación I', dia: 2, inicio: '18:30', fin: '22:30', comision: 'N1', color: 'indigo' },
+    { nombre: 'Arquitectura y Sistemas Operativos', dia: 3, inicio: '18:30', fin: '22:30', comision: 'N1', color: 'purple' },
+    { nombre: 'Matemática', dia: 4, inicio: '18:30', fin: '22:30', comision: 'N1', color: 'emerald' },
+    { nombre: 'Programación I', dia: 5, inicio: '18:30', fin: '22:30', comision: 'N1', color: 'indigo' }
+  ],
+  N3_1: [
+    { nombre: 'Inglés II', dia: 1, inicio: '18:30', fin: '22:30', comision: 'N3', color: 'rose' },
+    { nombre: 'Base de Datos II', dia: 2, inicio: '18:30', fin: '22:30', comision: 'N3', color: 'sky' },
+    { nombre: 'Programación III', dia: 3, inicio: '18:30', fin: '22:30', comision: 'N3', color: 'indigo' },
+    { nombre: 'Metodología de Sistemas I', dia: 4, inicio: '18:30', fin: '22:30', comision: 'N3', color: 'purple' },
+    { nombre: 'Programación III', dia: 5, inicio: '18:30', fin: '22:30', comision: 'N3', color: 'indigo' }
+  ],
+  M1A_2: [
+    { nombre: 'Programación II', dia: 1, inicio: '08:30', fin: '12:30', comision: 'M1A', color: 'indigo' },
+    { nombre: 'Probabilidad y Estadística', dia: 2, inicio: '08:30', fin: '12:30', comision: 'M1A', color: 'emerald' },
+    { nombre: 'Programación II', dia: 3, inicio: '08:30', fin: '12:30', comision: 'M1A', color: 'indigo' },
+    { nombre: 'Base de Datos I', dia: 4, inicio: '08:30', fin: '12:30', comision: 'M1A', color: 'sky' },
+    { nombre: 'Inglés I', dia: 5, inicio: '08:30', fin: '12:30', comision: 'M1A', color: 'rose' }
+  ],
+  M1B_2: [
+    { nombre: 'Inglés I', dia: 1, inicio: '08:30', fin: '12:30', comision: 'M1B', color: 'rose' },
+    { nombre: 'Base de Datos I', dia: 2, inicio: '08:30', fin: '12:30', comision: 'M1B', color: 'sky' },
+    { nombre: 'Programación II', dia: 3, inicio: '08:30', fin: '12:30', comision: 'M1B', color: 'indigo' },
+    { nombre: 'Probabilidad y Estadística', dia: 4, inicio: '08:30', fin: '12:30', comision: 'M1B', color: 'emerald' },
+    { nombre: 'Programación II', dia: 5, inicio: '08:30', fin: '12:30', comision: 'M1B', color: 'indigo' }
+  ],
+  M2_2: [
+    { nombre: 'Inglés II', dia: 1, inicio: '08:30', fin: '12:30', comision: 'M2', color: 'rose' },
+    { nombre: 'Base de Datos II', dia: 2, inicio: '08:30', fin: '12:30', comision: 'M2', color: 'sky' },
+    { nombre: 'Programación III', dia: 3, inicio: '08:30', fin: '12:30', comision: 'M2', color: 'indigo' },
+    { nombre: 'Metodología de Sistemas I', dia: 4, inicio: '08:30', fin: '12:30', comision: 'M2', color: 'purple' },
+    { nombre: 'Programación III', dia: 5, inicio: '08:30', fin: '12:30', comision: 'M2', color: 'indigo' }
+  ],
+  M3_2: [
+    { nombre: 'Metodología de Sistemas II', dia: 1, inicio: '08:30', fin: '12:30', comision: 'M3', color: 'purple' },
+    { nombre: 'Programación IV', dia: 2, inicio: '08:30', fin: '12:30', comision: 'M3', color: 'indigo' },
+    { nombre: 'Programación IV', dia: 3, inicio: '08:30', fin: '12:30', comision: 'M3', color: 'indigo' },
+    { nombre: 'Introducción al Análisis de Datos', dia: 4, inicio: '08:30', fin: '10:30', comision: 'M3', color: 'sky' },
+    { nombre: 'Legislación', dia: 4, inicio: '10:30', fin: '12:30', comision: 'M3', color: 'amber' },
+    { nombre: 'Gestión de Desarrollo de Software', dia: 5, inicio: '08:30', fin: '12:30', comision: 'M3', color: 'emerald' }
+  ],
+  M4_2: [
+    { nombre: 'Metodología de Sistemas II', dia: 1, inicio: '08:30', fin: '12:30', comision: 'M4', color: 'purple' },
+    { nombre: 'Programación IV', dia: 2, inicio: '08:30', fin: '12:30', comision: 'M4', color: 'indigo' },
+    { nombre: 'Programación IV', dia: 3, inicio: '08:30', fin: '12:30', comision: 'M4', color: 'indigo' },
+    { nombre: 'Introducción al Análisis de Datos', dia: 4, inicio: '08:30', fin: '10:30', comision: 'M4', color: 'sky' },
+    { nombre: 'Legislación', dia: 4, inicio: '10:30', fin: '12:30', comision: 'M4', color: 'amber' },
+    { nombre: 'Gestión de Desarrollo de Software', dia: 5, inicio: '08:30', fin: '12:30', comision: 'M4', color: 'emerald' }
+  ],
+  N1_2: [
+    { nombre: 'Inglés I', dia: 1, inicio: '18:30', fin: '22:30', comision: 'N1', color: 'rose' },
+    { nombre: 'Programación II', dia: 2, inicio: '18:30', fin: '22:30', comision: 'N1', color: 'indigo' },
+    { nombre: 'Base de Datos I', dia: 3, inicio: '18:30', fin: '22:30', comision: 'N1', color: 'sky' },
+    { nombre: 'Probabilidad y Estadística', dia: 4, inicio: '18:30', fin: '22:30', comision: 'N1', color: 'emerald' },
+    { nombre: 'Programación II', dia: 5, inicio: '18:30', fin: '22:30', comision: 'N1', color: 'indigo' }
+  ],
+  N3_2: [
+    { nombre: 'Metodología de Sistemas II', dia: 1, inicio: '18:30', fin: '22:30', comision: 'N3', color: 'purple' },
+    { nombre: 'Programación IV', dia: 2, inicio: '18:30', fin: '22:30', comision: 'N3', color: 'indigo' },
+    { nombre: 'Programación IV', dia: 3, inicio: '18:30', fin: '22:30', comision: 'N3', color: 'indigo' },
+    { nombre: 'Introducción al Análisis de Datos', dia: 4, inicio: '18:30', fin: '20:30', comision: 'N3', color: 'sky' },
+    { nombre: 'Legislación', dia: 4, inicio: '20:30', fin: '22:30', comision: 'N3', color: 'amber' },
+    { nombre: 'Gestión de Desarrollo de Software', dia: 5, inicio: '18:30', fin: '22:30', comision: 'N3', color: 'emerald' }
+  ]
+};
+
+window.loadUTNPresetSchedule = function() {
+  const select = document.getElementById('utn-presets-select');
+  if (!select) return;
+  
+  const presetKey = select.value;
+  if (!presetKey) return;
+  
+  const presetBlocks = UTN_SCHEDULE_PRESETS[presetKey];
+  if (!presetBlocks) return;
+  
+  const selectOptionText = select.options[select.selectedIndex].text;
+  
+  showCustomConfirm(
+    'Cargar Horario Oficial UTN',
+    `¿Deseas cargar la plantilla oficial de "${selectOptionText}"? Esto vaciará todos los bloques de tu Versión ${schedState.currentVersion} actual.`,
+    () => {
+      // 1. Filtrar y eliminar bloques correspondientes a la versión actual
+      schedState.blocks = schedState.blocks.filter(
+        b => (b.version || 'A') !== schedState.currentVersion
+      );
+      
+      // 2. Generar bloques basados en el preset
+      presetBlocks.forEach((preset, idx) => {
+        // Tratar de enlazar con una materia disponible en AVAILABLE_SUBJECTS
+        const matchedSub = AVAILABLE_SUBJECTS.find(
+          s => s.nombre.toLowerCase().trim() === preset.nombre.toLowerCase().trim()
+        );
+        
+        const newBlock = {
+          id: `preset-${presetKey}-${idx}-${Date.now()}`,
+          materia_id: matchedSub ? matchedSub.id : null,
+          nombre: preset.nombre,
+          tipo: 'materia',
+          codigo: matchedSub ? matchedSub.codigo : buildCodigo(preset.nombre),
+          comision: preset.comision,
+          dia: preset.dia,
+          inicio: preset.inicio,
+          fin: preset.fin,
+          color: preset.color,
+          version: schedState.currentVersion
+        };
+        
+        schedState.blocks.push(newBlock);
+      });
+      
+      // 3. Deseleccionar, re-renderizar, guardar y notificar
+      deselectBlock();
+      renderBlocksOnTracks();
+      checkOverlaps();
+      saveScheduleState();
+      showToastConflict(`Horario ${selectOptionText} cargado con éxito`);
+      
+      // Resetear visualmente el dropdown select
+      select.value = "";
+    }
+  );
+  
+  // Limpiar selector si cancela
+  select.value = "";
+};
+
+// ==========================================================================
+// BUSCADOR AUTOMÁTICO DE ALTERNATIVAS SIN SOLAPAMIENTO (IDEA 4)
+// ==========================================================================
+
+window.applyCommissionAlternative = function(subjectName, presetKey) {
+  const presetBlocks = UTN_SCHEDULE_PRESETS[presetKey];
+  if (!presetBlocks) return;
+
+  // 1. Filtrar todos los bloques de esta materia en la versión y grilla actual
+  schedState.blocks = schedState.blocks.filter(
+    b => !(b.tipo === 'materia' && b.nombre.toLowerCase().trim() === subjectName.toLowerCase().trim() && (b.version || 'A') === schedState.currentVersion)
+  );
+
+  // 2. Insertar los nuevos bloques de la comisión recomendada
+  presetBlocks.forEach((preset, idx) => {
+    const matchedSub = AVAILABLE_SUBJECTS.find(
+      s => s.nombre.toLowerCase().trim() === preset.nombre.toLowerCase().trim()
+    );
+
+    const newBlock = {
+      id: `preset-${presetKey}-${idx}-${Date.now()}`,
+      materia_id: matchedSub ? matchedSub.id : null,
+      nombre: preset.nombre,
+      tipo: 'materia',
+      codigo: matchedSub ? matchedSub.codigo : buildCodigo(preset.nombre),
+      comision: preset.comision,
+      dia: preset.dia,
+      inicio: preset.inicio,
+      fin: preset.fin,
+      color: preset.color,
+      version: schedState.currentVersion
+    };
+
+    schedState.blocks.push(newBlock);
+  });
+
+  // 3. Deseleccionar, re-renderizar, revisar colisiones y guardar
+  deselectBlock();
+  renderBlocksOnTracks();
+  checkOverlaps();
+  saveScheduleState();
+  showToastConflict(`Comisión cambiada a ${presetKey.split('_')[0]} para resolver conflicto`);
+};
+
+window.checkAlternativeCommissions = function(block) {
+  const notifArea = document.getElementById('editor-notification-area');
+  if (!notifArea) return;
+
+  if (!block || block.tipo !== 'materia') {
+    notifArea.innerHTML = '';
+    return;
+  }
+
+  // 1. Verificar si este bloque está marcado en colisión
+  const blockDiv = document.querySelector(`.sched-time-block[data-block-id="${block.id}"]`);
+  if (!blockDiv || !blockDiv.classList.contains('overlap-conflict')) {
+    notifArea.innerHTML = '';
+    return;
+  }
+
+  const subjectName = block.nombre.toLowerCase().trim();
+  const presetsWithSubject = [];
+
+  // Encontrar todas las comisiones en UTN_SCHEDULE_PRESETS que dicten esta materia
+  for (const presetKey in UTN_SCHEDULE_PRESETS) {
+    const blocksInPreset = UTN_SCHEDULE_PRESETS[presetKey];
+    if (blocksInPreset.some(b => b.nombre.toLowerCase().trim() === subjectName)) {
+      presetsWithSubject.push(presetKey);
+    }
+  }
+
+  // Filtrar los demás bloques de la grilla para la simulación
+  const otherBlocks = schedState.blocks.filter(
+    b => !(b.tipo === 'materia' && b.nombre.toLowerCase().trim() === subjectName && (b.version || 'A') === schedState.currentVersion)
+  );
+
+  let foundAlternative = null;
+
+  for (const presetKey of presetsWithSubject) {
+    const presetBlocks = UTN_SCHEDULE_PRESETS[presetKey];
+    const commissionName = presetBlocks[0].comision;
+
+    // Omitir la comisión actual en conflicto
+    if (block.comision === commissionName) continue;
+
+    // Simular inserción de bloques
+    let hasConflict = false;
+
+    for (const presetB of presetBlocks) {
+      if (presetB.nombre.toLowerCase().trim() !== subjectName) continue;
+
+      const s1 = timeToMin(presetB.inicio);
+      const e1 = timeToMin(presetB.fin);
+
+      for (const otherB of otherBlocks) {
+        if (otherB.dia !== presetB.dia) continue;
+
+        const s2 = timeToMin(otherB.inicio);
+        const e2 = timeToMin(otherB.fin);
+
+        if (s1 < e2 && s2 < e1) {
+          hasConflict = true;
+          break;
+        }
+      }
+
+      if (hasConflict) break;
+    }
+
+    // Si encontramos una comisión viable que no colisiona con el resto del horario
+    if (!hasConflict) {
+      foundAlternative = { key: presetKey, commission: commissionName };
+      break;
+    }
+  }
+
+  if (foundAlternative) {
+    notifArea.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); padding: 4px 10px; border-radius: 6px; box-sizing: border-box;">
+        <span style="color: #34d399; font-weight: bold; font-size: 11px; white-space: nowrap;">💡 Usar Com. ${foundAlternative.commission}:</span>
+        <button onclick="applyCommissionAlternative('${block.nombre}', '${foundAlternative.key}')" style="background: #10b981; color: #fff; border: none; padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; transition: background 0.15s; white-space: nowrap;">Cambiar</button>
+      </div>
+    `;
+  } else {
+    notifArea.innerHTML = '<span style="color: #ef4444; font-weight: 600; font-size: 11.5px;">⚠️ Solapado</span>';
+  }
+};
