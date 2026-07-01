@@ -22,6 +22,7 @@
 
 import { pomodoroService, LS_KEYS } from '../services/PomodoroStateService.js';
 import { ApiService }                from '../services/ApiService.js';
+import { ESTADOS_POMO }              from '../models/PomodoroStates.js';
 
 /* ==========================================================================
    CONSTANTES DE PRESENTACIÓN
@@ -230,14 +231,13 @@ function renderTimerPrincipal(snapshot) {
     if (ptimeEl) ptimeEl.textContent = timeStr;
 
     // --- Subtítulo de fase y sesión ---
-    const faseObj  = pomodoroService.obtenerSnapshot(); // ya tenemos el snapshot como parámetro
-    const faseTxt  = ESTADOS_POMO_ETIQUETAS[state.fase_actual] || state.fase_actual;
+    const fasePolimorfica = ESTADOS_POMO[state.fase_actual];
+    const faseTxt  = fasePolimorfica ? fasePolimorfica.etiqueta() : state.fase_actual;
     const psubEl   = document.getElementById('psub');
     if (psubEl) psubEl.textContent = `${faseTxt} · Sesión ${ciclos.ciclo_actual} de ${settings.sessionsPerCycle}`;
 
     // --- Progreso del Ring SVG ---
-    const faseObj2 = _getFaseObj(state.fase_actual);
-    const totalSec = faseObj2 ? faseObj2.duracion(settings) : settings.focusTime * 60;
+    const totalSec = fasePolimorfica ? fasePolimorfica.duracion(settings) : settings.focusTime * 60;
     const pct      = totalSec > 0 ? state.tiempo_restante / totalSec : 0;
     const rpEl     = document.getElementById('rp');
     if (rpEl) {
@@ -302,10 +302,11 @@ function renderFocusMode(snapshot) {
     const focusTimeEl = document.getElementById('focus-time-display');
     if (!focusTimeEl) return; // El overlay puede no estar en el DOM todavía
 
-    const min     = Math.floor(state.tiempo_restante / 60);
-    const sec     = state.tiempo_restante % 60;
-    const timeStr = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
-    const faseTxt = ESTADOS_POMO_ETIQUETAS[state.fase_actual] || state.fase_actual;
+    const min             = Math.floor(state.tiempo_restante / 60);
+    const sec             = state.tiempo_restante % 60;
+    const timeStr         = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+    const fasePolimorfica = ESTADOS_POMO[state.fase_actual];
+    const faseTxt         = fasePolimorfica ? fasePolimorfica.etiqueta() : state.fase_actual;
 
     focusTimeEl.textContent = timeStr;
 
@@ -329,14 +330,22 @@ function renderFocusMode(snapshot) {
     }
 
     // --- Ring SVG del Focus Mode ---
-    const faseObj2 = _getFaseObj(state.fase_actual);
-    const totalSec = faseObj2 ? faseObj2.duracion(settings) : settings.focusTime * 60;
+    const totalSec = fasePolimorfica ? fasePolimorfica.duracion(settings) : settings.focusTime * 60;
     const pct      = totalSec > 0 ? state.tiempo_restante / totalSec : 0;
     const rpFocus  = document.getElementById('focus-ring-progress');
     if (rpFocus) {
         rpFocus.style.strokeDasharray  = CIRC_FOCUS;
         rpFocus.style.strokeDashoffset = CIRC_FOCUS * (1 - pct);
-        rpFocus.setAttribute('class', `focus-timer-ring-progress ${faseObj2 ? faseObj2.colorClass() : 'enfoque'}`);
+        rpFocus.setAttribute('class', `focus-timer-ring-progress ${fasePolimorfica ? fasePolimorfica.colorClass() : 'enfoque'}`);
+
+        // Mejora visual: aplicar clase de fase al overlay usando el estado del payload
+        const overlay = document.getElementById('focus-mode-overlay');
+        if (overlay) {
+            overlay.classList.remove('focus-phase-enfoque', 'focus-phase-corto', 'focus-phase-largo');
+            if (state.fase_actual === 'enfoque')        overlay.classList.add('focus-phase-enfoque');
+            else if (state.fase_actual === 'descanso_corto') overlay.classList.add('focus-phase-corto');
+            else if (state.fase_actual === 'descanso_largo') overlay.classList.add('focus-phase-largo');
+        }
     }
 
     // --- Dots de progreso en el overlay ---
@@ -363,33 +372,7 @@ function renderFocusMode(snapshot) {
     }
 }
 
-/**
- * Mapa de etiquetas legibles de fase para el renderizado (evita importar PomodoroStates
- * solo para obtener el texto; este mapa vive aquí como dato de presentación).
- * @type {Object.<string, string>}
- */
-const ESTADOS_POMO_ETIQUETAS = {
-    enfoque:        'Enfoque',
-    descanso_corto: 'Descanso Corto',
-    descanso_largo: 'Descanso Largo',
-};
 
-/**
- * Obtiene el objeto de fase del mapa de estados global importado.
- * Acceso centralizado para evitar imports directos de PomodoroStates en este archivo.
- * El objeto real está en el servicio; aquí solo necesitamos duracion() y colorClass().
- * @param {string} faseKey
- * @returns {object|null}
- */
-function _getFaseObj(faseKey) {
-    // Acceso al mapa de estados a través del servicio para no crear una dependencia adicional
-    const dummy = {
-        enfoque:        { duracion: (s) => s.focusTime * 60,  colorClass: () => 'enfoque' },
-        descanso_corto: { duracion: (s) => s.shortBreak * 60, colorClass: () => 'recreo'  },
-        descanso_largo: { duracion: (s) => s.longBreak * 60,  colorClass: () => 'recreo'  },
-    };
-    return dummy[faseKey] || null;
-}
 
 /* ==========================================================================
    CONTROLES DEL POMODORO — Handlers de Acciones del Usuario
@@ -398,28 +381,24 @@ function _getFaseObj(faseKey) {
 /**
  * Alterna entre iniciar/reanudar y pausar el temporizador.
  * Desbloquea el contexto de audio (requiere gesto del usuario) antes de arrancar.
+ * La vista únicamente invoca métodos de dominio del servicio; el servicio
+ * se encarga internamente de comunicarse con el ApiService.
  */
 function togglePomo() {
     const snapshot = pomodoroService.obtenerSnapshot();
     if (snapshot.state.estado_reloj === 'corriendo') {
         pomodoroService.pausar();
-        ApiService.pausarSesion()
-            .then(() => showToast('Temporizador pausado en el servidor', 'success'))
-            .catch(() => showToast('No se pudo notificar la pausa al servidor', 'warn'));
     } else {
         // Desbloquear el AudioContext con el gesto del usuario antes de iniciar
         getPomoAudioCtx();
-        const esNueva = pomodoroService.iniciar();
-        const endpoint = esNueva ? ApiService.iniciarSesion : ApiService.reanudarSesion;
-        endpoint()
-            .then(() => showToast(esNueva ? 'Sesión de estudio iniciada' : 'Sesión reanudada', 'success'))
-            .catch(() => showToast('No se pudo notificar el inicio al servidor', 'warn'));
+        pomodoroService.iniciar();
     }
 }
 
 /**
  * Reinicia el temporizador de la fase actual, registrando el progreso parcial si aplica.
  * Solicita confirmación al usuario antes de ejecutar para evitar pérdidas accidentales.
+ * El servicio es responsable de comunicar el progreso parcial al ApiService.
  */
 function resetPomo() {
     const snapshot = pomodoroService.obtenerSnapshot();
@@ -428,11 +407,7 @@ function resetPomo() {
     openConfirm(
         '¿Desea reiniciar el temporizador actual? Se registrará el progreso parcial en el servidor.',
         () => {
-            const { elapsedMin, faseEraEnfoque } = pomodoroService.reiniciarFase();
-            if (faseEraEnfoque && elapsedMin > 0) {
-                ApiService.registrarSesionParcial(elapsedMin)
-                    .catch(() => console.warn('No se pudo registrar la sesión parcial'));
-            }
+            pomodoroService.reiniciarFase();
             showToast('Temporizador reiniciado', 'success');
         }
     );
@@ -458,11 +433,7 @@ function restartPomoCycle() {
  */
 function skipPomo() {
     openConfirm('¿Desea saltar la fase actual?', () => {
-        const { elapsedMin, faseEraEnfoque } = pomodoroService.saltarFase();
-        if (faseEraEnfoque && elapsedMin > 0) {
-            ApiService.registrarSesionParcial(elapsedMin)
-                .catch(() => console.warn('No se pudo registrar la sesión parcial'));
-        }
+        pomodoroService.saltarFase();
         showToast('Fase salteada', 'success');
     });
 }
@@ -1538,6 +1509,13 @@ function performExitFocusMode() {
 function changeFocusTheme(theme) {
     const bgContainer = document.getElementById('focus-bg-container');
     if (!bgContainer) return;
+
+    // Validación defensiva: si el tema guardado ya no es válido, restaurar a 'aurora'
+    const validThemes = ['aurora', 'rain', 'fire', 'forest', 'ocean'];
+    if (!validThemes.includes(theme)) {
+        theme = 'aurora';
+    }
+
     bgContainer.className = '';
     bgContainer.classList.add('theme-' + theme);
     localStorage.setItem('cursus_pomo_focus_theme', theme);
@@ -1670,9 +1648,10 @@ function toggleLofiPanel() {
     } else {
         panel.classList.add('show');
         if (btn) btn.classList.add('active');
-        const select  = document.getElementById('focus-lofi-select');
-        const videoId = select ? select.value : currentLofiVideoId;
-        iframe.src    = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=0`;
+        const select    = document.getElementById('focus-lofi-select');
+        const videoId   = select ? select.value : currentLofiVideoId;
+        const separator = videoId.includes('?') ? '&' : '?';
+        iframe.src      = `https://www.youtube.com/embed/${videoId}${separator}enablejsapi=1&autoplay=1&mute=0`;
     }
 }
 
@@ -1686,7 +1665,8 @@ function changeLofiChannel(videoId) {
     const iframe = document.getElementById('focus-lofi-iframe');
     if (!panel || !iframe) return;
     if (panel.classList.contains('show')) {
-        iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=0`;
+        const separator = videoId.includes('?') ? '&' : '?';
+        iframe.src      = `https://www.youtube.com/embed/${videoId}${separator}enablejsapi=1&autoplay=1&mute=0`;
     }
 }
 

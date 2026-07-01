@@ -109,7 +109,7 @@ class FaseDescansoCorto {
 
     /** @returns {string} */
     colorClass() {
-        return 'recreo';
+        return 'descanso-corto';
     }
 }
 
@@ -148,7 +148,7 @@ class FaseDescansoLargo {
 
     /** @returns {string} */
     colorClass() {
-        return 'recreo';
+        return 'descanso-largo';
     }
 }
 

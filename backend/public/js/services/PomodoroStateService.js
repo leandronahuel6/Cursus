@@ -26,6 +26,7 @@
 'use strict';
 
 import { ESTADOS_POMO } from '../models/PomodoroStates.js';
+import { ApiService } from './ApiService.js';
 
 /* ==========================================================================
    CLAVES DE LOCALSTORAGE (Única declaración autorizada en el sistema)
@@ -255,6 +256,11 @@ class PomodoroStateService extends EventTarget {
         this._persistirEstado();
         this._iniciarTicker();
         this._emitir('pomo:estadoCambiado');
+        
+        // Petición al API para reportar inicio/reanudación
+        const endpoint = esNueva ? ApiService.iniciarSesion : ApiService.reanudarSesion;
+        endpoint().catch(() => this._toast('No se pudo notificar el inicio al servidor', 'warn'));
+
         return esNueva;
     }
 
@@ -266,6 +272,9 @@ class PomodoroStateService extends EventTarget {
         this._detenerTicker();
         this._persistirEstado();
         this._emitir('pomo:estadoCambiado');
+
+        // Petición al API para reportar pausa
+        ApiService.pausarSesion().catch(() => this._toast('No se pudo notificar la pausa al servidor', 'warn'));
     }
 
     /**
@@ -285,6 +294,7 @@ class PomodoroStateService extends EventTarget {
         // Agregar entrada de sesión parcial al log si hubo progreso real en enfoque
         if (faseEraEnfoque && elapsedMin > 0) {
             this._agregarLogParcial(elapsedMin);
+            ApiService.registrarSesionParcial(elapsedMin).catch(() => console.warn('No se pudo registrar la sesión parcial'));
         }
 
         this._resetearADefecto();
@@ -322,6 +332,7 @@ class PomodoroStateService extends EventTarget {
         // Registrar entrada parcial en el log si hubo progreso en la fase de enfoque
         if (faseEraEnfoque && elapsedMin > 0) {
             this._agregarLogParcial(elapsedMin);
+            ApiService.registrarSesionParcial(elapsedMin).catch(() => console.warn('No se pudo registrar salto parcial'));
         }
 
         // Calcular y aplicar la siguiente fase usando la máquina de estados
