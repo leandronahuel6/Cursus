@@ -45,6 +45,10 @@ Route::get('/alertas', function () {
     return view('alertas');
 })->name('alertas');
 
+Route::get('/contacto', function () {
+    return view('contacto');
+})->name('contacto');
+
 // Admin
 Route::get('/admin/alumnos', function () {
     return view('admin.alumnos');
