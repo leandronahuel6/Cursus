@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" id="color-scheme-meta" content="light">
   <title>@yield('title', 'Cursus - Asistente de Estudiantes')</title>
-  <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/main.css') }}?v={{ filemtime(public_path('css/main.css')) }}">
   <link rel="stylesheet" href="{{ asset('css/layout/sidebar.css') }}">
   <link rel="icon" href="{{ asset('assets/icons/cursus-logo.svg') }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ asset('css/components/pomo-float.css') }}">
@@ -281,7 +282,7 @@
 <div class="toast-container" id="toast-container"></div>
 
 <!-- Scripts -->
-<script src="{{ asset('js/theme.js') }}"></script>
+<script src="{{ asset('js/theme.js') }}?v={{ filemtime(public_path('js/theme.js')) }}"></script>
 <script src="{{ asset('js/animations.js') }}"></script>
 <script src="{{ asset('js/celebracion.js') }}"></script>
 <script src="{{ asset('js/shared/sidebar.js') }}"></script>

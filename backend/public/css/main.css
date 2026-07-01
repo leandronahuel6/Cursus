@@ -41,6 +41,11 @@
    VARIABLES
 ============================== */
 :root {
+  /* Sin esto, si el SO del usuario está en modo oscuro, el navegador dibuja
+     los controles nativos (el popup de <select>, por ejemplo) con su tema
+     oscuro aunque el sitio esté en modo claro, dejando el texto invisible. */
+  color-scheme: light;
+
   --brand:        #4f46e5;
   --brand-hover:  #4338ca;
   --brand-light:  #eef2ff;
@@ -218,10 +223,60 @@ body.dark-mode .sched-time-block.act {
 body.dark-mode .sched-time-block.act .block-code-row {
   color: #60a5fa;
 }
+
+/* Colores personalizados de bloques en modo oscuro (curso oficial y editor
+   manual): sin esto, los 6 colores caían en el mismo tinte índigo genérico
+   de arriba, porque las reglas de modo claro usan !important. */
+body.dark-mode .sched-time-block.theme-color-indigo {
+  border-left: 4px solid #818cf8 !important;
+  background: rgba(79, 70, 229, 0.28) !important;
+}
+body.dark-mode .sched-time-block.theme-color-indigo .block-code-row {
+  color: #a5b4fc;
+}
+body.dark-mode .sched-time-block.theme-color-purple {
+  border-left: 4px solid #a78bfa !important;
+  background: rgba(147, 51, 234, 0.28) !important;
+}
+body.dark-mode .sched-time-block.theme-color-purple .block-code-row {
+  color: #c4b5fd;
+}
+body.dark-mode .sched-time-block.theme-color-emerald {
+  border-left: 4px solid #34d399 !important;
+  background: rgba(16, 185, 129, 0.26) !important;
+}
+body.dark-mode .sched-time-block.theme-color-emerald .block-code-row {
+  color: #6ee7b7;
+}
+body.dark-mode .sched-time-block.theme-color-rose {
+  border-left: 4px solid #fb7185 !important;
+  background: rgba(244, 63, 94, 0.26) !important;
+}
+body.dark-mode .sched-time-block.theme-color-rose .block-code-row {
+  color: #fda4af;
+}
+body.dark-mode .sched-time-block.theme-color-amber {
+  border-left: 4px solid #fbbf24 !important;
+  background: rgba(245, 158, 11, 0.26) !important;
+}
+body.dark-mode .sched-time-block.theme-color-amber .block-code-row {
+  color: #fcd34d;
+}
+body.dark-mode .sched-time-block.theme-color-sky {
+  border-left: 4px solid #38bdf8 !important;
+  background: rgba(14, 165, 233, 0.26) !important;
+}
+body.dark-mode .sched-time-block.theme-color-sky .block-code-row {
+  color: #7dd3fc;
+}
 body.dark-mode .sched-modal-card {
   background: #111827;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+}
+body.dark-mode .custom-confirm-card {
+  background: #111827;
+  border-color: rgba(255, 255, 255, 0.1);
 }
 body.dark-mode .modal-inp-readonly {
   background: #1f2937;
@@ -5045,9 +5100,18 @@ body.dark-mode .btn-version:hover:not(.active) {
   border-color: var(--brand);
 }
 
-.sched-compare-box select option {
+/* El fondo del popup nativo siempre es oscuro (a propósito, como el
+   sidebar), así que el texto tiene que ser siempre claro: no puede usar
+   var(--t1), que en modo claro es oscuro y quedaba ilegible (texto negro
+   sobre fondo negro). Los <optgroup> no tenían ningún estilo propio y
+   quedaban con el renderizado nativo del navegador. */
+.sched-compare-box select option,
+.sched-compare-box select optgroup {
   background-color: var(--sidebar-bg, #0f172a) !important;
-  color: var(--t1) !important;
+  color: #f3f4f6 !important;
+}
+.sched-compare-box select optgroup {
+  font-weight: 700;
 }
 
 body.dark-mode .sched-compare-box {
@@ -5062,6 +5126,7 @@ body.dark-mode .sched-compare-box {
 
 .compare-input-group input {
   flex: 1;
+  min-width: 0;
   padding: 7px 10px;
   border-radius: 8px;
   border: 1px solid var(--border);
@@ -5106,7 +5171,7 @@ body.dark-mode .sched-compare-box {
   opacity: 1;
 }
 .custom-confirm-card {
-  background: var(--sidebar-bg);
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 16px;
   width: 90%;
