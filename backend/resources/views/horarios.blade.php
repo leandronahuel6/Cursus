@@ -9,30 +9,10 @@
       <div class="mob-greet">Simulador de Horarios 📅</div>
       <div class="mob-sub">Planificación del cuatrimestre</div>
     </div>
-    <div class="version-tabs">
-      <button class="btn-version active" id="mob-btn-version-A" onclick="switchVersion('A')">A</button>
-      <button class="btn-version" id="mob-btn-version-B" onclick="switchVersion('B')">B</button>
-    </div>
   </div>
 </div>
 @endsection
 
-@section('mobile-header-actions')
-<div class="horarios-mobile-hdr-actions" style="gap: 5px;">
-  <button class="btn-rect-mobile btn-rect-mobile-hdr" onclick="exportToICS()" title="Exportar iCal">
-    <span>📅 iCal</span>
-  </button>
-  <button class="btn-rect-mobile btn-rect-mobile-hdr" onclick="printSchedule()" title="Imprimir PDF">
-    <span>🖨️ PDF</span>
-  </button>
-  <button class="btn-rect-mobile btn-rect-mobile-purple btn-rect-mobile-hdr" onclick="document.getElementById('btn-save-schedule').click()" title="Guardar Horario">
-    <span>💾 Guardar</span>
-  </button>
-  <button class="btn-rect-mobile btn-rect-mobile-hdr" onclick="document.getElementById('btn-clear-grid').click()" title="Limpiar Grilla">
-    <span>♻ Limpiar</span>
-  </button>
-</div>
-@endsection
 
 @section('topbar-content')
   <div class="topbar-title" style="display: flex; align-items: center; gap: 15px;">
@@ -51,6 +31,26 @@
 @endsection
 
 @section('content')
+  <!-- Barra de acciones móvil (solo visible en dispositivos móviles) -->
+  <div class="horarios-mobile-actions-bar">
+    <button class="btn-rect-mobile btn-rect-mobile-purple" onclick="document.getElementById('btn-save-schedule').click()" title="Guardar Horario">
+      <span>💾 Guardar</span>
+    </button>
+    <button class="btn-rect-mobile" onclick="document.getElementById('btn-clear-grid').click()" title="Limpiar Grilla">
+      <span>♻ Limpiar</span>
+    </button>
+    <div class="version-tabs">
+      <button class="btn-version active" id="mob-btn-version-A" onclick="switchVersion('A')">A</button>
+      <button class="btn-version" id="mob-btn-version-B" onclick="switchVersion('B')">B</button>
+    </div>
+    <button class="btn-rect-mobile" onclick="printSchedule()" title="Imprimir PDF">
+      <span>🖨️ PDF</span>
+    </button>
+    <button class="btn-rect-mobile" onclick="exportToICS()" title="Exportar iCal">
+      <span>📅 iCal</span>
+    </button>
+  </div>
+
   <!-- Double Column Area -->
   <div class="sched-main-split">
     

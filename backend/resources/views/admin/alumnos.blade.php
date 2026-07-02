@@ -6,8 +6,29 @@
 <link rel="stylesheet" href="{{ asset('css/admin-alumnos.css') }}">
 @endpush
 
+@section('mobile-header')
+<div class="mob-hdr">
+  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+    <div style="display: flex; flex-direction: column;">
+      <div class="mob-greet" style="display: flex; align-items: center; gap: 8px;">
+        <svg width="20" height="20" style="fill: none; stroke: currentColor; stroke-width: 2; color: var(--brand); flex-shrink: 0;" aria-hidden="true">
+          <use href="{{ asset('assets/icons/sprite.svg#user') }}"></use>
+        </svg>
+        Gestión de Alumnos
+      </div>
+      <div class="mob-sub">Administración de cursada</div>
+    </div>
+  </div>
+</div>
+@endsection
+
 @section('topbar-content')
-<span class="topbar-title">Administración — Alumnos</span>
+<span class="topbar-title" style="display: flex; align-items: center; gap: 10px;">
+  <svg width="22" height="22" style="fill: none; stroke: currentColor; stroke-width: 2; color: var(--brand); flex-shrink: 0;" aria-hidden="true">
+    <use href="{{ asset('assets/icons/sprite.svg#user') }}"></use>
+  </svg>
+  Administración — Alumnos
+</span>
 @endsection
 
 @section('content')
