@@ -16,13 +16,14 @@
     .onboarding-backdrop.show {
         opacity: 1;
         pointer-events: auto;
+        background: rgba(15, 23, 42, 0.35); /* Oscurece un poco el fondo al aparecer */
     }
     .onboarding-backdrop.modal-active {
         background: rgba(15, 23, 42, 0.65); /* Filtro completo cuando es modal */
         backdrop-filter: blur(4px);
     }
     .onboarding-highlighted {
-        position: relative !important;
+        position: relative;
         z-index: 100000 !important;
         box-shadow: 0 0 0 4px #ffffff, 0 0 0 8px var(--brand), 0 0 0 9999px rgba(15, 23, 42, 0.65) !important;
         pointer-events: none !important;
@@ -31,6 +32,15 @@
     body.dark-mode .onboarding-highlighted {
         box-shadow: 0 0 0 4px #0f172a, 0 0 0 8px var(--brand), 0 0 0 9999px rgba(15, 23, 42, 0.65) !important;
     }
+    .bnav.onboarding-highlighted {
+        position: fixed;
+        bottom: 8px;
+        left: 8px;
+        right: 8px;
+        width: calc(100% - 16px);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
     .onboarding-tooltip {
         position: absolute;
         background: #ffffff;
@@ -38,6 +48,7 @@
         border-radius: 20px;
         padding: 24px;
         width: 360px;
+        max-width: 90vw; /* Evitar desbordes en mobile */
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         z-index: 100001;
         opacity: 0;
@@ -231,6 +242,37 @@
     }
     body.dark-mode .onboarding-icon-wrap {
         background: rgba(129, 140, 248, 0.12);
+    }
+    @media (max-width: 640px) {
+        .onboarding-tooltip {
+            padding: 16px 20px;
+            width: 290px;
+            max-width: calc(100% - 32px);
+            gap: 10px;
+            border-radius: 16px;
+        }
+        .onboarding-title {
+            font-size: 16px;
+        }
+        .onboarding-body {
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .onboarding-btn {
+            padding: 7px 12px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+        .onboarding-illustration svg {
+            width: 56px;
+            height: 56px;
+        }
+        .onboarding-tooltip.modal-step {
+            transform: translate(-50%, -45%) scale(0.97) !important;
+        }
+        .onboarding-tooltip.modal-step.show {
+            transform: translate(-50%, -50%) scale(1) !important;
+        }
     }
     `;
 
@@ -448,7 +490,16 @@
             resizeHandler = null;
         }
 
-        const step = steps[currentStep];
+        // Clonar y adaptar paso para móviles
+        const step = { ...steps[currentStep] };
+        if (window.innerWidth <= 768) {
+            if (step.selector === '#sidebar') {
+                step.selector = '.bnav';
+                step.placement = 'top';
+            } else if (step.placement === 'left' || step.placement === 'right') {
+                step.placement = 'bottom';
+            }
+        }
         
         // Armar contenido con botones type="button" explícitos
         let html = `
@@ -529,7 +580,10 @@
                     target = target.closest('.card') || target;
                 }
                 if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const isFixed = window.getComputedStyle(target).position === 'fixed' || target.classList.contains('bnav');
+                    if (!isFixed) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
                     
                     // Esperar a que el scroll termine antes de recalcular y mostrar
                     setTimeout(() => {
@@ -570,7 +624,8 @@
             top = rect.top + window.scrollY + 40;
             left = rect.left - tooltipRect.width - 14;
         } else if (placement === 'top') {
-            top = rect.top + window.scrollY - tooltipRect.height - 14;
+            const offset = element.classList.contains('bnav') ? 32 : 14;
+            top = rect.top + window.scrollY - tooltipRect.height - offset;
             left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
         } else { // default 'bottom'
             top = rect.bottom + window.scrollY + 14;

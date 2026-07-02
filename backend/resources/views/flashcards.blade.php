@@ -631,11 +631,12 @@
         opacity: 0.85;
     }
 
-    @media (max-width: 576px) {
-        #exam-options-grid {
-            grid-template-columns: 1fr !important;
-        }
+    #exam-options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
     }
+
 
     /* ==========================================================================
        SECCIÓN DE RESUMEN FINAL
@@ -826,11 +827,177 @@
         margin-top: 1rem;
     }
 
+    .distractors-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    /* ==========================================================================
+       ESTILOS RESPONSIVOS PARA DISPOSITIVOS MÓVILES
+       ========================================================================== */
     @media (max-width: 768px) {
+        .fc-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .fc-title-group {
+            text-align: center;
+        }
+
+        .fc-header-actions {
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .btn-create-deck {
+            width: 100%;
+            justify-content: center;
+        }
+
         .manage-grid {
             grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .cards-list-container {
+            max-height: 400px;
         }
     }
+
+    @media (max-width: 576px) {
+        .fc-container {
+            padding: 1rem 0.75rem;
+        }
+
+        /* Ajustes de estudio activo */
+        .study-layout {
+            padding: 0.5rem 0;
+        }
+
+        .study-card-wrapper {
+            height: 280px;
+            margin-bottom: 1.5rem;
+        }
+
+        .flip-card-front, .flip-card-back {
+            padding: 2rem 1.5rem 2.5rem 1.5rem;
+        }
+
+        .card-text {
+            font-size: 1.15rem;
+        }
+
+        .card-action-hint {
+            font-size: 0.72rem;
+            bottom: 1rem;
+        }
+
+        .btn-outcome .key-hint {
+            display: none;
+        }
+
+        .btn-outcome {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        /* Ajustes de examen */
+        .exam-card-wrapper {
+            min-height: auto;
+        }
+
+        .exam-card-wrapper .summary-card {
+            padding: 1.5rem;
+            min-height: auto;
+        }
+
+        .exam-card-wrapper #exam-options-grid {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+
+        /* Ajustes de resumen final */
+        .summary-card {
+            padding: 2rem 1rem;
+        }
+
+        .summary-stats-grid {
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .summary-stat-box {
+            flex: 1;
+            min-width: 80px;
+            padding: 0.6rem 0.5rem;
+        }
+
+        .summary-actions {
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        .btn-summary-restart, .btn-summary-back {
+            width: 100%;
+            max-width: none;
+            justify-content: center;
+        }
+
+        /* Modales */
+        .fc-overlay {
+            padding: 1rem;
+        }
+
+        .fc-modal-box {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .fc-modal-body {
+            padding: 1.25rem;
+        }
+
+        .fc-modal-footer {
+            padding: 0.85rem 1.25rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .deck-actions {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .btn-study {
+            width: 100%;
+            flex: none;
+        }
+
+        .btn-deck-icon {
+            flex: 1;
+            justify-content: center;
+        }
+
+        /* Formulario de añadir tarjeta */
+        .distractors-header-row {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.5rem;
+        }
+
+        #btn-suggest-distractors {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
 
     .manage-form-card {
         background: var(--surface);
@@ -879,6 +1046,39 @@
         border-color: var(--brand);
         background: var(--surface);
         box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    .fc-select {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        border: 1px solid var(--border);
+        border-radius: var(--r-sm);
+        background: var(--surface);
+        color: var(--t1);
+        font-size: 0.85rem;
+        outline: none;
+        cursor: pointer;
+        font-family: var(--font-body);
+        transition: all 0.2s;
+    }
+
+    .fc-select:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    /* Adaptación de menús desplegables al modo oscuro */
+    body.dark-mode select.fc-input,
+    body.dark-mode select.fc-select {
+        background-color: #1f2937;
+        color: #f3f4f6;
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+    
+    body.dark-mode select option,
+    body.dark-mode select optgroup {
+        background-color: #111827;
+        color: #f3f4f6;
     }
 
     .fc-textarea {
@@ -1421,7 +1621,7 @@
                         <div class="card-text" id="exam-question-text" style="font-size: 1.25rem; margin-bottom: 1.5rem; max-height: 120px; overflow-y: auto; width: 100%; padding: 0;">¿Cargando pregunta?</div>
                     </div>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;" id="exam-options-grid">
+                    <div id="exam-options-grid">
                         <!-- Botones inyectados dinámicamente -->
                     </div>
                     
@@ -1533,7 +1733,7 @@
                             <textarea id="card-input-answer" class="fc-input fc-textarea" placeholder="Escribe la respuesta... Usa `código` para resaltar." required></textarea>
                         </div>
                         <div style="margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem; margin-bottom: 1.25rem;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                            <div class="distractors-header-row">
                                 <span style="font-size:0.85rem; font-weight:600; color:var(--t2);">Opciones incorrectas (Opcional)</span>
                                 <button type="button" id="btn-suggest-distractors" onclick="handleSuggestDistractors()" style="background:var(--border-light); border:1px solid var(--border); border-radius:var(--r-sm); padding:0.25rem 0.6rem; font-size:0.75rem; font-weight:600; color:var(--brand); cursor:pointer; display:flex; align-items:center; gap:0.25rem; transition:all 0.2s;">
                                     <span>Sugerir con IA ✨</span>
@@ -1644,7 +1844,7 @@
                 </div>
                 <div class="form-group" style="margin-top: 1.25rem;">
                     <label for="ai-deck-cards-count" style="font-size: 0.85rem; font-weight: 600; color: var(--t2); display: block; margin-bottom: 0.4rem;">Cantidad de flashcards a generar</label>
-                    <select id="ai-deck-cards-count" name="cantidad" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); color: var(--t1); font-size: 0.85rem; outline: none; cursor: pointer;">
+                    <select id="ai-deck-cards-count" name="cantidad" class="fc-select">
                         <option value="5">5 tarjetas (Rápido)</option>
                         <option value="10" selected>10 tarjetas (Recomendado)</option>
                         <option value="15">15 tarjetas (Completo)</option>
@@ -1734,7 +1934,7 @@
             <!-- Configuración de preguntas para Modo Examen -->
             <div id="exam-quantity-wrapper" style="display: none; margin-top: 1.25rem; padding: 0.85rem; border: 1px solid var(--border); border-radius: var(--r); background: var(--border-light);">
                 <label for="exam-question-count" style="font-size: 0.85rem; font-weight: 600; color: var(--t2); display: block; margin-bottom: 0.4rem;">Cantidad de preguntas en el cuestionario</label>
-                <select id="exam-question-count" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); color: var(--t1); font-size: 0.85rem; outline: none; cursor: pointer;">
+                <select id="exam-question-count" class="fc-select">
                     <option value="all" selected>Todas las tarjetas del mazo</option>
                     <option value="5">5 preguntas</option>
                     <option value="10">10 preguntas</option>
@@ -2079,7 +2279,7 @@
                                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
                             </svg>
                             <span style="font-weight:700; font-size:1.02rem; color:var(--t1);">${escapeHtml(cat)}</span>
-                            <span style="font-size:0.75rem; font-weight:600; padding:0.15rem 0.5rem; background:var(--border); border-radius:9999px; color:var(--t3);">${catDecks.length} ${catDecks.length === 1 ? 'mazo' : 'mazos'}</span>
+                            <span style="font-size:0.75rem; font-weight:600; padding:0.15rem 0.5rem; background:var(--border); border-radius:9999px; color:var(--t3);">${catDecks.length}</span>
                         </div>
                         <svg class="category-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.25s ease; ${isCollapsed ? 'transform:rotate(-90deg);' : ''}">
                             <path d="m6 9 6 6 6-6"/>

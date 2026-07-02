@@ -3,8 +3,8 @@
 @section('title', 'Cursus - Área de Concentración')
 
 @push('styles')
-  <link rel="stylesheet" href="{{ asset('css/views/area-estudio.css') }}?v=2">
-  <link rel="stylesheet" href="{{ asset('css/views/area-estudio-focus.css') }}?v=2">
+  <link rel="stylesheet" href="{{ asset('css/views/area-estudio.css') }}?v=5">
+  <link rel="stylesheet" href="{{ asset('css/views/area-estudio-focus.css') }}?v=5">
 @endpush
 
 @section('mobile-header')

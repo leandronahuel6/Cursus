@@ -317,10 +317,117 @@
 .aa-btn-confirm-delete:hover:not(:disabled) { opacity: .88; }
 .aa-btn-confirm-delete:disabled { opacity: .55; cursor: not-allowed; }
 
+
+/* ==========================================================================
+   VISTA ALUMNOS (Mobile)
+   ========================================================================== */
+
 @media (max-width: 600px) {
-  .aa-student-header { flex-direction: column; align-items: flex-start; }
-  .aa-btn-delete { align-self: flex-end; }
-  .aa-stats-row { gap: 8px; }
-  .aa-stat { min-width: 70px; }
-  .aa-stat-val { font-size: 18px; }
+  .admin-alumnos-page {
+    width: 100%;
+    max-width: 100vw;
+    padding: 16px 12px;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  .aa-search-row { 
+    flex-direction: column; 
+    align-items: stretch; 
+    gap: 12px;
+  }
+  
+  .aa-btn-search { 
+    width: 100%; 
+    justify-content: center; 
+    padding: 11px 20px;
+  }
+
+  .aa-student-header { 
+    flex-direction: column; 
+    align-items: stretch; 
+    gap: 16px; 
+  }
+  
+  .aa-btn-delete { 
+    width: 100%; 
+    justify-content: center; 
+    padding: 10px 14px;
+  }
+  
+  .aa-stats-row { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 12px; 
+    padding-top: 14px;
+  }
+  
+  .aa-stat { 
+    min-width: unset; 
+    text-align: center;
+  }
+  
+  .aa-stat-val { 
+    font-size: 18px; 
+  }
+
+  .admin-alumnos-page .aa-materias-table-wrap {
+    display: block;
+    width: 100%;
+    max-width: 100%; 
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 auto; 
+  }
+
+  .admin-alumnos-page .aa-materias-table-wrap .aa-table {
+    width: 100%;
+    margin: 0;
+  }
+}
+
+/* ============================
+   ADAPTACIÓN INTERMEDIA 
+   ============================ */
+@media (max-width: 1024px) {
+  .admin-alumnos-page {
+    padding: 20px 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .aa-search-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .aa-btn-search {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .aa-student-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .aa-btn-delete {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .aa-stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+  }
+
+  .admin-alumnos-page .aa-materias-table-wrap {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }

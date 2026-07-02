@@ -12,7 +12,7 @@
   @stack('styles')
 </head>
 
-<body style="visibility:hidden">
+<body style="visibility:hidden" class="{{ Request::routeIs('admin.*') ? 'route-admin' : '' }}">
   <script>
     if (localStorage.getItem('sidebar_collapsed') === 'true') {
       document.body.classList.add('sidebar-collapsed');
@@ -97,7 +97,72 @@
   </div><!-- /main -->
 
   <!-- ======== BOTTOM NAV (mobile) ======== -->
-  <nav class="bnav">
+  <!-- ======== BOTTOM NAV (mobile) ======== -->
+  <!-- Barra Admin (se muestra solo para admins vía CSS en mobile) -->
+  <nav class="bnav admin-bnav">
+    <div class="bnav-row">
+      <div class="bn {{ Request::routeIs('admin.alumnos') ? 'on' : '' }}" onclick="location.href='{{ route('admin.alumnos') }}'">
+        <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#user') }}"></use></svg>
+        <span class="bn-lbl">Alumnos</span>
+      </div>
+      <div class="bn {{ Request::routeIs('admin.cuotas') ? 'on' : '' }}" onclick="location.href='{{ route('admin.cuotas') }}'">
+        <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#wallet') }}"></use></svg>
+        <span class="bn-lbl">Cuotas</span>
+      </div>
+      <div class="bn {{ Request::routeIs('admin.plan-estudios') ? 'on' : '' }}" onclick="location.href='{{ route('admin.plan-estudios') }}'">
+        <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#graduation-cap') }}"></use></svg>
+        <span class="bn-lbl">Plan Estudios</span>
+      </div>
+      <div class="bn {{ !Request::routeIs('admin.*') ? 'on' : '' }}" id="btn-toggle-student-menu" onclick="toggleStudentMenu(event)">
+        <span class="bnav-icon-wrapper" style="position: relative; display: flex; align-items: center; justify-content: center;">
+          <svg class="bn-ic" style="transform: rotate(0deg); transition: transform 0.2s;" id="student-menu-caret" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#chevron-up') }}"></use></svg>
+        </span>
+        <span class="bn-lbl">Vista Alumno</span>
+      </div>
+    </div>
+
+    <!-- Menú flotante de Vista Alumno (Se despliega sobre el menú admin) -->
+    <div class="student-menu-popup" id="student-menu-popup">
+      <div class="student-menu-popup-title">Menú Vista Alumno</div>
+      <div class="student-menu-grid">
+        <div class="sm-item {{ Request::routeIs('dashboard') ? 'on' : '' }}" onclick="location.href='{{ route('dashboard') }}'">
+          <svg class="sm-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#layout-dashboard') }}"></use></svg>
+          <span class="sm-lbl">Inicio</span>
+        </div>
+        <div class="sm-item {{ Request::routeIs('materias') ? 'on' : '' }}" onclick="location.href='{{ route('materias') }}'">
+          <svg class="sm-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#library') }}"></use></svg>
+          <span class="sm-lbl">Materias</span>
+        </div>
+        <div class="sm-item {{ Request::routeIs('area-estudio') ? 'on' : '' }}" onclick="location.href='{{ route('area-estudio') }}'">
+          <svg class="sm-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#clock') }}"></use></svg>
+          <span class="sm-lbl">Estudio</span>
+        </div>
+        <div class="sm-item {{ Request::routeIs('horarios') ? 'on' : '' }}" onclick="location.href='{{ route('horarios') }}'">
+          <svg class="sm-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#calendar') }}"></use></svg>
+          <span class="sm-lbl">Horarios</span>
+        </div>
+        <div class="sm-item {{ Request::routeIs('beneficios') ? 'on' : '' }}" onclick="location.href='{{ route('beneficios') }}'">
+          <svg class="sm-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#gift') }}"></use></svg>
+          <span class="sm-lbl">Beneficios</span>
+        </div>
+        <div class="sm-item {{ Request::routeIs('flashcards') ? 'on' : '' }}" onclick="location.href='{{ route('flashcards') }}'">
+          <svg class="sm-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#book-copy') }}"></use></svg>
+          <span class="sm-lbl">Flashcards</span>
+        </div>
+        <div class="sm-item {{ Request::routeIs('alertas') ? 'on' : '' }}" onclick="location.href='{{ route('alertas') }}'">
+          <svg class="sm-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#bell') }}"></use></svg>
+          <span class="sm-lbl">Alertas</span>
+        </div>
+        <div class="sm-item {{ Request::routeIs('progreso') ? 'on' : '' }}" onclick="location.href='{{ route('progreso') }}'">
+          <svg class="sm-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#trending-up') }}"></use></svg>
+          <span class="sm-lbl">Progreso</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Barra Alumno (se muestra para usuarios no-admins vía CSS en mobile) -->
+  <nav class="bnav student-bnav">
     <div class="bnav-row">
       <div class="bn {{ Request::routeIs('dashboard') ? 'on' : '' }}" onclick="location.href='{{ route('dashboard') }}'">
         <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#layout-dashboard') }}"></use></svg>
@@ -105,7 +170,7 @@
       </div>
       <div class="bn {{ Request::routeIs('materias') ? 'on' : '' }}" onclick="location.href='{{ route('materias') }}'">
         <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#library') }}"></use></svg>
-        <span class="bn-lbl">Materias</span>
+        <span class="bn-lbl">Mis Materias</span>
       </div>
       <div class="bn {{ Request::routeIs('area-estudio') ? 'on' : '' }}" onclick="location.href='{{ route('area-estudio') }}'">
         <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#clock') }}"></use></svg>
@@ -289,8 +354,33 @@
 <script src="{{ asset('js/profile.js') }}"></script>
 <script type="module" src="{{ asset('js/pomo-float.js') }}?v={{ filemtime(public_path('js/pomo-float.js')) }}"></script>
 @if(Request::routeIs('dashboard') || Request::routeIs('area-estudio'))
-<script src="{{ asset('js/onboarding.js') }}"></script>
+<script src="{{ asset('js/onboarding.js') }}?v={{ filemtime(public_path('js/onboarding.js')) }}"></script>
 @endif
+<script>
+  function toggleStudentMenu(event) {
+      if (event) event.stopPropagation();
+      const popup = document.getElementById('student-menu-popup');
+      const caret = document.getElementById('student-menu-caret');
+      if (popup && caret) {
+          popup.classList.toggle('open');
+          if (popup.classList.contains('open')) {
+              caret.style.transform = 'rotate(180deg)';
+          } else {
+              caret.style.transform = 'rotate(0deg)';
+          }
+      }
+  }
+
+  document.addEventListener('click', function(event) {
+      const popup = document.getElementById('student-menu-popup');
+      const caret = document.getElementById('student-menu-caret');
+      const trigger = document.getElementById('btn-toggle-student-menu');
+      if (popup && popup.classList.contains('open') && !popup.contains(event.target) && (!trigger || !trigger.contains(event.target))) {
+          popup.classList.remove('open');
+          if (caret) caret.style.transform = 'rotate(0deg)';
+      }
+  });
+</script>
 @stack('scripts')
 
 </body>
