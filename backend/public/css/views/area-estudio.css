@@ -169,7 +169,7 @@
     .kd-f { background: #10b981; }
     
     .kbcnt { font-size: 11px; font-weight: 600; color: var(--tm); background: var(--surface); border: 1px solid var(--border); padding: 0 6px; border-radius: 10px; }
-    .kbcards { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; min-height: 50px; margin-bottom: 8px; padding-right: 2px; }
+    .kbcards { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; overflow-x: hidden; min-height: 50px; margin-bottom: 8px; padding: 0 8px; margin: 0 -8px; }
     
     /* Kanban Card UI */
     .kbcard {

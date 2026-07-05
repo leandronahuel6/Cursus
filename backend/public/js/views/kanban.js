@@ -164,6 +164,9 @@ export const KanbanManager = {
 
         const mapColsToDb = { pending: 'pendiente', progress: 'progreso', done: 'finalizado' };
 
+        // Guardar estado previo para rollback en caso de error
+        const oldTasksState = JSON.parse(JSON.stringify(this.tasks));
+
         // Recalcular orden para toda la columna
         const currentCards = Array.from(cardsContainer.querySelectorAll('.kbcard'));
         const tareasPayload = [];
@@ -194,8 +197,16 @@ export const KanbanManager = {
                 // Éxito, se queda como está en el DOM
             })
             .catch(() => {
-                this.callbacks.showToast('Error moviendo tarea, recargando...', 'error');
-                this.callbacks.reloadApp();
+                this.callbacks.showToast('Error al mover la tarea. Volviendo a la posición original.', 'error');
+                card.classList.add('kb-error-shake');
+                setTimeout(() => {
+                    card.classList.remove('kb-error-shake');
+                    // Rollback local sin recargar app
+                    this.tasks = oldTasksState;
+                    this.saveTasksToLocal();
+                    this.renderKanban();
+                    if (this.callbacks.updateFocusActiveGoal) this.callbacks.updateFocusActiveGoal();
+                }, 400); // Dar tiempo a la animación antes de recargar
             });
     },
 
