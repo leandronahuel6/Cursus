@@ -49,8 +49,14 @@
             <span id="mat-selector-name">—</span>
             <span class="mat-dropdown-caret">▾</span>
           </div>
-          <div class="mat-meta">
+          <div class="mat-meta" style="display: flex; align-items: center; gap: 6px; position: relative;">
             <span class="badge b-cur" id="mat-selector-badge">Cursando</span>
+            <button id="btn-independiente-help" style="display: none; background: none; border: none; padding: 0; cursor: pointer; color: var(--t2); align-items: center; width: 22px; height: 22px; justify-content: center;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="/assets/icons/sprite.svg#circle-question-mark"></use></svg>
+            </button>
+            <div id="tooltip-independiente-help" class="tooltip-popover" style="display: none;">
+                No estás cursando ninguna materia. Seleccioná "Cursar" sobre alguna materia desde "Mis Materias" para poder agregar tareas y marcadores.
+            </div>
             <span class="mat-yr">Tocá el nombre para cambiar de materia</span>
           </div>
           <!-- Selector de materia -->

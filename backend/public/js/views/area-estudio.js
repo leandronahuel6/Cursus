@@ -732,20 +732,18 @@ async function loadMateriasCursando() {
     renderMateriaDropdown();
 
     if (materiasCursando.length === 0) {
-        const nameEl  = document.getElementById('mat-selector-name');
-        const badgeEl = document.getElementById('mat-selector-badge');
-        if (nameEl)  nameEl.textContent  = 'Sin materias en curso';
-        if (badgeEl) badgeEl.textContent = '—';
-        selectedMateriaId = null;
-        localStorage.removeItem('cursus_selected_materia');
-        loadAppState(); // Limpia Kanban y UI
-        loadMateriaResumen(); // Carga las sesiones independientes (materia_id = NULL)
+        selectMateria(null);
         return;
     }
 
-    const saved       = parseInt(localStorage.getItem('cursus_selected_materia'), 10);
-    const savedValida = materiasCursando.find(m => m.id === saved);
-    selectMateria(savedValida ? saved : materiasCursando[0].id);
+    const savedRaw = localStorage.getItem('cursus_selected_materia');
+    if (savedRaw === 'independiente') {
+        selectMateria(null);
+    } else {
+        const saved = parseInt(savedRaw, 10);
+        const savedValida = materiasCursando.find(m => m.id === saved);
+        selectMateria(savedValida ? saved : materiasCursando[0].id);
+    }
 }
 
 /** Renderiza las opciones del dropdown de selección de materia. */
@@ -754,10 +752,13 @@ function renderMateriaDropdown() {
     if (!dropdown) return;
     dropdown.innerHTML = '';
 
-    if (materiasCursando.length === 0) {
-        dropdown.innerHTML = `<div class="mat-dropdown-empty">No estás cursando ninguna materia. Anotate desde "Mis Materias" para poder estudiar acá.</div>`;
-        return;
-    }
+    // Elemento permanente para Estudio Independiente
+    const indItem = document.createElement('div');
+    indItem.className = `mat-dropdown-item ${selectedMateriaId === null ? 'active' : ''}`;
+    indItem.innerHTML = `<span>Estudio Independiente</span>${selectedMateriaId === null ? '<span>✓</span>' : ''}`;
+    indItem.onclick   = () => selectMateria(null);
+    dropdown.appendChild(indItem);
+
     materiasCursando.forEach(m => {
         const item = document.createElement('div');
         item.className = `mat-dropdown-item ${m.id === selectedMateriaId ? 'active' : ''}`;
@@ -789,15 +790,45 @@ function closeMateriaDropdown() {
  */
 function selectMateria(id) {
     selectedMateriaId = id;
-    localStorage.setItem('cursus_selected_materia', String(id));
+    if (id === null) {
+        localStorage.setItem('cursus_selected_materia', 'independiente');
+    } else {
+        localStorage.setItem('cursus_selected_materia', String(id));
+    }
 
-    const materia = materiasCursando.find(m => m.id === id);
+    const materia = id ? materiasCursando.find(m => m.id === id) : null;
     const nameEl  = document.getElementById('mat-selector-name');
+    const badgeEl = document.getElementById('mat-selector-badge');
+    const helpBtn = document.getElementById('btn-independiente-help');
     const mobNameEl = document.getElementById('mob-materia-name');
     const mobMetaEl = document.getElementById('mob-materia-meta');
-    if (nameEl)   nameEl.textContent   = materia ? materia.nombre : '—';
-    if (mobNameEl) mobNameEl.textContent = materia ? materia.nombre : '—';
+    
+    const nombreMostrar = materia ? materia.nombre : 'Estudio Independiente';
+    
+    if (nameEl)   nameEl.textContent   = nombreMostrar;
+    if (mobNameEl) mobNameEl.textContent = nombreMostrar;
     if (mobMetaEl) mobMetaEl.textContent = materia ? `Nivel ${materia.nivel ?? '—'}` : '—';
+
+    if (badgeEl) {
+        if (materia) {
+            badgeEl.textContent = 'CURSANDO';
+            badgeEl.style.display = 'inline-block';
+            if (helpBtn) helpBtn.style.display = 'none';
+        } else {
+            badgeEl.style.display = 'none';
+            if (helpBtn) {
+                helpBtn.style.display = 'flex';
+                const tooltip = document.getElementById('tooltip-independiente-help');
+                if (tooltip) {
+                    if (materiasCursando.length === 0) {
+                        tooltip.textContent = 'Las tareas y marcadores no están disponibles en "Estudio Independiente". Para usarlos, ve a "Mis Materias" y seleccioná "Cursar" en alguna materia.';
+                    } else {
+                        tooltip.textContent = 'Las tareas y marcadores no están disponibles en "Estudio Independiente". Seleccioná una de tus materias en este menú para usarlos.';
+                    }
+                }
+            }
+        }
+    }
 
     // Limpiar stats mientras se carga el resumen real
     const hoursEl = document.getElementById('chip-stat-hours');
@@ -1268,6 +1299,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Inicializar el Servicio del Pomodoro (SSOT) ---
     pomodoroService.init(showToast);
+
+    // --- Configurar Tooltip de Ayuda para Estudio Independiente ---
+    const btnIndependienteHelp = document.getElementById('btn-independiente-help');
+    const tooltipIndependienteHelp = document.getElementById('tooltip-independiente-help');
+    if (btnIndependienteHelp && tooltipIndependienteHelp) {
+        btnIndependienteHelp.addEventListener('click', (e) => {
+            e.stopPropagation();
+            tooltipIndependienteHelp.style.display = tooltipIndependienteHelp.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Ocultar al hacer clic en cualquier otro lado
+        document.addEventListener('click', () => {
+            tooltipIndependienteHelp.style.display = 'none';
+        });
+        tooltipIndependienteHelp.addEventListener('click', (e) => {
+            e.stopPropagation(); // Evitar que clics dentro del tooltip lo cierren
+        });
+    }
 
     // --- Inicializar KanbanManager ---
     KanbanManager.init({

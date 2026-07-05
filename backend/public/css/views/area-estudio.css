@@ -748,8 +748,33 @@ body.dark-mode select.modal-input option {
   color: var(--t1);
 }
 
+/* -----------------------------------------------------------------------------
+ * Tooltip / Popover (Estudio Independiente)
+ * -------------------------------------------------------------------------- */
+.tooltip-popover {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 8px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-size: 13px;
+    color: var(--t3);
+    width: 280px;
+    z-index: 100;
+    line-height: 1.4;
+    cursor: default;
+}
+
 /* Menú desplegable de materias en modo oscuro (fondo sólido) */
 body.dark-mode .mat-dropdown {
-  background: #111827 !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+}
+
+body.dark-mode .mat-dropdown-item:hover {
+  background-color: var(--hover);
 }
