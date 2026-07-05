@@ -433,7 +433,11 @@
     .slog-row:last-child { border-bottom: none; }
     .slog-t  { font-size: 10.5px; color: rgba(255,255,255,.28); font-variant-numeric: tabular-nums; min-width: 32px; }
     .slog-d  { font-size: 10.5px; font-weight: 600; color: rgba(255,255,255,.5); }
-    .slog-ok { font-size: 10.5px; color: #34d399; margin-left: auto; }
+    .slog-ok { font-size: 10.5px; margin-left: auto; display: flex; align-items: center; gap: 4px; }
+    .slog-icon { width: 12px; height: 12px; }
+    .status-completada { color: #34d399; }
+    .status-parcial { color: #f59e0b; }
+    .status-abandonada { color: #ef4444; }
 
     /* COMMUNITY PANEL */
     .community {

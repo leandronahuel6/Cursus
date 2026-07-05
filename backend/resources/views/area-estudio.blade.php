@@ -93,44 +93,44 @@
               
               <!-- Pendiente Column -->
               <div class="kbcol" id="col-pending" 
-                   ondragover="allowDrop(event)" 
-                   ondragleave="leaveDrop(event)" 
-                   ondrop="dropCard(event, 'pending')">
+                   ondragover="window.KanbanManager.allowDrop(event)" 
+                   ondragleave="window.KanbanManager.leaveDrop(event)" 
+                   ondrop="window.KanbanManager.dropCard(event, 'pending')">
                 <div class="kbcol-hd">
                   <div class="kbcol-name"><div class="kbdot kd-p"></div>Pendiente</div>
                   <span class="kbcnt" id="cnt-pending">0</span>
                 </div>
                 <div class="kbcards" id="cards-pending"></div>
                 <div id="add-form-container-pending"></div>
-                <button class="kb-add" id="btn-add-pending" onclick="showInlineAddCardForm('pending')">+ Agregar tarea</button>
+                <button class="kb-add" id="btn-add-pending" onclick="window.KanbanManager.showInlineAddCardForm('pending')">+ Agregar tarea</button>
               </div>
 
               <!-- En Curso Column -->
               <div class="kbcol" id="col-progress" 
-                   ondragover="allowDrop(event)" 
-                   ondragleave="leaveDrop(event)" 
-                   ondrop="dropCard(event, 'progress')">
+                   ondragover="window.KanbanManager.allowDrop(event)" 
+                   ondragleave="window.KanbanManager.leaveDrop(event)" 
+                   ondrop="window.KanbanManager.dropCard(event, 'progress')">
                 <div class="kbcol-hd">
                   <div class="kbcol-name"><div class="kbdot kd-c"></div>En Curso</div>
                   <span class="kbcnt" id="cnt-progress">0</span>
                 </div>
                 <div class="kbcards" id="cards-progress"></div>
                 <div id="add-form-container-progress"></div>
-                <button class="kb-add" id="btn-add-progress" onclick="showInlineAddCardForm('progress')">+ Agregar tarea</button>
+                <button class="kb-add" id="btn-add-progress" onclick="window.KanbanManager.showInlineAddCardForm('progress')">+ Agregar tarea</button>
               </div>
 
               <!-- Finalizado Column -->
               <div class="kbcol" id="col-done" 
-                   ondragover="allowDrop(event)" 
-                   ondragleave="leaveDrop(event)" 
-                   ondrop="dropCard(event, 'done')">
+                   ondragover="window.KanbanManager.allowDrop(event)" 
+                   ondragleave="window.KanbanManager.leaveDrop(event)" 
+                   ondrop="window.KanbanManager.dropCard(event, 'done')">
                 <div class="kbcol-hd">
                   <div class="kbcol-name"><div class="kbdot kd-f"></div>Finalizado</div>
                   <span class="kbcnt" id="cnt-done">0</span>
                 </div>
                 <div class="kbcards" id="cards-done"></div>
                 <div id="add-form-container-done"></div>
-                <button class="kb-add" id="btn-add-done" onclick="showInlineAddCardForm('done')">+ Agregar tarea</button>
+                <button class="kb-add" id="btn-add-done" onclick="window.KanbanManager.showInlineAddCardForm('done')">+ Agregar tarea</button>
               </div>
 
             </div>
@@ -169,7 +169,13 @@
           <!-- POMODORO TIMER CARD -->
           <div class="focus-card">
             <div class="pomo-hd">
-              <div class="pomo-hd-title">Temporizador Pomodoro</div>
+              <div class="pomo-hd-title" style="display:flex; align-items:center;">
+                Temporizador Pomodoro
+                <svg id="offline-sync-indicator" style="display:none; width:16px; height:16px; margin-left:8px; color:#f59e0b; cursor:help;" aria-label="Hay sesiones pendientes de sincronizar">
+                  <title>Hay sesiones pendientes de sincronizar</title>
+                  <use href="{{ asset('assets/icons/sprite.svg') }}#cloud-alert"></use>
+                </svg>
+              </div>
               <div class="pomo-presets">
                 <button class="pomo-preset-btn active" id="preset-classic" onclick="setPreset('classic')">25/5</button>
                 <button class="pomo-preset-btn" id="preset-deep" onclick="setPreset('deep')">50/10</button>
@@ -254,7 +260,7 @@
       <div class="modal-title">
         <span>Columna: </span><span id="task-modal-col-name" style="color: var(--brand);">Pendiente</span>
       </div>
-      <button class="modal-close" onclick="closeTaskModal()">✕</button>
+      <button class="modal-close" onclick="window.KanbanManager.closeTaskModal()">✕</button>
     </div>
     <div class="modal-body">
       
@@ -267,7 +273,7 @@
       <!-- Fecha de Vencimiento -->
       <div class="modal-field">
         <label class="modal-label" for="task-modal-due">Fecha de Vencimiento</label>
-        <input type="datetime-local" id="task-modal-due" class="modal-input" onblur="handleDateAutocomplete(this)">
+        <input type="datetime-local" id="task-modal-due" class="modal-input" onblur="window.KanbanManager.handleDateAutocomplete(this)">
       </div>
 
       <!-- Descripción -->
@@ -285,18 +291,18 @@
           </div>
           <div class="subtask-add-row" id="subtask-add-form" style="display:none;">
             <input type="text" id="subtask-new-txt" class="modal-input" placeholder="Nombre de la subtarea" style="flex:1; padding: 4px 8px; font-size:12px;">
-            <button class="btn-save" onclick="saveNewSubtask()" style="padding:4px 8px; font-size:11px;">Añadir</button>
-            <button class="btn-cancel" onclick="hideSubtaskAddInput()" style="padding:4px 8px; font-size:11px;">✕</button>
+            <button class="btn-save" onclick="window.KanbanManager.saveNewSubtask()" style="padding:4px 8px; font-size:11px;">Añadir</button>
+            <button class="btn-cancel" onclick="window.KanbanManager.hideSubtaskAddInput()" style="padding:4px 8px; font-size:11px;">✕</button>
           </div>
-          <button class="subtask-add-btn" id="btn-show-subtask-add" onclick="showSubtaskAddInput()">+ Añadir una subtarea</button>
+          <button class="subtask-add-btn" id="btn-show-subtask-add" onclick="window.KanbanManager.showSubtaskAddInput()">+ Añadir una subtarea</button>
         </div>
       </div>
 
     </div>
     <div class="modal-foot">
-      <button class="btn-danger" onclick="deleteTaskFromModal()" style="margin-right:auto;">Eliminar Tarea</button>
-      <button class="btn-cancel" onclick="closeTaskModal()">Cancelar</button>
-      <button class="btn-save" onclick="saveTaskDetails()">Guardar</button>
+      <button class="btn-danger" onclick="window.KanbanManager.deleteTaskFromModal()" style="margin-right:auto;">Eliminar Tarea</button>
+      <button class="btn-cancel" onclick="window.KanbanManager.closeTaskModal()">Cancelar</button>
+      <button class="btn-save" onclick="window.KanbanManager.saveTaskDetails()">Guardar</button>
     </div>
   </div>
 </div>
