@@ -397,12 +397,28 @@ function skipPomo() {
  * @param {'classic'|'deep'|'short'|'custom'} type - Nombre del preset a aplicar.
  */
 function setPreset(type) {
-    const aplicado = pomodoroService.aplicarPreset(type);
-    if (!aplicado) {
+    const snapshot = pomodoroService.obtenerSnapshot();
+    if (snapshot.state.estado_reloj === 'corriendo') {
         showToast('Pausa el temporizador antes de cambiar de modo', 'warn');
         return;
     }
-    showToast(`Preset aplicado: ${type.toUpperCase()}`, 'success');
+
+    const cicloActual = snapshot.ciclos.ciclo_actual;
+
+    // Todos los presets predeterminados tienen 4 sesiones
+    if (type !== 'custom' && cicloActual > 4) {
+        openConfirm(
+            `Atención: El preset que seleccionaste tiene un límite de 4 sesiones por ciclo, pero actualmente te encuentras en la sesión ${cicloActual}. Al aplicar este cambio, tu progreso del ciclo se reiniciará a la sesión 1. ¿Deseas continuar?`,
+            () => {
+                const aplicado = pomodoroService.aplicarPreset(type);
+                if (aplicado) showToast(`Preset aplicado: ${type.toUpperCase()}`, 'success');
+            }
+        );
+        return;
+    }
+
+    const aplicado = pomodoroService.aplicarPreset(type);
+    if (aplicado) showToast(`Preset aplicado: ${type.toUpperCase()}`, 'success');
 }
 
 /**
@@ -519,6 +535,25 @@ async function saveCustomPomoSettings() {
     const autoReproduccion = autoPlayToggle ? autoPlayToggle.checked : true;
 
     const btnSave = document.getElementById('btn-save-pomo');
+
+    const snapshot = pomodoroService.obtenerSnapshot();
+    const cicloActual = snapshot.ciclos.ciclo_actual;
+    const presetActivo = snapshot.config.preset_activo;
+
+    if (presetActivo === 'custom' && sessions < cicloActual) {
+        openConfirm(
+            `Atención: Estás reduciendo la cantidad de sesiones por ciclo a ${sessions}, pero actualmente te encuentras en la sesión ${cicloActual}. Al aplicar este cambio, tu progreso del ciclo se reiniciará a la sesión 1. ¿Deseas continuar?`,
+            () => {
+                _ejecutarSaveCustomPomoSettings(focus, short, long, sessions, cycles, sonidoAlarma, modoEstricto, reproducirAlarma, mostrarWidget, autoReproduccion, btnSave, errorDiv);
+            }
+        );
+        return;
+    }
+
+    _ejecutarSaveCustomPomoSettings(focus, short, long, sessions, cycles, sonidoAlarma, modoEstricto, reproducirAlarma, mostrarWidget, autoReproduccion, btnSave, errorDiv);
+}
+
+async function _ejecutarSaveCustomPomoSettings(focus, short, long, sessions, cycles, sonidoAlarma, modoEstricto, reproducirAlarma, mostrarWidget, autoReproduccion, btnSave, errorDiv) {
     if (btnSave) {
         btnSave.disabled = true;
         btnSave.textContent = 'Guardando...';

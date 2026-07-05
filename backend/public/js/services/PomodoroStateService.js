@@ -476,6 +476,8 @@ class PomodoroStateService extends EventTarget {
         this._persistirYEnviarConfig().catch(e => console.warn('No se pudo guardar la config', e));
         this._derivarSettings();
 
+        this._validarYCorregirCiclos();
+
         this._resetearADefecto();
         this._emitir('pomo:estadoCambiado');
         return true;
@@ -491,6 +493,10 @@ class PomodoroStateService extends EventTarget {
      * @returns {Promise}
      */
     guardarAjustesPersonalizados(nuevosSettings, configuracionesGenerales) {
+        // Guardamos la duración de la fase actual antes de aplicar los cambios
+        const faseObj = ESTADOS_POMO[this._state.fase_actual];
+        const duracionPrevia = faseObj.duracion(this._settings);
+
         Object.assign(this._config, nuevosSettings);
         if (configuracionesGenerales) {
             Object.assign(this._config, configuracionesGenerales);
@@ -499,10 +505,19 @@ class PomodoroStateService extends EventTarget {
         const promise = this._persistirYEnviarConfig();
         this._derivarSettings();
 
-        // Solo resetea el timer si el preset activo es custom, 
-        // de lo contrario, el reloj actual mantiene su estado (Classic, Deep, etc)
+        this._validarYCorregirCiclos();
+
+        // Si estamos en el preset 'custom' y la configuración del tiempo que afecta a la fase actual cambió,
+        // reiniciamos ÚNICAMENTE la fase actual (no volvemos a enfoque por defecto, mantenemos la fase).
         if (this._config.preset_activo === 'custom') {
-            this._resetearADefecto();
+            const duracionNueva = faseObj.duracion(this._settings);
+            if (duracionPrevia !== duracionNueva) {
+                this._detenerTicker();
+                this._state.tiempo_restante = duracionNueva;
+                this._state.estado_reloj = 'detenido';
+                this._state.timestamp_ultimo_cambio = Date.now();
+                this._persistirEstado();
+            }
         }
         
         this._emitir('pomo:estadoCambiado');
@@ -710,6 +725,19 @@ class PomodoroStateService extends EventTarget {
             timestamp_ultimo_cambio: Date.now(),
         };
         this._persistirEstado();
+    }
+
+    /**
+     * Valida si el ciclo actual superó el límite máximo configurado
+     * (por ejemplo, si se cambió a un preset con menos sesiones por ciclo).
+     * Si es así, reinicia los ciclos de forma segura.
+     */
+    _validarYCorregirCiclos() {
+        if (this._ciclos.ciclo_actual > this._settings.sesiones_por_ciclo) {
+            this._ciclos.ciclo_actual = 1;
+            this._ciclos.distracciones = 0;
+            this._persistirCiclos();
+        }
     }
 
     /**
