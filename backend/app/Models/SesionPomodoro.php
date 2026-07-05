@@ -13,6 +13,7 @@ class SesionPomodoro extends Model
         'materia_id',
         'duracion_segundos',
         'completada_en',
+        'estado',
     ];
 
     protected $casts = [
