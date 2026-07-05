@@ -222,7 +222,99 @@
       const chevron = document.getElementById('va-chevron');
       if (chevron) chevron.classList.toggle('open', abierto);
     }
+
+    // Aplicar personalización de fondo del espacio de trabajo
+    const bgEl = document.getElementById('js-dashboard-bg');
+    if (bgEl) {
+      const presetsMap = {
+        'none': 'none',
+        'utn-haedo': "url('/assets/img/default_dashboard_bg.jpg')",
+        'utn-building': "url('/assets/img/utn-haedo.jpg')",
+        'study-cozy': "url('/assets/img/contact_bg.png')",
+        'code-abstract': "url('/assets/img/code_abstract.jpg')",
+        'lofi-room': "url('/assets/img/lofi_room.jpg')",
+        'custom': user.bg_custom_url ? `url('${user.bg_custom_url}')` : 'none'
+      };
+      const preset = user.bg_preset || 'utn-haedo';
+      const bgUrl = presetsMap[preset] || presetsMap['utn-haedo'];
+      const opacity = (user.bg_opacity !== undefined && user.bg_opacity !== null) ? (user.bg_opacity / 100) : 0.10;
+      const blur = (user.bg_blur !== undefined && user.bg_blur !== null) ? user.bg_blur : 1.8;
+      
+      bgEl.style.setProperty('--bg-url', bgUrl);
+      bgEl.style.setProperty('--bg-opacity', opacity);
+      bgEl.style.setProperty('--bg-blur', blur + 'px');
+    }
   }
+
+  // Personalización del espacio de trabajo
+  const presetsMap = {
+    'none': 'none',
+    'utn-haedo': "url('/assets/img/default_dashboard_bg.jpg')",
+    'utn-building': "url('/assets/img/utn-haedo.jpg')",
+    'study-cozy': "url('/assets/img/contact_bg.png')",
+    'code-abstract': "url('/assets/img/code_abstract.jpg')",
+    'lofi-room': "url('/assets/img/lofi_room.jpg')"
+  };
+
+  window.handleBgPresetChange = function(preset, updatePreview = true) {
+    const opacityContainer = document.getElementById('profile-bg-opacity-container');
+    const blurContainer = document.getElementById('profile-bg-blur-container');
+    const uploadContainer = document.getElementById('profile-bg-upload-container');
+    
+    if (preset === 'none') {
+      if (opacityContainer) opacityContainer.style.display = 'none';
+      if (blurContainer) blurContainer.style.display = 'none';
+      if (uploadContainer) uploadContainer.style.display = 'none';
+    } else {
+      if (opacityContainer) opacityContainer.style.display = 'block';
+      if (blurContainer) blurContainer.style.display = 'block';
+      if (uploadContainer) {
+        uploadContainer.style.display = (preset === 'custom') ? 'block' : 'none';
+      }
+    }
+
+    if (updatePreview) {
+      const bgEl = document.getElementById('js-dashboard-bg');
+      if (bgEl) {
+        if (preset === 'custom') {
+          if (pendingBgPreviewUrl) {
+            bgEl.style.setProperty('--bg-url', `url('${pendingBgPreviewUrl}')`);
+          } else {
+            const cached = getStoredUser();
+            let user = null;
+            try { user = JSON.parse(cached); } catch(_) {}
+            if (user && user.bg_custom_url) {
+              bgEl.style.setProperty('--bg-url', `url('${user.bg_custom_url}')`);
+            } else {
+              bgEl.style.setProperty('--bg-url', 'none');
+            }
+          }
+        } else {
+          bgEl.style.setProperty('--bg-url', presetsMap[preset] || presetsMap['utn-haedo']);
+        }
+      }
+    }
+  };
+
+  window.handleBgOpacityInput = function(opacity) {
+    const valEl = document.getElementById('profile-bg-opacity-value');
+    if (valEl) valEl.textContent = opacity + '%';
+    
+    const bgEl = document.getElementById('js-dashboard-bg');
+    if (bgEl) {
+      bgEl.style.setProperty('--bg-opacity', opacity / 100);
+    }
+  };
+
+  window.handleBgBlurInput = function(blur) {
+    const valEl = document.getElementById('profile-bg-blur-value');
+    if (valEl) valEl.textContent = parseFloat(blur).toFixed(1) + 'px';
+    
+    const bgEl = document.getElementById('js-dashboard-bg');
+    if (bgEl) {
+      bgEl.style.setProperty('--bg-blur', blur + 'px');
+    }
+  };
 
   // Pop up para editar los datos de perfil (nombre, legajo, email)
   function clearProfileFormErrors() {
@@ -243,6 +335,36 @@
         document.getElementById('profile-nombre').value = user.nombre || '';
         document.getElementById('profile-legajo').value = user.legajo || '';
         document.getElementById('profile-email').value = user.email || '';
+        
+        // Pre-cargar valores de personalización
+        const presetSelect = document.getElementById('profile-bg-preset');
+        const opacityInput = document.getElementById('profile-bg-opacity');
+        const blurInput = document.getElementById('profile-bg-blur');
+        
+        const presetVal = user.bg_preset || 'utn-haedo';
+        const opacityVal = user.bg_opacity !== undefined ? user.bg_opacity : 10;
+        const blurVal = user.bg_blur !== undefined ? user.bg_blur : 1.8;
+        
+        if (presetSelect) presetSelect.value = presetVal;
+        if (opacityInput) {
+          opacityInput.value = opacityVal;
+          const valEl = document.getElementById('profile-bg-opacity-value');
+          if (valEl) valEl.textContent = opacityVal + '%';
+        }
+        if (blurInput) {
+          blurInput.value = blurVal;
+          const valEl = document.getElementById('profile-bg-blur-value');
+          if (valEl) valEl.textContent = parseFloat(blurVal).toFixed(1) + 'px';
+        }
+        
+        // Cargar estado de eliminación de fondo customizado
+        const deleteBgBtn = document.getElementById('profile-bg-delete-btn');
+        if (deleteBgBtn) {
+          deleteBgBtn.style.display = user.bg_custom_url ? 'flex' : 'none';
+        }
+        
+        // Ajustar visibilidad de sliders según el preset cargado
+        window.handleBgPresetChange(presetVal, false);
       } catch (e) { /* cache corrupto, se ignora */ }
     }
 
@@ -255,6 +377,24 @@
   let pendingAvatarFile = null;
   let pendingAvatarPreviewUrl = null;
   let pendingAvatarRemove = false;
+
+  // Fondo personalizado pendiente
+  let pendingBgFile = null;
+  let pendingBgPreviewUrl = null;
+  let pendingBgRemove = false;
+
+  function discardPendingBg() {
+    pendingBgFile = null;
+    pendingBgRemove = false;
+    if (pendingBgPreviewUrl) {
+      URL.revokeObjectURL(pendingBgPreviewUrl);
+      pendingBgPreviewUrl = null;
+    }
+    const input = document.getElementById('profile-bg-input');
+    if (input) input.value = '';
+    const errorEl = document.getElementById('profile-bg-error');
+    if (errorEl) errorEl.textContent = '';
+  }
 
   function discardPendingAvatar() {
     pendingAvatarFile = null;
@@ -293,7 +433,14 @@
 
   function closeProfileModal() {
     discardPendingAvatar();
+    discardPendingBg();
     document.getElementById('profile-edit-overlay').classList.remove('open');
+    
+    // Restaurar el fondo guardado en la base de datos si se cancelaron los cambios
+    const cached = getStoredUser();
+    if (cached) {
+      try { applyUserToDOM(JSON.parse(cached)); } catch (e) {}
+    }
   }
 
   function handleAvatarFileChange(e) {
@@ -347,6 +494,57 @@
     if (deleteBtn) deleteBtn.style.display = 'none';
   }
 
+  window.handleBgFileChange = function(e) {
+    const file = e.target.files[0];
+    const errorEl = document.getElementById('profile-bg-error');
+    errorEl.textContent = '';
+    if (!file) return;
+
+    const allowedTypes = ['image/png', 'image/jpeg'];
+    if (!allowedTypes.includes(file.type)) {
+      errorEl.textContent = 'Solo se permiten imágenes PNG o JPG.';
+      e.target.value = '';
+      return;
+    }
+
+    if (pendingBgPreviewUrl) {
+      URL.revokeObjectURL(pendingBgPreviewUrl);
+    }
+    pendingBgFile = file;
+    pendingBgPreviewUrl = URL.createObjectURL(file);
+    pendingBgRemove = false;
+
+    const bgEl = document.getElementById('js-dashboard-bg');
+    if (bgEl) {
+      bgEl.style.setProperty('--bg-url', `url('${pendingBgPreviewUrl}')`);
+    }
+
+    const deleteBtn = document.getElementById('profile-bg-delete-btn');
+    if (deleteBtn) deleteBtn.style.display = 'flex';
+  };
+
+  window.handleBgDelete = function() {
+    if (pendingBgPreviewUrl) {
+      URL.revokeObjectURL(pendingBgPreviewUrl);
+      pendingBgPreviewUrl = null;
+    }
+    pendingBgFile = null;
+    pendingBgRemove = true;
+
+    const input = document.getElementById('profile-bg-input');
+    if (input) input.value = '';
+    const errorEl = document.getElementById('profile-bg-error');
+    if (errorEl) errorEl.textContent = '';
+
+    const bgEl = document.getElementById('js-dashboard-bg');
+    if (bgEl) {
+      bgEl.style.setProperty('--bg-url', 'none');
+    }
+
+    const deleteBtn = document.getElementById('profile-bg-delete-btn');
+    if (deleteBtn) deleteBtn.style.display = 'none';
+  };
+
   async function uploadPendingAvatar(token) {
     const formData = new FormData();
     formData.append('avatar', pendingAvatarFile);
@@ -387,6 +585,46 @@
     return data;
   }
 
+  async function uploadPendingBg(token) {
+    const formData = new FormData();
+    formData.append('background', pendingBgFile);
+
+    const response = await fetch('/api/profile/background', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: formData
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      const errorEl = document.getElementById('profile-bg-error');
+      if (errorEl) errorEl.textContent = data.errors?.background?.[0] || data.message || 'No se pudo actualizar el fondo.';
+      throw new Error('bg-upload-failed');
+    }
+    return data;
+  }
+
+  async function deleteCustomBgNow(token) {
+    const response = await fetch('/api/profile/background', {
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + token
+      }
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      const errorEl = document.getElementById('profile-bg-error');
+      if (errorEl) errorEl.textContent = data.message || 'No se pudo eliminar el fondo.';
+      throw new Error('bg-delete-failed');
+    }
+    return data;
+  }
+
   async function handleProfileSubmit(e) {
     e.preventDefault();
     clearProfileFormErrors();
@@ -397,8 +635,12 @@
     const nombre = document.getElementById('profile-nombre').value.trim();
     const legajo = document.getElementById('profile-legajo').value.trim();
     const email = document.getElementById('profile-email').value.trim();
-
-    const btn = document.querySelector('#profile-edit-form .contact-btn-send');
+    
+    const bg_preset = document.getElementById('profile-bg-preset').value;
+    const bg_opacity = parseInt(document.getElementById('profile-bg-opacity').value, 10);
+    const bg_blur = parseFloat(document.getElementById('profile-bg-blur').value);
+    
+    const btn = document.querySelector('#profile-edit-form button[type="submit"]');
     const original = btn.textContent;
     btn.disabled = true;
 
@@ -410,7 +652,7 @@
           'Accept': 'application/json',
           'Authorization': 'Bearer ' + token
         },
-        body: JSON.stringify({ nombre, legajo: legajo || null, email })
+        body: JSON.stringify({ nombre, legajo: legajo || null, email, bg_preset, bg_opacity, bg_blur })
       });
 
       let data = await response.json();
@@ -434,6 +676,20 @@
       } else if (pendingAvatarRemove) {
         data = await deleteAvatarNow(token);
         pendingAvatarRemove = false;
+      }
+
+      // Si el usuario subió fondo nuevo o marcó eliminarlo
+      if (bg_preset === 'custom' && pendingBgFile) {
+        data = await uploadPendingBg(token);
+        pendingBgFile = null;
+        if (pendingBgPreviewUrl) {
+          URL.revokeObjectURL(pendingBgPreviewUrl);
+          pendingBgPreviewUrl = null;
+        }
+      } else if (pendingBgRemove || (bg_preset !== 'custom' && pendingBgFile)) {
+        data = await deleteCustomBgNow(token);
+        pendingBgRemove = false;
+        pendingBgFile = null;
       }
 
       // Guardar en el mismo storage donde ya vive el token y refrescar la UI.

@@ -564,6 +564,11 @@
                         <i data-lucide="mail" style="width: 20px; height: 20px; stroke-width: 2; color: var(--brand); flex-shrink: 0;"></i>
                         <span>soporte@cursus.utn.edu.ar</span>
                     </div>
+
+                    <!-- Mapa de Google (Requisito examen) -->
+                    <div style="margin-top: 25px; border-radius: var(--r); overflow: hidden; border: 1px solid var(--card-border); box-shadow: var(--card-shadow); height: 220px; width: 100%;">
+                        <iframe src="https://maps.google.com/maps?q=UTN%20Facultad%20Regional%20Haedo,%20Par%C3%ADs%20532,%20Haedo&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
                 </div>
             </div>
 

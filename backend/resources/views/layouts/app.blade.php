@@ -10,9 +10,40 @@
   <link rel="icon" href="{{ asset('assets/icons/cursus-logo.svg') }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ asset('css/components/pomo-float.css') }}">
   @stack('styles')
+  <style>
+    .dashboard-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: var(--bg-url);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: var(--bg-opacity);
+        filter: grayscale(15%) blur(var(--bg-blur));
+        z-index: -2;
+        pointer-events: none;
+        transition: opacity 0.3s, filter 0.3s, background-image 0.3s;
+    }
+    .contact-range {
+        width: 100%;
+        height: 6px;
+        background: var(--card-border);
+        border-radius: 3px;
+        outline: none;
+        accent-color: var(--brand);
+        margin-top: 8px;
+        cursor: pointer;
+    }
+  </style>
 </head>
 
 <body style="visibility:hidden" class="{{ Request::routeIs('admin.*') ? 'route-admin' : '' }}">
+  <!-- FONDO PERSONALIZABLE DEL PANEL -->
+  <div class="dashboard-bg" id="js-dashboard-bg" style="--bg-url: none; --bg-opacity: 0.10; --bg-blur: 1.8px;"></div>
+
   <script>
     if (localStorage.getItem('sidebar_collapsed') === 'true') {
       document.body.classList.add('sidebar-collapsed');
@@ -282,6 +313,52 @@
           <label for="profile-email">Email</label>
           <input type="email" id="profile-email" class="contact-input" placeholder="nombre@ejemplo.com" required>
           <span id="profile-email-error" class="error-message"></span>
+        </div>
+        
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--brand); margin-top: 20px; margin-bottom: 12px; letter-spacing: 0.75px;">
+          Personalización de Pantalla
+        </div>
+        
+        <div class="contact-field">
+          <label for="profile-bg-preset">Fondo de Pantalla</label>
+          <select id="profile-bg-preset" class="contact-input" onchange="window.handleBgPresetChange(this.value)">
+            <option value="none">Sin imagen (Fondo plano)</option>
+            <option value="utn-haedo">Fondo UTN Haedo (Escudo + Logo)</option>
+            <option value="utn-building">Fondo UTN Haedo (Edificio)</option>
+            <option value="study-cozy">Escritorio Cozy (Programación)</option>
+            <option value="code-abstract">Código Abstracto (Cyberpunk)</option>
+            <option value="lofi-room">Habitación Lo-Fi (Estilo de estudio)</option>
+            <option value="custom">Subir imagen propia...</option>
+          </select>
+        </div>
+
+        <div class="contact-field" id="profile-bg-upload-container" style="display: none; margin-top: 10px;">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button type="button" class="profile-bg-select-btn" style="background: var(--brand); color: white; border: none; padding: 8px 16px; font-size: 13px; border-radius: 6px; width: auto; cursor: pointer;" onclick="document.getElementById('profile-bg-input').click()">
+              Seleccionar imagen
+            </button>
+            <button type="button" class="contact-btn-cancel" id="profile-bg-delete-btn" style="background: #ef4444; color: white; border: none; padding: 8px 16px; font-size: 13px; border-radius: 6px; display: none; width: auto;" onclick="window.handleBgDelete()">
+              Eliminar imagen
+            </button>
+          </div>
+          <input type="file" id="profile-bg-input" accept="image/png,image/jpeg" style="display:none;" onchange="window.handleBgFileChange(event)">
+          <span id="profile-bg-error" class="error-message" style="display:block; margin-top: 6px;"></span>
+        </div>
+
+        <div class="contact-field" id="profile-bg-opacity-container" style="display: none;">
+          <label for="profile-bg-opacity" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Opacidad de la imagen</span>
+            <span id="profile-bg-opacity-value" style="font-weight: 600; color: var(--brand);">10%</span>
+          </label>
+          <input type="range" id="profile-bg-opacity" min="0" max="30" step="1" value="10" class="contact-range" oninput="window.handleBgOpacityInput(this.value)">
+        </div>
+
+        <div class="contact-field" id="profile-bg-blur-container" style="display: none;">
+          <label for="profile-bg-blur" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Desenfoque (Blur)</span>
+            <span id="profile-bg-blur-value" style="font-weight: 600; color: var(--brand);">1.8px</span>
+          </label>
+          <input type="range" id="profile-bg-blur" min="0" max="8" step="0.2" value="1.8" class="contact-range" oninput="window.handleBgBlurInput(this.value)">
         </div>
         <div class="contact-footer">
           <button type="button" class="btn-change-pwd" onclick="window.openChangePasswordModal()">
