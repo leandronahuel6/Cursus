@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('config_pomodoro', function (Blueprint $table) {
             $table->foreignId('usuario_id')->primary()->constrained('users')->onDelete('cascade');
+            $table->enum('preset_activo', ['classic', 'deep', 'short', 'custom'])->default('classic');
             $table->integer('tiempo_enfoque')->default(25);
             $table->integer('descanso_corto')->default(5);
             $table->integer('descanso_largo')->default(20);
             $table->integer('sesiones_por_ciclo')->default(4);
             $table->integer('ciclos_totales')->nullable()->default(null);
-            $table->enum('sonido_alarma', ['chime', 'beep', 'zen', 'none'])->default('chime');
+            $table->enum('sonido_alarma', ['chime', 'beep', 'zen'])->default('chime');
             $table->boolean('modo_estricto')->default(false);
             $table->boolean('reproducir_alarma')->default(true);
             $table->boolean('mostrar_widget')->default(true);

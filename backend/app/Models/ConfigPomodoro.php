@@ -12,6 +12,7 @@ class ConfigPomodoro extends Model
 
     protected $fillable = [
         'usuario_id',
+        'preset_activo',
         'tiempo_enfoque',
         'descanso_corto',
         'descanso_largo',

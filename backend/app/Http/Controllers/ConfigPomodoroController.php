@@ -16,6 +16,7 @@ class ConfigPomodoroController extends Controller
         $config = ConfigPomodoro::firstOrCreate(
             ['usuario_id' => $request->user()->id],
             [
+                'preset_activo' => 'classic',
                 'tiempo_enfoque' => 25,
                 'descanso_corto' => 5,
                 'descanso_largo' => 20,
@@ -38,12 +39,13 @@ class ConfigPomodoroController extends Controller
     public function update(Request $request)
     {
         $data = $request->validate([
+            'preset_activo' => 'in:classic,deep,short,custom',
             'tiempo_enfoque' => 'integer|min:1|max:90',
             'descanso_corto' => 'integer|min:1|max:30',
             'descanso_largo' => 'integer|min:5|max:60',
             'sesiones_por_ciclo' => 'integer|min:1|max:8',
             'ciclos_totales' => 'nullable|integer|min:1|max:10',
-            'sonido_alarma' => 'in:chime,beep,zen,none',
+            'sonido_alarma' => 'in:chime,beep,zen',
             'modo_estricto' => 'boolean',
             'reproducir_alarma' => 'boolean',
             'mostrar_widget' => 'boolean',
