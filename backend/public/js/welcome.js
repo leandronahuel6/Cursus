@@ -569,6 +569,38 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // 9. Scrollspy (Highlight active nav link based on scroll position)
+    const navLinks = document.querySelectorAll('.landing-nav a');
+    const sections = document.querySelectorAll('section[id]');
+
+    if (navLinks.length > 0 && sections.length > 0) {
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -65% 0px', // Triggers when section occupies middle of viewport
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const activeId = entry.target.getAttribute('id');
+                    navLinks.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (href === `#${activeId}` || href.endsWith(`#${activeId}`)) {
+                            link.classList.add('active-link');
+                        } else {
+                            link.classList.remove('active-link');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    }
 });
 
 
