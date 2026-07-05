@@ -29,6 +29,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/profile', [AuthController::class, 'updateProfile']);
     Route::post('/profile/avatar', [AuthController::class, 'updateAvatar']);
     Route::delete('/profile/avatar', [AuthController::class, 'deleteAvatar']);
+    Route::post('/profile/background', [AuthController::class, 'updateCustomBg']);
+    Route::delete('/profile/background', [AuthController::class, 'deleteCustomBg']);
     Route::put('/change-password', [AuthController::class, 'changePassword']);
     Route::get('/user', function (Request $request) {
         return $request->user();
@@ -89,7 +91,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/flashcards/cards/{card}', [FlashcardController::class, 'updateCard']);
     Route::delete('/flashcards/cards/{card}', [FlashcardController::class, 'destroyCard']);
     Route::post('/flashcards/cards/{card}/resultado', [FlashcardController::class, 'recordResult']);
-
+    Route::post('/flashcards/cards/generate-distractors', [FlashcardController::class, 'generateDistractors']);
+    
     // Rutas de administración
     Route::middleware('admin')->prefix('admin')->group(function () {
         Route::get('/alumnos/buscar', [AdminController::class, 'buscarAlumno']);
@@ -101,5 +104,5 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/plan-estudios/{id}', [AdminController::class, 'updateMateria']);
         Route::delete('/plan-estudios/{id}', [AdminController::class, 'destroyMateria']);
     });
-    Route::post('/flashcards/cards/generate-distractors', [FlashcardController::class, 'generateDistractors']);
+    
 });
