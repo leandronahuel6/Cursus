@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacto — Cursus UTN Haedo</title>
+    <link rel="icon" href="{{ asset('assets/icons/cursus-logo.svg') }}" type="image/svg+xml">
 
     <!-- Google Fonts: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -77,28 +78,7 @@
         }
 
         /* BACKGROUND BLOBS FLOTANTES */
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            z-index: -1;
-            opacity: 0.35;
-            transition: all 0.5s ease;
-        }
-        .blob-1 {
-            width: 350px;
-            height: 350px;
-            background: #818cf8;
-            top: -50px;
-            left: -50px;
-        }
-        .blob-2 {
-            width: 400px;
-            height: 400px;
-            background: #22d3ee;
-            bottom: 10%;
-            right: -100px;
-        }
+
 
         /* HEADER */
         .landing-header {
@@ -217,15 +197,19 @@
         body.dark-mode .theme-toggle-btn .icon-sun { display: block; }
         body.dark-mode .theme-toggle-btn .icon-moon { display: none; }
 
-        /* CONTACT CONTAINER */
-        .contact-bg-wrapper {
-            width: 100%;
+        .contact-page {
             position: relative;
             overflow: hidden;
+            padding: 130px 5% 80px 5%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
             background-color: var(--bg-color);
-            border-bottom: 1px solid var(--hero-border);
+            box-sizing: border-box;
         }
-        .contact-bg-wrapper::before {
+        .contact-page::before {
             content: "";
             position: absolute;
             top: 0;
@@ -237,20 +221,12 @@
             background-position: center;
             background-repeat: no-repeat;
             opacity: var(--hero-img-opacity, 0.12);
-            filter: grayscale(15%) blur(1.5px);
+            filter: grayscale(15%) blur(1.8px);
             z-index: 1;
         }
-        .contact-page {
+        .contact-layout {
             position: relative;
             z-index: 2;
-            padding: 130px 5% 80px 5%;
-            min-height: calc(100vh - 120px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-        }
-        .contact-layout {
             display: grid;
             grid-template-columns: 1fr 1.2fr;
             gap: 60px;
@@ -435,6 +411,8 @@
         /* FOOTER */
         .landing-footer {
             background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-top: 1px solid var(--card-border);
             padding: 40px 5% 30px 5%;
             z-index: 5;
@@ -527,9 +505,7 @@
 </head>
 <body>
 
-    <!-- BACKGROUND BLOBS FLOTANTES -->
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
+
 
     <!-- HEADER / NAVBAR sticky -->
     <header class="landing-header">
@@ -568,9 +544,8 @@
     </header>
 
     <!-- CONTAINER PRINCIPAL DE LA PÁGINA DE CONTACTO -->
-    <div class="contact-bg-wrapper" style="--hero-bg-url: url('{{ asset('assets/img/contact_bg.png') }}');">
-        <main class="contact-page">
-            <div class="contact-layout">
+    <main class="contact-page" style="--hero-bg-url: url('{{ asset('assets/img/contact_bg.png') }}');">
+        <div class="contact-layout">
                 <div class="contact-info">
                     <div>
                         <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; color: var(--brand); display: block; margin-bottom: 12px;">Contacto</span>
@@ -627,7 +602,6 @@
             </form>
         </div>
     </main>
-</div>
 
     <!-- FOOTER -->
     <footer class="landing-footer">
