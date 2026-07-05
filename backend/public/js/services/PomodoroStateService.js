@@ -160,7 +160,16 @@ class PomodoroStateService extends EventTarget {
                 const eraValidoElTimestamp = savedState.timestamp_ultimo_cambio > 0;
 
                 if (eraValidoElTimestamp && horasPasadas >= 4) {
-                    // Abandono de larga duración: la sesión expiró, limpiar y notificar
+                    // Abandono de larga duración: la sesión expiró, registrar como abandonada si hubo progreso
+                    if (savedState.fase_actual === 'enfoque') {
+                        const maxSeconds = this._settings.focusTime * 60;
+                        const elapsedSeconds = maxSeconds - savedState.tiempo_restante;
+                        const elapsedMin = Math.floor(elapsedSeconds / 60);
+                        if (elapsedMin > 0) {
+                            this._registrarInterrupcionSesion(elapsedMin, 'abandonada');
+                        }
+                    }
+
                     this._toast('Sesión de estudio anterior expirada por inactividad (>4 hs).', 'warn');
                     this._resetearADefecto();
 
@@ -643,15 +652,17 @@ class PomodoroStateService extends EventTarget {
         this._agregarLogParcial(elapsedMin, estado);
         
         const rawMateria = localStorage.getItem('cursus_selected_materia');
-        const materiaId = rawMateria ? parseInt(rawMateria, 10) : null;
+        const materiaId = (rawMateria && rawMateria !== 'independiente') ? parseInt(rawMateria, 10) : null;
+        
+        // Evitar registrar si hay un rawMateria inválido distinto de 'independiente'
+        if (rawMateria && rawMateria !== 'independiente' && isNaN(materiaId)) return;
+
         const duracionSegundos = elapsedMin * 60;
         
-        if (!(rawMateria && isNaN(materiaId))) {
-            if (estado === 'completada_parcial') {
-                ApiService.registrarSesionParcial(materiaId, duracionSegundos).catch(() => console.warn('No se pudo registrar la sesión parcial'));
-            } else {
-                ApiService.registrarSesionAbandonada(materiaId, duracionSegundos).catch(() => console.warn('No se pudo registrar la sesión abandonada'));
-            }
+        if (estado === 'completada_parcial') {
+            ApiService.registrarSesionParcial(materiaId, duracionSegundos).catch(() => console.warn('No se pudo registrar la sesión parcial'));
+        } else {
+            ApiService.registrarSesionAbandonada(materiaId, duracionSegundos).catch(() => console.warn('No se pudo registrar la sesión abandonada'));
         }
     }
 
@@ -734,8 +745,9 @@ class PomodoroStateService extends EventTarget {
      */
     _registrarSesionEnBackend(duracionSegundos) {
         const rawMateria = localStorage.getItem('cursus_selected_materia');
-        const materiaId = rawMateria ? parseInt(rawMateria, 10) : null;
-        if (rawMateria && isNaN(materiaId)) return;
+        const materiaId = (rawMateria && rawMateria !== 'independiente') ? parseInt(rawMateria, 10) : null;
+        
+        if (rawMateria && rawMateria !== 'independiente' && isNaN(materiaId)) return;
 
         if (!navigator.locks) {
             this._registrarConTokenLegacy(materiaId, duracionSegundos);
