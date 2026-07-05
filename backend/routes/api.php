@@ -15,6 +15,7 @@ use App\Http\Controllers\RecordatorioCuotaController;
 use App\Http\Controllers\PagoCuotaController;
 use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ConfigPomodoroController;
 
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
@@ -49,8 +50,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/horarios/compartido/{userId}', [HorarioController::class, 'sharedSchedule']);
     Route::get('/horarios/buscar-usuario', [HorarioController::class, 'findUser']);
 
+    Route::get('/pomodoro/config', [ConfigPomodoroController::class, 'show']);
+    Route::put('/pomodoro/config', [ConfigPomodoroController::class, 'update']);
     Route::post('/pomodoro/sesiones', [SesionPomodoroController::class, 'store']);
     Route::get('/pomodoro/resumen', [SesionPomodoroController::class, 'resumenUsuario']);
+    Route::get('/pomodoro/resumen-independiente', [SesionPomodoroController::class, 'resumenIndependiente']);
     Route::get('/pomodoro/productividad', [SesionPomodoroController::class, 'productividad']);
     Route::get('/materias/{materia}/pomodoro-resumen', [SesionPomodoroController::class, 'resumenMateria']);
 
@@ -58,8 +62,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/tareas/pendientes-count', [TareaController::class, 'pendientesCount']);
     Route::get('/tareas', [TareaController::class, 'index']);
     Route::post('/tareas', [TareaController::class, 'store']);
+    Route::put('/tareas/mover', [TareaController::class, 'mover']);
     Route::put('/tareas/{tarea}', [TareaController::class, 'update']);
     Route::delete('/tareas/{tarea}', [TareaController::class, 'destroy']);
+    Route::post('/tareas/{tarea}/subtareas', [TareaController::class, 'storeSubtarea']);
+    Route::put('/subtareas/{subtarea}', [TareaController::class, 'updateSubtarea']);
+    Route::delete('/subtareas/{subtarea}', [TareaController::class, 'destroySubtarea']);
 
     Route::get('/marcadores', [MarcadorController::class, 'index']);
     Route::post('/marcadores', [MarcadorController::class, 'store']);

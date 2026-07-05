@@ -24,6 +24,10 @@ import { pomodoroService, LS_KEYS }    from '../services/PomodoroStateService.js
 import { ApiService }                  from '../services/ApiService.js';
 import { ESTADOS_POMO }                from '../models/PomodoroStates.js';
 import { playPomoAlarm, unlockPomoAudio } from '../shared/pomo-audio-player.js';
+import { KanbanManager }               from './kanban.js';
+import { toggleLofiPanel, changeLofiChannel } from './lofi-panel.js';
+import { PomodoroSyncQueue }           from '../services/PomodoroSyncQueue.js';
+
 
 /* ==========================================================================
    CONSTANTES DE PRESENTACIÓN
@@ -46,7 +50,7 @@ const COLUMNA_UI_TO_DB = { pending: 'pendiente', progress: 'progreso', done: 'fi
    ========================================================================== */
 
 /** Lista activa de tareas en memoria (espejo local de la BD). */
-let tasks = [];
+
 
 /** Lista activa de marcadores en memoria (espejo local de la BD). */
 let bookmarks = [];
@@ -185,18 +189,58 @@ function renderTimerPrincipal(snapshot) {
 
     // --- Log de sesiones ---
     const logList = document.getElementById('slog-list');
-    if (logList) {
-        logList.innerHTML = '';
-        ciclos.log.forEach(row => {
-            const div = document.createElement('div');
-            div.className = 'slog-row';
-            div.innerHTML = `
-              <span class="slog-t">${row.time}</span>
-              <span class="slog-d">${row.duration}</span>
-              <span class="slog-ok">${row.status}</span>
-            `;
-            logList.appendChild(div);
+    const logHash = JSON.stringify(ciclos.log);
+    
+    if (logList && window._lastLogHash !== logHash) {
+        window._lastLogHash = logHash;
+        
+        // Mapear nodos existentes por su hash interno para reutilizarlos de forma segura
+        const existingNodes = {};
+        Array.from(logList.children).forEach(child => {
+            if (child._rowHash) existingNodes[child._rowHash] = child;
         });
+        
+        // Reconstruir la lista en el orden exacto del array
+        ciclos.log.forEach(row => {
+            const rowHash = JSON.stringify(row);
+            let node = existingNodes[rowHash];
+            
+            if (!node) {
+                node = document.createElement('div');
+                node.className = 'slog-row';
+                node._rowHash = rowHash;
+                
+                const warningIconHtml = row.status.isOffline 
+                    ? `<svg class="slog-icon" style="color:#f59e0b; cursor:help; margin-left: 12px;" aria-label="Pendiente de sincronizar (Offline)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Pendiente de sincronizar (Offline)</title><path d="M12 12v4"/><path d="M12 20h.01"/><path d="M8.128 16.949A7 7 0 1 1 15.71 8h1.79a1 1 0 0 1 0 9h-1.642"/></svg>` 
+                    : '';
+                    
+                let statusIconHtml = `<svg class="slog-icon"><use href="/assets/icons/sprite.svg#${row.status.icon}"></use></svg>`;
+                if (row.status.isOffline) {
+                    const paths = {
+                        'check-check': '<path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/>',
+                        'check': '<path d="M20 6 9 17l-5-5"/>',
+                        'x': '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'
+                    };
+                    statusIconHtml = `<svg class="slog-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths[row.status.icon] || ''}</svg>`;
+                }
+
+                node.innerHTML = `
+                  <span class="slog-t">${row.time}</span>
+                  <span class="slog-d">${row.duration}</span>
+                  ${warningIconHtml}
+                  <span class="slog-ok ${row.status.class}">
+                    ${statusIconHtml}
+                    ${row.status.text}
+                  </span>
+                `;
+            }
+            
+            logList.appendChild(node);
+            delete existingNodes[rowHash];
+        });
+        
+        // Eliminar los nodos que ya no están en ciclos.log
+        Object.values(existingNodes).forEach(node => node.remove());
     }
 }
 
@@ -467,34 +511,36 @@ function saveCustomPomoSettings() {
  * (descripción, subtareas) que no están en el backend todavía.
  */
 async function loadAppState() {
+    KanbanManager.setMateriaId(selectedMateriaId);
+    
     if (!selectedMateriaId) {
-        tasks     = [];
+        KanbanManager.updateTasks([]);
         bookmarks = [];
-        renderKanban();
         renderBookmarks();
         return;
     }
 
-    const localTasks = localStorage.getItem('cursus_tasks_v2');
-    const savedLocalTasks = localTasks ? JSON.parse(localTasks) : [];
+    const localTasksData = JSON.parse(localStorage.getItem('cursus_tasks_v2') || '[]');
 
     // Cargar tareas desde la BD
     try {
         const dbTasks = await ApiService.getTareas(selectedMateriaId);
-        tasks = dbTasks.map(t => {
-            const localMatch = savedLocalTasks.find(lt => lt.id == t.id);
+        const dbTasksMapped = dbTasks.map(t => {
+            const localMatch = localTasksData.find(lt => String(lt.id) === String(t.id));
             return {
                 id:          String(t.id),
-                column:      COLUMNA_DB_TO_UI[t.columna] || 'pending',
                 title:       t.titulo,
+                column:      COLUMNA_DB_TO_UI[t.columna],
                 dueDate:     t.fecha_vencimiento ? t.fecha_vencimiento.substring(0, 16) : '',
+                orden:       t.orden,
                 description: localMatch ? localMatch.description : '',
                 subtasks:    localMatch ? localMatch.subtasks : [],
             };
         });
+        KanbanManager.updateTasks(dbTasksMapped);
     } catch (e) {
         console.error('Error cargando tareas DB', e);
-        tasks = [];
+        KanbanManager.updateTasks([]);
     }
 
     // Cargar marcadores desde la BD
@@ -510,514 +556,13 @@ async function loadAppState() {
         bookmarks = [];
     }
 
-    renderKanban();
+    // RenderBookmarks
     renderBookmarks();
-}
-
-/**
- * Persiste la lista de tareas actual en LocalStorage como caché local.
- * Solo guarda los campos que no están en la BD (descripción y subtareas).
- */
-function saveTasksToLocal() {
-    localStorage.setItem('cursus_tasks_v2', JSON.stringify(tasks));
 }
 
 /** Persiste la lista de marcadores en LocalStorage (caché de respaldo). */
 function saveBookmarksToLocal() {
     localStorage.setItem('cursus_bookmarks_v2', JSON.stringify(bookmarks));
-}
-
-/* ==========================================================================
-   KANBAN — Renderizado
-   ========================================================================== */
-
-/**
- * Renderiza las tres columnas del tablero Kanban con las tarjetas actuales.
- * Actualiza también el componente de meta activa del Modo Concentración.
- */
-function renderKanban() {
-    const cols = ['pending', 'progress', 'done'];
-    cols.forEach(col => {
-        const container = document.getElementById(`cards-${col}`);
-        if (!container) return;
-        container.innerHTML = '';
-        const colTasks = tasks.filter(t => t.column === col);
-        const cntEl    = document.getElementById(`cnt-${col}`);
-        if (cntEl) cntEl.textContent = colTasks.length;
-
-        colTasks.forEach(task => {
-            const card = document.createElement('div');
-            card.className = 'kbcard';
-            card.id        = task.id;
-            card.draggable = true;
-
-            card.addEventListener('dragstart', (e) => dragStart(e, task.id));
-            card.addEventListener('dragend', dragEnd);
-            card.addEventListener('click', (e) => {
-                if (e.target.closest('.kb-del')) return;
-                openTaskModal(task.id);
-            });
-
-            // --- Meta indicators (fecha y subtareas) ---
-            let metaHtml = '';
-            if (task.dueDate) {
-                const [datePart, timePart] = task.dueDate.split('T');
-                const [y, m, d] = datePart.split('-');
-                const date       = new Date(y, m - 1, d);
-                const currentYear = new Date().getFullYear();
-                let dateStr = date.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
-                if (date.getFullYear() !== currentYear) dateStr += ` ${date.getFullYear()}`;
-                if (timePart) dateStr += ` · ${timePart.substring(0, 5)}`;
-                const today    = new Date(); today.setHours(0, 0, 0, 0);
-                const isOverdue = date < today && task.column !== 'done';
-                metaHtml += `
-                  <div class="kb-meta ${isOverdue ? 'urg' : ''}">
-                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 1v2M11 1v2M2 6h12"/></svg>
-                    <span>Vence ${dateStr}</span>
-                  </div>
-                `;
-            }
-            if (task.subtasks && task.subtasks.length > 0) {
-                const completed = task.subtasks.filter(s => s.completed).length;
-                metaHtml += `
-                  <div class="kb-meta">
-                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="10" height="10" rx="1.5"/><path d="M6 8l1.5 1.5L10 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <span>Subtareas ${completed}/${task.subtasks.length}</span>
-                  </div>
-                `;
-            }
-
-            card.innerHTML = `
-              <div class="kb-title">${escapeHTML(task.title)}</div>
-              <div class="kb-meta-wrap">${metaHtml}</div>
-              <button class="kb-del" title="Eliminar tarea">
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h10M5 6v7a1 1 0 001 1h4a1 1 0 001-1V6M6 3.5V2a.5.5 0 01.5-.5h3a.5.5 0 01.5.5v1.5"/></svg>
-              </button>
-            `;
-            card.querySelector('.kb-del').addEventListener('click', () => {
-                openConfirm(`¿Desea eliminar la tarea "${task.title}"?`, () => deleteTask(task.id));
-            });
-            container.appendChild(card);
-        });
-    });
-    if (typeof updateFocusActiveGoal === 'function') updateFocusActiveGoal();
-}
-
-/* ==========================================================================
-   KANBAN — Creación Inline
-   ========================================================================== */
-
-/**
- * Muestra el formulario inline de creación rápida de tareas en una columna.
- * @param {string} col - Columna destino ('pending' | 'progress' | 'done').
- */
-function showInlineAddCardForm(col) {
-    cancelAllInlineForms();
-    const container = document.getElementById(`add-form-container-${col}`);
-    const btnAdd    = document.getElementById(`btn-add-${col}`);
-    if (!container || !btnAdd) return;
-    btnAdd.style.display = 'none';
-
-    const form = document.createElement('div');
-    form.className = 'kb-add-form';
-    form.id        = `inline-form-${col}`;
-    form.innerHTML = `
-      <textarea class="kb-add-inp" id="inline-inp-${col}" placeholder="Introduce el título de la tarea..." required></textarea>
-      <div class="kb-add-btns">
-        <button class="kb-add-btn-save" onclick="window.saveInlineCard('${col}')">Añadir tarea</button>
-        <button class="kb-add-btn-cancel" onclick="window.cancelInlineAddCard('${col}')">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg>
-        </button>
-      </div>
-    `;
-    container.appendChild(form);
-
-    const textarea = form.querySelector('textarea');
-    textarea.focus();
-    textarea.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); saveInlineCard(col); }
-    });
-    // Guardado/cancelado implícito al perder foco (con delay para no pisar clics explícitos)
-    textarea.addEventListener('blur', () => {
-        setTimeout(() => {
-            const activeEl = document.activeElement;
-            if (activeEl && activeEl.closest(`#inline-form-${col}`)) return;
-            if (textarea.value.trim()) saveInlineCard(col);
-            else cancelInlineAddCard(col);
-        }, 150);
-    });
-}
-
-/**
- * Cancela y elimina el formulario inline de una columna específica.
- * @param {string} col - Columna del formulario a cancelar.
- */
-function cancelInlineAddCard(col) {
-    const form = document.getElementById(`inline-form-${col}`);
-    if (form) form.remove();
-    const btn = document.getElementById(`btn-add-${col}`);
-    if (btn) btn.style.display = 'block';
-}
-
-/** Cancela todos los formularios inline activos en las tres columnas. */
-function cancelAllInlineForms() {
-    ['pending', 'progress', 'done'].forEach(col => cancelInlineAddCard(col));
-}
-
-/**
- * Guarda la tarjeta del formulario inline creando la tarea en la BD.
- * @param {string} col - Columna de destino.
- */
-function saveInlineCard(col) {
-    const input = document.getElementById(`inline-inp-${col}`);
-    if (!input) return;
-    const title = input.value.trim();
-    if (!title) { cancelInlineAddCard(col); return; }
-    if (!selectedMateriaId) { showToast('Elegí una materia primero', 'warn'); return; }
-
-    cancelInlineAddCard(col);
-
-    ApiService.createTarea(selectedMateriaId, title, COLUMNA_UI_TO_DB[col])
-        .then(() => {
-            loadAppState();
-            showToast('Tarea agregada exitosamente', 'success');
-        })
-        .catch(() => showToast('Error creando tarea', 'error'));
-}
-
-/**
- * Elimina una tarea optimísticamente de la UI y luego sincroniza con la BD.
- * En caso de error de red, muestra un toast (no revierte el borrado local
- * porque el usuario ya confirmó la acción en el modal de confirmación previo).
- * @param {string} id - ID de la tarea a eliminar.
- */
-function deleteTask(id) {
-    tasks = tasks.filter(t => t.id !== id);
-    saveTasksToLocal();
-    renderKanban();
-
-    ApiService.deleteTarea(id)
-        .then(() => showToast('Tarea eliminada', 'success'))
-        .catch(() => showToast('Error al eliminar la tarea en el servidor', 'error'));
-}
-
-/* ==========================================================================
-   DRAG & DROP — Kanban con Optimistic UI y Rollback Visual
-   ========================================================================== */
-
-let dragId            = null;
-let dragOriginalCol   = null;
-let dragOriginalSibling = null;
-
-/**
- * Inicia el drag de una tarjeta, guardando su posición original para rollback.
- * @param {DragEvent} e
- * @param {string} id - ID de la tarjeta arrastrada.
- */
-function dragStart(e, id) {
-    dragId = id;
-    const card        = document.getElementById(id);
-    const taskObj     = tasks.find(t => t.id === id);
-    dragOriginalCol   = taskObj ? taskObj.column : null;
-    dragOriginalSibling = card ? card.nextSibling : null;
-    e.dataTransfer.effectAllowed = 'move';
-    setTimeout(() => { if (card) card.classList.add('dragging'); }, 0);
-}
-
-/** Limpia la clase visual de arrastre al soltar. */
-function dragEnd(e) {
-    e.target.classList.remove('dragging');
-}
-
-/** Permite el drop sobre una columna destino. */
-function allowDrop(e) {
-    e.preventDefault();
-    e.currentTarget.classList.add('over');
-}
-
-/** Limpia el estilo de hover al salir de la zona de drop. */
-function leaveDrop(e) {
-    e.currentTarget.classList.remove('over');
-}
-
-/**
- * Maneja el drop de una tarjeta en una columna destino con UI optimista y rollback.
- * @param {DragEvent} e
- * @param {string} col - Columna destino ('pending' | 'progress' | 'done').
- */
-function dropCard(e, col) {
-    e.preventDefault();
-    e.currentTarget.classList.remove('over');
-    if (!dragId) return;
-
-    const card          = document.getElementById(dragId);
-    const taskObj       = tasks.find(t => t.id === dragId);
-    const cardsContainer = document.getElementById(`cards-${col}`);
-    if (!card || !taskObj || !cardsContainer) return;
-
-    // Mover en el DOM optimísticamente
-    cardsContainer.appendChild(card);
-    const oldCol  = taskObj.column;
-    taskObj.column = col;
-    updateCounts();
-
-    const currentDragId = dragId;
-    ApiService.moveTarea(currentDragId, COLUMNA_UI_TO_DB[col])
-        .then(() => {
-            saveTasksToLocal();
-            renderKanban();
-        })
-        .catch(() => {
-            // Rollback: devolver la tarjeta a su posición original
-            taskObj.column = oldCol;
-            updateCounts();
-            const origContainer = document.getElementById(`cards-${oldCol}`);
-            if (origContainer) {
-                if (dragOriginalSibling && dragOriginalSibling.parentNode === origContainer) {
-                    origContainer.insertBefore(card, dragOriginalSibling);
-                } else {
-                    origContainer.appendChild(card);
-                }
-            }
-            card.classList.add('kb-error-shake');
-            setTimeout(() => card.classList.remove('kb-error-shake'), 350);
-            showToast('Error moviendo tarea', 'error');
-        });
-
-    dragId = null;
-}
-
-/** Actualiza los contadores numéricos de las tres columnas del Kanban. */
-function updateCounts() {
-    ['pending', 'progress', 'done'].forEach(col => {
-        const el = document.getElementById(`cnt-${col}`);
-        if (el) el.textContent = tasks.filter(t => t.column === col).length;
-    });
-}
-
-/* ==========================================================================
-   MODAL DE EDICIÓN DE TAREA
-   ========================================================================== */
-
-let currentEditingTaskId = null;
-let subtasksTempList     = [];
-
-/**
- * Abre el modal de edición de una tarea cargando sus datos actuales.
- * @param {string} id - ID de la tarea a editar.
- */
-function openTaskModal(id) {
-    currentEditingTaskId = id;
-    const task = tasks.find(t => t.id === id);
-    if (!task) return;
-
-    document.getElementById('task-modal-col-name').textContent = translateCol(task.column);
-    document.getElementById('task-modal-title').value          = task.title;
-
-    let dueStr = '';
-    if (task.dueDate) {
-        dueStr = task.dueDate.length === 10 ? task.dueDate + 'T00:00' : task.dueDate.substring(0, 16);
-    }
-    document.getElementById('task-modal-due').value  = dueStr;
-    document.getElementById('task-modal-desc').value = task.description || '';
-
-    subtasksTempList = task.subtasks ? JSON.parse(JSON.stringify(task.subtasks)) : [];
-    renderModalSubtasks();
-    hideSubtaskAddInput();
-    document.getElementById('task-modal').classList.add('show');
-}
-
-/** Cierra el modal de edición de tarea y limpia el ID de edición activo. */
-function closeTaskModal() {
-    document.getElementById('task-modal').classList.remove('show');
-    currentEditingTaskId = null;
-}
-
-/**
- * Traduce la clave de columna a texto legible en español.
- * @param {string} col - Clave interna ('pending' | 'progress' | 'done').
- * @returns {string} Etiqueta legible.
- */
-function translateCol(col) {
-    const map = { pending: 'Pendiente', progress: 'En Curso', done: 'Finalizado' };
-    return map[col] || col;
-}
-
-/**
- * Autocompleta la hora a 23:59 si el usuario seleccionó solo fecha sin hora.
- * @param {HTMLInputElement} input - El input datetime-local que disparó el evento.
- */
-function handleDateAutocomplete(input) {
-    if (!input.value) return;
-    const parts = input.value.split('T');
-    if (parts.length === 2 && parts[1] === '00:00') {
-        input.value = `${parts[0]}T23:59:00`;
-    }
-}
-
-/** Renderiza la lista de subtareas en el modal de edición de tarea. */
-function renderModalSubtasks() {
-    const list = document.getElementById('task-modal-subtasks-list');
-    if (!list) return;
-    list.innerHTML = '';
-    subtasksTempList.forEach((sub, index) => {
-        const item = document.createElement('div');
-        item.className = 'subtask-item';
-        item.innerHTML = `
-          <input type="checkbox" class="subtask-chk" ${sub.completed ? 'checked' : ''} onchange="window.toggleSubtaskStatus(${index})">
-          <span class="subtask-txt ${sub.completed ? 'done' : ''}" contenteditable="true" onblur="window.saveSubtaskText(${index}, this)" onkeydown="window.handleSubtaskEnter(event, ${index}, this)">${escapeHTML(sub.text)}</span>
-          <div class="subtask-del" title="Eliminar subtarea" onclick="window.deleteSubtask(${index})">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h10M5 6v7a1 1 0 001 1h4a1 1 0 001-1V6M6 3.5V2a.5.5 0 01.5-.5h3a.5.5 0 01.5.5v1.5"/></svg>
-          </div>
-        `;
-        list.appendChild(item);
-    });
-}
-
-/**
- * Alterna el estado completado de una subtarea y sincroniza con la BD.
- * @param {number} index - Índice de la subtarea en la lista temporal.
- */
-function toggleSubtaskStatus(index) {
-    subtasksTempList[index].completed = !subtasksTempList[index].completed;
-    renderModalSubtasks();
-    saveTaskSubtasksStateOnly();
-}
-
-/**
- * Guarda el texto editado de una subtarea (llamado en onblur del contenteditable).
- * @param {number} index - Índice de la subtarea.
- * @param {HTMLElement} element - El elemento contenteditable.
- */
-function saveSubtaskText(index, element) {
-    const newText = element.textContent.trim();
-    if (newText) {
-        subtasksTempList[index].text = newText;
-    } else {
-        element.textContent = subtasksTempList[index].text;
-    }
-    saveTaskSubtasksStateOnly();
-}
-
-/**
- * Intercepta la tecla Enter en subtareas editables para confirmar sin nueva línea.
- * @param {KeyboardEvent} e
- * @param {number} index
- * @param {HTMLElement} element
- */
-function handleSubtaskEnter(e, index, element) {
-    if (e.key === 'Enter') { e.preventDefault(); element.blur(); }
-}
-
-/**
- * Elimina una subtarea de la lista temporal y sincroniza con la BD.
- * @param {number} index - Índice de la subtarea a eliminar.
- */
-function deleteSubtask(index) {
-    subtasksTempList.splice(index, 1);
-    renderModalSubtasks();
-    saveTaskSubtasksStateOnly();
-}
-
-/** Muestra el campo de entrada para agregar una nueva subtarea. */
-function showSubtaskAddInput() {
-    document.getElementById('subtask-add-form').style.display  = 'flex';
-    document.getElementById('btn-show-subtask-add').style.display = 'none';
-    const input = document.getElementById('subtask-new-txt');
-    input.value = '';
-    input.focus();
-    input.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); saveNewSubtask(); } };
-}
-
-/** Oculta el campo de entrada de nueva subtarea. */
-function hideSubtaskAddInput() {
-    document.getElementById('subtask-add-form').style.display      = 'none';
-    document.getElementById('btn-show-subtask-add').style.display  = 'inline-flex';
-}
-
-/** Crea y guarda una nueva subtarea desde el input de adición. */
-function saveNewSubtask() {
-    const input = document.getElementById('subtask-new-txt');
-    const text  = input.value.trim();
-    if (!text) { hideSubtaskAddInput(); return; }
-    subtasksTempList.push({ id: `s_${Date.now()}`, text, completed: false });
-    renderModalSubtasks();
-    hideSubtaskAddInput();
-    saveTaskSubtasksStateOnly();
-}
-
-/**
- * Persiste el estado de las subtareas en la tarea en memoria y en la BD (optimista).
- * En caso de error de red, aplica rollback al estado anterior.
- */
-function saveTaskSubtasksStateOnly() {
-    const task = tasks.find(t => t.id === currentEditingTaskId);
-    if (!task) return;
-
-    const oldSubtasks  = JSON.parse(JSON.stringify(task.subtasks || []));
-    task.subtasks      = JSON.parse(JSON.stringify(subtasksTempList));
-    saveTasksToLocal();
-    renderKanban();
-
-    ApiService.updateSubtareas(task.id, task.subtasks)
-        .catch(() => {
-            task.subtasks      = oldSubtasks;
-            subtasksTempList   = JSON.parse(JSON.stringify(oldSubtasks));
-            saveTasksToLocal();
-            renderKanban();
-            renderModalSubtasks();
-            showToast('Error sincronizando subtareas', 'error');
-        });
-}
-
-/**
- * Guarda los campos base (título, fecha, descripción) de la tarea editada.
- * Aplica optimistic update con rollback si la petición falla.
- */
-function saveTaskDetails() {
-    const task = tasks.find(t => t.id === currentEditingTaskId);
-    if (!task) return;
-
-    const newTitle = document.getElementById('task-modal-title').value.trim();
-    if (!newTitle) { showToast('El título de la tarea no puede estar vacío', 'error'); return; }
-
-    const oldTitle   = task.title;
-    const oldDueDate = task.dueDate;
-    const oldDesc    = task.description;
-
-    task.title       = newTitle;
-    task.dueDate     = document.getElementById('task-modal-due').value;
-    task.description = document.getElementById('task-modal-desc').value.trim();
-
-    saveTasksToLocal();
-    renderKanban();
-    closeTaskModal();
-
-    ApiService.updateTarea(task.id, { titulo: task.title, fecha_vencimiento: task.dueDate || null })
-        .then(() => {
-            loadAppState();
-            showToast('Tarea actualizada exitosamente', 'success');
-        })
-        .catch(() => {
-            task.title       = oldTitle;
-            task.dueDate     = oldDueDate;
-            task.description = oldDesc;
-            saveTasksToLocal();
-            renderKanban();
-            showToast('Error actualizando tarea', 'error');
-        });
-}
-
-/**
- * Elimina la tarea actualmente abierta en el modal, solicitando confirmación.
- */
-function deleteTaskFromModal() {
-    if (!currentEditingTaskId) return;
-    openConfirm('¿Desea eliminar esta tarea de forma permanente?', () => {
-        const id = currentEditingTaskId;
-        closeTaskModal();
-        deleteTask(id);
-    });
 }
 
 /* ==========================================================================
@@ -1193,6 +738,8 @@ async function loadMateriasCursando() {
         if (badgeEl) badgeEl.textContent = '—';
         selectedMateriaId = null;
         localStorage.removeItem('cursus_selected_materia');
+        loadAppState(); // Limpia Kanban y UI
+        loadMateriaResumen(); // Carga las sesiones independientes (materia_id = NULL)
         return;
     }
 
@@ -1269,9 +816,11 @@ function selectMateria(id) {
  * y sincroniza el log de ciclos del servicio con los datos reales del backend.
  */
 async function loadMateriaResumen() {
-    if (!selectedMateriaId) return;
     try {
-        const data    = await ApiService.getMateriaResumen(selectedMateriaId);
+        const data = selectedMateriaId
+            ? await ApiService.getMateriaResumen(selectedMateriaId)
+            : await ApiService.getResumenIndependiente();
+            
         const hoursEl = document.getElementById('chip-stat-hours');
         const pomosEl = document.getElementById('chip-stat-pomos');
         if (hoursEl) hoursEl.textContent = `${data.horas_semana}h`;
@@ -1280,11 +829,18 @@ async function loadMateriaResumen() {
         // Sincronizar el servicio para que el Observer actualice el log del timer
         pomodoroService.sincronizarCiclosConBackend({
             sesiones_completadas_hoy: data.sesiones_hoy.length,
-            log: data.sesiones_hoy.map(s => ({
-                time:     s.hora,
-                duration: `${Math.floor(s.duracion_segundos / 60)}:00`,
-                status:   '✓ Completada',
-            })),
+            // Revertir para que las sesiones más nuevas queden arriba (como en el modo local)
+            log: data.sesiones_hoy.reverse().map(s => {
+                let statusInfo = { text: 'Completada', class: 'status-completada', icon: 'check-check', isOffline: false };
+                if (s.estado === 'completada_parcial') statusInfo = { text: 'Parcial', class: 'status-parcial', icon: 'check', isOffline: false };
+                else if (s.estado === 'abandonada') statusInfo = { text: 'Abandonada', class: 'status-abandonada', icon: 'x', isOffline: false };
+                
+                return {
+                    time:     s.hora,
+                    duration: `${Math.floor(s.duracion_segundos / 60)}:00`,
+                    status:   statusInfo,
+                };
+            }),
         });
     } catch (e) {
         console.error('Error cargando resumen de materia', e);
@@ -1309,7 +865,7 @@ function updateFocusActiveGoal() {
     const nextBtn          = document.getElementById('focus-goal-next-btn');
     if (!focusGoalTitle) return;
 
-    const progressTasks = tasks.filter(t => t.column === 'progress');
+    const progressTasks = KanbanManager.tasks.filter(t => t.column === 'progress');
     if (progressTasks.length > 0) {
         if (activeFocusTaskIndex >= progressTasks.length) activeFocusTaskIndex = 0;
         const activeTask = progressTasks[activeFocusTaskIndex];
@@ -1537,51 +1093,10 @@ function changeFocusPhase(phase) {
     showToast(`Cambiado a fase: ${labels[phase] || phase}`, 'success');
 }
 
-/* Lofi player */
-let currentLofiVideoId = '3yH2Wo2SaIM';
-
-/**
- * Abre o cierra el panel del reproductor Lofi en el Modo Concentración.
- */
-function toggleLofiPanel() {
-    const panel  = document.getElementById('focus-lofi-panel');
-    const btn    = document.getElementById('lofi-panel-toggle');
-    const iframe = document.getElementById('focus-lofi-iframe');
-    if (!panel || !iframe) return;
-
-    const isOpen = panel.classList.contains('show');
-    if (isOpen) {
-        panel.classList.remove('show');
-        if (btn) btn.classList.remove('active');
-        iframe.src = '';
-    } else {
-        panel.classList.add('show');
-        if (btn) btn.classList.add('active');
-        const select    = document.getElementById('focus-lofi-select');
-        const videoId   = select ? select.value : currentLofiVideoId;
-        const separator = videoId.includes('?') ? '&' : '?';
-        iframe.src      = `https://www.youtube.com/embed/${videoId}${separator}enablejsapi=1&autoplay=1&mute=0`;
-    }
-}
-
-/**
- * Cambia el canal del reproductor Lofi.
- * @param {string} videoId - ID del video de YouTube a cargar.
- */
-function changeLofiChannel(videoId) {
-    currentLofiVideoId = videoId;
-    const panel  = document.getElementById('focus-lofi-panel');
-    const iframe = document.getElementById('focus-lofi-iframe');
-    if (!panel || !iframe) return;
-    if (panel.classList.contains('show')) {
-        const separator = videoId.includes('?') ? '&' : '?';
-        iframe.src      = `https://www.youtube.com/embed/${videoId}${separator}enablejsapi=1&autoplay=1&mute=0`;
-    }
-}
-
+/* Lofi player extraido a lofi-panel.js */
 /** Navega a la tarea anterior en el carrusel del Modo Concentración. */
 function prevFocusTask() {
-    const progressTasks = tasks.filter(t => t.column === 'progress');
+    const progressTasks = KanbanManager.tasks.filter(t => t.column === 'progress');
     if (progressTasks.length <= 1) return;
     activeFocusTaskIndex = activeFocusTaskIndex <= 0 ? progressTasks.length - 1 : activeFocusTaskIndex - 1;
     updateFocusActiveGoal();
@@ -1589,7 +1104,7 @@ function prevFocusTask() {
 
 /** Navega a la tarea siguiente en el carrusel del Modo Concentración. */
 function nextFocusTask() {
-    const progressTasks = tasks.filter(t => t.column === 'progress');
+    const progressTasks = KanbanManager.tasks.filter(t => t.column === 'progress');
     if (progressTasks.length <= 1) return;
     activeFocusTaskIndex = (activeFocusTaskIndex + 1) >= progressTasks.length ? 0 : activeFocusTaskIndex + 1;
     updateFocusActiveGoal();
@@ -1600,7 +1115,7 @@ function nextFocusTask() {
  * Usa UI optimista con rollback en caso de error de red.
  */
 function completeFocusActiveTask() {
-    const progressTasks = tasks.filter(t => t.column === 'progress');
+    const progressTasks = KanbanManager.tasks.filter(t => t.column === 'progress');
     if (progressTasks.length === 0) return;
     const activeTask = progressTasks[activeFocusTaskIndex];
     if (!activeTask) return;
@@ -1608,21 +1123,21 @@ function completeFocusActiveTask() {
     const oldCol = activeTask.column;
     const taskId = activeTask.id;
     activeTask.column = 'done';
-    updateCounts();
+    KanbanManager.updateCounts();
     if (activeFocusTaskIndex >= progressTasks.length - 1 && activeFocusTaskIndex > 0) activeFocusTaskIndex--;
     updateFocusActiveGoal();
 
     ApiService.moveTarea(taskId, 'finalizado')
         .then(() => {
-            saveTasksToLocal();
-            renderKanban();
+            KanbanManager.saveTasksToLocal();
+            KanbanManager.renderKanban();
             showToast('¡Tarea completada con éxito! 🎉', 'success');
         })
         .catch(() => {
             activeTask.column = oldCol;
-            updateCounts();
+            KanbanManager.updateCounts();
             updateFocusActiveGoal();
-            renderKanban();
+            KanbanManager.renderKanban();
             showToast('Error al completar la tarea', 'error');
         });
 }
@@ -1639,7 +1154,7 @@ function toggleFocusSubtasksDrawer() {
 function renderFocusSubtasks() {
     const listContainer = document.getElementById('focus-subtasks-list');
     if (!listContainer) return;
-    const progressTasks = tasks.filter(t => t.column === 'progress');
+    const progressTasks = KanbanManager.tasks.filter(t => t.column === 'progress');
     if (progressTasks.length === 0) {
         listContainer.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:0.5rem 0;">No hay tareas en curso</div>';
         return;
@@ -1666,21 +1181,21 @@ function renderFocusSubtasks() {
  * @param {number} index - Índice de la subtarea.
  */
 function toggleFocusSubtaskStatus(index) {
-    const progressTasks = tasks.filter(t => t.column === 'progress');
+    const progressTasks = KanbanManager.tasks.filter(t => t.column === 'progress');
     if (progressTasks.length === 0) return;
     const activeTask = progressTasks[activeFocusTaskIndex];
     if (!activeTask || !activeTask.subtasks || !activeTask.subtasks[index]) return;
 
     activeTask.subtasks[index].completed = !activeTask.subtasks[index].completed;
-    saveTasksToLocal();
-    renderKanban();
+    KanbanManager.saveTasksToLocal();
+    KanbanManager.renderKanban();
     renderFocusSubtasks();
 
     ApiService.updateSubtareas(activeTask.id, activeTask.subtasks)
         .catch(() => {
             activeTask.subtasks[index].completed = !activeTask.subtasks[index].completed;
-            saveTasksToLocal();
-            renderKanban();
+            KanbanManager.saveTasksToLocal();
+            KanbanManager.renderKanban();
             renderFocusSubtasks();
             showToast('Error sincronizando subtareas', 'error');
         });
@@ -1754,6 +1269,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Inicializar el Servicio del Pomodoro (SSOT) ---
     pomodoroService.init(showToast);
 
+    // --- Inicializar KanbanManager ---
+    KanbanManager.init({
+        selectedMateriaId: null,
+        tasks: [],
+        showToast,
+        openConfirm,
+        escapeHTML,
+        reloadApp: loadAppState,
+        updateFocusActiveGoal
+    });
+
+    // --- Inicializar cola offline de sesiones Pomodoro ---
+    PomodoroSyncQueue.init();
+    
+    window.addEventListener('pomo:syncQueueChanged', (e) => {
+        const count = e.detail.count;
+        const ind = document.getElementById('offline-sync-indicator');
+        if (ind) {
+            ind.style.display = count > 0 ? 'inline-block' : 'none';
+        }
+        
+        // Si la cola se vació después de tener items, refrescamos el log desde el backend
+        if (count === 0 && window._hadPendingSync) {
+            window._hadPendingSync = false;
+            if (typeof pomodoroService !== 'undefined') {
+                pomodoroService.marcarSesionesComoSincronizadas();
+            }
+            loadMateriaResumen(); // Re-renderiza las sesiones, marcándolas como "sincronizadas"
+        } else if (count > 0) {
+            window._hadPendingSync = true;
+        }
+    });
+    // Forzar actualización inicial
+    window.dispatchEvent(new CustomEvent('pomo:syncQueueChanged', {
+        detail: { count: PomodoroSyncQueue.getPendingCount() }
+    }));
+
     // --- Botón de confirmación del modal genérico ---
     const confirmYesBtn = document.getElementById('confirm-yes-btn');
     if (confirmYesBtn) {
@@ -1818,27 +1370,7 @@ window.closeCustomPomoModal   = closeCustomPomoModal;
 window.saveCustomPomoSettings = saveCustomPomoSettings;
 window.testSelectedSound      = testSelectedSound;
 
-// Kanban
-window.showInlineAddCardForm  = showInlineAddCardForm;
-window.saveInlineCard         = saveInlineCard;
-window.cancelInlineAddCard    = cancelInlineAddCard;
-window.allowDrop              = allowDrop;
-window.leaveDrop              = leaveDrop;
-window.dropCard               = dropCard;
-window.deleteTask             = deleteTask;
 
-// Modal de Tarea
-window.closeTaskModal         = closeTaskModal;
-window.handleDateAutocomplete = handleDateAutocomplete;
-window.saveNewSubtask         = saveNewSubtask;
-window.hideSubtaskAddInput    = hideSubtaskAddInput;
-window.showSubtaskAddInput    = showSubtaskAddInput;
-window.deleteTaskFromModal    = deleteTaskFromModal;
-window.saveTaskDetails        = saveTaskDetails;
-window.toggleSubtaskStatus    = toggleSubtaskStatus;
-window.saveSubtaskText        = saveSubtaskText;
-window.handleSubtaskEnter     = handleSubtaskEnter;
-window.deleteSubtask          = deleteSubtask;
 
 // Marcadores
 window.addBookmark              = addBookmark;

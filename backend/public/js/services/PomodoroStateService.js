@@ -293,8 +293,7 @@ class PomodoroStateService extends EventTarget {
 
         // Agregar entrada de sesión parcial al log si hubo progreso real en enfoque
         if (faseEraEnfoque && elapsedMin > 0) {
-            this._agregarLogParcial(elapsedMin);
-            ApiService.registrarSesionParcial(elapsedMin).catch(() => console.warn('No se pudo registrar la sesión parcial'));
+            this._registrarInterrupcionSesion(elapsedMin, 'abandonada');
         }
 
         this._resetearADefecto();
@@ -308,6 +307,16 @@ class PomodoroStateService extends EventTarget {
      */
     reiniciarCiclo() {
         this._detenerTicker();
+        const faseActualObj  = ESTADOS_POMO[this._state.fase_actual];
+        const totalSeg       = faseActualObj.duracion(this._settings);
+        const elapsedMin     = Math.floor((totalSeg - this._state.tiempo_restante) / 60);
+        const faseEraEnfoque = this._state.fase_actual === 'enfoque';
+
+        // Registrar sesión abandonada si hubo progreso en la fase de enfoque
+        if (faseEraEnfoque && elapsedMin > 0) {
+            this._registrarInterrupcionSesion(elapsedMin, 'abandonada');
+        }
+
         this._ciclos.ciclo_actual = 1;
         this._persistirCiclos();
         this._resetearADefecto();
@@ -331,8 +340,7 @@ class PomodoroStateService extends EventTarget {
 
         // Registrar entrada parcial en el log si hubo progreso en la fase de enfoque
         if (faseEraEnfoque && elapsedMin > 0) {
-            this._agregarLogParcial(elapsedMin);
-            ApiService.registrarSesionParcial(elapsedMin).catch(() => console.warn('No se pudo registrar salto parcial'));
+            this._registrarInterrupcionSesion(elapsedMin, 'completada_parcial');
         }
 
         // Calcular y aplicar la siguiente fase usando la máquina de estados
@@ -450,6 +458,25 @@ class PomodoroStateService extends EventTarget {
         this._emitir('pomo:estadoCambiado');
     }
 
+    /**
+     * Marca todas las sesiones locales offline como sincronizadas.
+     * Útil cuando se vacía la cola de sincronización, especialmente
+     * para el modo "Estudio Independiente" que no tiene resumen de backend.
+     */
+    marcarSesionesComoSincronizadas() {
+        let changed = false;
+        this._ciclos.log.forEach(row => {
+            if (row.status && row.status.isOffline) {
+                row.status.isOffline = false;
+                changed = true;
+            }
+        });
+        if (changed) {
+            this._persistirCiclos();
+            this._emitir('pomo:estadoCambiado');
+        }
+    }
+
     /* =========================================================================
        API PÚBLICA — Accesores (solo lectura)
        ========================================================================= */
@@ -550,7 +577,7 @@ class PomodoroStateService extends EventTarget {
             this._ciclos.log.unshift({
                 time:     hhmm,
                 duration: `${this._settings.focusTime}:00`,
-                status:   '✓ Completada',
+                status:   this._formatSessionStatus('completada'),
             });
 
             this._toast('¡Buen trabajo! Sesión de enfoque completada. Hora de descansar.', 'success');
@@ -608,16 +635,60 @@ class PomodoroStateService extends EventTarget {
     }
 
     /**
+     * Registra una sesión interrumpida de forma local y en el backend.
+     * @param {number} elapsedMin 
+     * @param {string} estado ('completada_parcial' | 'abandonada')
+     */
+    _registrarInterrupcionSesion(elapsedMin, estado) {
+        this._agregarLogParcial(elapsedMin, estado);
+        
+        const rawMateria = localStorage.getItem('cursus_selected_materia');
+        const materiaId = rawMateria ? parseInt(rawMateria, 10) : null;
+        const duracionSegundos = elapsedMin * 60;
+        
+        if (!(rawMateria && isNaN(materiaId))) {
+            if (estado === 'completada_parcial') {
+                ApiService.registrarSesionParcial(materiaId, duracionSegundos).catch(() => console.warn('No se pudo registrar la sesión parcial'));
+            } else {
+                ApiService.registrarSesionAbandonada(materiaId, duracionSegundos).catch(() => console.warn('No se pudo registrar la sesión abandonada'));
+            }
+        }
+    }
+
+    /**
+     * Helper para formatear el estado de la sesión para el renderizado del log.
+     * @param {string} estado ('completada', 'completada_parcial', 'abandonada')
+     * @param {boolean} [synced=false] Si proviene del backend (siempre true) o si fue local
+     * @returns {object} { text, class, icon, tooltip }
+     */
+    _formatSessionStatus(estado, synced = false) {
+        const isOffline = !navigator.onLine && !synced;
+        const icon = estado === 'completada' ? 'check-check' : (estado === 'completada_parcial' ? 'check' : 'x');
+        
+        let text, cssClass;
+        if (estado === 'completada') {
+            text = 'Completada'; cssClass = 'status-completada';
+        } else if (estado === 'completada_parcial') {
+            text = 'Parcial'; cssClass = 'status-parcial';
+        } else {
+            text = 'Abandonada'; cssClass = 'status-abandonada';
+        }
+        
+        return { text, class: cssClass, icon, isOffline };
+    }
+
+    /**
      * Agrega una entrada de sesión parcial al log de ciclos.
      * @param {number} elapsedMin - Minutos transcurridos antes de la interrupción.
+     * @param {string} estado - Estado de la sesión.
      */
-    _agregarLogParcial(elapsedMin) {
+    _agregarLogParcial(elapsedMin, estado) {
         const ahora = new Date();
         const hhmm  = `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`;
         this._ciclos.log.unshift({
             time:     hhmm,
             duration: `${elapsedMin}:00`,
-            status:   '⚠ Parcial',
+            status:   this._formatSessionStatus(estado),
         });
         this._persistirCiclos();
     }
@@ -663,9 +734,8 @@ class PomodoroStateService extends EventTarget {
      */
     _registrarSesionEnBackend(duracionSegundos) {
         const rawMateria = localStorage.getItem('cursus_selected_materia');
-        if (!rawMateria) return;
-        const materiaId = parseInt(rawMateria, 10);
-        if (isNaN(materiaId)) return;
+        const materiaId = rawMateria ? parseInt(rawMateria, 10) : null;
+        if (rawMateria && isNaN(materiaId)) return;
 
         if (!navigator.locks) {
             this._registrarConTokenLegacy(materiaId, duracionSegundos);
