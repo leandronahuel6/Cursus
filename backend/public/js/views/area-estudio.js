@@ -133,7 +133,8 @@ function escapeHTML(str) {
  * @param {{state: object, settings: object, ciclos: object, presetActivo: string}} snapshot
  */
 function renderTimerPrincipal(snapshot) {
-    const { state, settings, ciclos, presetActivo } = snapshot;
+    const { state, settings, ciclos, config } = snapshot;
+    const presetActivo = config.preset_activo;
 
     // --- Reloj texto ---
     const min = Math.floor(state.tiempo_restante / 60);
@@ -146,10 +147,10 @@ function renderTimerPrincipal(snapshot) {
     const fasePolimorfica = ESTADOS_POMO[state.fase_actual];
     const faseTxt  = fasePolimorfica ? fasePolimorfica.etiqueta() : state.fase_actual;
     const psubEl   = document.getElementById('psub');
-    if (psubEl) psubEl.textContent = `${faseTxt} · Sesión ${ciclos.ciclo_actual} de ${settings.sessionsPerCycle}`;
+    if (psubEl) psubEl.textContent = `${faseTxt} · Sesión ${ciclos.ciclo_actual} de ${settings.sesiones_por_ciclo}`;
 
     // --- Progreso del Ring SVG ---
-    const totalSec = fasePolimorfica ? fasePolimorfica.duracion(settings) : settings.focusTime * 60;
+    const totalSec = fasePolimorfica ? fasePolimorfica.duracion(settings) : settings.tiempo_enfoque * 60;
     const pct      = totalSec > 0 ? state.tiempo_restante / totalSec : 0;
     const rpEl     = document.getElementById('rp');
     if (rpEl) {
@@ -180,7 +181,7 @@ function renderTimerPrincipal(snapshot) {
     const dotsContainer = document.getElementById('pomo-dots');
     if (dotsContainer) {
         dotsContainer.innerHTML = '';
-        for (let i = 1; i <= settings.sessionsPerCycle; i++) {
+        for (let i = 1; i <= settings.sesiones_por_ciclo; i++) {
             const dot = document.createElement('div');
             dot.className = `dot ${i < ciclos.ciclo_actual ? 'done' : ''}`;
             dotsContainer.appendChild(dot);
@@ -266,7 +267,7 @@ function renderFocusMode(snapshot) {
     if (focusPhaseEl) focusPhaseEl.textContent = faseTxt;
 
     const focusSessionEl = document.getElementById('focus-session-display');
-    if (focusSessionEl) focusSessionEl.textContent = `Sesión ${ciclos.ciclo_actual} de ${settings.sessionsPerCycle}`;
+    if (focusSessionEl) focusSessionEl.textContent = `Sesión ${ciclos.ciclo_actual} de ${settings.sesiones_por_ciclo}`;
 
     // --- Tabs de fase activa ---
     const tabEnfoque = document.getElementById('phase-tab-enfoque');
@@ -282,7 +283,7 @@ function renderFocusMode(snapshot) {
     }
 
     // --- Ring SVG del Focus Mode ---
-    const totalSec = fasePolimorfica ? fasePolimorfica.duracion(settings) : settings.focusTime * 60;
+    const totalSec = fasePolimorfica ? fasePolimorfica.duracion(settings) : settings.tiempo_enfoque * 60;
     const pct      = totalSec > 0 ? state.tiempo_restante / totalSec : 0;
     const rpFocus  = document.getElementById('focus-ring-progress');
     if (rpFocus) {
@@ -304,7 +305,7 @@ function renderFocusMode(snapshot) {
     const focusDotsContainer = document.getElementById('focus-dots');
     if (focusDotsContainer) {
         focusDotsContainer.innerHTML = '';
-        for (let i = 1; i <= settings.sessionsPerCycle; i++) {
+        for (let i = 1; i <= settings.sesiones_por_ciclo; i++) {
             const dot = document.createElement('div');
             dot.className = `focus-dot ${i < ciclos.ciclo_actual ? 'done' : ''}`;
             focusDotsContainer.appendChild(dot);
@@ -414,21 +415,40 @@ function openCustomPomoModal() {
         showToast('Pausa el temporizador antes de cambiar ajustes', 'warn');
         return;
     }
-    const { settings } = snapshot;
-    document.getElementById('custom-pomo-focus').value    = settings.focusTime;
-    document.getElementById('custom-pomo-short').value    = settings.shortBreak;
-    document.getElementById('custom-pomo-long').value     = settings.longBreak;
-    document.getElementById('custom-pomo-sessions').value = settings.sessionsPerCycle;
-    document.getElementById('custom-pomo-cycles').value   = settings.totalCycles || 'infinite';
-
-    const savedSound = localStorage.getItem(LS_KEYS.SONIDO_ALARMA) || 'chime';
+    const { config } = snapshot;
+    
+    // Configs generales
     const soundSelect = document.getElementById('custom-pomo-sound');
-    if (soundSelect) soundSelect.value = savedSound;
+    if (soundSelect) soundSelect.value = config.sonido_alarma;
 
     const strictToggle = document.getElementById('pomo-strict-toggle');
-    if (strictToggle) strictToggle.checked = localStorage.getItem(LS_KEYS.MODO_ESTRICTO) === 'true';
+    if (strictToggle) strictToggle.checked = config.modo_estricto;
 
-    document.getElementById('pomo-validation-error').style.display = 'none';
+    const playAlarmToggle = document.getElementById('pomo-play-alarm-toggle');
+    if (playAlarmToggle) playAlarmToggle.checked = config.reproducir_alarma;
+
+    const showWidgetToggle = document.getElementById('pomo-show-widget-toggle');
+    if (showWidgetToggle) showWidgetToggle.checked = config.mostrar_widget;
+
+    const autoPlayToggle = document.getElementById('pomo-auto-play-toggle');
+    if (autoPlayToggle) autoPlayToggle.checked = config.auto_reproduccion_fases;
+
+    // Configs Modo P
+    document.getElementById('custom-pomo-focus').value    = config.tiempo_enfoque;
+    document.getElementById('custom-pomo-short').value    = config.descanso_corto;
+    document.getElementById('custom-pomo-long').value     = config.descanso_largo;
+    document.getElementById('custom-pomo-sessions').value = config.sesiones_por_ciclo;
+    document.getElementById('custom-pomo-cycles').value   = config.ciclos_totales || 'infinite';
+
+    const errorDiv = document.getElementById('pomo-validation-error');
+    if (errorDiv) errorDiv.style.display = 'none';
+    
+    const btnSave = document.getElementById('btn-save-pomo');
+    if (btnSave) {
+        btnSave.disabled = false;
+        btnSave.textContent = 'Aplicar Ajustes';
+    }
+
     document.getElementById('pomo-custom-modal').classList.add('show');
 }
 
@@ -441,7 +461,7 @@ function closeCustomPomoModal() {
  * Lee, valida y persiste la configuración personalizada del Pomodoro.
  * Muestra errores de validación inline sin cerrar el modal.
  */
-function saveCustomPomoSettings() {
+async function saveCustomPomoSettings() {
     const focus    = parseInt(document.getElementById('custom-pomo-focus').value);
     const short    = parseInt(document.getElementById('custom-pomo-short').value);
     const long     = parseInt(document.getElementById('custom-pomo-long').value);
@@ -488,17 +508,49 @@ function saveCustomPomoSettings() {
 
     const soundSelect  = document.getElementById('custom-pomo-sound');
     const strictToggle = document.getElementById('pomo-strict-toggle');
+    const playAlarmToggle = document.getElementById('pomo-play-alarm-toggle');
+    const showWidgetToggle = document.getElementById('pomo-show-widget-toggle');
+    const autoPlayToggle = document.getElementById('pomo-auto-play-toggle');
+
     const sonidoAlarma = soundSelect ? soundSelect.value : 'chime';
     const modoEstricto = strictToggle ? strictToggle.checked : false;
+    const reproducirAlarma = playAlarmToggle ? playAlarmToggle.checked : true;
+    const mostrarWidget = showWidgetToggle ? showWidgetToggle.checked : true;
+    const autoReproduccion = autoPlayToggle ? autoPlayToggle.checked : true;
 
-    pomodoroService.guardarAjustesPersonalizados(
-        { focusTime: focus, shortBreak: short, longBreak: long, sessionsPerCycle: sessions, totalCycles: cycles },
-        sonidoAlarma,
-        modoEstricto
-    );
+    const btnSave = document.getElementById('btn-save-pomo');
+    if (btnSave) {
+        btnSave.disabled = true;
+        btnSave.textContent = 'Guardando...';
+    }
 
-    closeCustomPomoModal();
-    showToast('Ajustes personalizados aplicados con éxito', 'success');
+    try {
+        await pomodoroService.guardarAjustesPersonalizados(
+            { tiempo_enfoque: focus, descanso_corto: short, descanso_largo: long, sesiones_por_ciclo: sessions, ciclos_totales: cycles },
+            { 
+                sonido_alarma: sonidoAlarma, 
+                modo_estricto: modoEstricto,
+                reproducir_alarma: reproducirAlarma,
+                mostrar_widget: mostrarWidget,
+                auto_reproduccion_fases: autoReproduccion
+            }
+        );
+
+        closeCustomPomoModal();
+        const currentPreset = pomodoroService.obtenerSnapshot().config.preset_activo;
+        if (currentPreset !== 'custom') {
+            showToast('Ajustes guardados. Para ver las configuraciones aplicadas al "Modo Personalizado" pulse el "Botón P"', 'success');
+        } else {
+            showToast('Ajustes guardados con éxito', 'success');
+        }
+    } catch (e) {
+        errorDiv.textContent = 'Error de red: No se pudieron guardar los ajustes.';
+        errorDiv.style.display = 'block';
+        if (btnSave) {
+            btnSave.disabled = false;
+            btnSave.textContent = 'Aplicar Ajustes';
+        }
+    }
 }
 
 /* ==========================================================================
@@ -956,8 +1008,8 @@ function enterFocusMode() {
  * En Modo Estricto con reloj corriendo, solicita confirmación y registra la falla.
  */
 function exitFocusMode() {
-    const strictMode = localStorage.getItem(LS_KEYS.MODO_ESTRICTO) === 'true';
     const snapshot   = pomodoroService.obtenerSnapshot();
+    const strictMode = snapshot.config.modo_estricto;
     if (strictMode && snapshot.state.estado_reloj === 'corriendo') {
         openConfirm(
             '¡Estás en modo estricto! Salir ahora interrumpirá tu concentración. El tiempo acumulado se guardará en tu historial como sesión abandonada. ¿Realmente quieres rendirte?',
@@ -1286,8 +1338,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     pomodoroService.addEventListener('pomo:faseCompletada', () => {
         // 1. Reproducir alarma via módulo de audio centralizado (pomo-audio-player.js)
-        const alarmSound = localStorage.getItem(LS_KEYS.SONIDO_ALARMA) || 'chime';
-        playPomoAlarm(alarmSound);
+        const config = pomodoroService.obtenerSnapshot().config;
+        if (config.reproducir_alarma) {
+            playPomoAlarm(config.sonido_alarma);
+        }
     });
 
     pomodoroService.addEventListener('pomo:sesionRegistradaBackend', () => {
@@ -1299,6 +1353,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Inicializar el Servicio del Pomodoro (SSOT) ---
     pomodoroService.init(showToast);
+    pomodoroService.sincronizarConfigDesdeBackend();
 
     // --- Configurar Tooltip de Ayuda para Estudio Independiente ---
     const btnIndependienteHelp = document.getElementById('btn-independiente-help');
@@ -1372,24 +1427,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Modo Estricto: detector de pérdida de foco ---
     document.addEventListener('visibilitychange', () => {
-        const strictMode = localStorage.getItem(LS_KEYS.MODO_ESTRICTO) === 'true';
-        const snapshot   = pomodoroService.obtenerSnapshot();
+        const snapshot = pomodoroService.obtenerSnapshot();
+        const strictMode = snapshot.config.modo_estricto;
         
         // CORRECCIÓN: Solo aplicar la regla si el reloj corre Y estamos en fase de enfoque.
         const enEnfoqueCorriendo = snapshot.state.estado_reloj === 'corriendo' && snapshot.state.fase_actual === 'enfoque';
 
         if (document.hidden && strictMode && enEnfoqueCorriendo) {
-            let distractCount = parseInt(sessionStorage.getItem('cursus_strict_distractions') || '0', 10);
-            distractCount++;
-            sessionStorage.setItem('cursus_strict_distractions', String(distractCount));
+            pomodoroService.registrarDistraccion();
             // Llamada al módulo de audio centralizado (SRP)
             playPomoAlarm('beep');
         } else if (!document.hidden && strictMode && enEnfoqueCorriendo) {
-            const distractCount = sessionStorage.getItem('cursus_strict_distractions') || '0';
-            if (distractCount !== '0') {
+            const distractCount = pomodoroService.obtenerDistracciones();
+            if (distractCount > 0) {
                 showToast(`¡Atención! Te has distraído cambiando de pestaña. Distracciones: ${distractCount}. Mantén el enfoque.`, 'warn');
-                sessionStorage.setItem('cursus_strict_distractions', '0');
             }
+        }
+    });
+
+    // Escuchar cambios de configuración para resetear distracciones si se apaga el modo estricto
+    pomodoroService.addEventListener('pomo:estadoCambiado', () => {
+        if (!pomodoroService.obtenerSnapshot().config.modo_estricto) {
+            pomodoroService.reiniciarDistracciones();
         }
     });
 
