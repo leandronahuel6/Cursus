@@ -358,7 +358,7 @@ function resetPomo() {
     if (snapshot.state.estado_reloj === 'detenido') return;
 
     openConfirm(
-        '¿Desea reiniciar el temporizador actual? Se registrará el progreso parcial en el servidor.',
+        '¿Deseas reiniciar el temporizador? El tiempo que hayas acumulado hasta ahora se guardará en tu historial como progreso parcial.',
         () => {
             pomodoroService.reiniciarFase();
             showToast('Temporizador reiniciado', 'success');
@@ -372,7 +372,7 @@ function resetPomo() {
  */
 function restartPomoCycle() {
     openConfirm(
-        '¿Desea reiniciar el ciclo de sesiones? Volverá a la sesión 1 y se perderá el progreso de la sesión actual.',
+        '¿Estás seguro de que deseas reiniciar el ciclo completo? Volverás a la sesión 1. Si el temporizador actual tiene progreso, se guardará en tu historial como sesión abandonada.',
         () => {
             pomodoroService.reiniciarCiclo();
             showToast('Ciclo de sesiones reiniciado', 'success');
@@ -385,7 +385,7 @@ function restartPomoCycle() {
  * Si la fase saltada era enfoque con progreso, notifica al backend.
  */
 function skipPomo() {
-    openConfirm('¿Desea saltar la fase actual?', () => {
+    openConfirm('¿Deseas saltar esta fase y pasar a la siguiente? Si estabas en una sesión de enfoque con progreso, este se guardará en tu historial.', () => {
         pomodoroService.saltarFase();
         showToast('Fase salteada', 'success');
     });
@@ -960,7 +960,7 @@ function exitFocusMode() {
     const snapshot   = pomodoroService.obtenerSnapshot();
     if (strictMode && snapshot.state.estado_reloj === 'corriendo') {
         openConfirm(
-            '¡Estás en modo estricto! Salir ahora anulará tu ciclo de concentración actual y registrará una sesión fallida. ¿Realmente quieres rendirte?',
+            '¡Estás en modo estricto! Salir ahora interrumpirá tu concentración. El tiempo acumulado se guardará en tu historial como sesión abandonada. ¿Realmente quieres rendirte?',
             () => {
                 pomodoroService.reiniciarFase();
                 performExitFocusMode();
