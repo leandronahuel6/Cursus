@@ -78,6 +78,7 @@ document.body.appendChild(widget);
 const playBtn       = document.getElementById('pomo-float-play-btn');
 const navBtn        = document.getElementById('pomo-float-nav-btn');
 const minBtn        = document.getElementById('pomo-float-min-btn');
+
 const closeBtn      = document.getElementById('pomo-float-close-btn');
 const infoWrapper   = document.getElementById('pomo-float-info');
 const actionsWrapper = document.getElementById('pomo-float-actions');
@@ -120,7 +121,17 @@ _makeElementDraggable(widget, widget);
  * @param {{state: object, settings: object, ciclos: object}} snapshot
  */
 function _renderWidget(snapshot) {
-    const { state, settings, ciclos } = snapshot;
+    const { state, settings, ciclos, config } = snapshot;
+
+    // Ocultar si la config dice que no se muestra
+    if (config.mostrar_widget === false) {
+        widget.style.display = 'none';
+        return;
+    }
+    // Mostrar si estaba oculto
+    if (widget.style.display === 'none' && !localStorage.getItem('cursus_pomo_float_dismissed')) {
+        widget.style.display = 'flex';
+    }
 
     // --- Reloj ---
     const min     = Math.floor(state.tiempo_restante / 60);
@@ -153,7 +164,7 @@ function _renderWidget(snapshot) {
     }
 
     // --- Sesión actual / total ---
-    const sessionText = `${ciclos.ciclo_actual || 1}/${settings.sessionsPerCycle || 4}`;
+    const sessionText = `${ciclos.ciclo_actual || 1}/${settings.sesiones_por_ciclo || 4}`;
     if (sessionEl.textContent !== sessionText) {
         sessionEl.textContent = sessionText;
     }
@@ -214,8 +225,10 @@ pomodoroService.addEventListener('pomo:estadoCambiado', (e) => {
  * El widget reproduce la alarma de audio (SRP: el servicio no conoce el audio).
  */
 pomodoroService.addEventListener('pomo:faseCompletada', () => {
-    const alarmSound = localStorage.getItem(LS_KEYS.SONIDO_ALARMA) || 'chime';
-    playPomoAlarm(alarmSound);
+    const config = pomodoroService.obtenerSnapshot().config;
+    if (config.reproducir_alarma) {
+        playPomoAlarm(config.sonido_alarma);
+    }
 });
 
 /* ==========================================================================
@@ -231,6 +244,9 @@ pomodoroService.init((msg, type) => {
 
 // Llamada inicial para pintar el estado cargado
 _sincronizarVisibilidad(pomodoroService.obtenerSnapshot());
+
+// Sincronizar configuración con el backend en segundo plano
+pomodoroService.sincronizarConfigDesdeBackend();
 
 /* ==========================================================================
    HANDLERS DE BOTONES

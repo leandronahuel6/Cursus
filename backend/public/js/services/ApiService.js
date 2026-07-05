@@ -213,6 +213,17 @@ async function deleteSubtarea(subtareaId) {
 }
 
 /* ==========================================================================
+   CONFIGURACIÓN POMODORO
+   ========================================================================== */
+
+async function actualizarConfigPomodoro(configData) {
+    return apiFetch(`${API_BASE}/pomodoro/config`, {
+        method: 'PUT',
+        body: JSON.stringify(configData),
+    });
+}
+
+/* ==========================================================================
    MARCADORES
    ========================================================================== */
 
@@ -394,6 +405,7 @@ export const ApiService = {
     registrarSesionCompletada,
     registrarSesionParcial,
     registrarSesionAbandonada,
+    actualizarConfigPomodoro,
     getConfigPomodoro,
     updateConfigPomodoro,
 };
