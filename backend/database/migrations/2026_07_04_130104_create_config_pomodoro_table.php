@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('descanso_largo')->default(20);
             $table->integer('sesiones_por_ciclo')->default(4);
             $table->integer('ciclos_totales')->nullable()->default(null);
-            $table->string('sonido_alarma')->default('beep');
+            $table->enum('sonido_alarma', ['chime', 'beep', 'zen', 'none'])->default('chime');
             $table->boolean('modo_estricto')->default(false);
             $table->boolean('reproducir_alarma')->default(true);
             $table->boolean('mostrar_widget')->default(true);
