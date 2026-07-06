@@ -694,6 +694,22 @@ function formatBookmarkUrl(rawUrl) {
     return 'https://' + url;
 }
 
+/**
+ * Limpia un título redundante convirtiéndolo en null si es exactamente igual al dominio de la URL.
+ * @param {string} title 
+ * @param {string} url 
+ * @returns {string|null}
+ */
+function cleanRedundantTitle(title, url) {
+    if (!title) return null;
+    let hostname = '';
+    try { hostname = new URL(url).hostname.replace(/^www\./i, ''); } catch (_) {}
+    if (hostname && title.toLowerCase() === hostname.toLowerCase()) {
+        return null;
+    }
+    return title || null;
+}
+
 /** Renderiza la lista completa de marcadores. */
 function renderBookmarks() {
     const container = document.getElementById('bm-list');
@@ -765,7 +781,9 @@ function addBookmark() {
     btnSave.disabled    = true;
     btnSave.textContent = 'Guardando...';
 
-    ApiService.createMarcador(selectedMateriaId, url, title || null)
+    const finalTitle = cleanRedundantTitle(title, url);
+
+    ApiService.createMarcador(selectedMateriaId, url, finalTitle)
         .then(() => {
             loadAppState();
             urlInput.value   = '';
@@ -813,14 +831,16 @@ function saveBookmarkInlineEdit(id) {
     newUrl = formatBookmarkUrl(newUrl);
     if (!newUrl) { showToast('La URL no puede quedar vacía', 'error'); return; }
 
+    const finalTitle = cleanRedundantTitle(newTitle, newUrl);
+
     const oldTitle = bm.title;
     const oldUrl   = bm.url;
-    bm.title = newTitle || null;
+    bm.title = finalTitle;
     bm.url   = newUrl;
     saveBookmarksToLocal();
     renderBookmarks();
 
-    ApiService.updateMarcador(id, { url: newUrl, titulo: newTitle || null })
+    ApiService.updateMarcador(id, { url: newUrl, titulo: finalTitle })
         .then(() => {
             loadAppState();
             showToast('Marcador actualizado', 'success');
