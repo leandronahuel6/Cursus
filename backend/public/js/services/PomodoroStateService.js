@@ -327,9 +327,17 @@ class PomodoroStateService extends EventTarget {
         }
 
         this._state.tiempo_restante = totalSeg;
-        this._state.estado_reloj = 'detenido';
+        
+        const autoPlay = this._config.auto_reproduccion_fases;
+        this._state.estado_reloj = autoPlay ? 'corriendo' : 'detenido';
         this._state.timestamp_ultimo_cambio = Date.now();
+        
         this._persistirEstado();
+        
+        if (autoPlay) {
+            this._iniciarTicker();
+        }
+        
         this._emitir('pomo:estadoCambiado');
         return { elapsedMin, faseEraEnfoque };
     }
@@ -353,7 +361,16 @@ class PomodoroStateService extends EventTarget {
         this._ciclos.ciclo_actual = 1;
         this._ciclos.distracciones = 0;
         this._persistirCiclos();
+        
         this._resetearADefecto();
+        
+        const autoPlay = this._config.auto_reproduccion_fases;
+        if (autoPlay) {
+            this._state.estado_reloj = 'corriendo';
+            this._persistirEstado();
+            this._iniciarTicker();
+        }
+        
         this._emitir('pomo:estadoCambiado');
     }
 
@@ -387,11 +404,17 @@ class PomodoroStateService extends EventTarget {
 
         this._state.fase_actual      = siguienteClave;
         this._state.tiempo_restante  = siguienteObj.duracion(this._settings);
-        this._state.estado_reloj     = 'corriendo';
+        
+        const autoPlay = this._config.auto_reproduccion_fases;
+        this._state.estado_reloj     = autoPlay ? 'corriendo' : 'detenido';
+        this._state.timestamp_ultimo_cambio = Date.now();
 
         this._persistirEstado();
         this._persistirCiclos();
-        this._iniciarTicker();
+        
+        if (autoPlay) {
+            this._iniciarTicker();
+        }
         this._emitir('pomo:estadoCambiado');
 
         return { elapsedMin, faseEraEnfoque };
