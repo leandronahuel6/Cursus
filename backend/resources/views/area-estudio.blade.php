@@ -155,7 +155,7 @@
               <div class="bm-form">
                 <div class="bm-form-title">Agregar enlace útil</div>
                 <div class="bm-row">
-                  <input id="bm-url" class="bm-inp url" type="url" placeholder="https://..." required>
+                  <input id="bm-url" class="bm-inp url" type="url" placeholder="ej. google.com" required>
                   <input id="bm-title" class="bm-inp" type="text" placeholder="Título (opcional)">
                   <button class="bm-save" id="btn-bm-save" onclick="addBookmark()">Guardar</button>
                 </div>

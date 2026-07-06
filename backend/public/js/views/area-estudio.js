@@ -651,7 +651,7 @@ async function loadAppState() {
         bookmarks = dbBookmarks.map(b => ({
             id:    String(b.id),
             url:   b.url,
-            title: b.titulo || b.url,
+            title: b.titulo,
         }));
     } catch (e) {
         console.error('Error cargando marcadores DB', e);
@@ -671,6 +671,29 @@ function saveBookmarksToLocal() {
    BÓVEDA DE MARCADORES
    ========================================================================== */
 
+/**
+ * Formatea una URL ingresada por el usuario.
+ * Añade https:// por defecto, o http:// si detecta un entorno local.
+ * @param {string} rawUrl 
+ * @returns {string}
+ */
+function formatBookmarkUrl(rawUrl) {
+    let url = rawUrl.trim();
+    if (!url) return url;
+    
+    if (/^https?:\/\//i.test(url)) {
+        return url;
+    }
+    
+    // Regex simple para localhost, 127.x.x.x, 192.168.x.x, 10.x.x.x
+    const isLocal = /^(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?(\/.*)?$/i.test(url);
+    
+    if (isLocal) {
+        return 'http://' + url;
+    }
+    return 'https://' + url;
+}
+
 /** Renderiza la lista completa de marcadores. */
 function renderBookmarks() {
     const container = document.getElementById('bm-list');
@@ -684,17 +707,23 @@ function renderBookmarks() {
 
         let hostname = '';
         try { hostname = new URL(bm.url).hostname; } catch (_) { hostname = 'link'; }
+        
+        let displayTitle = bm.title;
+        if (!displayTitle) {
+            displayTitle = hostname !== 'link' ? hostname.replace(/^www\./i, '') : bm.url;
+        }
+
         const faviconUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
 
         card.innerHTML = `
           <img class="bm-ic" src="${faviconUrl}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22 fill=%22%234f46e5%22><circle cx=%228%22 cy=%228%22 r=%226%22/></svg>'" alt="Logo">
           <div class="bm-inf">
-            <div class="bm-name">${escapeHTML(bm.title || bm.url)}</div>
+            <div class="bm-name">${escapeHTML(displayTitle)}</div>
             <div class="bm-url">${escapeHTML(bm.url)}</div>
           </div>
           <div class="bm-edit-row">
+            <input type="url" class="bm-edit-inp url" id="bm-edit-url-${bm.id}" value="${escapeHTML(bm.url)}" placeholder="ej. google.com">
             <input type="text" class="bm-edit-inp" id="bm-edit-title-${bm.id}" value="${escapeHTML(bm.title || '')}" placeholder="Título">
-            <input type="url" class="bm-edit-inp url" id="bm-edit-url-${bm.id}" value="${escapeHTML(bm.url)}" placeholder="https://...">
             <div class="bm-edit-btns">
               <button class="bm-act-btn" onclick="window.saveBookmarkInlineEdit('${bm.id}')" title="Guardar">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l3 3 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -725,8 +754,10 @@ function addBookmark() {
     const urlInput = document.getElementById('bm-url');
     const titleInput = document.getElementById('bm-title');
     const btnSave    = document.getElementById('btn-bm-save');
-    const url   = urlInput.value.trim();
+    let url     = urlInput.value.trim();
     const title = titleInput.value.trim();
+
+    url = formatBookmarkUrl(url);
 
     if (!url) { showToast('Introduce una dirección URL válida', 'error'); return; }
     if (!selectedMateriaId) { showToast('Elegí una materia primero', 'warn'); return; }
@@ -750,6 +781,15 @@ function addBookmark() {
 
 /** Activa el modo de edición inline de un marcador. */
 function startBookmarkInlineEdit(id) {
+    const bm = bookmarks.find(b => b.id === id);
+    if (!bm) return;
+
+    // Repoblar inputs con la información real para revertir posibles cambios no guardados
+    const titleInput = document.getElementById(`bm-edit-title-${id}`);
+    const urlInput   = document.getElementById(`bm-edit-url-${id}`);
+    if (titleInput) titleInput.value = bm.title || '';
+    if (urlInput)   urlInput.value   = bm.url || '';
+
     const item = document.getElementById('bm-item-' + id);
     if (item) item.classList.add('editing');
 }
@@ -768,17 +808,19 @@ function saveBookmarkInlineEdit(id) {
     const bm       = bookmarks.find(b => b.id === id);
     if (!bm) return;
     const newTitle = document.getElementById(`bm-edit-title-${id}`).value.trim();
-    const newUrl   = document.getElementById(`bm-edit-url-${id}`).value.trim();
+    let newUrl     = document.getElementById(`bm-edit-url-${id}`).value.trim();
+    
+    newUrl = formatBookmarkUrl(newUrl);
     if (!newUrl) { showToast('La URL no puede quedar vacía', 'error'); return; }
 
     const oldTitle = bm.title;
     const oldUrl   = bm.url;
-    bm.title = newTitle;
+    bm.title = newTitle || null;
     bm.url   = newUrl;
     saveBookmarksToLocal();
     renderBookmarks();
 
-    ApiService.updateMarcador(id, { url: newUrl, titulo: newTitle })
+    ApiService.updateMarcador(id, { url: newUrl, titulo: newTitle || null })
         .then(() => {
             loadAppState();
             showToast('Marcador actualizado', 'success');
