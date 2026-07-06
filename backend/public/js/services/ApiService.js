@@ -16,6 +16,8 @@
 
 'use strict';
 
+import { PomodoroSyncQueue } from './PomodoroSyncQueue.js';
+
 /** URL base de la API del backend Laravel. */
 const API_BASE = '/api';
 
@@ -35,15 +37,12 @@ function getAuthHeaders() {
         'Content-Type':  'application/json',
         'Accept':         'application/json',
         'Authorization': 'Bearer ' + token,
+        'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
     };
 }
 
 /**
  * Simula una petición HTTP asíncrona con delay realista (500 ms).
- *
- * Bloque de rechazo comentado intencionalmente para habilitar pruebas de
- * rollback visual sin afectar el flujo nominal. Para activar: descomentar
- * el bloque y volver a cargar la página.
  *
  * @param {string} url - Endpoint relativo de la petición.
  * @param {object} [options={}] - Opciones de la petición (method, body, etc.).
@@ -52,13 +51,6 @@ function getAuthHeaders() {
 function mockFetch(url, options = {}) {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            /*
-             * Para probar el flujo de rollback visual en el Kanban o Marcadores,
-             * descomentar el siguiente bloque:
-             *
-             * reject({ success: false, message: 'Error de sincronización simulado.' });
-             * return;
-             */
             resolve({
                 success: true,
                 data: options.body ? JSON.parse(options.body) : {},
@@ -84,7 +76,10 @@ async function apiFetch(url, options = {}) {
         ...options,
     });
     if (!res.ok) throw new Error(`HTTP ${res.status} en ${url}`);
-    return res.json();
+    
+    // Check if empty response (like 204)
+    const text = await res.text();
+    return text ? JSON.parse(text) : {};
 }
 
 /* ==========================================================================
@@ -109,6 +104,14 @@ async function getMaterias() {
  */
 async function getMateriaResumen(materiaId) {
     return apiFetch(`${API_BASE}/materias/${materiaId}/pomodoro-resumen`);
+}
+
+/**
+ * Obtiene el resumen estadístico Pomodoro (horas hoy/semana) para Estudio Independiente (materia_id = null).
+ * @returns {Promise<object>}
+ */
+async function getResumenIndependiente() {
+    return apiFetch(`${API_BASE}/pomodoro/resumen-independiente`);
 }
 
 /* ==========================================================================
@@ -162,17 +165,14 @@ async function deleteTarea(id) {
 }
 
 /**
- * Mueve una tarea a otra columna del Kanban en la BD.
- * Se invoca desde el handler de Drag & Drop con UI optimista; en caso de
- * error, la UI debe ejecutar el rollback visual antes de mostrar el toast.
- * @param {string|number} id - ID de la tarea.
- * @param {string} columna - Nueva columna en formato backend.
+ * Mueve un conjunto de tareas (o una) a otra columna del Kanban en la BD actualizando su orden.
+ * @param {Array<{id: string|number, columna: string, orden: number}>} tareasPayload 
  * @returns {Promise<object>}
  */
-async function moveTarea(id, columna) {
-    return apiFetch(`${API_BASE}/tareas/${id}`, {
+async function moveTareasEnBloque(tareasPayload) {
+    return apiFetch(`${API_BASE}/tareas/mover`, {
         method: 'PUT',
-        body:   JSON.stringify({ columna }),
+        body:   JSON.stringify({ tareas: tareasPayload }),
     });
 }
 
@@ -181,17 +181,45 @@ async function moveTarea(id, columna) {
    ========================================================================== */
 
 /**
- * Persiste el estado completo de las subtareas de una tarea en la BD.
- * Usa mockFetch porque la API real de subtareas aún no está implementada
- * en el backend (pendiente para un lote futuro).
- * @param {string|number} tareaId - ID de la tarea padre.
- * @param {Array<{id: string, text: string, completed: boolean}>} subtasks - Lista de subtareas.
- * @returns {Promise<object>}
+ * Agrega una subtarea real a la BD.
+ * @param {string|number} tareaId
+ * @param {string} descripcion
  */
-async function updateSubtareas(tareaId, subtasks) {
-    return mockFetch(`/api/subtareas/${tareaId}`, {
+async function createSubtarea(tareaId, descripcion) {
+    return apiFetch(`${API_BASE}/tareas/${tareaId}/subtareas`, {
+        method: 'POST',
+        body:   JSON.stringify({ descripcion }),
+    });
+}
+
+/**
+ * Actualiza una subtarea real en la BD.
+ * @param {string|number} subtareaId
+ * @param {object} datos { descripcion, completado }
+ */
+async function updateSubtarea(subtareaId, datos) {
+    return apiFetch(`${API_BASE}/subtareas/${subtareaId}`, {
         method: 'PUT',
-        body:   JSON.stringify({ subtasks }),
+        body:   JSON.stringify(datos),
+    });
+}
+
+/**
+ * Borra una subtarea real en la BD.
+ * @param {string|number} subtareaId
+ */
+async function deleteSubtarea(subtareaId) {
+    return apiFetch(`${API_BASE}/subtareas/${subtareaId}`, { method: 'DELETE' });
+}
+
+/* ==========================================================================
+   CONFIGURACIÓN POMODORO
+   ========================================================================== */
+
+async function actualizarConfigPomodoro(configData) {
+    return apiFetch(`${API_BASE}/pomodoro/config`, {
+        method: 'PUT',
+        body: JSON.stringify(configData),
     });
 }
 
@@ -251,7 +279,7 @@ async function deleteMarcador(id) {
 
 /**
  * Notifica al servidor que el usuario inicia una nueva sesión de enfoque.
- * Actualmente simulada; se conectará al endpoint real en un lote posterior.
+ * Actualmente simulada.
  * @returns {Promise<object>}
  */
 async function iniciarSesion() {
@@ -276,29 +304,76 @@ async function pausarSesion() {
 
 /**
  * Registra una sesión de enfoque completada exitosamente en la base de datos.
- * Esta es la única función del módulo que persiste un registro histórico real;
- * por eso usa apiFetch (petición real) en lugar de mockFetch.
- * @param {number} materiaId - ID de la materia activa al momento de completar.
+ * Si falla, encola la petición en LocalStorage.
+ * @param {number|null} materiaId - ID de la materia activa. Nulo si es estudio independiente.
  * @param {number} duracionSegundos - Duración de la sesión en segundos.
  * @returns {Promise<object>}
  */
 async function registrarSesionCompletada(materiaId, duracionSegundos) {
-    return apiFetch(`${API_BASE}/pomodoro/sesiones`, {
-        method: 'POST',
-        body:   JSON.stringify({ materia_id: materiaId, duracion_segundos: duracionSegundos }),
-    });
+    const payload = { materia_id: materiaId, duracion_segundos: duracionSegundos, estado: 'completada' };
+    try {
+        return await apiFetch(`${API_BASE}/pomodoro/sesiones`, {
+            method: 'POST',
+            body:   JSON.stringify(payload),
+        });
+    } catch (e) {
+        PomodoroSyncQueue.enqueueSession(payload);
+        throw e;
+    }
 }
 
 /**
  * Registra una sesión de enfoque interrumpida antes de completarse.
- * Se invoca al Reiniciar o Saltar una fase de enfoque con progreso parcial.
- * @param {number} duracionMinutos - Minutos completados antes de la interrupción.
+ * Si falla, encola la petición en LocalStorage.
+ * @param {number|null} materiaId - ID de la materia. Nulo si es estudio independiente.
+ * @param {number} duracionSegundos - Segundos completados antes de la interrupción.
  * @returns {Promise<object>}
  */
-async function registrarSesionParcial(duracionMinutos) {
-    return mockFetch('/api/sesiones/finalizar', {
-        method: 'POST',
-        body:   JSON.stringify({ estado: 'completada_parcial', duracion: duracionMinutos }),
+async function registrarSesionParcial(materiaId, duracionSegundos) {
+    const payload = { materia_id: materiaId, duracion_segundos: duracionSegundos, estado: 'completada_parcial' };
+    try {
+        return await apiFetch(`${API_BASE}/pomodoro/sesiones`, {
+            method: 'POST',
+            body:   JSON.stringify(payload),
+        });
+    } catch (e) {
+        PomodoroSyncQueue.enqueueSession(payload);
+        throw e;
+    }
+}
+
+/**
+ * Registra una sesión de enfoque descartada/abandonada.
+ * Si falla, encola la petición en LocalStorage.
+ * @param {number|null} materiaId - ID de la materia. Nulo si es estudio independiente.
+ * @param {number} duracionSegundos - Segundos transcurridos antes del abandono.
+ * @returns {Promise<object>}
+ */
+async function registrarSesionAbandonada(materiaId, duracionSegundos) {
+    const payload = { materia_id: materiaId, duracion_segundos: duracionSegundos, estado: 'abandonada' };
+    try {
+        return await apiFetch(`${API_BASE}/pomodoro/sesiones`, {
+            method: 'POST',
+            body:   JSON.stringify(payload),
+        });
+    } catch (e) {
+        PomodoroSyncQueue.enqueueSession(payload);
+        throw e;
+    }
+}
+
+/* ==========================================================================
+   CONFIG POMODORO
+   ========================================================================== */
+
+async function getConfigPomodoro() {
+    return apiFetch(`${API_BASE}/pomodoro/config`);
+}
+
+async function updateConfigPomodoro(data) {
+    return apiFetch(`${API_BASE}/pomodoro/config`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
     });
 }
 
@@ -307,15 +382,19 @@ async function registrarSesionParcial(duracionMinutos) {
    ========================================================================== */
 
 export const ApiService = {
+    apiFetch,
     getAuthHeaders,
     getMaterias,
     getMateriaResumen,
+    getResumenIndependiente,
     getTareas,
     createTarea,
     updateTarea,
     deleteTarea,
-    moveTarea,
-    updateSubtareas,
+    moveTareasEnBloque,
+    createSubtarea,
+    updateSubtarea,
+    deleteSubtarea,
     getMarcadores,
     createMarcador,
     updateMarcador,
@@ -325,4 +404,8 @@ export const ApiService = {
     pausarSesion,
     registrarSesionCompletada,
     registrarSesionParcial,
+    registrarSesionAbandonada,
+    actualizarConfigPomodoro,
+    getConfigPomodoro,
+    updateConfigPomodoro,
 };

@@ -49,8 +49,14 @@
             <span id="mat-selector-name">—</span>
             <span class="mat-dropdown-caret">▾</span>
           </div>
-          <div class="mat-meta">
+          <div class="mat-meta" style="display: flex; align-items: center; gap: 6px; position: relative;">
             <span class="badge b-cur" id="mat-selector-badge">Cursando</span>
+            <button id="btn-independiente-help" style="display: none; background: none; border: none; padding: 0; cursor: pointer; color: var(--t2); align-items: center; width: 22px; height: 22px; justify-content: center;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="/assets/icons/sprite.svg#circle-question-mark"></use></svg>
+            </button>
+            <div id="tooltip-independiente-help" class="tooltip-popover" style="display: none;">
+                No estás cursando ninguna materia. Seleccioná "Cursar" sobre alguna materia desde "Mis Materias" para poder agregar tareas y marcadores.
+            </div>
             <span class="mat-yr">Tocá el nombre para cambiar de materia</span>
           </div>
           <!-- Selector de materia -->
@@ -59,11 +65,19 @@
         <div class="mat-chips">
           <div class="mat-chip">
             <div class="mat-chip-v" id="chip-stat-hours">—</div>
-            <div class="mat-chip-l">esta semana</div>
+            <div class="mat-chip-l">efectivas esta semana</div>
+          </div>
+          <div class="mat-chip warn">
+            <div class="mat-chip-v" id="chip-stat-hours-lost">—</div>
+            <div class="mat-chip-l">perdidas esta semana</div>
           </div>
           <div class="mat-chip">
             <div class="mat-chip-v" id="chip-stat-pomos">—</div>
-            <div class="mat-chip-l">🍅 totales</div>
+            <div class="mat-chip-l">🍅 efectivos</div>
+          </div>
+          <div class="mat-chip warn">
+            <div class="mat-chip-v" id="chip-stat-pomos-lost">—</div>
+            <div class="mat-chip-l">🍅 abandonados</div>
           </div>
           {{-- Chip "online ahora" comentado: dato simulado, no real.
           <div class="mat-chip">
@@ -93,44 +107,44 @@
               
               <!-- Pendiente Column -->
               <div class="kbcol" id="col-pending" 
-                   ondragover="allowDrop(event)" 
-                   ondragleave="leaveDrop(event)" 
-                   ondrop="dropCard(event, 'pending')">
+                   ondragover="window.KanbanManager.allowDrop(event)" 
+                   ondragleave="window.KanbanManager.leaveDrop(event)" 
+                   ondrop="window.KanbanManager.dropCard(event, 'pending')">
                 <div class="kbcol-hd">
                   <div class="kbcol-name"><div class="kbdot kd-p"></div>Pendiente</div>
                   <span class="kbcnt" id="cnt-pending">0</span>
                 </div>
                 <div class="kbcards" id="cards-pending"></div>
                 <div id="add-form-container-pending"></div>
-                <button class="kb-add" id="btn-add-pending" onclick="showInlineAddCardForm('pending')">+ Agregar tarea</button>
+                <button class="kb-add" id="btn-add-pending" onclick="window.KanbanManager.showInlineAddCardForm('pending')">+ Agregar tarea</button>
               </div>
 
               <!-- En Curso Column -->
               <div class="kbcol" id="col-progress" 
-                   ondragover="allowDrop(event)" 
-                   ondragleave="leaveDrop(event)" 
-                   ondrop="dropCard(event, 'progress')">
+                   ondragover="window.KanbanManager.allowDrop(event)" 
+                   ondragleave="window.KanbanManager.leaveDrop(event)" 
+                   ondrop="window.KanbanManager.dropCard(event, 'progress')">
                 <div class="kbcol-hd">
                   <div class="kbcol-name"><div class="kbdot kd-c"></div>En Curso</div>
                   <span class="kbcnt" id="cnt-progress">0</span>
                 </div>
                 <div class="kbcards" id="cards-progress"></div>
                 <div id="add-form-container-progress"></div>
-                <button class="kb-add" id="btn-add-progress" onclick="showInlineAddCardForm('progress')">+ Agregar tarea</button>
+                <button class="kb-add" id="btn-add-progress" onclick="window.KanbanManager.showInlineAddCardForm('progress')">+ Agregar tarea</button>
               </div>
 
               <!-- Finalizado Column -->
               <div class="kbcol" id="col-done" 
-                   ondragover="allowDrop(event)" 
-                   ondragleave="leaveDrop(event)" 
-                   ondrop="dropCard(event, 'done')">
+                   ondragover="window.KanbanManager.allowDrop(event)" 
+                   ondragleave="window.KanbanManager.leaveDrop(event)" 
+                   ondrop="window.KanbanManager.dropCard(event, 'done')">
                 <div class="kbcol-hd">
                   <div class="kbcol-name"><div class="kbdot kd-f"></div>Finalizado</div>
                   <span class="kbcnt" id="cnt-done">0</span>
                 </div>
                 <div class="kbcards" id="cards-done"></div>
                 <div id="add-form-container-done"></div>
-                <button class="kb-add" id="btn-add-done" onclick="showInlineAddCardForm('done')">+ Agregar tarea</button>
+                <button class="kb-add" id="btn-add-done" onclick="window.KanbanManager.showInlineAddCardForm('done')">+ Agregar tarea</button>
               </div>
 
             </div>
@@ -149,7 +163,7 @@
               <div class="bm-form">
                 <div class="bm-form-title">Agregar enlace útil</div>
                 <div class="bm-row">
-                  <input id="bm-url" class="bm-inp url" type="url" placeholder="https://..." required>
+                  <input id="bm-url" class="bm-inp url" type="url" placeholder="ej. google.com" required>
                   <input id="bm-title" class="bm-inp" type="text" placeholder="Título (opcional)">
                   <button class="bm-save" id="btn-bm-save" onclick="addBookmark()">Guardar</button>
                 </div>
@@ -169,7 +183,13 @@
           <!-- POMODORO TIMER CARD -->
           <div class="focus-card">
             <div class="pomo-hd">
-              <div class="pomo-hd-title">Temporizador Pomodoro</div>
+              <div class="pomo-hd-title" style="display:flex; align-items:center;">
+                Temporizador Pomodoro
+                <svg id="offline-sync-indicator" style="display:none; width:16px; height:16px; margin-left:8px; color:#f59e0b; cursor:help;" aria-label="Hay sesiones pendientes de sincronizar">
+                  <title>Hay sesiones pendientes de sincronizar</title>
+                  <use href="{{ asset('assets/icons/sprite.svg') }}#cloud-alert"></use>
+                </svg>
+              </div>
               <div class="pomo-presets">
                 <button class="pomo-preset-btn active" id="preset-classic" onclick="setPreset('classic')">25/5</button>
                 <button class="pomo-preset-btn" id="preset-deep" onclick="setPreset('deep')">50/10</button>
@@ -254,7 +274,7 @@
       <div class="modal-title">
         <span>Columna: </span><span id="task-modal-col-name" style="color: var(--brand);">Pendiente</span>
       </div>
-      <button class="modal-close" onclick="closeTaskModal()">✕</button>
+      <button class="modal-close" onclick="window.KanbanManager.closeTaskModal()">✕</button>
     </div>
     <div class="modal-body">
       
@@ -267,7 +287,7 @@
       <!-- Fecha de Vencimiento -->
       <div class="modal-field">
         <label class="modal-label" for="task-modal-due">Fecha de Vencimiento</label>
-        <input type="datetime-local" id="task-modal-due" class="modal-input" onblur="handleDateAutocomplete(this)">
+        <input type="datetime-local" id="task-modal-due" class="modal-input" onblur="window.KanbanManager.handleDateAutocomplete(this)">
       </div>
 
       <!-- Descripción -->
@@ -285,88 +305,122 @@
           </div>
           <div class="subtask-add-row" id="subtask-add-form" style="display:none;">
             <input type="text" id="subtask-new-txt" class="modal-input" placeholder="Nombre de la subtarea" style="flex:1; padding: 4px 8px; font-size:12px;">
-            <button class="btn-save" onclick="saveNewSubtask()" style="padding:4px 8px; font-size:11px;">Añadir</button>
-            <button class="btn-cancel" onclick="hideSubtaskAddInput()" style="padding:4px 8px; font-size:11px;">✕</button>
+            <button class="btn-save" onclick="window.KanbanManager.saveNewSubtask()" style="padding:4px 8px; font-size:11px;">Añadir</button>
+            <button class="btn-cancel" onclick="window.KanbanManager.hideSubtaskAddInput()" style="padding:4px 8px; font-size:11px;">✕</button>
           </div>
-          <button class="subtask-add-btn" id="btn-show-subtask-add" onclick="showSubtaskAddInput()">+ Añadir una subtarea</button>
+          <button class="subtask-add-btn" id="btn-show-subtask-add" onclick="window.KanbanManager.showSubtaskAddInput()">+ Añadir una subtarea</button>
         </div>
       </div>
 
     </div>
     <div class="modal-foot">
-      <button class="btn-danger" onclick="deleteTaskFromModal()" style="margin-right:auto;">Eliminar Tarea</button>
-      <button class="btn-cancel" onclick="closeTaskModal()">Cancelar</button>
-      <button class="btn-save" onclick="saveTaskDetails()">Guardar</button>
+      <button class="btn-danger" onclick="window.KanbanManager.deleteTaskFromModal()" style="margin-right:auto;">Eliminar Tarea</button>
+      <button class="btn-cancel" onclick="window.KanbanManager.closeTaskModal()">Cancelar</button>
+      <button class="btn-save" onclick="window.KanbanManager.saveTaskDetails()">Guardar</button>
     </div>
   </div>
 </div>
 
-<!-- 2. MODAL CONFIGURACIÓN POMODORO PERSONALIZADO -->
+<!-- 2. MODAL CONFIGURACIÓN POMODORO -->
 <div class="modal-overlay" id="pomo-custom-modal">
-  <div class="modal-box" style="max-width: 400px;">
+  <div class="modal-box" style="max-width: 480px;">
     <div class="modal-hdr">
-      <div class="modal-title">Ajustes Pomodoro Personalizado</div>
+      <div class="modal-title">Ajustes del Temporizador Pomodoro</div>
       <button class="modal-close" onclick="closeCustomPomoModal()">✕</button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style="display: flex; flex-direction: column; gap: 1.5rem;">
       
-      <div class="modal-field">
-        <label class="modal-label" for="custom-pomo-focus">Tiempo de Enfoque (minutos)</label>
-        <input type="number" id="custom-pomo-focus" class="modal-input" min="1" max="90" step="1" value="25" required>
-      </div>
+      <!-- SECCIÓN 1: CONFIGURACIONES GENERALES -->
+      <div>
+        <h4 style="margin: 0 0 0.75rem 0; font-size: 14px; color: var(--t1); border-bottom: 1px solid var(--border); padding-bottom: 0.25rem;">Configuraciones Generales</h4>
+        
+        <div class="modal-field">
+          <label class="modal-label" for="custom-pomo-sound">Sonido de Alarma</label>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <select id="custom-pomo-sound" class="modal-input" style="flex: 1;">
+              <option value="chime">Campana Clásica (Chime)</option>
+              <option value="beep">Beep Digital (Retro)</option>
+              <option value="zen">Campana Zen (Relajante)</option>
+            </select>
+            <button type="button" class="btn-cancel" id="btn-test-sound" onclick="testSelectedSound()" style="padding: 10px 14px; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.25rem; white-space: nowrap; border-radius: 6px;" title="Probar sonido">
+              🔊 Probar
+            </button>
+          </div>
+        </div>
 
-      <div class="modal-field">
-        <label class="modal-label" for="custom-pomo-short">Descanso Corto (minutos)</label>
-        <input type="number" id="custom-pomo-short" class="modal-input" min="1" max="30" step="1" value="5" required>
-      </div>
+        <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+          <div class="modal-field">
+            <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
+              <div class="ios-switch">
+                <input type="checkbox" id="pomo-play-alarm-toggle">
+                <span class="slider"></span>
+              </div>
+              <span style="font-weight: 500; font-size: 13px; color: var(--t1);">Reproducir alarma al finalizar fase</span>
+            </label>
+          </div>
 
-      <div class="modal-field">
-        <label class="modal-label" for="custom-pomo-long">Descanso Largo (minutos)</label>
-        <input type="number" id="custom-pomo-long" class="modal-input" min="5" max="60" step="1" value="20" required>
-      </div>
+          <div class="modal-field">
+            <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
+              <div class="ios-switch">
+                <input type="checkbox" id="pomo-auto-play-toggle">
+                <span class="slider"></span>
+              </div>
+              <span style="font-weight: 500; font-size: 13px; color: var(--t1);">Auto-reproducción de fases</span>
+            </label>
+          </div>
 
-      <div class="modal-field">
-        <label class="modal-label" for="custom-pomo-sessions">Sesiones por Ciclo (Pomodoros)</label>
-        <input type="number" id="custom-pomo-sessions" class="modal-input" min="1" max="8" step="1" value="4" required>
-      </div>
-
-      <div class="modal-field">
-        <label class="modal-label" for="custom-pomo-cycles">Ciclos Totales</label>
-        <select id="custom-pomo-cycles" class="modal-input">
-          <option value="infinite">Bucle Infinito</option>
-          <option value="1">1 Ciclo</option>
-          <option value="2">2 Ciclos</option>
-          <option value="3">3 Ciclos</option>
-          <option value="4">4 Ciclos</option>
-          <option value="5">5 Ciclos</option>
-          <option value="6">6 Ciclos</option>
-          <option value="7">7 Ciclos</option>
-          <option value="8">8 Ciclos</option>
-          <option value="9">9 Ciclos</option>
-          <option value="10">10 Ciclos</option>
-        </select>
-      </div>
-
-      <div class="modal-field">
-        <label class="modal-label" for="custom-pomo-sound">Sonido de Alarma</label>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
-          <select id="custom-pomo-sound" class="modal-input" style="flex: 1;">
-            <option value="chime">Campana Clásica (Chime)</option>
-            <option value="beep">Beep Digital (Retro)</option>
-            <option value="zen">Campana Zen (Relajante)</option>
-            <option value="none">Ninguno (Silencioso)</option>
-          </select>
-          <button type="button" class="btn-cancel" id="btn-test-sound" onclick="testSelectedSound()" style="padding: 10px 14px; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.25rem; white-space: nowrap; border-radius: 6px;" title="Probar sonido">
-            🔊 Probar
-          </button>
+          <div class="modal-field">
+            <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
+              <div class="ios-switch">
+                <input type="checkbox" id="pomo-strict-toggle">
+                <span class="slider"></span>
+              </div>
+              <span style="font-weight: 500; font-size: 13px; color: var(--t1);">🔒 Modo Estricto (Penaliza si cambias de pestaña o sales)</span>
+            </label>
+          </div>
         </div>
       </div>
 
-      <div class="modal-field">
-        <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
-          <input type="checkbox" id="pomo-strict-toggle" style="width: 15px; height: 15px; cursor: pointer; margin: 0;">
-          <span style="font-weight: 500; font-size: 13px; color: var(--t1);">🔒 Modo Estricto (Penaliza si cambias de pestaña o sales)</span>
-        </label>
+      <!-- SECCIÓN 2: MODO P -->
+      <div>
+        <h4 style="margin: 0 0 0.75rem 0; font-size: 14px; color: var(--t1); border-bottom: 1px solid var(--border); padding-bottom: 0.25rem;">Parámetros Modo "P" (Personalizado)</h4>
+        <p style="font-size: 12px; color: var(--t2); margin-top: -0.25rem; margin-bottom: 1rem;">Estos tiempos solo aplican al seleccionar el preset "P".</p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="modal-field">
+            <label class="modal-label" for="custom-pomo-focus">Enfoque (minutos)</label>
+            <input type="number" id="custom-pomo-focus" class="modal-input" min="1" max="90" step="1" value="25" required>
+          </div>
+          <div class="modal-field">
+            <label class="modal-label" for="custom-pomo-sessions">Sesiones por Ciclo</label>
+            <input type="number" id="custom-pomo-sessions" class="modal-input" min="1" max="8" step="1" value="4" required>
+          </div>
+          <div class="modal-field">
+            <label class="modal-label" for="custom-pomo-short">Descanso Corto (minutos)</label>
+            <input type="number" id="custom-pomo-short" class="modal-input" min="1" max="30" step="1" value="5" required>
+          </div>
+          <div class="modal-field">
+            <label class="modal-label" for="custom-pomo-long">Descanso Largo (minutos)</label>
+            <input type="number" id="custom-pomo-long" class="modal-input" min="5" max="60" step="1" value="20" required>
+          </div>
+        </div>
+
+        <div class="modal-field" style="margin-top: 1rem;">
+          <label class="modal-label" for="custom-pomo-cycles">Ciclos Totales</label>
+          <select id="custom-pomo-cycles" class="modal-input">
+            <option value="infinite">Bucle Infinito</option>
+            <option value="1">1 Ciclo</option>
+            <option value="2">2 Ciclos</option>
+            <option value="3">3 Ciclos</option>
+            <option value="4">4 Ciclos</option>
+            <option value="5">5 Ciclos</option>
+            <option value="6">6 Ciclos</option>
+            <option value="7">7 Ciclos</option>
+            <option value="8">8 Ciclos</option>
+            <option value="9">9 Ciclos</option>
+            <option value="10">10 Ciclos</option>
+          </select>
+        </div>
       </div>
 
       <div id="pomo-validation-error" style="color: var(--red); font-size:12px; font-weight:600; display:none;"></div>
@@ -374,7 +428,7 @@
     </div>
     <div class="modal-foot">
       <button class="btn-cancel" onclick="closeCustomPomoModal()">Cancelar</button>
-      <button class="btn-save" onclick="saveCustomPomoSettings()">Aplicar Ajustes</button>
+      <button class="btn-save" onclick="saveCustomPomoSettings()" id="btn-save-pomo">Aplicar Ajustes</button>
     </div>
   </div>
 </div>

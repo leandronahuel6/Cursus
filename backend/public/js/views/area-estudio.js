@@ -24,6 +24,10 @@ import { pomodoroService, LS_KEYS }    from '../services/PomodoroStateService.js
 import { ApiService }                  from '../services/ApiService.js';
 import { ESTADOS_POMO }                from '../models/PomodoroStates.js';
 import { playPomoAlarm, unlockPomoAudio } from '../shared/pomo-audio-player.js';
+import { KanbanManager }               from './kanban.js';
+import { toggleLofiPanel, changeLofiChannel } from './lofi-panel.js';
+import { PomodoroSyncQueue }           from '../services/PomodoroSyncQueue.js';
+
 
 /* ==========================================================================
    CONSTANTES DE PRESENTACIÓN
@@ -46,7 +50,7 @@ const COLUMNA_UI_TO_DB = { pending: 'pendiente', progress: 'progreso', done: 'fi
    ========================================================================== */
 
 /** Lista activa de tareas en memoria (espejo local de la BD). */
-let tasks = [];
+
 
 /** Lista activa de marcadores en memoria (espejo local de la BD). */
 let bookmarks = [];
@@ -129,7 +133,8 @@ function escapeHTML(str) {
  * @param {{state: object, settings: object, ciclos: object, presetActivo: string}} snapshot
  */
 function renderTimerPrincipal(snapshot) {
-    const { state, settings, ciclos, presetActivo } = snapshot;
+    const { state, settings, ciclos, config } = snapshot;
+    const presetActivo = config.preset_activo;
 
     // --- Reloj texto ---
     const min = Math.floor(state.tiempo_restante / 60);
@@ -142,10 +147,10 @@ function renderTimerPrincipal(snapshot) {
     const fasePolimorfica = ESTADOS_POMO[state.fase_actual];
     const faseTxt  = fasePolimorfica ? fasePolimorfica.etiqueta() : state.fase_actual;
     const psubEl   = document.getElementById('psub');
-    if (psubEl) psubEl.textContent = `${faseTxt} · Sesión ${ciclos.ciclo_actual} de ${settings.sessionsPerCycle}`;
+    if (psubEl) psubEl.textContent = `${faseTxt} · Sesión ${ciclos.ciclo_actual} de ${settings.sesiones_por_ciclo}`;
 
     // --- Progreso del Ring SVG ---
-    const totalSec = fasePolimorfica ? fasePolimorfica.duracion(settings) : settings.focusTime * 60;
+    const totalSec = fasePolimorfica ? fasePolimorfica.duracion(settings) : settings.tiempo_enfoque * 60;
     const pct      = totalSec > 0 ? state.tiempo_restante / totalSec : 0;
     const rpEl     = document.getElementById('rp');
     if (rpEl) {
@@ -176,7 +181,7 @@ function renderTimerPrincipal(snapshot) {
     const dotsContainer = document.getElementById('pomo-dots');
     if (dotsContainer) {
         dotsContainer.innerHTML = '';
-        for (let i = 1; i <= settings.sessionsPerCycle; i++) {
+        for (let i = 1; i <= settings.sesiones_por_ciclo; i++) {
             const dot = document.createElement('div');
             dot.className = `dot ${i < ciclos.ciclo_actual ? 'done' : ''}`;
             dotsContainer.appendChild(dot);
@@ -185,18 +190,58 @@ function renderTimerPrincipal(snapshot) {
 
     // --- Log de sesiones ---
     const logList = document.getElementById('slog-list');
-    if (logList) {
-        logList.innerHTML = '';
-        ciclos.log.forEach(row => {
-            const div = document.createElement('div');
-            div.className = 'slog-row';
-            div.innerHTML = `
-              <span class="slog-t">${row.time}</span>
-              <span class="slog-d">${row.duration}</span>
-              <span class="slog-ok">${row.status}</span>
-            `;
-            logList.appendChild(div);
+    const logHash = JSON.stringify(ciclos.log);
+    
+    if (logList && window._lastLogHash !== logHash) {
+        window._lastLogHash = logHash;
+        
+        // Mapear nodos existentes por su hash interno para reutilizarlos de forma segura
+        const existingNodes = {};
+        Array.from(logList.children).forEach(child => {
+            if (child._rowHash) existingNodes[child._rowHash] = child;
         });
+        
+        // Reconstruir la lista en el orden exacto del array
+        ciclos.log.forEach(row => {
+            const rowHash = JSON.stringify(row);
+            let node = existingNodes[rowHash];
+            
+            if (!node) {
+                node = document.createElement('div');
+                node.className = 'slog-row';
+                node._rowHash = rowHash;
+                
+                const warningIconHtml = row.status.isOffline 
+                    ? `<svg class="slog-icon" style="color:#f59e0b; cursor:help; margin-left: 12px;" aria-label="Pendiente de sincronizar (Offline)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Pendiente de sincronizar (Offline)</title><path d="M12 12v4"/><path d="M12 20h.01"/><path d="M8.128 16.949A7 7 0 1 1 15.71 8h1.79a1 1 0 0 1 0 9h-1.642"/></svg>` 
+                    : '';
+                    
+                let statusIconHtml = `<svg class="slog-icon"><use href="/assets/icons/sprite.svg#${row.status.icon}"></use></svg>`;
+                if (row.status.isOffline) {
+                    const paths = {
+                        'check-check': '<path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/>',
+                        'check': '<path d="M20 6 9 17l-5-5"/>',
+                        'x': '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'
+                    };
+                    statusIconHtml = `<svg class="slog-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths[row.status.icon] || ''}</svg>`;
+                }
+
+                node.innerHTML = `
+                  <span class="slog-t">${row.time}</span>
+                  <span class="slog-d">${row.duration}</span>
+                  ${warningIconHtml}
+                  <span class="slog-ok ${row.status.class}">
+                    ${statusIconHtml}
+                    ${row.status.text}
+                  </span>
+                `;
+            }
+            
+            logList.appendChild(node);
+            delete existingNodes[rowHash];
+        });
+        
+        // Eliminar los nodos que ya no están en ciclos.log
+        Object.values(existingNodes).forEach(node => node.remove());
     }
 }
 
@@ -222,7 +267,7 @@ function renderFocusMode(snapshot) {
     if (focusPhaseEl) focusPhaseEl.textContent = faseTxt;
 
     const focusSessionEl = document.getElementById('focus-session-display');
-    if (focusSessionEl) focusSessionEl.textContent = `Sesión ${ciclos.ciclo_actual} de ${settings.sessionsPerCycle}`;
+    if (focusSessionEl) focusSessionEl.textContent = `Sesión ${ciclos.ciclo_actual} de ${settings.sesiones_por_ciclo}`;
 
     // --- Tabs de fase activa ---
     const tabEnfoque = document.getElementById('phase-tab-enfoque');
@@ -238,7 +283,7 @@ function renderFocusMode(snapshot) {
     }
 
     // --- Ring SVG del Focus Mode ---
-    const totalSec = fasePolimorfica ? fasePolimorfica.duracion(settings) : settings.focusTime * 60;
+    const totalSec = fasePolimorfica ? fasePolimorfica.duracion(settings) : settings.tiempo_enfoque * 60;
     const pct      = totalSec > 0 ? state.tiempo_restante / totalSec : 0;
     const rpFocus  = document.getElementById('focus-ring-progress');
     if (rpFocus) {
@@ -260,7 +305,7 @@ function renderFocusMode(snapshot) {
     const focusDotsContainer = document.getElementById('focus-dots');
     if (focusDotsContainer) {
         focusDotsContainer.innerHTML = '';
-        for (let i = 1; i <= settings.sessionsPerCycle; i++) {
+        for (let i = 1; i <= settings.sesiones_por_ciclo; i++) {
             const dot = document.createElement('div');
             dot.className = `focus-dot ${i < ciclos.ciclo_actual ? 'done' : ''}`;
             focusDotsContainer.appendChild(dot);
@@ -313,13 +358,19 @@ function resetPomo() {
     const snapshot = pomodoroService.obtenerSnapshot();
     if (snapshot.state.estado_reloj === 'detenido') return;
 
-    openConfirm(
-        '¿Desea reiniciar el temporizador actual? Se registrará el progreso parcial en el servidor.',
-        () => {
-            pomodoroService.reiniciarFase();
-            showToast('Temporizador reiniciado', 'success');
-        }
-    );
+    if (snapshot.state.fase_actual === 'enfoque') {
+        openConfirm(
+            'Vas a reiniciar tu sesión de enfoque actual. El tiempo acumulado se guardará en tu historial como sesión abandonada. ¿Deseas continuar?',
+            () => {
+                pomodoroService.reiniciarFase();
+                showToast('Sesión de enfoque reiniciada', 'success');
+            }
+        );
+    } else {
+        // En descanso, reiniciar no tiene riesgo de pérdida de datos productivos
+        pomodoroService.reiniciarFase();
+        showToast('Descanso reiniciado', 'success');
+    }
 }
 
 /**
@@ -327,13 +378,17 @@ function resetPomo() {
  * Solicita confirmación para evitar pérdidas accidentales.
  */
 function restartPomoCycle() {
-    openConfirm(
-        '¿Desea reiniciar el ciclo de sesiones? Volverá a la sesión 1 y se perderá el progreso de la sesión actual.',
-        () => {
-            pomodoroService.reiniciarCiclo();
-            showToast('Ciclo de sesiones reiniciado', 'success');
-        }
-    );
+    const snapshot = pomodoroService.obtenerSnapshot();
+    const isEnfoque = snapshot.state.fase_actual === 'enfoque';
+    
+    const msg = isEnfoque 
+        ? 'Vas a reiniciar el ciclo completo y volverás a la sesión 1. El tiempo acumulado de tu enfoque actual se guardará como sesión abandonada. ¿Deseas continuar?'
+        : '¿Estás seguro de que deseas reiniciar el ciclo completo? Se perderá el progreso de tu ciclo actual y volverás a la sesión 1.';
+        
+    openConfirm(msg, () => {
+        pomodoroService.reiniciarCiclo();
+        showToast('Ciclo de sesiones reiniciado', 'success');
+    });
 }
 
 /**
@@ -341,10 +396,21 @@ function restartPomoCycle() {
  * Si la fase saltada era enfoque con progreso, notifica al backend.
  */
 function skipPomo() {
-    openConfirm('¿Desea saltar la fase actual?', () => {
+    const snapshot = pomodoroService.obtenerSnapshot();
+    
+    if (snapshot.state.fase_actual === 'enfoque') {
+        openConfirm(
+            'Vas a saltar el resto de tu sesión de enfoque. El tiempo acumulado se guardará en tu historial como sesión completada parcialmente. ¿Deseas continuar?', 
+            () => {
+                pomodoroService.saltarFase();
+                showToast('Fase de enfoque salteada', 'success');
+            }
+        );
+    } else {
+        // En descanso es común querer saltar la pausa si ya se quiere volver a estudiar
         pomodoroService.saltarFase();
-        showToast('Fase salteada', 'success');
-    });
+        showToast('Descanso salteado', 'success');
+    }
 }
 
 /**
@@ -352,12 +418,28 @@ function skipPomo() {
  * @param {'classic'|'deep'|'short'|'custom'} type - Nombre del preset a aplicar.
  */
 function setPreset(type) {
-    const aplicado = pomodoroService.aplicarPreset(type);
-    if (!aplicado) {
+    const snapshot = pomodoroService.obtenerSnapshot();
+    if (snapshot.state.estado_reloj === 'corriendo') {
         showToast('Pausa el temporizador antes de cambiar de modo', 'warn');
         return;
     }
-    showToast(`Preset aplicado: ${type.toUpperCase()}`, 'success');
+
+    const cicloActual = snapshot.ciclos.ciclo_actual;
+
+    // Todos los presets predeterminados tienen 4 sesiones
+    if (type !== 'custom' && cicloActual > 4) {
+        openConfirm(
+            `Atención: El preset que seleccionaste tiene un límite de 4 sesiones por ciclo, pero actualmente te encuentras en la sesión ${cicloActual}. Al aplicar este cambio, tu progreso del ciclo se reiniciará a la sesión 1. ¿Deseas continuar?`,
+            () => {
+                const aplicado = pomodoroService.aplicarPreset(type);
+                if (aplicado) showToast(`Preset aplicado: ${type.toUpperCase()}`, 'success');
+            }
+        );
+        return;
+    }
+
+    const aplicado = pomodoroService.aplicarPreset(type);
+    if (aplicado) showToast(`Preset aplicado: ${type.toUpperCase()}`, 'success');
 }
 
 /**
@@ -370,21 +452,37 @@ function openCustomPomoModal() {
         showToast('Pausa el temporizador antes de cambiar ajustes', 'warn');
         return;
     }
-    const { settings } = snapshot;
-    document.getElementById('custom-pomo-focus').value    = settings.focusTime;
-    document.getElementById('custom-pomo-short').value    = settings.shortBreak;
-    document.getElementById('custom-pomo-long').value     = settings.longBreak;
-    document.getElementById('custom-pomo-sessions').value = settings.sessionsPerCycle;
-    document.getElementById('custom-pomo-cycles').value   = settings.totalCycles || 'infinite';
-
-    const savedSound = localStorage.getItem(LS_KEYS.SONIDO_ALARMA) || 'chime';
+    const { config } = snapshot;
+    
+    // Configs generales
     const soundSelect = document.getElementById('custom-pomo-sound');
-    if (soundSelect) soundSelect.value = savedSound;
+    if (soundSelect) soundSelect.value = config.sonido_alarma;
 
     const strictToggle = document.getElementById('pomo-strict-toggle');
-    if (strictToggle) strictToggle.checked = localStorage.getItem(LS_KEYS.MODO_ESTRICTO) === 'true';
+    if (strictToggle) strictToggle.checked = config.modo_estricto;
 
-    document.getElementById('pomo-validation-error').style.display = 'none';
+    const playAlarmToggle = document.getElementById('pomo-play-alarm-toggle');
+    if (playAlarmToggle) playAlarmToggle.checked = config.reproducir_alarma;
+
+    const autoPlayToggle = document.getElementById('pomo-auto-play-toggle');
+    if (autoPlayToggle) autoPlayToggle.checked = config.auto_reproduccion_fases;
+
+    // Configs Modo P
+    document.getElementById('custom-pomo-focus').value    = config.tiempo_enfoque;
+    document.getElementById('custom-pomo-short').value    = config.descanso_corto;
+    document.getElementById('custom-pomo-long').value     = config.descanso_largo;
+    document.getElementById('custom-pomo-sessions').value = config.sesiones_por_ciclo;
+    document.getElementById('custom-pomo-cycles').value   = config.ciclos_totales || 'infinite';
+
+    const errorDiv = document.getElementById('pomo-validation-error');
+    if (errorDiv) errorDiv.style.display = 'none';
+    
+    const btnSave = document.getElementById('btn-save-pomo');
+    if (btnSave) {
+        btnSave.disabled = false;
+        btnSave.textContent = 'Aplicar Ajustes';
+    }
+
     document.getElementById('pomo-custom-modal').classList.add('show');
 }
 
@@ -397,7 +495,7 @@ function closeCustomPomoModal() {
  * Lee, valida y persiste la configuración personalizada del Pomodoro.
  * Muestra errores de validación inline sin cerrar el modal.
  */
-function saveCustomPomoSettings() {
+async function saveCustomPomoSettings() {
     const focus    = parseInt(document.getElementById('custom-pomo-focus').value);
     const short    = parseInt(document.getElementById('custom-pomo-short').value);
     const long     = parseInt(document.getElementById('custom-pomo-long').value);
@@ -444,17 +542,65 @@ function saveCustomPomoSettings() {
 
     const soundSelect  = document.getElementById('custom-pomo-sound');
     const strictToggle = document.getElementById('pomo-strict-toggle');
+    const playAlarmToggle = document.getElementById('pomo-play-alarm-toggle');
+    const autoPlayToggle = document.getElementById('pomo-auto-play-toggle');
+
     const sonidoAlarma = soundSelect ? soundSelect.value : 'chime';
     const modoEstricto = strictToggle ? strictToggle.checked : false;
+    const reproducirAlarma = playAlarmToggle ? playAlarmToggle.checked : true;
+    const autoReproduccion = autoPlayToggle ? autoPlayToggle.checked : true;
 
-    pomodoroService.guardarAjustesPersonalizados(
-        { focusTime: focus, shortBreak: short, longBreak: long, sessionsPerCycle: sessions, totalCycles: cycles },
-        sonidoAlarma,
-        modoEstricto
-    );
+    const btnSave = document.getElementById('btn-save-pomo');
 
-    closeCustomPomoModal();
-    showToast('Ajustes personalizados aplicados con éxito', 'success');
+    const snapshot = pomodoroService.obtenerSnapshot();
+    const cicloActual = snapshot.ciclos.ciclo_actual;
+    const presetActivo = snapshot.config.preset_activo;
+
+    if (presetActivo === 'custom' && sessions < cicloActual) {
+        openConfirm(
+            `Atención: Estás reduciendo la cantidad de sesiones por ciclo a ${sessions}, pero actualmente te encuentras en la sesión ${cicloActual}. Al aplicar este cambio, tu progreso del ciclo se reiniciará a la sesión 1. ¿Deseas continuar?`,
+            () => {
+                _ejecutarSaveCustomPomoSettings(focus, short, long, sessions, cycles, sonidoAlarma, modoEstricto, reproducirAlarma, autoReproduccion, btnSave, errorDiv);
+            }
+        );
+        return;
+    }
+
+    _ejecutarSaveCustomPomoSettings(focus, short, long, sessions, cycles, sonidoAlarma, modoEstricto, reproducirAlarma, autoReproduccion, btnSave, errorDiv);
+}
+
+async function _ejecutarSaveCustomPomoSettings(focus, short, long, sessions, cycles, sonidoAlarma, modoEstricto, reproducirAlarma, autoReproduccion, btnSave, errorDiv) {
+    if (btnSave) {
+        btnSave.disabled = true;
+        btnSave.textContent = 'Guardando...';
+    }
+
+    try {
+        await pomodoroService.guardarAjustesPersonalizados(
+            { tiempo_enfoque: focus, descanso_corto: short, descanso_largo: long, sesiones_por_ciclo: sessions, ciclos_totales: cycles },
+            { 
+                sonido_alarma: sonidoAlarma, 
+                modo_estricto: modoEstricto,
+                reproducir_alarma: reproducirAlarma,
+                auto_reproduccion_fases: autoReproduccion
+            }
+        );
+
+        closeCustomPomoModal();
+        const currentPreset = pomodoroService.obtenerSnapshot().config.preset_activo;
+        if (currentPreset !== 'custom') {
+            showToast('Ajustes guardados. Para ver las configuraciones aplicadas al "Modo Personalizado" pulse el "Botón P"', 'success');
+        } else {
+            showToast('Ajustes guardados con éxito', 'success');
+        }
+    } catch (e) {
+        errorDiv.textContent = 'Error de red: No se pudieron guardar los ajustes.';
+        errorDiv.style.display = 'block';
+        if (btnSave) {
+            btnSave.disabled = false;
+            btnSave.textContent = 'Aplicar Ajustes';
+        }
+    }
 }
 
 /* ==========================================================================
@@ -467,34 +613,36 @@ function saveCustomPomoSettings() {
  * (descripción, subtareas) que no están en el backend todavía.
  */
 async function loadAppState() {
+    KanbanManager.setMateriaId(selectedMateriaId);
+    
     if (!selectedMateriaId) {
-        tasks     = [];
+        KanbanManager.updateTasks([]);
         bookmarks = [];
-        renderKanban();
         renderBookmarks();
         return;
     }
 
-    const localTasks = localStorage.getItem('cursus_tasks_v2');
-    const savedLocalTasks = localTasks ? JSON.parse(localTasks) : [];
+    const localTasksData = JSON.parse(localStorage.getItem('cursus_tasks') || '[]');
 
     // Cargar tareas desde la BD
     try {
         const dbTasks = await ApiService.getTareas(selectedMateriaId);
-        tasks = dbTasks.map(t => {
-            const localMatch = savedLocalTasks.find(lt => lt.id == t.id);
+        const dbTasksMapped = dbTasks.map(t => {
+            const localMatch = localTasksData.find(lt => String(lt.id) === String(t.id));
             return {
                 id:          String(t.id),
-                column:      COLUMNA_DB_TO_UI[t.columna] || 'pending',
                 title:       t.titulo,
+                column:      COLUMNA_DB_TO_UI[t.columna],
                 dueDate:     t.fecha_vencimiento ? t.fecha_vencimiento.substring(0, 16) : '',
+                orden:       t.orden,
                 description: localMatch ? localMatch.description : '',
                 subtasks:    localMatch ? localMatch.subtasks : [],
             };
         });
+        KanbanManager.updateTasks(dbTasksMapped);
     } catch (e) {
         console.error('Error cargando tareas DB', e);
-        tasks = [];
+        KanbanManager.updateTasks([]);
     }
 
     // Cargar marcadores desde la BD
@@ -503,526 +651,64 @@ async function loadAppState() {
         bookmarks = dbBookmarks.map(b => ({
             id:    String(b.id),
             url:   b.url,
-            title: b.titulo || b.url,
+            title: b.titulo,
         }));
     } catch (e) {
         console.error('Error cargando marcadores DB', e);
         bookmarks = [];
     }
 
-    renderKanban();
+    // RenderBookmarks
     renderBookmarks();
-}
-
-/**
- * Persiste la lista de tareas actual en LocalStorage como caché local.
- * Solo guarda los campos que no están en la BD (descripción y subtareas).
- */
-function saveTasksToLocal() {
-    localStorage.setItem('cursus_tasks_v2', JSON.stringify(tasks));
 }
 
 /** Persiste la lista de marcadores en LocalStorage (caché de respaldo). */
 function saveBookmarksToLocal() {
-    localStorage.setItem('cursus_bookmarks_v2', JSON.stringify(bookmarks));
-}
-
-/* ==========================================================================
-   KANBAN — Renderizado
-   ========================================================================== */
-
-/**
- * Renderiza las tres columnas del tablero Kanban con las tarjetas actuales.
- * Actualiza también el componente de meta activa del Modo Concentración.
- */
-function renderKanban() {
-    const cols = ['pending', 'progress', 'done'];
-    cols.forEach(col => {
-        const container = document.getElementById(`cards-${col}`);
-        if (!container) return;
-        container.innerHTML = '';
-        const colTasks = tasks.filter(t => t.column === col);
-        const cntEl    = document.getElementById(`cnt-${col}`);
-        if (cntEl) cntEl.textContent = colTasks.length;
-
-        colTasks.forEach(task => {
-            const card = document.createElement('div');
-            card.className = 'kbcard';
-            card.id        = task.id;
-            card.draggable = true;
-
-            card.addEventListener('dragstart', (e) => dragStart(e, task.id));
-            card.addEventListener('dragend', dragEnd);
-            card.addEventListener('click', (e) => {
-                if (e.target.closest('.kb-del')) return;
-                openTaskModal(task.id);
-            });
-
-            // --- Meta indicators (fecha y subtareas) ---
-            let metaHtml = '';
-            if (task.dueDate) {
-                const [datePart, timePart] = task.dueDate.split('T');
-                const [y, m, d] = datePart.split('-');
-                const date       = new Date(y, m - 1, d);
-                const currentYear = new Date().getFullYear();
-                let dateStr = date.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
-                if (date.getFullYear() !== currentYear) dateStr += ` ${date.getFullYear()}`;
-                if (timePart) dateStr += ` · ${timePart.substring(0, 5)}`;
-                const today    = new Date(); today.setHours(0, 0, 0, 0);
-                const isOverdue = date < today && task.column !== 'done';
-                metaHtml += `
-                  <div class="kb-meta ${isOverdue ? 'urg' : ''}">
-                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 1v2M11 1v2M2 6h12"/></svg>
-                    <span>Vence ${dateStr}</span>
-                  </div>
-                `;
-            }
-            if (task.subtasks && task.subtasks.length > 0) {
-                const completed = task.subtasks.filter(s => s.completed).length;
-                metaHtml += `
-                  <div class="kb-meta">
-                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="10" height="10" rx="1.5"/><path d="M6 8l1.5 1.5L10 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <span>Subtareas ${completed}/${task.subtasks.length}</span>
-                  </div>
-                `;
-            }
-
-            card.innerHTML = `
-              <div class="kb-title">${escapeHTML(task.title)}</div>
-              <div class="kb-meta-wrap">${metaHtml}</div>
-              <button class="kb-del" title="Eliminar tarea">
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h10M5 6v7a1 1 0 001 1h4a1 1 0 001-1V6M6 3.5V2a.5.5 0 01.5-.5h3a.5.5 0 01.5.5v1.5"/></svg>
-              </button>
-            `;
-            card.querySelector('.kb-del').addEventListener('click', () => {
-                openConfirm(`¿Desea eliminar la tarea "${task.title}"?`, () => deleteTask(task.id));
-            });
-            container.appendChild(card);
-        });
-    });
-    if (typeof updateFocusActiveGoal === 'function') updateFocusActiveGoal();
-}
-
-/* ==========================================================================
-   KANBAN — Creación Inline
-   ========================================================================== */
-
-/**
- * Muestra el formulario inline de creación rápida de tareas en una columna.
- * @param {string} col - Columna destino ('pending' | 'progress' | 'done').
- */
-function showInlineAddCardForm(col) {
-    cancelAllInlineForms();
-    const container = document.getElementById(`add-form-container-${col}`);
-    const btnAdd    = document.getElementById(`btn-add-${col}`);
-    if (!container || !btnAdd) return;
-    btnAdd.style.display = 'none';
-
-    const form = document.createElement('div');
-    form.className = 'kb-add-form';
-    form.id        = `inline-form-${col}`;
-    form.innerHTML = `
-      <textarea class="kb-add-inp" id="inline-inp-${col}" placeholder="Introduce el título de la tarea..." required></textarea>
-      <div class="kb-add-btns">
-        <button class="kb-add-btn-save" onclick="window.saveInlineCard('${col}')">Añadir tarea</button>
-        <button class="kb-add-btn-cancel" onclick="window.cancelInlineAddCard('${col}')">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg>
-        </button>
-      </div>
-    `;
-    container.appendChild(form);
-
-    const textarea = form.querySelector('textarea');
-    textarea.focus();
-    textarea.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); saveInlineCard(col); }
-    });
-    // Guardado/cancelado implícito al perder foco (con delay para no pisar clics explícitos)
-    textarea.addEventListener('blur', () => {
-        setTimeout(() => {
-            const activeEl = document.activeElement;
-            if (activeEl && activeEl.closest(`#inline-form-${col}`)) return;
-            if (textarea.value.trim()) saveInlineCard(col);
-            else cancelInlineAddCard(col);
-        }, 150);
-    });
-}
-
-/**
- * Cancela y elimina el formulario inline de una columna específica.
- * @param {string} col - Columna del formulario a cancelar.
- */
-function cancelInlineAddCard(col) {
-    const form = document.getElementById(`inline-form-${col}`);
-    if (form) form.remove();
-    const btn = document.getElementById(`btn-add-${col}`);
-    if (btn) btn.style.display = 'block';
-}
-
-/** Cancela todos los formularios inline activos en las tres columnas. */
-function cancelAllInlineForms() {
-    ['pending', 'progress', 'done'].forEach(col => cancelInlineAddCard(col));
-}
-
-/**
- * Guarda la tarjeta del formulario inline creando la tarea en la BD.
- * @param {string} col - Columna de destino.
- */
-function saveInlineCard(col) {
-    const input = document.getElementById(`inline-inp-${col}`);
-    if (!input) return;
-    const title = input.value.trim();
-    if (!title) { cancelInlineAddCard(col); return; }
-    if (!selectedMateriaId) { showToast('Elegí una materia primero', 'warn'); return; }
-
-    cancelInlineAddCard(col);
-
-    ApiService.createTarea(selectedMateriaId, title, COLUMNA_UI_TO_DB[col])
-        .then(() => {
-            loadAppState();
-            showToast('Tarea agregada exitosamente', 'success');
-        })
-        .catch(() => showToast('Error creando tarea', 'error'));
-}
-
-/**
- * Elimina una tarea optimísticamente de la UI y luego sincroniza con la BD.
- * En caso de error de red, muestra un toast (no revierte el borrado local
- * porque el usuario ya confirmó la acción en el modal de confirmación previo).
- * @param {string} id - ID de la tarea a eliminar.
- */
-function deleteTask(id) {
-    tasks = tasks.filter(t => t.id !== id);
-    saveTasksToLocal();
-    renderKanban();
-
-    ApiService.deleteTarea(id)
-        .then(() => showToast('Tarea eliminada', 'success'))
-        .catch(() => showToast('Error al eliminar la tarea en el servidor', 'error'));
-}
-
-/* ==========================================================================
-   DRAG & DROP — Kanban con Optimistic UI y Rollback Visual
-   ========================================================================== */
-
-let dragId            = null;
-let dragOriginalCol   = null;
-let dragOriginalSibling = null;
-
-/**
- * Inicia el drag de una tarjeta, guardando su posición original para rollback.
- * @param {DragEvent} e
- * @param {string} id - ID de la tarjeta arrastrada.
- */
-function dragStart(e, id) {
-    dragId = id;
-    const card        = document.getElementById(id);
-    const taskObj     = tasks.find(t => t.id === id);
-    dragOriginalCol   = taskObj ? taskObj.column : null;
-    dragOriginalSibling = card ? card.nextSibling : null;
-    e.dataTransfer.effectAllowed = 'move';
-    setTimeout(() => { if (card) card.classList.add('dragging'); }, 0);
-}
-
-/** Limpia la clase visual de arrastre al soltar. */
-function dragEnd(e) {
-    e.target.classList.remove('dragging');
-}
-
-/** Permite el drop sobre una columna destino. */
-function allowDrop(e) {
-    e.preventDefault();
-    e.currentTarget.classList.add('over');
-}
-
-/** Limpia el estilo de hover al salir de la zona de drop. */
-function leaveDrop(e) {
-    e.currentTarget.classList.remove('over');
-}
-
-/**
- * Maneja el drop de una tarjeta en una columna destino con UI optimista y rollback.
- * @param {DragEvent} e
- * @param {string} col - Columna destino ('pending' | 'progress' | 'done').
- */
-function dropCard(e, col) {
-    e.preventDefault();
-    e.currentTarget.classList.remove('over');
-    if (!dragId) return;
-
-    const card          = document.getElementById(dragId);
-    const taskObj       = tasks.find(t => t.id === dragId);
-    const cardsContainer = document.getElementById(`cards-${col}`);
-    if (!card || !taskObj || !cardsContainer) return;
-
-    // Mover en el DOM optimísticamente
-    cardsContainer.appendChild(card);
-    const oldCol  = taskObj.column;
-    taskObj.column = col;
-    updateCounts();
-
-    const currentDragId = dragId;
-    ApiService.moveTarea(currentDragId, COLUMNA_UI_TO_DB[col])
-        .then(() => {
-            saveTasksToLocal();
-            renderKanban();
-        })
-        .catch(() => {
-            // Rollback: devolver la tarjeta a su posición original
-            taskObj.column = oldCol;
-            updateCounts();
-            const origContainer = document.getElementById(`cards-${oldCol}`);
-            if (origContainer) {
-                if (dragOriginalSibling && dragOriginalSibling.parentNode === origContainer) {
-                    origContainer.insertBefore(card, dragOriginalSibling);
-                } else {
-                    origContainer.appendChild(card);
-                }
-            }
-            card.classList.add('kb-error-shake');
-            setTimeout(() => card.classList.remove('kb-error-shake'), 350);
-            showToast('Error moviendo tarea', 'error');
-        });
-
-    dragId = null;
-}
-
-/** Actualiza los contadores numéricos de las tres columnas del Kanban. */
-function updateCounts() {
-    ['pending', 'progress', 'done'].forEach(col => {
-        const el = document.getElementById(`cnt-${col}`);
-        if (el) el.textContent = tasks.filter(t => t.column === col).length;
-    });
-}
-
-/* ==========================================================================
-   MODAL DE EDICIÓN DE TAREA
-   ========================================================================== */
-
-let currentEditingTaskId = null;
-let subtasksTempList     = [];
-
-/**
- * Abre el modal de edición de una tarea cargando sus datos actuales.
- * @param {string} id - ID de la tarea a editar.
- */
-function openTaskModal(id) {
-    currentEditingTaskId = id;
-    const task = tasks.find(t => t.id === id);
-    if (!task) return;
-
-    document.getElementById('task-modal-col-name').textContent = translateCol(task.column);
-    document.getElementById('task-modal-title').value          = task.title;
-
-    let dueStr = '';
-    if (task.dueDate) {
-        dueStr = task.dueDate.length === 10 ? task.dueDate + 'T00:00' : task.dueDate.substring(0, 16);
-    }
-    document.getElementById('task-modal-due').value  = dueStr;
-    document.getElementById('task-modal-desc').value = task.description || '';
-
-    subtasksTempList = task.subtasks ? JSON.parse(JSON.stringify(task.subtasks)) : [];
-    renderModalSubtasks();
-    hideSubtaskAddInput();
-    document.getElementById('task-modal').classList.add('show');
-}
-
-/** Cierra el modal de edición de tarea y limpia el ID de edición activo. */
-function closeTaskModal() {
-    document.getElementById('task-modal').classList.remove('show');
-    currentEditingTaskId = null;
-}
-
-/**
- * Traduce la clave de columna a texto legible en español.
- * @param {string} col - Clave interna ('pending' | 'progress' | 'done').
- * @returns {string} Etiqueta legible.
- */
-function translateCol(col) {
-    const map = { pending: 'Pendiente', progress: 'En Curso', done: 'Finalizado' };
-    return map[col] || col;
-}
-
-/**
- * Autocompleta la hora a 23:59 si el usuario seleccionó solo fecha sin hora.
- * @param {HTMLInputElement} input - El input datetime-local que disparó el evento.
- */
-function handleDateAutocomplete(input) {
-    if (!input.value) return;
-    const parts = input.value.split('T');
-    if (parts.length === 2 && parts[1] === '00:00') {
-        input.value = `${parts[0]}T23:59:00`;
-    }
-}
-
-/** Renderiza la lista de subtareas en el modal de edición de tarea. */
-function renderModalSubtasks() {
-    const list = document.getElementById('task-modal-subtasks-list');
-    if (!list) return;
-    list.innerHTML = '';
-    subtasksTempList.forEach((sub, index) => {
-        const item = document.createElement('div');
-        item.className = 'subtask-item';
-        item.innerHTML = `
-          <input type="checkbox" class="subtask-chk" ${sub.completed ? 'checked' : ''} onchange="window.toggleSubtaskStatus(${index})">
-          <span class="subtask-txt ${sub.completed ? 'done' : ''}" contenteditable="true" onblur="window.saveSubtaskText(${index}, this)" onkeydown="window.handleSubtaskEnter(event, ${index}, this)">${escapeHTML(sub.text)}</span>
-          <div class="subtask-del" title="Eliminar subtarea" onclick="window.deleteSubtask(${index})">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h10M5 6v7a1 1 0 001 1h4a1 1 0 001-1V6M6 3.5V2a.5.5 0 01.5-.5h3a.5.5 0 01.5.5v1.5"/></svg>
-          </div>
-        `;
-        list.appendChild(item);
-    });
-}
-
-/**
- * Alterna el estado completado de una subtarea y sincroniza con la BD.
- * @param {number} index - Índice de la subtarea en la lista temporal.
- */
-function toggleSubtaskStatus(index) {
-    subtasksTempList[index].completed = !subtasksTempList[index].completed;
-    renderModalSubtasks();
-    saveTaskSubtasksStateOnly();
-}
-
-/**
- * Guarda el texto editado de una subtarea (llamado en onblur del contenteditable).
- * @param {number} index - Índice de la subtarea.
- * @param {HTMLElement} element - El elemento contenteditable.
- */
-function saveSubtaskText(index, element) {
-    const newText = element.textContent.trim();
-    if (newText) {
-        subtasksTempList[index].text = newText;
-    } else {
-        element.textContent = subtasksTempList[index].text;
-    }
-    saveTaskSubtasksStateOnly();
-}
-
-/**
- * Intercepta la tecla Enter en subtareas editables para confirmar sin nueva línea.
- * @param {KeyboardEvent} e
- * @param {number} index
- * @param {HTMLElement} element
- */
-function handleSubtaskEnter(e, index, element) {
-    if (e.key === 'Enter') { e.preventDefault(); element.blur(); }
-}
-
-/**
- * Elimina una subtarea de la lista temporal y sincroniza con la BD.
- * @param {number} index - Índice de la subtarea a eliminar.
- */
-function deleteSubtask(index) {
-    subtasksTempList.splice(index, 1);
-    renderModalSubtasks();
-    saveTaskSubtasksStateOnly();
-}
-
-/** Muestra el campo de entrada para agregar una nueva subtarea. */
-function showSubtaskAddInput() {
-    document.getElementById('subtask-add-form').style.display  = 'flex';
-    document.getElementById('btn-show-subtask-add').style.display = 'none';
-    const input = document.getElementById('subtask-new-txt');
-    input.value = '';
-    input.focus();
-    input.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); saveNewSubtask(); } };
-}
-
-/** Oculta el campo de entrada de nueva subtarea. */
-function hideSubtaskAddInput() {
-    document.getElementById('subtask-add-form').style.display      = 'none';
-    document.getElementById('btn-show-subtask-add').style.display  = 'inline-flex';
-}
-
-/** Crea y guarda una nueva subtarea desde el input de adición. */
-function saveNewSubtask() {
-    const input = document.getElementById('subtask-new-txt');
-    const text  = input.value.trim();
-    if (!text) { hideSubtaskAddInput(); return; }
-    subtasksTempList.push({ id: `s_${Date.now()}`, text, completed: false });
-    renderModalSubtasks();
-    hideSubtaskAddInput();
-    saveTaskSubtasksStateOnly();
-}
-
-/**
- * Persiste el estado de las subtareas en la tarea en memoria y en la BD (optimista).
- * En caso de error de red, aplica rollback al estado anterior.
- */
-function saveTaskSubtasksStateOnly() {
-    const task = tasks.find(t => t.id === currentEditingTaskId);
-    if (!task) return;
-
-    const oldSubtasks  = JSON.parse(JSON.stringify(task.subtasks || []));
-    task.subtasks      = JSON.parse(JSON.stringify(subtasksTempList));
-    saveTasksToLocal();
-    renderKanban();
-
-    ApiService.updateSubtareas(task.id, task.subtasks)
-        .catch(() => {
-            task.subtasks      = oldSubtasks;
-            subtasksTempList   = JSON.parse(JSON.stringify(oldSubtasks));
-            saveTasksToLocal();
-            renderKanban();
-            renderModalSubtasks();
-            showToast('Error sincronizando subtareas', 'error');
-        });
-}
-
-/**
- * Guarda los campos base (título, fecha, descripción) de la tarea editada.
- * Aplica optimistic update con rollback si la petición falla.
- */
-function saveTaskDetails() {
-    const task = tasks.find(t => t.id === currentEditingTaskId);
-    if (!task) return;
-
-    const newTitle = document.getElementById('task-modal-title').value.trim();
-    if (!newTitle) { showToast('El título de la tarea no puede estar vacío', 'error'); return; }
-
-    const oldTitle   = task.title;
-    const oldDueDate = task.dueDate;
-    const oldDesc    = task.description;
-
-    task.title       = newTitle;
-    task.dueDate     = document.getElementById('task-modal-due').value;
-    task.description = document.getElementById('task-modal-desc').value.trim();
-
-    saveTasksToLocal();
-    renderKanban();
-    closeTaskModal();
-
-    ApiService.updateTarea(task.id, { titulo: task.title, fecha_vencimiento: task.dueDate || null })
-        .then(() => {
-            loadAppState();
-            showToast('Tarea actualizada exitosamente', 'success');
-        })
-        .catch(() => {
-            task.title       = oldTitle;
-            task.dueDate     = oldDueDate;
-            task.description = oldDesc;
-            saveTasksToLocal();
-            renderKanban();
-            showToast('Error actualizando tarea', 'error');
-        });
-}
-
-/**
- * Elimina la tarea actualmente abierta en el modal, solicitando confirmación.
- */
-function deleteTaskFromModal() {
-    if (!currentEditingTaskId) return;
-    openConfirm('¿Desea eliminar esta tarea de forma permanente?', () => {
-        const id = currentEditingTaskId;
-        closeTaskModal();
-        deleteTask(id);
-    });
+    localStorage.setItem('cursus_bookmarks', JSON.stringify(bookmarks));
 }
 
 /* ==========================================================================
    BÓVEDA DE MARCADORES
    ========================================================================== */
+
+/**
+ * Formatea una URL ingresada por el usuario.
+ * Añade https:// por defecto, o http:// si detecta un entorno local.
+ * @param {string} rawUrl 
+ * @returns {string}
+ */
+function formatBookmarkUrl(rawUrl) {
+    let url = rawUrl.trim();
+    if (!url) return url;
+    
+    if (/^https?:\/\//i.test(url)) {
+        return url;
+    }
+    
+    // Regex simple para localhost, 127.x.x.x, 192.168.x.x, 10.x.x.x
+    const isLocal = /^(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?(\/.*)?$/i.test(url);
+    
+    if (isLocal) {
+        return 'http://' + url;
+    }
+    return 'https://' + url;
+}
+
+/**
+ * Limpia un título redundante convirtiéndolo en null si es exactamente igual al dominio de la URL.
+ * @param {string} title 
+ * @param {string} url 
+ * @returns {string|null}
+ */
+function cleanRedundantTitle(title, url) {
+    if (!title) return null;
+    let hostname = '';
+    try { hostname = new URL(url).hostname.replace(/^www\./i, ''); } catch (_) {}
+    if (hostname && title.toLowerCase() === hostname.toLowerCase()) {
+        return null;
+    }
+    return title || null;
+}
 
 /** Renderiza la lista completa de marcadores. */
 function renderBookmarks() {
@@ -1037,17 +723,23 @@ function renderBookmarks() {
 
         let hostname = '';
         try { hostname = new URL(bm.url).hostname; } catch (_) { hostname = 'link'; }
+        
+        let displayTitle = bm.title;
+        if (!displayTitle) {
+            displayTitle = hostname !== 'link' ? hostname.replace(/^www\./i, '') : bm.url;
+        }
+
         const faviconUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
 
         card.innerHTML = `
           <img class="bm-ic" src="${faviconUrl}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22 fill=%22%234f46e5%22><circle cx=%228%22 cy=%228%22 r=%226%22/></svg>'" alt="Logo">
           <div class="bm-inf">
-            <div class="bm-name">${escapeHTML(bm.title || bm.url)}</div>
+            <div class="bm-name">${escapeHTML(displayTitle)}</div>
             <div class="bm-url">${escapeHTML(bm.url)}</div>
           </div>
           <div class="bm-edit-row">
+            <input type="url" class="bm-edit-inp url" id="bm-edit-url-${bm.id}" value="${escapeHTML(bm.url)}" placeholder="ej. google.com">
             <input type="text" class="bm-edit-inp" id="bm-edit-title-${bm.id}" value="${escapeHTML(bm.title || '')}" placeholder="Título">
-            <input type="url" class="bm-edit-inp url" id="bm-edit-url-${bm.id}" value="${escapeHTML(bm.url)}" placeholder="https://...">
             <div class="bm-edit-btns">
               <button class="bm-act-btn" onclick="window.saveBookmarkInlineEdit('${bm.id}')" title="Guardar">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l3 3 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1078,8 +770,10 @@ function addBookmark() {
     const urlInput = document.getElementById('bm-url');
     const titleInput = document.getElementById('bm-title');
     const btnSave    = document.getElementById('btn-bm-save');
-    const url   = urlInput.value.trim();
+    let url     = urlInput.value.trim();
     const title = titleInput.value.trim();
+
+    url = formatBookmarkUrl(url);
 
     if (!url) { showToast('Introduce una dirección URL válida', 'error'); return; }
     if (!selectedMateriaId) { showToast('Elegí una materia primero', 'warn'); return; }
@@ -1087,7 +781,9 @@ function addBookmark() {
     btnSave.disabled    = true;
     btnSave.textContent = 'Guardando...';
 
-    ApiService.createMarcador(selectedMateriaId, url, title || null)
+    const finalTitle = cleanRedundantTitle(title, url);
+
+    ApiService.createMarcador(selectedMateriaId, url, finalTitle)
         .then(() => {
             loadAppState();
             urlInput.value   = '';
@@ -1103,6 +799,15 @@ function addBookmark() {
 
 /** Activa el modo de edición inline de un marcador. */
 function startBookmarkInlineEdit(id) {
+    const bm = bookmarks.find(b => b.id === id);
+    if (!bm) return;
+
+    // Repoblar inputs con la información real para revertir posibles cambios no guardados
+    const titleInput = document.getElementById(`bm-edit-title-${id}`);
+    const urlInput   = document.getElementById(`bm-edit-url-${id}`);
+    if (titleInput) titleInput.value = bm.title || '';
+    if (urlInput)   urlInput.value   = bm.url || '';
+
     const item = document.getElementById('bm-item-' + id);
     if (item) item.classList.add('editing');
 }
@@ -1121,17 +826,21 @@ function saveBookmarkInlineEdit(id) {
     const bm       = bookmarks.find(b => b.id === id);
     if (!bm) return;
     const newTitle = document.getElementById(`bm-edit-title-${id}`).value.trim();
-    const newUrl   = document.getElementById(`bm-edit-url-${id}`).value.trim();
+    let newUrl     = document.getElementById(`bm-edit-url-${id}`).value.trim();
+    
+    newUrl = formatBookmarkUrl(newUrl);
     if (!newUrl) { showToast('La URL no puede quedar vacía', 'error'); return; }
+
+    const finalTitle = cleanRedundantTitle(newTitle, newUrl);
 
     const oldTitle = bm.title;
     const oldUrl   = bm.url;
-    bm.title = newTitle;
+    bm.title = finalTitle;
     bm.url   = newUrl;
     saveBookmarksToLocal();
     renderBookmarks();
 
-    ApiService.updateMarcador(id, { url: newUrl, titulo: newTitle })
+    ApiService.updateMarcador(id, { url: newUrl, titulo: finalTitle })
         .then(() => {
             loadAppState();
             showToast('Marcador actualizado', 'success');
@@ -1187,18 +896,18 @@ async function loadMateriasCursando() {
     renderMateriaDropdown();
 
     if (materiasCursando.length === 0) {
-        const nameEl  = document.getElementById('mat-selector-name');
-        const badgeEl = document.getElementById('mat-selector-badge');
-        if (nameEl)  nameEl.textContent  = 'Sin materias en curso';
-        if (badgeEl) badgeEl.textContent = '—';
-        selectedMateriaId = null;
-        localStorage.removeItem('cursus_selected_materia');
+        selectMateria(null);
         return;
     }
 
-    const saved       = parseInt(localStorage.getItem('cursus_selected_materia'), 10);
-    const savedValida = materiasCursando.find(m => m.id === saved);
-    selectMateria(savedValida ? saved : materiasCursando[0].id);
+    const savedRaw = localStorage.getItem('cursus_selected_materia');
+    if (!savedRaw || savedRaw === 'independiente') {
+        selectMateria(null);
+    } else {
+        const saved = parseInt(savedRaw, 10);
+        const savedValida = materiasCursando.find(m => m.id === saved);
+        selectMateria(savedValida ? saved : null);
+    }
 }
 
 /** Renderiza las opciones del dropdown de selección de materia. */
@@ -1207,10 +916,13 @@ function renderMateriaDropdown() {
     if (!dropdown) return;
     dropdown.innerHTML = '';
 
-    if (materiasCursando.length === 0) {
-        dropdown.innerHTML = `<div class="mat-dropdown-empty">No estás cursando ninguna materia. Anotate desde "Mis Materias" para poder estudiar acá.</div>`;
-        return;
-    }
+    // Elemento permanente para Estudio Independiente
+    const indItem = document.createElement('div');
+    indItem.className = `mat-dropdown-item ${selectedMateriaId === null ? 'active' : ''}`;
+    indItem.innerHTML = `<span>Estudio Independiente</span>${selectedMateriaId === null ? '<span>✓</span>' : ''}`;
+    indItem.onclick   = () => selectMateria(null);
+    dropdown.appendChild(indItem);
+
     materiasCursando.forEach(m => {
         const item = document.createElement('div');
         item.className = `mat-dropdown-item ${m.id === selectedMateriaId ? 'active' : ''}`;
@@ -1242,21 +954,55 @@ function closeMateriaDropdown() {
  */
 function selectMateria(id) {
     selectedMateriaId = id;
-    localStorage.setItem('cursus_selected_materia', String(id));
+    if (id === null) {
+        localStorage.setItem('cursus_selected_materia', 'independiente');
+    } else {
+        localStorage.setItem('cursus_selected_materia', String(id));
+    }
 
-    const materia = materiasCursando.find(m => m.id === id);
+    const materia = id ? materiasCursando.find(m => m.id === id) : null;
     const nameEl  = document.getElementById('mat-selector-name');
+    const badgeEl = document.getElementById('mat-selector-badge');
+    const helpBtn = document.getElementById('btn-independiente-help');
     const mobNameEl = document.getElementById('mob-materia-name');
     const mobMetaEl = document.getElementById('mob-materia-meta');
-    if (nameEl)   nameEl.textContent   = materia ? materia.nombre : '—';
-    if (mobNameEl) mobNameEl.textContent = materia ? materia.nombre : '—';
+    
+    const nombreMostrar = materia ? materia.nombre : 'Estudio Independiente';
+    
+    if (nameEl)   nameEl.textContent   = nombreMostrar;
+    if (mobNameEl) mobNameEl.textContent = nombreMostrar;
     if (mobMetaEl) mobMetaEl.textContent = materia ? `Nivel ${materia.nivel ?? '—'}` : '—';
+
+    if (badgeEl) {
+        if (materia) {
+            badgeEl.textContent = 'CURSANDO';
+            badgeEl.style.display = 'inline-block';
+            if (helpBtn) helpBtn.style.display = 'none';
+        } else {
+            badgeEl.style.display = 'none';
+            if (helpBtn) {
+                helpBtn.style.display = 'flex';
+                const tooltip = document.getElementById('tooltip-independiente-help');
+                if (tooltip) {
+                    if (materiasCursando.length === 0) {
+                        tooltip.textContent = 'Las tareas y marcadores no están disponibles en "Estudio Independiente". Para usarlos, ve a "Mis Materias" y seleccioná "Cursar" en alguna materia.';
+                    } else {
+                        tooltip.textContent = 'Las tareas y marcadores no están disponibles en "Estudio Independiente". Seleccioná una de tus materias en este menú para usarlos.';
+                    }
+                }
+            }
+        }
+    }
 
     // Limpiar stats mientras se carga el resumen real
     const hoursEl = document.getElementById('chip-stat-hours');
+    const hoursLostEl = document.getElementById('chip-stat-hours-lost');
     const pomosEl = document.getElementById('chip-stat-pomos');
+    const pomosLostEl = document.getElementById('chip-stat-pomos-lost');
     if (hoursEl) hoursEl.textContent = '—';
+    if (hoursLostEl) hoursLostEl.textContent = '—';
     if (pomosEl) pomosEl.textContent = '—';
+    if (pomosLostEl) pomosLostEl.textContent = '—';
 
     renderMateriaDropdown();
     closeMateriaDropdown();
@@ -1269,26 +1015,53 @@ function selectMateria(id) {
  * y sincroniza el log de ciclos del servicio con los datos reales del backend.
  */
 async function loadMateriaResumen() {
-    if (!selectedMateriaId) return;
     try {
-        const data    = await ApiService.getMateriaResumen(selectedMateriaId);
-        const hoursEl = document.getElementById('chip-stat-hours');
-        const pomosEl = document.getElementById('chip-stat-pomos');
-        if (hoursEl) hoursEl.textContent = `${data.horas_semana}h`;
-        if (pomosEl) pomosEl.textContent = data.sesiones_totales;
+        const data = selectedMateriaId
+            ? await ApiService.getMateriaResumen(selectedMateriaId)
+            : await ApiService.getResumenIndependiente();
+            
+        updateResumenUI(data);
 
-        // Sincronizar el servicio para que el Observer actualice el log del timer
-        pomodoroService.sincronizarCiclosConBackend({
-            sesiones_completadas_hoy: data.sesiones_hoy.length,
-            log: data.sesiones_hoy.map(s => ({
-                time:     s.hora,
-                duration: `${Math.floor(s.duracion_segundos / 60)}:00`,
-                status:   '✓ Completada',
-            })),
-        });
+        // Compartir con otras pestañas
+        localStorage.setItem('cursus_resumen_data', JSON.stringify({ 
+            materiaId: selectedMateriaId, 
+            data, 
+            timestamp: Date.now() 
+        }));
     } catch (e) {
         console.error('Error cargando resumen de materia', e);
     }
+}
+
+/**
+ * Actualiza el DOM con los datos del resumen.
+ */
+function updateResumenUI(data) {
+    const hoursEl = document.getElementById('chip-stat-hours');
+    const hoursLostEl = document.getElementById('chip-stat-hours-lost');
+    const pomosEl = document.getElementById('chip-stat-pomos');
+    const pomosLostEl = document.getElementById('chip-stat-pomos-lost');
+    if (hoursEl) hoursEl.textContent = `${data.horas_semana}h`;
+    if (hoursLostEl) hoursLostEl.textContent = `${data.horas_perdidas_semana}h`;
+    if (pomosEl) pomosEl.textContent = data.sesiones_totales;
+    if (pomosLostEl) pomosLostEl.textContent = data.sesiones_abandonadas_totales;
+
+    // Sincronizar el servicio para que el Observer actualice el log del timer
+    pomodoroService.sincronizarCiclosConBackend({
+        sesiones_completadas_hoy: data.sesiones_hoy.length,
+        // Revertir para que las sesiones más nuevas queden arriba (como en el modo local)
+        log: data.sesiones_hoy.reverse().map(s => {
+            let statusInfo = { text: 'Completada', class: 'status-completada', icon: 'check-check', isOffline: false };
+            if (s.estado === 'completada_parcial') statusInfo = { text: 'Parcial', class: 'status-parcial', icon: 'check', isOffline: false };
+            else if (s.estado === 'abandonada') statusInfo = { text: 'Abandonada', class: 'status-abandonada', icon: 'x', isOffline: false };
+            
+            return {
+                time:     s.hora,
+                duration: `${Math.floor(s.duracion_segundos / 60)}:00`,
+                status:   statusInfo,
+            };
+        }),
+    });
 }
 
 /* ==========================================================================
@@ -1309,7 +1082,7 @@ function updateFocusActiveGoal() {
     const nextBtn          = document.getElementById('focus-goal-next-btn');
     if (!focusGoalTitle) return;
 
-    const progressTasks = tasks.filter(t => t.column === 'progress');
+    const progressTasks = KanbanManager.tasks.filter(t => t.column === 'progress');
     if (progressTasks.length > 0) {
         if (activeFocusTaskIndex >= progressTasks.length) activeFocusTaskIndex = 0;
         const activeTask = progressTasks[activeFocusTaskIndex];
@@ -1369,11 +1142,11 @@ function enterFocusMode() {
  * En Modo Estricto con reloj corriendo, solicita confirmación y registra la falla.
  */
 function exitFocusMode() {
-    const strictMode = localStorage.getItem(LS_KEYS.MODO_ESTRICTO) === 'true';
     const snapshot   = pomodoroService.obtenerSnapshot();
+    const strictMode = snapshot.config.modo_estricto;
     if (strictMode && snapshot.state.estado_reloj === 'corriendo') {
         openConfirm(
-            '¡Estás en modo estricto! Salir ahora anulará tu ciclo de concentración actual y registrará una sesión fallida. ¿Realmente quieres rendirte?',
+            '¡Estás en modo estricto! Salir ahora interrumpirá tu concentración. El tiempo acumulado se guardará en tu historial como sesión abandonada. ¿Realmente quieres rendirte?',
             () => {
                 pomodoroService.reiniciarFase();
                 performExitFocusMode();
@@ -1537,51 +1310,10 @@ function changeFocusPhase(phase) {
     showToast(`Cambiado a fase: ${labels[phase] || phase}`, 'success');
 }
 
-/* Lofi player */
-let currentLofiVideoId = '3yH2Wo2SaIM';
-
-/**
- * Abre o cierra el panel del reproductor Lofi en el Modo Concentración.
- */
-function toggleLofiPanel() {
-    const panel  = document.getElementById('focus-lofi-panel');
-    const btn    = document.getElementById('lofi-panel-toggle');
-    const iframe = document.getElementById('focus-lofi-iframe');
-    if (!panel || !iframe) return;
-
-    const isOpen = panel.classList.contains('show');
-    if (isOpen) {
-        panel.classList.remove('show');
-        if (btn) btn.classList.remove('active');
-        iframe.src = '';
-    } else {
-        panel.classList.add('show');
-        if (btn) btn.classList.add('active');
-        const select    = document.getElementById('focus-lofi-select');
-        const videoId   = select ? select.value : currentLofiVideoId;
-        const separator = videoId.includes('?') ? '&' : '?';
-        iframe.src      = `https://www.youtube.com/embed/${videoId}${separator}enablejsapi=1&autoplay=1&mute=0`;
-    }
-}
-
-/**
- * Cambia el canal del reproductor Lofi.
- * @param {string} videoId - ID del video de YouTube a cargar.
- */
-function changeLofiChannel(videoId) {
-    currentLofiVideoId = videoId;
-    const panel  = document.getElementById('focus-lofi-panel');
-    const iframe = document.getElementById('focus-lofi-iframe');
-    if (!panel || !iframe) return;
-    if (panel.classList.contains('show')) {
-        const separator = videoId.includes('?') ? '&' : '?';
-        iframe.src      = `https://www.youtube.com/embed/${videoId}${separator}enablejsapi=1&autoplay=1&mute=0`;
-    }
-}
-
+/* Lofi player extraido a lofi-panel.js */
 /** Navega a la tarea anterior en el carrusel del Modo Concentración. */
 function prevFocusTask() {
-    const progressTasks = tasks.filter(t => t.column === 'progress');
+    const progressTasks = KanbanManager.tasks.filter(t => t.column === 'progress');
     if (progressTasks.length <= 1) return;
     activeFocusTaskIndex = activeFocusTaskIndex <= 0 ? progressTasks.length - 1 : activeFocusTaskIndex - 1;
     updateFocusActiveGoal();
@@ -1589,7 +1321,7 @@ function prevFocusTask() {
 
 /** Navega a la tarea siguiente en el carrusel del Modo Concentración. */
 function nextFocusTask() {
-    const progressTasks = tasks.filter(t => t.column === 'progress');
+    const progressTasks = KanbanManager.tasks.filter(t => t.column === 'progress');
     if (progressTasks.length <= 1) return;
     activeFocusTaskIndex = (activeFocusTaskIndex + 1) >= progressTasks.length ? 0 : activeFocusTaskIndex + 1;
     updateFocusActiveGoal();
@@ -1600,7 +1332,7 @@ function nextFocusTask() {
  * Usa UI optimista con rollback en caso de error de red.
  */
 function completeFocusActiveTask() {
-    const progressTasks = tasks.filter(t => t.column === 'progress');
+    const progressTasks = KanbanManager.tasks.filter(t => t.column === 'progress');
     if (progressTasks.length === 0) return;
     const activeTask = progressTasks[activeFocusTaskIndex];
     if (!activeTask) return;
@@ -1608,21 +1340,21 @@ function completeFocusActiveTask() {
     const oldCol = activeTask.column;
     const taskId = activeTask.id;
     activeTask.column = 'done';
-    updateCounts();
+    KanbanManager.updateCounts();
     if (activeFocusTaskIndex >= progressTasks.length - 1 && activeFocusTaskIndex > 0) activeFocusTaskIndex--;
     updateFocusActiveGoal();
 
     ApiService.moveTarea(taskId, 'finalizado')
         .then(() => {
-            saveTasksToLocal();
-            renderKanban();
+            KanbanManager.saveTasksToLocal();
+            KanbanManager.renderKanban();
             showToast('¡Tarea completada con éxito! 🎉', 'success');
         })
         .catch(() => {
             activeTask.column = oldCol;
-            updateCounts();
+            KanbanManager.updateCounts();
             updateFocusActiveGoal();
-            renderKanban();
+            KanbanManager.renderKanban();
             showToast('Error al completar la tarea', 'error');
         });
 }
@@ -1639,7 +1371,7 @@ function toggleFocusSubtasksDrawer() {
 function renderFocusSubtasks() {
     const listContainer = document.getElementById('focus-subtasks-list');
     if (!listContainer) return;
-    const progressTasks = tasks.filter(t => t.column === 'progress');
+    const progressTasks = KanbanManager.tasks.filter(t => t.column === 'progress');
     if (progressTasks.length === 0) {
         listContainer.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:0.5rem 0;">No hay tareas en curso</div>';
         return;
@@ -1666,21 +1398,21 @@ function renderFocusSubtasks() {
  * @param {number} index - Índice de la subtarea.
  */
 function toggleFocusSubtaskStatus(index) {
-    const progressTasks = tasks.filter(t => t.column === 'progress');
+    const progressTasks = KanbanManager.tasks.filter(t => t.column === 'progress');
     if (progressTasks.length === 0) return;
     const activeTask = progressTasks[activeFocusTaskIndex];
     if (!activeTask || !activeTask.subtasks || !activeTask.subtasks[index]) return;
 
     activeTask.subtasks[index].completed = !activeTask.subtasks[index].completed;
-    saveTasksToLocal();
-    renderKanban();
+    KanbanManager.saveTasksToLocal();
+    KanbanManager.renderKanban();
     renderFocusSubtasks();
 
     ApiService.updateSubtareas(activeTask.id, activeTask.subtasks)
         .catch(() => {
             activeTask.subtasks[index].completed = !activeTask.subtasks[index].completed;
-            saveTasksToLocal();
-            renderKanban();
+            KanbanManager.saveTasksToLocal();
+            KanbanManager.renderKanban();
             renderFocusSubtasks();
             showToast('Error sincronizando subtareas', 'error');
         });
@@ -1740,19 +1472,75 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     pomodoroService.addEventListener('pomo:faseCompletada', () => {
         // 1. Reproducir alarma via módulo de audio centralizado (pomo-audio-player.js)
-        const alarmSound = localStorage.getItem(LS_KEYS.SONIDO_ALARMA) || 'chime';
-        playPomoAlarm(alarmSound);
+        const config = pomodoroService.obtenerSnapshot().config;
+        if (config.reproducir_alarma) {
+            playPomoAlarm(config.sonido_alarma);
+        }
     });
 
     pomodoroService.addEventListener('pomo:sesionRegistradaBackend', () => {
         // Refrescar el resumen de la materia (stats, etc) en la vista activa
-        if (selectedMateriaId) {
-            loadMateriaResumen();
-        }
+        requestResumenUpdate();
     });
 
     // --- Inicializar el Servicio del Pomodoro (SSOT) ---
     pomodoroService.init(showToast);
+    pomodoroService.sincronizarConfigDesdeBackend();
+
+    // --- Configurar Tooltip de Ayuda para Estudio Independiente ---
+    const btnIndependienteHelp = document.getElementById('btn-independiente-help');
+    const tooltipIndependienteHelp = document.getElementById('tooltip-independiente-help');
+    if (btnIndependienteHelp && tooltipIndependienteHelp) {
+        btnIndependienteHelp.addEventListener('click', (e) => {
+            e.stopPropagation();
+            tooltipIndependienteHelp.style.display = tooltipIndependienteHelp.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Ocultar al hacer clic en cualquier otro lado
+        document.addEventListener('click', () => {
+            tooltipIndependienteHelp.style.display = 'none';
+        });
+        tooltipIndependienteHelp.addEventListener('click', (e) => {
+            e.stopPropagation(); // Evitar que clics dentro del tooltip lo cierren
+        });
+    }
+
+    // --- Inicializar KanbanManager ---
+    KanbanManager.init({
+        selectedMateriaId: null,
+        tasks: [],
+        showToast,
+        openConfirm,
+        escapeHTML,
+        reloadApp: loadAppState,
+        updateFocusActiveGoal
+    });
+
+    // --- Inicializar cola offline de sesiones Pomodoro ---
+    PomodoroSyncQueue.init();
+    
+    window.addEventListener('pomo:syncQueueChanged', (e) => {
+        const count = e.detail.count;
+        const ind = document.getElementById('offline-sync-indicator');
+        if (ind) {
+            ind.style.display = count > 0 ? 'inline-block' : 'none';
+        }
+        
+        // Si la cola se vació después de tener items, refrescamos el log desde el backend
+        if (count === 0 && window._hadPendingSync) {
+            window._hadPendingSync = false;
+            if (typeof pomodoroService !== 'undefined') {
+                pomodoroService.marcarSesionesComoSincronizadas();
+            }
+            loadMateriaResumen(); // Re-renderiza las sesiones, marcándolas como "sincronizadas"
+        } else if (count > 0) {
+            window._hadPendingSync = true;
+        }
+    });
+    // Forzar actualización inicial
+    window.dispatchEvent(new CustomEvent('pomo:syncQueueChanged', {
+        detail: { count: PomodoroSyncQueue.getPendingCount() }
+    }));
 
     // --- Botón de confirmación del modal genérico ---
     const confirmYesBtn = document.getElementById('confirm-yes-btn');
@@ -1771,24 +1559,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Modo Estricto: detector de pérdida de foco ---
     document.addEventListener('visibilitychange', () => {
-        const strictMode = localStorage.getItem(LS_KEYS.MODO_ESTRICTO) === 'true';
-        const snapshot   = pomodoroService.obtenerSnapshot();
+        const snapshot = pomodoroService.obtenerSnapshot();
+        const strictMode = snapshot.config.modo_estricto;
         
         // CORRECCIÓN: Solo aplicar la regla si el reloj corre Y estamos en fase de enfoque.
         const enEnfoqueCorriendo = snapshot.state.estado_reloj === 'corriendo' && snapshot.state.fase_actual === 'enfoque';
 
         if (document.hidden && strictMode && enEnfoqueCorriendo) {
-            let distractCount = parseInt(sessionStorage.getItem('cursus_strict_distractions') || '0', 10);
-            distractCount++;
-            sessionStorage.setItem('cursus_strict_distractions', String(distractCount));
+            pomodoroService.registrarDistraccion();
             // Llamada al módulo de audio centralizado (SRP)
             playPomoAlarm('beep');
         } else if (!document.hidden && strictMode && enEnfoqueCorriendo) {
-            const distractCount = sessionStorage.getItem('cursus_strict_distractions') || '0';
-            if (distractCount !== '0') {
+            const distractCount = pomodoroService.obtenerDistracciones();
+            if (distractCount > 0) {
                 showToast(`¡Atención! Te has distraído cambiando de pestaña. Distracciones: ${distractCount}. Mantén el enfoque.`, 'warn');
-                sessionStorage.setItem('cursus_strict_distractions', '0');
             }
+        }
+    });
+
+    // Escuchar cambios de configuración para resetear distracciones si se apaga el modo estricto
+    pomodoroService.addEventListener('pomo:estadoCambiado', () => {
+        if (!pomodoroService.obtenerSnapshot().config.modo_estricto) {
+            pomodoroService.reiniciarDistracciones();
         }
     });
 
@@ -1801,6 +1593,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Cargar materias y estado inicial ---
     await loadMateriasCursando();
+});
+
+/* ==========================================================================
+   SINCRONIZACIÓN MULTI-TAB (Auto-Update al finalizar sesiones)
+   ========================================================================== */
+
+function requestResumenUpdate() {
+    const lockKey = `cursus_resumen_lock_${selectedMateriaId || 'indep'}`;
+    const myTicket = Date.now() + '_' + Math.random();
+    const lastSuccess = parseInt(localStorage.getItem(lockKey + '_success') || '0');
+    
+    // Bloqueo distribuido: Solo una pestaña debe hacer el fetch a la API
+    if (Date.now() - lastSuccess >= 5000) {
+        localStorage.setItem(lockKey, myTicket);
+        setTimeout(() => {
+            // Si sigo siendo el dueño del lock después del retraso aleatorio (Jitter)
+            if (localStorage.getItem(lockKey) === myTicket) {
+                loadMateriaResumen().then(() => {
+                    localStorage.setItem(lockKey + '_success', Date.now());
+                });
+            }
+        }, 500 + Math.random() * 500);
+    }
+}
+
+let lastSyncCount = 0;
+window.addEventListener('pomo:syncQueueChanged', (e) => {
+    const currentCount = e.detail.count;
+    // Si la cola se vació (pasó de >0 a 0), significa que se acaba de guardar una sesión en DB
+    if (lastSyncCount > 0 && currentCount === 0) {
+        requestResumenUpdate();
+    }
+    lastSyncCount = currentCount;
+});
+
+// Escuchar si OTRA pestaña actualizó los datos para refrescar la UI sin hacer petición a la API
+window.addEventListener('storage', (e) => {
+    if (e.key === 'cursus_resumen_data' && e.newValue) {
+        const cache = JSON.parse(e.newValue);
+        // Verificar que estamos en la misma materia y que los datos son recientes (< 10 segundos)
+        if (cache.materiaId === selectedMateriaId && Date.now() - cache.timestamp < 10000) {
+            updateResumenUI(cache.data);
+        }
+    }
 });
 
 /* ==========================================================================
@@ -1818,27 +1654,7 @@ window.closeCustomPomoModal   = closeCustomPomoModal;
 window.saveCustomPomoSettings = saveCustomPomoSettings;
 window.testSelectedSound      = testSelectedSound;
 
-// Kanban
-window.showInlineAddCardForm  = showInlineAddCardForm;
-window.saveInlineCard         = saveInlineCard;
-window.cancelInlineAddCard    = cancelInlineAddCard;
-window.allowDrop              = allowDrop;
-window.leaveDrop              = leaveDrop;
-window.dropCard               = dropCard;
-window.deleteTask             = deleteTask;
 
-// Modal de Tarea
-window.closeTaskModal         = closeTaskModal;
-window.handleDateAutocomplete = handleDateAutocomplete;
-window.saveNewSubtask         = saveNewSubtask;
-window.hideSubtaskAddInput    = hideSubtaskAddInput;
-window.showSubtaskAddInput    = showSubtaskAddInput;
-window.deleteTaskFromModal    = deleteTaskFromModal;
-window.saveTaskDetails        = saveTaskDetails;
-window.toggleSubtaskStatus    = toggleSubtaskStatus;
-window.saveSubtaskText        = saveSubtaskText;
-window.handleSubtaskEnter     = handleSubtaskEnter;
-window.deleteSubtask          = deleteSubtask;
 
 // Marcadores
 window.addBookmark              = addBookmark;

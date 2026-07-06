@@ -32,11 +32,11 @@ class FaseEnfoque {
     /**
      * Devuelve la duración en segundos configurada para el enfoque.
      * @param {object} settings - Configuración activa del Pomodoro.
-     * @param {number} settings.focusTime - Minutos de enfoque.
+     * @param {number} settings.tiempo_enfoque - Minutos de enfoque.
      * @returns {number} Duración en segundos.
      */
     duracion(settings) {
-        return settings.focusTime * 60;
+        return settings.tiempo_enfoque * 60;
     }
 
     /**
@@ -49,11 +49,11 @@ class FaseEnfoque {
      * @param {object} ciclos - Estado mutable de los ciclos.
      * @param {number} ciclos.ciclo_actual - Número del ciclo en curso (1-indexado).
      * @param {object} settings - Configuración activa del Pomodoro.
-     * @param {number} settings.sessionsPerCycle - Ciclos antes del descanso largo.
+     * @param {number} settings.sesiones_por_ciclo - Ciclos antes del descanso largo.
      * @returns {string} Clave de la fase siguiente ('descanso_corto' | 'descanso_largo').
      */
     siguiente(ciclos, settings) {
-        if (ciclos.ciclo_actual < settings.sessionsPerCycle) {
+        if (ciclos.ciclo_actual < settings.sesiones_por_ciclo) {
             ciclos.ciclo_actual++;
             return 'descanso_corto';
         }
@@ -84,11 +84,11 @@ class FaseEnfoque {
 class FaseDescansoCorto {
     /**
      * @param {object} settings
-     * @param {number} settings.shortBreak - Minutos de descanso corto.
+     * @param {number} settings.descanso_corto - Minutos de descanso corto.
      * @returns {number} Duración en segundos.
      */
     duracion(settings) {
-        return settings.shortBreak * 60;
+        return settings.descanso_corto * 60;
     }
 
     /**
@@ -124,11 +124,11 @@ class FaseDescansoCorto {
 class FaseDescansoLargo {
     /**
      * @param {object} settings
-     * @param {number} settings.longBreak - Minutos de descanso largo.
+     * @param {number} settings.descanso_largo - Minutos de descanso largo.
      * @returns {number} Duración en segundos.
      */
     duracion(settings) {
-        return settings.longBreak * 60;
+        return settings.descanso_largo * 60;
     }
 
     /**
@@ -161,7 +161,7 @@ class FaseDescansoLargo {
  * y en el estado interno del servicio) con su objeto de fase correspondiente.
  *
  * Uso: `ESTADOS_POMO['enfoque'].duracion(settings)` en lugar de
- * `if (fase === 'enfoque') return settings.focusTime * 60`.
+ * `if (fase === 'enfoque') return settings.tiempo_enfoque * 60`.
  *
  * Incluir una nueva fase en el futuro requiere únicamente:
  * 1. Crear la clase que implemente la interfaz de cuatro métodos.

@@ -15,13 +15,15 @@ class SesionPomodoroController extends Controller
     {
         $data = $request->validate([
             'materia_id' => 'nullable|exists:materias,id',
-            'duracion_segundos' => 'required|integer|min:1',
+            'duracion_segundos' => 'required|integer|min:0',
+            'estado' => 'required|in:completada,completada_parcial,abandonada'
         ]);
 
         $sesion = SesionPomodoro::create([
             'usuario_id' => $request->user()->id,
             'materia_id' => $data['materia_id'] ?? null,
             'duracion_segundos' => $data['duracion_segundos'],
+            'estado' => $data['estado'],
             'completada_en' => now(),
         ]);
 
@@ -152,25 +154,96 @@ class SesionPomodoroController extends Controller
         $horasSemana = SesionPomodoro::where('usuario_id', $usuarioId)
             ->where('materia_id', $materia->id)
             ->where('completada_en', '>=', now()->startOfWeek())
+            ->whereIn('estado', ['completada', 'completada_parcial'])
+            ->sum('duracion_segundos') / 3600;
+
+        $horasPerdidas = SesionPomodoro::where('usuario_id', $usuarioId)
+            ->where('materia_id', $materia->id)
+            ->where('completada_en', '>=', now()->startOfWeek())
+            ->where('estado', 'abandonada')
             ->sum('duracion_segundos') / 3600;
 
         $sesionesTotales = SesionPomodoro::where('usuario_id', $usuarioId)
             ->where('materia_id', $materia->id)
+            ->whereIn('estado', ['completada', 'completada_parcial'])
             ->count();
+
+        $sesionesAbandonadasTotales = SesionPomodoro::where('usuario_id', $usuarioId)
+            ->where('materia_id', $materia->id)
+            ->where('estado', 'abandonada')
+            ->count();
+
+        $tz = $request->header('X-Timezone', config('app.timezone'));
+        $inicioDia = Carbon::now($tz)->startOfDay()->utc();
+        $finDia = Carbon::now($tz)->endOfDay()->utc();
 
         $sesionesHoy = SesionPomodoro::where('usuario_id', $usuarioId)
             ->where('materia_id', $materia->id)
-            ->whereDate('completada_en', Carbon::today())
+            ->whereBetween('completada_en', [$inicioDia, $finDia])
             ->orderBy('completada_en')
             ->get()
             ->map(fn ($sesion) => [
-                'hora' => $sesion->completada_en->format('H:i'),
+                'hora' => $sesion->completada_en->copy()->tz($tz)->format('H:i'),
                 'duracion_segundos' => $sesion->duracion_segundos,
+                'estado' => $sesion->estado,
             ]);
 
         return response()->json([
             'horas_semana' => round($horasSemana, 1),
+            'horas_perdidas_semana' => round($horasPerdidas, 1),
             'sesiones_totales' => $sesionesTotales,
+            'sesiones_abandonadas_totales' => $sesionesAbandonadasTotales,
+            'sesiones_hoy' => $sesionesHoy,
+        ]);
+    }
+
+    // Resumen para Estudio Independiente (materia_id IS NULL)
+    public function resumenIndependiente(Request $request)
+    {
+        $usuarioId = $request->user()->id;
+
+        $horasSemana = SesionPomodoro::where('usuario_id', $usuarioId)
+            ->whereNull('materia_id')
+            ->where('completada_en', '>=', now()->startOfWeek())
+            ->whereIn('estado', ['completada', 'completada_parcial'])
+            ->sum('duracion_segundos') / 3600;
+
+        $horasPerdidas = SesionPomodoro::where('usuario_id', $usuarioId)
+            ->whereNull('materia_id')
+            ->where('completada_en', '>=', now()->startOfWeek())
+            ->where('estado', 'abandonada')
+            ->sum('duracion_segundos') / 3600;
+
+        $sesionesTotales = SesionPomodoro::where('usuario_id', $usuarioId)
+            ->whereNull('materia_id')
+            ->whereIn('estado', ['completada', 'completada_parcial'])
+            ->count();
+
+        $sesionesAbandonadasTotales = SesionPomodoro::where('usuario_id', $usuarioId)
+            ->whereNull('materia_id')
+            ->where('estado', 'abandonada')
+            ->count();
+
+        $tz = $request->header('X-Timezone', config('app.timezone'));
+        $inicioDia = Carbon::now($tz)->startOfDay()->utc();
+        $finDia = Carbon::now($tz)->endOfDay()->utc();
+
+        $sesionesHoy = SesionPomodoro::where('usuario_id', $usuarioId)
+            ->whereNull('materia_id')
+            ->whereBetween('completada_en', [$inicioDia, $finDia])
+            ->orderBy('completada_en')
+            ->get()
+            ->map(fn ($sesion) => [
+                'hora' => $sesion->completada_en->copy()->tz($tz)->format('H:i'),
+                'duracion_segundos' => $sesion->duracion_segundos,
+                'estado' => $sesion->estado,
+            ]);
+
+        return response()->json([
+            'horas_semana' => round($horasSemana, 1),
+            'horas_perdidas_semana' => round($horasPerdidas, 1),
+            'sesiones_totales' => $sesionesTotales,
+            'sesiones_abandonadas_totales' => $sesionesAbandonadasTotales,
             'sesiones_hoy' => $sesionesHoy,
         ]);
     }

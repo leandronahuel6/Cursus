@@ -19,8 +19,10 @@
  *
  * // Reproducir al recibir el evento del servicio
  * pomodoroService.addEventListener('pomo:faseCompletada', (e) => {
- *     const sound = localStorage.getItem('cursus_pomo_alarm_sound') || 'chime';
- *     playPomoAlarm(sound);
+ *     const config = pomodoroService.obtenerSnapshot().config;
+ *     if (config.reproducir_alarma) {
+ *         playPomoAlarm(config.sonido_alarma);
+ *     }
  * });
  * ```
  *

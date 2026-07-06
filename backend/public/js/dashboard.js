@@ -46,14 +46,27 @@ function renderMatsGrid(materias) {
 
 function renderStudyPanel(materiasCursando) {
   const heroSubject = document.getElementById('study-hero-subject');
-  if (heroSubject) {
-    heroSubject.textContent = materiasCursando[0] ? materiasCursando[0].nombre : 'Sin materias en curso';
+  
+  // 1. Determinar heroMateria basada en la última selección del usuario
+  const savedRaw = localStorage.getItem('cursus_selected_materia');
+  let heroMateria = null; // null = 'Estudio Independiente'
+
+  if (savedRaw && savedRaw !== 'independiente') {
+      const savedId = parseInt(savedRaw, 10);
+      heroMateria = materiasCursando.find(m => m.id === savedId) || null;
   }
 
+  // 2. Renderizar el título
+  if (heroSubject) {
+    heroSubject.textContent = heroMateria ? heroMateria.nombre : 'Estudio Independiente';
+  }
+
+  // 3. Renderizar las demás materias (excluyendo a la heroMateria)
   const list = document.getElementById('study-others-list');
   if (list) {
     list.innerHTML = '';
-    materiasCursando.slice(1).forEach(m => {
+    const otrasMaterias = materiasCursando.filter(m => m !== heroMateria);
+    otrasMaterias.forEach(m => {
       const item = document.createElement('div');
       item.className = 'so-item';
       item.onclick = () => { window.location.href = '/area-estudio'; };
@@ -62,8 +75,17 @@ function renderStudyPanel(materiasCursando) {
     });
   }
 
-  if (materiasCursando[0]) {
-    loadSesionesHoy(materiasCursando[0]);
+  // 4. Cargar sesiones
+  if (heroMateria) {
+    loadSesionesHoy(heroMateria);
+  } else {
+    // Si es Estudio Independiente, no hay endpoint por ahora, pero explicamos dónde se guarda
+    const listEl = document.getElementById('study-sessions-list');
+    const sub = document.getElementById('study-hero-sub');
+    if (sub) sub.textContent = 'Sesiones no vinculadas';
+    if (listEl) {
+        listEl.innerHTML = '<div class="ss-empty" style="padding:10px 0;color:var(--t3);font-size:13px">Las sesiones de estudio independiente se registran en tu historial general. Selecciona una materia específica en el Área de Estudio para ver su resumen diario aquí.</div>';
+    }
   }
 }
 

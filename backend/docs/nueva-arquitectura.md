@@ -55,7 +55,8 @@ public/
 │   │   └── PomodoroStates.js # State Pattern: FaseEnfoque, FaseDescansoCorto, FaseDescansoLargo
 │   ├── services/           # Servicios desacoplados de la UI (ES6 Modules)
 │   │   ├── ApiService.js     # Repository Pattern: abstrae TODOS los fetch de la app
-│   │   └── PomodoroStateService.js # Observer/SSOT: estado canónico del Pomodoro + motor Time Deltas
+│   │   ├── PomodoroStateService.js # Observer/SSOT: estado canónico del Pomodoro + motor Time Deltas
+│   │   └── PomodoroSyncQueue.js # Cola Offline: Sincronización en segundo plano de sesiones Pomodoro
 │   ├── shared/             # Scripts transversales a toda la app
 │   │   ├── api.js          # Utilidades para llamadas fetch al backend
 │   │   ├── router.js       # Manejo de navegación/historial
@@ -65,7 +66,9 @@ public/
 │   └── views/              # Lógica específica por página (orquestadores)
 │       ├── welcome.js      # Animaciones de la landing
 │       ├── dashboard.js    # Lógica del panel de inicio
-│       ├── area-estudio.js # Orquestador: Kanban, Marcadores, suscriptor del Observer Pomodoro
+│       ├── area-estudio.js # Orquestador principal del Área de Estudio
+│       ├── kanban.js       # Lógica separada del Tablero Kanban y Modal de Tareas
+│       ├── lofi-panel.js   # Panel de ruido blanco y música Lo-Fi
 │       ├── materias.js     # Interacciones del árbol de materias
 │       ├── alertas/        # Lógica compleja de la página de alertas dividida
 │       │   ├── alertas-data.js     # Manejo de datos y mocks
@@ -128,6 +131,7 @@ resources/views/
 | **Singleton** | `pomodoroService` (exportado) | Una única instancia del servicio para garantizar el SSOT. Consumidores (`pomo-float.js`, futuros módulos) deben importarlo directamente. |
 | **SRP — Módulo de Audio** | `js/shared/pomo-audio-player.js` | Encapsula exclusivamente la síntesis de sonido con la Web Audio API. No conoce el estado del Pomodoro ni el DOM. Las vistas lo importan y lo activan al recibir el evento `pomo:faseCompletada`. |
 | **Web Locks API** | `_registrarSesionConDedup()` en `area-estudio.js` | Sustituye el token de localStorage para la deduplicación multi-pestaña. `navigator.locks.request('cursus_pomo_dedup', { mode: 'exclusive' }, ...)` garantiza exclusión atómica: si N pestañas intentan registrar al mismo milisegundo, el navegador las encola y solo el líder realiza el `fetch`. |
+| **Offline-First / Queue** | `js/services/PomodoroSyncQueue.js` | Cola de sincronización local que retiene sesiones terminadas (localStorage) si el servidor falla o no hay conexión, reintentando automáticamente al volver a estar online sin bloquear la UI principal. |
 
 ---
 
