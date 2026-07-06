@@ -61,6 +61,8 @@ class PomodoroStateService extends EventTarget {
     constructor() {
         super();
 
+        window.__pomodoroServiceActive = true;
+
         /**
          * Estado operativo del reloj.
          * @type {{fase_actual: string, estado_reloj: string, tiempo_restante: number, timestamp_ultimo_cambio: number}}
@@ -189,30 +191,63 @@ class PomodoroStateService extends EventTarget {
                     this._state = savedState;
 
                     if (this._state.estado_reloj === 'corriendo') {
-                        const segundosAusente = Math.floor((ahora - this._state.timestamp_ultimo_cambio) / 1000);
-
-                        if (segundosAusente <= 120) {
-                            // Recarga rápida (< 2 min): descontar tiempo real ausente y reanudar
-                            this._state.tiempo_restante  = Math.max(0, this._state.tiempo_restante - segundosAusente);
-                            this._state.timestamp_ultimo_cambio = ahora;
-
-                            if (this._state.tiempo_restante <= 0) {
-                                // El timer vencía mientras se estuvo fuera
-                                this._manejarFaseCompleta();
-                            } else {
-                                this._iniciarTicker();
+                        // Fast-forward matemático
+                        let segundosAusente = Math.floor((ahora - this._state.timestamp_ultimo_cambio) / 1000);
+                        let autoPlay = this._config.auto_reproduccion_fases;
+                        
+                        let tiempoRestanteLocal = this._state.tiempo_restante;
+                        let faseActualLocal = this._state.fase_actual;
+                        
+                        while (segundosAusente > 0 && segundosAusente >= tiempoRestanteLocal) {
+                            segundosAusente -= tiempoRestanteLocal;
+                            
+                            // 1. Simular fin de fase
+                            const faseObj = ESTADOS_POMO[faseActualLocal];
+                            if (faseActualLocal === 'enfoque') {
+                                this._ciclos.sesiones_completadas_hoy++;
+                                const logDate = new Date(ahora - (segundosAusente * 1000));
+                                const hhmm  = `${String(logDate.getHours()).padStart(2, '0')}:${String(logDate.getMinutes()).padStart(2, '0')}`;
+                                this._ciclos.log.unshift({
+                                    time:     hhmm,
+                                    duration: `${this._settings.tiempo_enfoque}:00`,
+                                    status:   this._formatSessionStatus('completada'),
+                                });
                             }
-
-                        } else {
-                            // Ausencia prolongada (> 2 min): Auto-Pausa y descuento máximo 120 s
-                            this._state.tiempo_restante  = Math.max(0, this._state.tiempo_restante - 120);
-                            this._state.estado_reloj     = 'pausado';
-                            this._state.timestamp_ultimo_cambio = ahora;
-                            this._persistirEstado();
-                            this._toast(
-                                'Auto-Pausa: se detectó inactividad prolongada. Se descontaron 120 segundos.',
-                                'warn'
-                            );
+                            
+                            // 2. Transición a siguiente fase
+                            const siguienteClave = faseObj.siguiente(this._ciclos, this._settings);
+                            const siguienteObj = ESTADOS_POMO[siguienteClave];
+                            
+                            if (this._ciclos.ciclo_actual === 1) {
+                                this._ciclos.distracciones = 0;
+                            }
+                            
+                            faseActualLocal = siguienteClave;
+                            tiempoRestanteLocal = siguienteObj.duracion(this._settings);
+                            
+                            // 3. Evaluar autoplay
+                            if (!autoPlay) {
+                                // Se detiene al inicio de la nueva fase
+                                segundosAusente = 0;
+                                this._state.estado_reloj = 'detenido';
+                                break;
+                            }
+                        }
+                        
+                        // Aplicar los residuos de tiempo a la fase resultante
+                        this._state.fase_actual = faseActualLocal;
+                        this._state.tiempo_restante = Math.max(0, tiempoRestanteLocal - segundosAusente);
+                        this._state.timestamp_ultimo_cambio = ahora;
+                        
+                        if (!autoPlay) {
+                            this._state.estado_reloj = 'detenido';
+                        }
+                        
+                        this._persistirEstado();
+                        this._persistirCiclos();
+                        
+                        if (this._state.estado_reloj === 'corriendo') {
+                            this._iniciarTicker();
                         }
                     }
                 }
@@ -281,6 +316,8 @@ class PomodoroStateService extends EventTarget {
      *                    `false` si era una reanudación desde 'pausado'.
      */
     iniciar() {
+        this._solicitarPermisosNotificacion();
+        
         const esNueva = this._state.estado_reloj === 'detenido';
         this._state.estado_reloj = 'corriendo';
         this._persistirEstado();
@@ -689,8 +726,10 @@ class PomodoroStateService extends EventTarget {
             });
 
             this._toast('¡Buen trabajo! Sesión de enfoque completada. Hora de descansar.', 'success');
+            this._enviarNotificacionPush('¡Enfoque completado!', 'Buen trabajo. Es hora de tu descanso.');
         } else {
             this._toast('El descanso ha terminado. ¡A enfocar nuevamente!', 'success');
+            this._enviarNotificacionPush('¡Descanso terminado!', 'Es hora de volver a enfocarse.');
         }
 
         // Máquina de estados: calcular la siguiente fase sin condicionales
@@ -960,6 +999,61 @@ class PomodoroStateService extends EventTarget {
             }
         } catch (error) {
             console.warn('[PomodoroStateService] No se pudo sincronizar la config con el backend:', error);
+        }
+    }
+
+    /* =========================================================================
+       API PÚBLICA — Notificaciones
+       ========================================================================= */
+
+    _solicitarPermisosNotificacion() {
+        if (!("Notification" in window)) return;
+        if (Notification.permission === "default") {
+            Notification.requestPermission();
+        }
+    }
+
+    _enviarNotificacionPush(titulo, cuerpo) {
+        if (!("Notification" in window) || Notification.permission !== "granted") return;
+        
+        const isAreaEstudio = window.location.pathname.includes('/area-estudio');
+        const widgetDismissed = localStorage.getItem('cursus_pomo_float_dismissed') === 'true';
+        const widgetDisabled = this._config.mostrar_widget === false;
+
+        let shouldNotify = false;
+        if (document.hidden) {
+            shouldNotify = true;
+        } else {
+            // Si la pestaña está activa, pero NO estamos en area-estudio y el widget está cerrado/desactivado,
+            // no hay interfaz visual, por lo que DEBEMOS mostrar la notificación push.
+            if (!isAreaEstudio && (widgetDismissed || widgetDisabled)) {
+                shouldNotify = true;
+            }
+        }
+
+        if (shouldNotify) {
+            // Deduplicar notificaciones entre múltiples pestañas abiertas
+            const lockKey = 'cursus_pomo_notif_lock';
+            const currentLock = localStorage.getItem(lockKey);
+            const timeKey = String(this._state.timestamp_ultimo_cambio);
+            
+            if (currentLock !== timeKey) {
+                localStorage.setItem(lockKey, timeKey);
+                
+                const notif = new Notification(titulo, {
+                    body: cuerpo,
+                    icon: '/favicon.ico'
+                });
+                
+                notif.onclick = function() {
+                    window.focus();
+                    if (!window.location.pathname.includes('/area-estudio')) {
+                        window.location.href = '/area-estudio';
+                    }
+                };
+                
+                setTimeout(() => notif.close(), 8000);
+            }
         }
     }
 }
