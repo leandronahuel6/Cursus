@@ -308,7 +308,7 @@ class PomodoroStateService extends EventTarget {
     }
 
     /**
-     * Reinicia el temporizador a la fase de enfoque con la configuración actual.
+     * Reinicia el temporizador de la fase actual (manteniendo si es enfoque o descanso).
      * Usado por el botón "Reiniciar" (no reinicia el ciclo completo).
      *
      * @returns {{elapsedMin: number, faseEraEnfoque: boolean}} Metadatos para que la
@@ -326,7 +326,10 @@ class PomodoroStateService extends EventTarget {
             this._registrarInterrupcionSesion(elapsedMin, 'abandonada');
         }
 
-        this._resetearADefecto();
+        this._state.tiempo_restante = totalSeg;
+        this._state.estado_reloj = 'detenido';
+        this._state.timestamp_ultimo_cambio = Date.now();
+        this._persistirEstado();
         this._emitir('pomo:estadoCambiado');
         return { elapsedMin, faseEraEnfoque };
     }

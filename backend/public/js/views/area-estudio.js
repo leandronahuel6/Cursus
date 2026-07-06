@@ -358,13 +358,19 @@ function resetPomo() {
     const snapshot = pomodoroService.obtenerSnapshot();
     if (snapshot.state.estado_reloj === 'detenido') return;
 
-    openConfirm(
-        '¿Deseas reiniciar el temporizador? El tiempo que hayas acumulado hasta ahora se guardará en tu historial como progreso parcial.',
-        () => {
-            pomodoroService.reiniciarFase();
-            showToast('Temporizador reiniciado', 'success');
-        }
-    );
+    if (snapshot.state.fase_actual === 'enfoque') {
+        openConfirm(
+            'Vas a reiniciar tu sesión de enfoque actual. El tiempo acumulado se guardará en tu historial como sesión abandonada. ¿Deseas continuar?',
+            () => {
+                pomodoroService.reiniciarFase();
+                showToast('Sesión de enfoque reiniciada', 'success');
+            }
+        );
+    } else {
+        // En descanso, reiniciar no tiene riesgo de pérdida de datos productivos
+        pomodoroService.reiniciarFase();
+        showToast('Descanso reiniciado', 'success');
+    }
 }
 
 /**
@@ -372,13 +378,17 @@ function resetPomo() {
  * Solicita confirmación para evitar pérdidas accidentales.
  */
 function restartPomoCycle() {
-    openConfirm(
-        '¿Estás seguro de que deseas reiniciar el ciclo completo? Volverás a la sesión 1. Si el temporizador actual tiene progreso, se guardará en tu historial como sesión abandonada.',
-        () => {
-            pomodoroService.reiniciarCiclo();
-            showToast('Ciclo de sesiones reiniciado', 'success');
-        }
-    );
+    const snapshot = pomodoroService.obtenerSnapshot();
+    const isEnfoque = snapshot.state.fase_actual === 'enfoque';
+    
+    const msg = isEnfoque 
+        ? 'Vas a reiniciar el ciclo completo y volverás a la sesión 1. El tiempo acumulado de tu enfoque actual se guardará como sesión abandonada. ¿Deseas continuar?'
+        : '¿Estás seguro de que deseas reiniciar el ciclo completo? Se perderá el progreso de tu ciclo actual y volverás a la sesión 1.';
+        
+    openConfirm(msg, () => {
+        pomodoroService.reiniciarCiclo();
+        showToast('Ciclo de sesiones reiniciado', 'success');
+    });
 }
 
 /**
@@ -386,10 +396,21 @@ function restartPomoCycle() {
  * Si la fase saltada era enfoque con progreso, notifica al backend.
  */
 function skipPomo() {
-    openConfirm('¿Deseas saltar esta fase y pasar a la siguiente? Si estabas en una sesión de enfoque con progreso, este se guardará en tu historial.', () => {
+    const snapshot = pomodoroService.obtenerSnapshot();
+    
+    if (snapshot.state.fase_actual === 'enfoque') {
+        openConfirm(
+            'Vas a saltar el resto de tu sesión de enfoque. El tiempo acumulado se guardará en tu historial como sesión completada parcialmente. ¿Deseas continuar?', 
+            () => {
+                pomodoroService.saltarFase();
+                showToast('Fase de enfoque salteada', 'success');
+            }
+        );
+    } else {
+        // En descanso es común querer saltar la pausa si ya se quiere volver a estudiar
         pomodoroService.saltarFase();
-        showToast('Fase salteada', 'success');
-    });
+        showToast('Descanso salteado', 'success');
+    }
 }
 
 /**
