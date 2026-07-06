@@ -622,7 +622,7 @@ async function loadAppState() {
         return;
     }
 
-    const localTasksData = JSON.parse(localStorage.getItem('cursus_tasks_v2') || '[]');
+    const localTasksData = JSON.parse(localStorage.getItem('cursus_tasks') || '[]');
 
     // Cargar tareas desde la BD
     try {
@@ -664,7 +664,7 @@ async function loadAppState() {
 
 /** Persiste la lista de marcadores en LocalStorage (caché de respaldo). */
 function saveBookmarksToLocal() {
-    localStorage.setItem('cursus_bookmarks_v2', JSON.stringify(bookmarks));
+    localStorage.setItem('cursus_bookmarks', JSON.stringify(bookmarks));
 }
 
 /* ==========================================================================

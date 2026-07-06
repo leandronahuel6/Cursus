@@ -39,7 +39,7 @@ export const KanbanManager = {
     },
 
     saveTasksToLocal() {
-        localStorage.setItem('cursus_tasks_v2', JSON.stringify(this.tasks));
+        localStorage.setItem('cursus_tasks', JSON.stringify(this.tasks));
     },
 
     /* ==========================================================================
