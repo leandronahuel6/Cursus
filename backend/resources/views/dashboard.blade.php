@@ -121,7 +121,7 @@
 
         <!-- CTA principal -->
         <div class="study-cta-wrap">
-          <button class="study-cta" onclick="location.href='{{ route('area-estudio') }}'">
+          <button class="study-cta" type="button">
             ▶ Continuar estudiando →
           </button>
         </div>

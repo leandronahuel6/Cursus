@@ -17,10 +17,22 @@ function getAuthHeaders() {
   };
 }
 
+function goToAreaEstudio(materiaId) {
+  if (materiaId != null) {
+    localStorage.setItem('cursus_selected_materia', String(materiaId));
+  }
+  window.location.href = '/area-estudio';
+}
+
 function renderMatsGrid(materias) {
   const grid = document.getElementById('mats-grid');
   if (!grid) return;
   grid.innerHTML = '';
+
+  if (materias.length === 0) {
+    grid.innerHTML = '<div style="padding:10px 0;color:var(--t3);font-size:13px">No tenés materias cursando este cuatrimestre.</div>';
+    return;
+  }
 
   materias.forEach(m => {
     const badge = ESTADO_BADGE[m.estado];
@@ -28,7 +40,7 @@ function renderMatsGrid(materias) {
 
     const mat = document.createElement('div');
     mat.className = 'mat';
-    mat.onclick = () => { window.location.href = '/area-estudio'; };
+    mat.onclick = () => goToAreaEstudio(m.id);
     mat.innerHTML = `
       <div class="mat-top">
         <div class="mat-name">${m.nombre}</div>
@@ -56,9 +68,14 @@ function renderStudyPanel(materiasCursando) {
       heroMateria = materiasCursando.find(m => m.id === savedId) || null;
   }
 
-  // 2. Renderizar el título
+  // 2. Renderizar el título y enlazar el CTA principal
   if (heroSubject) {
     heroSubject.textContent = heroMateria ? heroMateria.nombre : 'Estudio Independiente';
+  }
+
+  const studyCta = document.querySelector('.study-cta');
+  if (studyCta) {
+    studyCta.onclick = () => goToAreaEstudio(heroMateria ? heroMateria.id : null);
   }
 
   // 3. Renderizar las demás materias (excluyendo a la heroMateria)
@@ -69,7 +86,7 @@ function renderStudyPanel(materiasCursando) {
     otrasMaterias.forEach(m => {
       const item = document.createElement('div');
       item.className = 'so-item';
-      item.onclick = () => { window.location.href = '/area-estudio'; };
+      item.onclick = () => goToAreaEstudio(m.id);
       item.innerHTML = `<span>📖 ${m.nombre}</span><span>→</span>`;
       list.appendChild(item);
     });
@@ -154,10 +171,9 @@ async function loadDashboardMaterias() {
     if (!response.ok) throw new Error('No se pudieron cargar las materias');
     const data = await response.json();
 
-    const enCurso = data.filter(m => m.estado !== 'libre');
     const cursando = data.filter(m => m.estado === 'cursando');
 
-    renderMatsGrid(enCurso);
+    renderMatsGrid(cursando);
     renderStudyPanel(cursando);
 
     const statMateriasActivas = document.getElementById('stat-materias-activas');
@@ -390,6 +406,9 @@ function setGreetingLocal() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  const studyCta = document.querySelector('.study-cta');
+  if (studyCta) studyCta.onclick = () => goToAreaEstudio(null);
+
   setGreetingLocal();
   loadDashboardMaterias();
   loadPomodoroResumen();
