@@ -996,9 +996,13 @@ function selectMateria(id) {
 
     // Limpiar stats mientras se carga el resumen real
     const hoursEl = document.getElementById('chip-stat-hours');
+    const hoursLostEl = document.getElementById('chip-stat-hours-lost');
     const pomosEl = document.getElementById('chip-stat-pomos');
+    const pomosLostEl = document.getElementById('chip-stat-pomos-lost');
     if (hoursEl) hoursEl.textContent = '—';
+    if (hoursLostEl) hoursLostEl.textContent = '—';
     if (pomosEl) pomosEl.textContent = '—';
+    if (pomosLostEl) pomosLostEl.textContent = '—';
 
     renderMateriaDropdown();
     closeMateriaDropdown();
@@ -1016,30 +1020,48 @@ async function loadMateriaResumen() {
             ? await ApiService.getMateriaResumen(selectedMateriaId)
             : await ApiService.getResumenIndependiente();
             
-        const hoursEl = document.getElementById('chip-stat-hours');
-        const pomosEl = document.getElementById('chip-stat-pomos');
-        if (hoursEl) hoursEl.textContent = `${data.horas_semana}h`;
-        if (pomosEl) pomosEl.textContent = data.sesiones_totales;
+        updateResumenUI(data);
 
-        // Sincronizar el servicio para que el Observer actualice el log del timer
-        pomodoroService.sincronizarCiclosConBackend({
-            sesiones_completadas_hoy: data.sesiones_hoy.length,
-            // Revertir para que las sesiones más nuevas queden arriba (como en el modo local)
-            log: data.sesiones_hoy.reverse().map(s => {
-                let statusInfo = { text: 'Completada', class: 'status-completada', icon: 'check-check', isOffline: false };
-                if (s.estado === 'completada_parcial') statusInfo = { text: 'Parcial', class: 'status-parcial', icon: 'check', isOffline: false };
-                else if (s.estado === 'abandonada') statusInfo = { text: 'Abandonada', class: 'status-abandonada', icon: 'x', isOffline: false };
-                
-                return {
-                    time:     s.hora,
-                    duration: `${Math.floor(s.duracion_segundos / 60)}:00`,
-                    status:   statusInfo,
-                };
-            }),
-        });
+        // Compartir con otras pestañas
+        localStorage.setItem('cursus_resumen_data', JSON.stringify({ 
+            materiaId: selectedMateriaId, 
+            data, 
+            timestamp: Date.now() 
+        }));
     } catch (e) {
         console.error('Error cargando resumen de materia', e);
     }
+}
+
+/**
+ * Actualiza el DOM con los datos del resumen.
+ */
+function updateResumenUI(data) {
+    const hoursEl = document.getElementById('chip-stat-hours');
+    const hoursLostEl = document.getElementById('chip-stat-hours-lost');
+    const pomosEl = document.getElementById('chip-stat-pomos');
+    const pomosLostEl = document.getElementById('chip-stat-pomos-lost');
+    if (hoursEl) hoursEl.textContent = `${data.horas_semana}h`;
+    if (hoursLostEl) hoursLostEl.textContent = `${data.horas_perdidas_semana}h`;
+    if (pomosEl) pomosEl.textContent = data.sesiones_totales;
+    if (pomosLostEl) pomosLostEl.textContent = data.sesiones_abandonadas_totales;
+
+    // Sincronizar el servicio para que el Observer actualice el log del timer
+    pomodoroService.sincronizarCiclosConBackend({
+        sesiones_completadas_hoy: data.sesiones_hoy.length,
+        // Revertir para que las sesiones más nuevas queden arriba (como en el modo local)
+        log: data.sesiones_hoy.reverse().map(s => {
+            let statusInfo = { text: 'Completada', class: 'status-completada', icon: 'check-check', isOffline: false };
+            if (s.estado === 'completada_parcial') statusInfo = { text: 'Parcial', class: 'status-parcial', icon: 'check', isOffline: false };
+            else if (s.estado === 'abandonada') statusInfo = { text: 'Abandonada', class: 'status-abandonada', icon: 'x', isOffline: false };
+            
+            return {
+                time:     s.hora,
+                duration: `${Math.floor(s.duracion_segundos / 60)}:00`,
+                status:   statusInfo,
+            };
+        }),
+    });
 }
 
 /* ==========================================================================
@@ -1458,9 +1480,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     pomodoroService.addEventListener('pomo:sesionRegistradaBackend', () => {
         // Refrescar el resumen de la materia (stats, etc) en la vista activa
-        if (selectedMateriaId) {
-            loadMateriaResumen();
-        }
+        requestResumenUpdate();
     });
 
     // --- Inicializar el Servicio del Pomodoro (SSOT) ---
@@ -1573,6 +1593,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Cargar materias y estado inicial ---
     await loadMateriasCursando();
+});
+
+/* ==========================================================================
+   SINCRONIZACIÓN MULTI-TAB (Auto-Update al finalizar sesiones)
+   ========================================================================== */
+
+function requestResumenUpdate() {
+    const lockKey = `cursus_resumen_lock_${selectedMateriaId || 'indep'}`;
+    const myTicket = Date.now() + '_' + Math.random();
+    const lastSuccess = parseInt(localStorage.getItem(lockKey + '_success') || '0');
+    
+    // Bloqueo distribuido: Solo una pestaña debe hacer el fetch a la API
+    if (Date.now() - lastSuccess >= 5000) {
+        localStorage.setItem(lockKey, myTicket);
+        setTimeout(() => {
+            // Si sigo siendo el dueño del lock después del retraso aleatorio (Jitter)
+            if (localStorage.getItem(lockKey) === myTicket) {
+                loadMateriaResumen().then(() => {
+                    localStorage.setItem(lockKey + '_success', Date.now());
+                });
+            }
+        }, 500 + Math.random() * 500);
+    }
+}
+
+let lastSyncCount = 0;
+window.addEventListener('pomo:syncQueueChanged', (e) => {
+    const currentCount = e.detail.count;
+    // Si la cola se vació (pasó de >0 a 0), significa que se acaba de guardar una sesión en DB
+    if (lastSyncCount > 0 && currentCount === 0) {
+        requestResumenUpdate();
+    }
+    lastSyncCount = currentCount;
+});
+
+// Escuchar si OTRA pestaña actualizó los datos para refrescar la UI sin hacer petición a la API
+window.addEventListener('storage', (e) => {
+    if (e.key === 'cursus_resumen_data' && e.newValue) {
+        const cache = JSON.parse(e.newValue);
+        // Verificar que estamos en la misma materia y que los datos son recientes (< 10 segundos)
+        if (cache.materiaId === selectedMateriaId && Date.now() - cache.timestamp < 10000) {
+            updateResumenUI(cache.data);
+        }
+    }
 });
 
 /* ==========================================================================

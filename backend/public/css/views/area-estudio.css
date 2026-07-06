@@ -110,6 +110,14 @@
     .mat-chip-v { font-size: 16px; font-weight: 700; color: var(--t1); letter-spacing: -.02em; }
     .mat-chip-l { font-size: 11px; color: var(--t3); }
 
+    .mat-chip.warn {
+        background-color: rgba(255, 59, 48, 0.05); /* Soft red background */
+        border: 1px solid rgba(255, 59, 48, 0.15); /* Light red border */
+        border-radius: 6px;
+    }
+    .mat-chip.warn .mat-chip-v { color: #ff3b30; }
+    .mat-chip.warn .mat-chip-l { color: rgba(255, 59, 48, 0.7); }
+
     /* ==========================================================================
        SPLIT LAYOUT v2 (Grid de dos columnas)
        ========================================================================== */

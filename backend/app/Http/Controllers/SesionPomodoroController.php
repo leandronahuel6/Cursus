@@ -154,10 +154,23 @@ class SesionPomodoroController extends Controller
         $horasSemana = SesionPomodoro::where('usuario_id', $usuarioId)
             ->where('materia_id', $materia->id)
             ->where('completada_en', '>=', now()->startOfWeek())
+            ->whereIn('estado', ['completada', 'completada_parcial'])
+            ->sum('duracion_segundos') / 3600;
+
+        $horasPerdidas = SesionPomodoro::where('usuario_id', $usuarioId)
+            ->where('materia_id', $materia->id)
+            ->where('completada_en', '>=', now()->startOfWeek())
+            ->where('estado', 'abandonada')
             ->sum('duracion_segundos') / 3600;
 
         $sesionesTotales = SesionPomodoro::where('usuario_id', $usuarioId)
             ->where('materia_id', $materia->id)
+            ->whereIn('estado', ['completada', 'completada_parcial'])
+            ->count();
+
+        $sesionesAbandonadasTotales = SesionPomodoro::where('usuario_id', $usuarioId)
+            ->where('materia_id', $materia->id)
+            ->where('estado', 'abandonada')
             ->count();
 
         $tz = $request->header('X-Timezone', config('app.timezone'));
@@ -177,7 +190,9 @@ class SesionPomodoroController extends Controller
 
         return response()->json([
             'horas_semana' => round($horasSemana, 1),
+            'horas_perdidas_semana' => round($horasPerdidas, 1),
             'sesiones_totales' => $sesionesTotales,
+            'sesiones_abandonadas_totales' => $sesionesAbandonadasTotales,
             'sesiones_hoy' => $sesionesHoy,
         ]);
     }
@@ -190,10 +205,23 @@ class SesionPomodoroController extends Controller
         $horasSemana = SesionPomodoro::where('usuario_id', $usuarioId)
             ->whereNull('materia_id')
             ->where('completada_en', '>=', now()->startOfWeek())
+            ->whereIn('estado', ['completada', 'completada_parcial'])
+            ->sum('duracion_segundos') / 3600;
+
+        $horasPerdidas = SesionPomodoro::where('usuario_id', $usuarioId)
+            ->whereNull('materia_id')
+            ->where('completada_en', '>=', now()->startOfWeek())
+            ->where('estado', 'abandonada')
             ->sum('duracion_segundos') / 3600;
 
         $sesionesTotales = SesionPomodoro::where('usuario_id', $usuarioId)
             ->whereNull('materia_id')
+            ->whereIn('estado', ['completada', 'completada_parcial'])
+            ->count();
+
+        $sesionesAbandonadasTotales = SesionPomodoro::where('usuario_id', $usuarioId)
+            ->whereNull('materia_id')
+            ->where('estado', 'abandonada')
             ->count();
 
         $tz = $request->header('X-Timezone', config('app.timezone'));
@@ -213,7 +241,9 @@ class SesionPomodoroController extends Controller
 
         return response()->json([
             'horas_semana' => round($horasSemana, 1),
+            'horas_perdidas_semana' => round($horasPerdidas, 1),
             'sesiones_totales' => $sesionesTotales,
+            'sesiones_abandonadas_totales' => $sesionesAbandonadasTotales,
             'sesiones_hoy' => $sesionesHoy,
         ]);
     }

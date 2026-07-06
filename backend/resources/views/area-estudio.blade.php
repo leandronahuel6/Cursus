@@ -65,11 +65,19 @@
         <div class="mat-chips">
           <div class="mat-chip">
             <div class="mat-chip-v" id="chip-stat-hours">—</div>
-            <div class="mat-chip-l">esta semana</div>
+            <div class="mat-chip-l">efectivas esta semana</div>
+          </div>
+          <div class="mat-chip warn">
+            <div class="mat-chip-v" id="chip-stat-hours-lost">—</div>
+            <div class="mat-chip-l">perdidas esta semana</div>
           </div>
           <div class="mat-chip">
             <div class="mat-chip-v" id="chip-stat-pomos">—</div>
-            <div class="mat-chip-l">🍅 totales</div>
+            <div class="mat-chip-l">🍅 efectivos</div>
+          </div>
+          <div class="mat-chip warn">
+            <div class="mat-chip-v" id="chip-stat-pomos-lost">—</div>
+            <div class="mat-chip-l">🍅 abandonados</div>
           </div>
           {{-- Chip "online ahora" comentado: dato simulado, no real.
           <div class="mat-chip">

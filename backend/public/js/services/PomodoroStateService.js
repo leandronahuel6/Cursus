@@ -817,9 +817,13 @@ class PomodoroStateService extends EventTarget {
         const duracionSegundos = elapsedMin * 60;
         
         if (estado === 'completada_parcial') {
-            ApiService.registrarSesionParcial(materiaId, duracionSegundos).catch(() => console.warn('No se pudo registrar la sesión parcial'));
+            ApiService.registrarSesionParcial(materiaId, duracionSegundos)
+                .then(() => this._emitir('pomo:sesionRegistradaBackend'))
+                .catch(() => console.warn('No se pudo registrar la sesión parcial'));
         } else {
-            ApiService.registrarSesionAbandonada(materiaId, duracionSegundos).catch(() => console.warn('No se pudo registrar la sesión abandonada'));
+            ApiService.registrarSesionAbandonada(materiaId, duracionSegundos)
+                .then(() => this._emitir('pomo:sesionRegistradaBackend'))
+                .catch(() => console.warn('No se pudo registrar la sesión abandonada'));
         }
     }
 

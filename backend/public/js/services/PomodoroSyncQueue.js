@@ -50,6 +50,8 @@ class SyncQueue {
         });
         this._saveQueue(queue);
         this._emitQueueChangeEvent();
+        // Intentar sincronizar inmediatamente
+        this._attemptSync();
     }
 
     /**
