@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\ContactMail;
 use App\Mail\WelcomeMail;
 use App\Models\User;
+use App\Models\ContactMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -136,6 +137,9 @@ class AuthController extends Controller
             'nombre' => 'required|string|max:255',
             'legajo' => 'nullable|string|max:255|unique:users,legajo,' . $user->id,
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'bg_preset' => 'required|string|in:none,utn-haedo,utn-building,study-cozy,code-abstract,lofi-room,custom',
+            'bg_opacity' => 'required|integer|min:0|max:30',
+            'bg_blur' => 'required|numeric|min:0|max:8',
         ]);
 
         $user->update($data);
@@ -173,6 +177,36 @@ class AuthController extends Controller
         return response()->json($user);
     }
 
+    public function updateCustomBg(Request $request)
+    {
+        $request->validate([
+            'background' => 'required|image|mimes:png,jpg,jpeg|max:4096',
+        ]);
+
+        $user = $request->user();
+
+        if ($user->bg_custom_path) {
+            Storage::disk('public')->delete($user->bg_custom_path);
+        }
+
+        $path = $request->file('background')->store('backgrounds', 'public');
+        $user->update(['bg_custom_path' => $path]);
+
+        return response()->json($user);
+    }
+
+    public function deleteCustomBg(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->bg_custom_path) {
+            Storage::disk('public')->delete($user->bg_custom_path);
+            $user->update(['bg_custom_path' => null]);
+        }
+
+        return response()->json($user);
+    }
+
     public function changePassword(Request $request){
         $request->validate([
         'current_password' => 'required',
@@ -203,6 +237,9 @@ class AuthController extends Controller
             'remitente_nombre' => 'required|string|max:255',
             'remitente_email'  => 'required|email|max:255',
         ]);
+
+        // Grabar el mensaje en la base de datos (Requisito examen)
+        ContactMessage::create($data);
 
         Mail::to(config('mail.from.address'))
             ->send(new ContactMail(

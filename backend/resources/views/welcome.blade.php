@@ -34,7 +34,7 @@
             --bg-input: #ffffff;
             
             --hero-border: rgba(226, 232, 240, 0.8);
-            --hero-img-opacity: 0.12;
+            --global-bg-opacity: 0.07;
             
             --table-th-bg: rgba(241, 245, 249, 0.5);
             --table-td-bg-siu: rgba(241, 245, 249, 0.5);
@@ -86,7 +86,7 @@
             --bg-input: #1e293b;
             
             --hero-border: rgba(30, 41, 59, 0.8);
-            --hero-img-opacity: 0.08;
+            --global-bg-opacity: 0.05;
             
             --table-th-bg: rgba(15, 23, 42, 0.6);
             --table-td-bg-siu: rgba(15, 23, 42, 0.6);
@@ -118,6 +118,10 @@
             --gray-card-bg-hover: rgba(30, 41, 59, 0.8);
             
             background-image: var(--bg-gradient-aurora);
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -278,17 +282,9 @@
             box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35), 0 4px 10px rgba(6, 182, 212, 0.25);
         }
 
-        /* Hero Section */
-        .hero-wrapper {
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-            border-bottom: 1px solid var(--hero-border);
-            background: var(--bg-color, #f8fafc);
-        }
-        .hero-wrapper::before {
-            content: "";
-            position: absolute;
+        /* Global Fixed Background */
+        .global-fixed-bg {
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
@@ -297,20 +293,39 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            opacity: var(--hero-img-opacity, 0.12);
-            filter: grayscale(15%) blur(1.5px);
-            z-index: 1;
+            opacity: var(--global-bg-opacity, 0.07);
+            filter: grayscale(15%) blur(1.8px);
+            z-index: -2;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
+
+        /* Hero Section */
+        .hero-wrapper {
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding-top: 80px;
+        }
+
         .hero-section {
             position: relative;
             z-index: 2;
             display: grid;
             grid-template-columns: 1.1fr 1fr;
             gap: 40px;
-            padding: 150px 5% 80px 5%;
+            padding: 40px 5%;
             align-items: center;
             max-width: 1300px;
+            width: 100%;
             margin: 0 auto;
+            box-sizing: border-box;
         }
         .hero-info {
             display: flex;
@@ -1113,7 +1128,7 @@
         @media (max-width: 992px) {
             .hero-section {
                 grid-template-columns: 1fr;
-                padding-top: 120px;
+                padding: 30px 5% 50px 5%;
                 text-align: center;
             }
             .hero-info {
@@ -1492,6 +1507,9 @@
 </head>
 <body>
 
+    <!-- FONDO FIJO GLOBAL DE LA FACULTAD -->
+    <div class="global-fixed-bg" style="--hero-bg-url: url('{{ asset('assets/img/utn-haedo.jpg') }}');"></div>
+
     <!-- BACKGROUND BLOBS FLOTANTES -->
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -1534,7 +1552,7 @@
     </header>
 
     <!-- SECCIÓN HERO CON MINI-DASHBOARD INTERACTIVO -->
-    <div class="hero-wrapper" style="--hero-bg-url: url('{{ asset('assets/img/utn-haedo.jpg') }}');">
+    <div class="hero-wrapper">
         <section class="hero-section">
         <div class="hero-info">
             <div class="badge-utn">Asistente Estudiantil</div>

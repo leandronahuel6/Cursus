@@ -3,8 +3,8 @@
 @section('title', 'Cursus - Área de Concentración')
 
 @push('styles')
-  <link rel="stylesheet" href="{{ asset('css/views/area-estudio.css') }}?v=5">
-  <link rel="stylesheet" href="{{ asset('css/views/area-estudio-focus.css') }}?v=5">
+  <link rel="stylesheet" href="{{ asset('css/views/area-estudio.css') }}?v={{ filemtime(public_path('css/views/area-estudio.css')) }}">
+  <link rel="stylesheet" href="{{ asset('css/views/area-estudio-focus.css') }}?v={{ filemtime(public_path('css/views/area-estudio-focus.css')) }}">
 @endpush
 
 @section('mobile-header')
@@ -587,17 +587,20 @@
       </div>
     </div>
 
-    <!-- Botón de Música Lofi -->
-    <button class="focus-theme-btn" id="lofi-panel-toggle" onclick="window.toggleLofiPanel()" title="Música Lofi">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
-      <span>Música Lofi</span>
-    </button>
+    <!-- Acciones de barra inferior -->
+    <div class="focus-bottom-actions">
+      <!-- Botón de Música Lofi -->
+      <button class="focus-theme-btn" id="lofi-panel-toggle" onclick="window.toggleLofiPanel()" title="Música Lofi">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+        <span>Música Lofi</span>
+      </button>
 
-    <!-- Botón de Pantalla Completa -->
-    <button class="focus-theme-btn" id="focus-fullscreen-toggle" onclick="window.toggleFullscreen()" title="Pantalla Completa">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-      <span id="focus-fullscreen-text">Pantalla Completa</span>
-    </button>
+      <!-- Botón de Pantalla Completa -->
+      <button class="focus-theme-btn" id="focus-fullscreen-toggle" onclick="window.toggleFullscreen()" title="Pantalla Completa">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        <span id="focus-fullscreen-text">Pantalla Completa</span>
+      </button>
+    </div>
   </div>
 
   <!-- Panel de Música Lofi Lateral -->
