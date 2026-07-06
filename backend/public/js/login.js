@@ -31,6 +31,16 @@ function getStoredToken() {
     }
 })();
 
+const emailValidation = (email) => {
+    if (!emailRegex.test(email)) return 'El email debe tener un formato válido';
+    return null;
+}
+
+const passwordValidation = (password) => {
+    if (password.length < 8) return 'La contraseña debe tener al menos 8 caracteres';
+    return null;
+}
+
 const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -41,23 +51,10 @@ const handleSubmit = async (e) => {
     const emailError = document.querySelector('#email-error');
     const passwordError = document.querySelector('#password-error');
 
-    emailError.textContent = '';
-    passwordError.textContent = '';
+    emailError.textContent = emailValidation(emailInput.value) || '';
+    passwordError.textContent = passwordValidation(passwordInput.value) || '';
 
-    if (!emailInput.value) {
-        emailError.textContent = 'Ingrese un correo electrónico';
-        return;
-    }
-
-    if (!emailRegex.test(emailInput.value)) {
-        emailError.textContent = 'Ingrese un correo electrónico válido';
-        emailInput.focus();
-        return;
-    }
-
-    if (passwordInput.value.length < 8) {
-        passwordError.textContent = 'La contraseña debe tener al menos 8 caracteres';
-        passwordInput.focus();
+    if (emailError.textContent || passwordError.textContent) {
         return;
     }
 
@@ -79,8 +76,9 @@ const handleSubmit = async (e) => {
 
         if (!response.ok) {
             // errores del backend (Laravel)
-            if (data.errors?.email) {
-                emailError.textContent = data.errors.email[0];
+            if (data.message) {
+                emailError.textContent = data.message;
+                passwordError.textContent = data.message;
             }
             return;
         }

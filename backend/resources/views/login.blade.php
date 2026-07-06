@@ -25,7 +25,7 @@
                         <p>Ingresá con tu correo institucional</p>
                     </div>
     
-                    <form id="LoginForm" class="login-form" action="#" method="post" >
+                    <form id="LoginForm" class="login-form" action="#" method="post" novalidate>
                         @csrf
                         <div class="login-field">
                             <label for="email">Usuario</label>
