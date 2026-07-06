@@ -340,32 +340,46 @@
           </div>
         </div>
 
-        <div class="modal-field" style="margin-top: 12px;">
-          <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
-            <input type="checkbox" id="pomo-play-alarm-toggle" style="width: 15px; height: 15px; cursor: pointer; margin: 0;">
-            <span style="font-weight: 500; font-size: 13px; color: var(--t1);">Reproducir alarma al finalizar fase</span>
-          </label>
-        </div>
+        <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+          <div class="modal-field">
+            <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
+              <div class="ios-switch">
+                <input type="checkbox" id="pomo-play-alarm-toggle">
+                <span class="slider"></span>
+              </div>
+              <span style="font-weight: 500; font-size: 13px; color: var(--t1);">Reproducir alarma al finalizar fase</span>
+            </label>
+          </div>
 
-        <div class="modal-field">
-          <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
-            <input type="checkbox" id="pomo-show-widget-toggle" style="width: 15px; height: 15px; cursor: pointer; margin: 0;">
-            <span style="font-weight: 500; font-size: 13px; color: var(--t1);">Mostrar widget flotante (global)</span>
-          </label>
-        </div>
+          <div class="modal-field">
+            <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
+              <div class="ios-switch">
+                <input type="checkbox" id="pomo-show-widget-toggle">
+                <span class="slider"></span>
+              </div>
+              <span style="font-weight: 500; font-size: 13px; color: var(--t1);">Mostrar widget flotante (global)</span>
+            </label>
+          </div>
 
-        <div class="modal-field">
-          <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
-            <input type="checkbox" id="pomo-auto-play-toggle" style="width: 15px; height: 15px; cursor: pointer; margin: 0;">
-            <span style="font-weight: 500; font-size: 13px; color: var(--t1);">Auto-reproducción de fases</span>
-          </label>
-        </div>
+          <div class="modal-field">
+            <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
+              <div class="ios-switch">
+                <input type="checkbox" id="pomo-auto-play-toggle">
+                <span class="slider"></span>
+              </div>
+              <span style="font-weight: 500; font-size: 13px; color: var(--t1);">Auto-reproducción de fases</span>
+            </label>
+          </div>
 
-        <div class="modal-field">
-          <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
-            <input type="checkbox" id="pomo-strict-toggle" style="width: 15px; height: 15px; cursor: pointer; margin: 0;">
-            <span style="font-weight: 500; font-size: 13px; color: var(--t1);">🔒 Modo Estricto (Penaliza si cambias de pestaña o sales)</span>
-          </label>
+          <div class="modal-field">
+            <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
+              <div class="ios-switch">
+                <input type="checkbox" id="pomo-strict-toggle">
+                <span class="slider"></span>
+              </div>
+              <span style="font-weight: 500; font-size: 13px; color: var(--t1);">🔒 Modo Estricto (Penaliza si cambias de pestaña o sales)</span>
+            </label>
+          </div>
         </div>
       </div>
 
