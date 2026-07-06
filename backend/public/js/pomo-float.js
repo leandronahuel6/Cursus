@@ -30,9 +30,7 @@ import { playPomoAlarm, unlockPomoAudio } from './shared/pomo-audio-player.js';
    ========================================================================== */
 
 if (window.location.pathname.includes('/area-estudio')) {
-    // Resetear el estado de "descartado" para que el widget reaparezca
-    // la próxima vez que el usuario navegue a otra página con el pomo corriendo.
-    localStorage.removeItem('cursus_pomo_float_dismissed');
+    // Si entramos al área de estudio, el widget nunca se muestra
 } else {
 
 /* ==========================================================================
@@ -92,14 +90,15 @@ const sessionEl     = document.getElementById('pomo-float-session');
    ESTADO LOCAL DEL WIDGET (solo UI — sin lógica de dominio)
    ========================================================================== */
 
-/** Indica si el usuario cerró explícitamente el widget en esta sesión. */
-let widgetDismissed = localStorage.getItem('cursus_pomo_float_dismissed') === 'true';
+    // Eliminado el let widgetDismissed
 
 /* ==========================================================================
    POSICIONAMIENTO PERSISTENTE Y ARRASTRE
    ========================================================================== */
 
 const savedPos = localStorage.getItem('cursus_pomo_float_pos');
+const tutorialShownInit = localStorage.getItem('cursus_pomo_widget_tutorial_shown') === 'true';
+
 if (savedPos) {
     try {
         const pos = JSON.parse(savedPos);
@@ -108,6 +107,15 @@ if (savedPos) {
         widget.style.bottom = 'auto';
         widget.style.right  = 'auto';
     } catch (_) {}
+} else if (!tutorialShownInit) {
+    // Si es la primera vez que se mostrará (no ha visto el tutorial ni guardado posición), centrarlo.
+    // Asumimos dimensiones base del widget expandido (aprox 210px x 44px)
+    const topPos = (window.innerHeight - 44) / 2;
+    const leftPos = (window.innerWidth - 210) / 2;
+    widget.style.top    = `${Math.max(0, topPos)}px`;
+    widget.style.left   = `${Math.max(0, leftPos)}px`;
+    widget.style.bottom = 'auto';
+    widget.style.right  = 'auto';
 }
 
 _makeElementDraggable(widget, widget);
@@ -123,13 +131,8 @@ _makeElementDraggable(widget, widget);
 function _renderWidget(snapshot) {
     const { state, settings, ciclos, config } = snapshot;
 
-    // Ocultar si la config dice que no se muestra
-    if (config.mostrar_widget === false) {
-        widget.style.display = 'none';
-        return;
-    }
     // Mostrar si estaba oculto
-    if (widget.style.display === 'none' && !localStorage.getItem('cursus_pomo_float_dismissed')) {
+    if (widget.style.display === 'none') {
         widget.style.display = 'flex';
     }
 
@@ -186,17 +189,55 @@ function _renderWidget(snapshot) {
  * @param {{state: object, settings: object, ciclos: object}} snapshot
  */
 function _sincronizarVisibilidad(snapshot) {
-    if (widgetDismissed) {
+    let widgetVisible = localStorage.getItem('cursus_pomo_widget_visible') === 'true';
+    const tutorialShown = localStorage.getItem('cursus_pomo_widget_tutorial_shown') === 'true';
+
+    // Aparición Natural: si no vio el tutorial y el reloj no está detenido, activamos el widget
+    if (!tutorialShown && snapshot.state.estado_reloj !== 'detenido') {
+        widgetVisible = true;
+        localStorage.setItem('cursus_pomo_widget_visible', 'true');
+        
+        // Disparar evento para que el menú de perfil global se entere (si está abierto)
+        window.dispatchEvent(new Event('storage'));
+    }
+
+    if (!widgetVisible) {
         widget.classList.remove('is-visible');
         return;
     }
 
-    if (snapshot.state.estado_reloj === 'corriendo') {
-        widget.classList.add('is-visible');
-        _renderWidget(snapshot);
-    } else {
-        widget.classList.remove('is-visible');
+    widget.classList.add('is-visible');
+    _renderWidget(snapshot);
+
+    if (widgetVisible && !tutorialShown) {
+        _mostrarTutorial();
     }
+}
+
+function _mostrarTutorial() {
+    if (document.getElementById('pomo-widget-tutorial')) return;
+    
+    const tooltip = document.createElement('div');
+    tooltip.id = 'pomo-widget-tutorial';
+    tooltip.className = 'pomo-float__tutorial';
+    tooltip.innerHTML = `
+        <h4 class="pomo-float__tutorial-title">Tu Pomodoro te acompaña</h4>
+        <p class="pomo-float__tutorial-text">
+            Este widget te permite pausar o reanudar el tiempo desde cualquier página.<br><br>
+            Para configurar tus ciclos o tiempos, debes ir al <b>Área de Estudio</b>.<br><br>
+            Puedes ocultar/mostrar este widget en cualquier momento usando el switch en tu <b>Menú de Perfil</b>. También puedes ocultarlo pulsando la 'X'.
+        </p>
+        <button id="pomo-tutorial-ok" class="pomo-float__tutorial-btn" type="button">Entendido</button>
+        <div class="pomo-float__tutorial-arrow"></div>
+    `;
+    
+    widget.appendChild(tooltip);
+    
+    document.getElementById('pomo-tutorial-ok').addEventListener('click', (e) => {
+        e.stopPropagation(); // Evitar arrastre del widget
+        localStorage.setItem('cursus_pomo_widget_tutorial_shown', 'true');
+        tooltip.remove();
+    });
 }
 
 /* ==========================================================================
@@ -208,7 +249,8 @@ function _sincronizarVisibilidad(snapshot) {
  * Solo actualiza el texto del tiempo para evitar renders innecesarios.
  */
 pomodoroService.addEventListener('pomo:tick', (e) => {
-    if (widgetDismissed) return;
+    // Si no está visible, ni siquiera nos molestamos en sincronizar a cada segundo
+    if (localStorage.getItem('cursus_pomo_widget_visible') !== 'true') return;
     _sincronizarVisibilidad(e.detail);
 });
 
@@ -287,10 +329,42 @@ minBtn.addEventListener('click', (e) => {
 
 closeBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    widgetDismissed = true;
-    localStorage.setItem('cursus_pomo_float_dismissed', 'true');
+    localStorage.setItem('cursus_pomo_widget_visible', 'false');
     widget.classList.remove('is-visible');
+    window.dispatchEvent(new Event('storage')); // Notificar al menú de perfil global
 });
+
+/* ==========================================================================
+   SINCRONIZACIÓN DEL SWITCH GLOBAL DE PERFIL
+   ========================================================================== */
+
+const globalWidgetToggle = document.getElementById('global-widget-toggle');
+if (globalWidgetToggle) {
+    // Estado inicial
+    globalWidgetToggle.checked = localStorage.getItem('cursus_pomo_widget_visible') === 'true';
+
+    // Al hacer clic en el switch
+    globalWidgetToggle.addEventListener('change', (e) => {
+        localStorage.setItem('cursus_pomo_widget_visible', e.target.checked ? 'true' : 'false');
+        
+        // Si el usuario lo enciende manualmente por primera vez, forzamos mostrar el tutorial
+        if (e.target.checked && localStorage.getItem('cursus_pomo_widget_tutorial_shown') !== 'true') {
+            _mostrarTutorial();
+        }
+
+        // Forzamos la actualización visual
+        const snapshot = pomodoroService.obtenerSnapshot();
+        _sincronizarVisibilidad(snapshot);
+        
+        // Notificar a otras pestañas
+        window.dispatchEvent(new Event('storage'));
+    });
+
+    // Mantener el switch sincronizado si se cierra el widget con la "X" o se cambia en otra pestaña
+    window.addEventListener('storage', () => {
+        globalWidgetToggle.checked = localStorage.getItem('cursus_pomo_widget_visible') === 'true';
+    });
+}
 
 /* ==========================================================================
    HELPERS DE ARRASTRE (Mouse + Touch)

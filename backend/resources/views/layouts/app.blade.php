@@ -59,6 +59,13 @@
         <span class="slider"></span>
       </label>
     </div>
+    <div class="profile-menu-item profile-menu-switch-row" onclick="event.stopPropagation()" style="margin-top: 0;">
+      <span>Widget Pomodoro</span>
+      <label class="ios-switch">
+        <input type="checkbox" id="global-widget-toggle">
+        <span class="slider"></span>
+      </label>
+    </div>
     <div class="profile-menu-divider"></div>
     <button class="profile-menu-item" onclick="window.handleLogout()">
       <svg class="pmenu-ic" aria-hidden="true" width="16" height="16"><use href="{{ asset('assets/icons/sprite.svg#log-out') }}"></use></svg>

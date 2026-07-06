@@ -21,14 +21,12 @@ class ConfigPomodoro extends Model
         'sonido_alarma',
         'modo_estricto',
         'reproducir_alarma',
-        'mostrar_widget',
         'auto_reproduccion_fases',
     ];
 
     protected $casts = [
         'modo_estricto' => 'boolean',
         'reproducir_alarma' => 'boolean',
-        'mostrar_widget' => 'boolean',
         'auto_reproduccion_fases' => 'boolean',
     ];
 

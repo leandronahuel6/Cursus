@@ -25,7 +25,6 @@ class ConfigPomodoroController extends Controller
                 'sonido_alarma' => 'chime',
                 'modo_estricto' => false,
                 'reproducir_alarma' => true,
-                'mostrar_widget' => true,
                 'auto_reproduccion_fases' => true,
             ]
         );
@@ -48,7 +47,6 @@ class ConfigPomodoroController extends Controller
             'sonido_alarma' => 'in:chime,beep,zen',
             'modo_estricto' => 'boolean',
             'reproducir_alarma' => 'boolean',
-            'mostrar_widget' => 'boolean',
             'auto_reproduccion_fases' => 'boolean',
         ]);
 

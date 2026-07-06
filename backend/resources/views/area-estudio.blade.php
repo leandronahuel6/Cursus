@@ -354,16 +354,6 @@
           <div class="modal-field">
             <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
               <div class="ios-switch">
-                <input type="checkbox" id="pomo-show-widget-toggle">
-                <span class="slider"></span>
-              </div>
-              <span style="font-weight: 500; font-size: 13px; color: var(--t1);">Mostrar widget flotante (global)</span>
-            </label>
-          </div>
-
-          <div class="modal-field">
-            <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
-              <div class="ios-switch">
                 <input type="checkbox" id="pomo-auto-play-toggle">
                 <span class="slider"></span>
               </div>

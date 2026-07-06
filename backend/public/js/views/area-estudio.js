@@ -464,9 +464,6 @@ function openCustomPomoModal() {
     const playAlarmToggle = document.getElementById('pomo-play-alarm-toggle');
     if (playAlarmToggle) playAlarmToggle.checked = config.reproducir_alarma;
 
-    const showWidgetToggle = document.getElementById('pomo-show-widget-toggle');
-    if (showWidgetToggle) showWidgetToggle.checked = config.mostrar_widget;
-
     const autoPlayToggle = document.getElementById('pomo-auto-play-toggle');
     if (autoPlayToggle) autoPlayToggle.checked = config.auto_reproduccion_fases;
 
@@ -546,13 +543,11 @@ async function saveCustomPomoSettings() {
     const soundSelect  = document.getElementById('custom-pomo-sound');
     const strictToggle = document.getElementById('pomo-strict-toggle');
     const playAlarmToggle = document.getElementById('pomo-play-alarm-toggle');
-    const showWidgetToggle = document.getElementById('pomo-show-widget-toggle');
     const autoPlayToggle = document.getElementById('pomo-auto-play-toggle');
 
     const sonidoAlarma = soundSelect ? soundSelect.value : 'chime';
     const modoEstricto = strictToggle ? strictToggle.checked : false;
     const reproducirAlarma = playAlarmToggle ? playAlarmToggle.checked : true;
-    const mostrarWidget = showWidgetToggle ? showWidgetToggle.checked : true;
     const autoReproduccion = autoPlayToggle ? autoPlayToggle.checked : true;
 
     const btnSave = document.getElementById('btn-save-pomo');
@@ -565,16 +560,16 @@ async function saveCustomPomoSettings() {
         openConfirm(
             `Atención: Estás reduciendo la cantidad de sesiones por ciclo a ${sessions}, pero actualmente te encuentras en la sesión ${cicloActual}. Al aplicar este cambio, tu progreso del ciclo se reiniciará a la sesión 1. ¿Deseas continuar?`,
             () => {
-                _ejecutarSaveCustomPomoSettings(focus, short, long, sessions, cycles, sonidoAlarma, modoEstricto, reproducirAlarma, mostrarWidget, autoReproduccion, btnSave, errorDiv);
+                _ejecutarSaveCustomPomoSettings(focus, short, long, sessions, cycles, sonidoAlarma, modoEstricto, reproducirAlarma, autoReproduccion, btnSave, errorDiv);
             }
         );
         return;
     }
 
-    _ejecutarSaveCustomPomoSettings(focus, short, long, sessions, cycles, sonidoAlarma, modoEstricto, reproducirAlarma, mostrarWidget, autoReproduccion, btnSave, errorDiv);
+    _ejecutarSaveCustomPomoSettings(focus, short, long, sessions, cycles, sonidoAlarma, modoEstricto, reproducirAlarma, autoReproduccion, btnSave, errorDiv);
 }
 
-async function _ejecutarSaveCustomPomoSettings(focus, short, long, sessions, cycles, sonidoAlarma, modoEstricto, reproducirAlarma, mostrarWidget, autoReproduccion, btnSave, errorDiv) {
+async function _ejecutarSaveCustomPomoSettings(focus, short, long, sessions, cycles, sonidoAlarma, modoEstricto, reproducirAlarma, autoReproduccion, btnSave, errorDiv) {
     if (btnSave) {
         btnSave.disabled = true;
         btnSave.textContent = 'Guardando...';
@@ -587,7 +582,6 @@ async function _ejecutarSaveCustomPomoSettings(focus, short, long, sessions, cyc
                 sonido_alarma: sonidoAlarma, 
                 modo_estricto: modoEstricto,
                 reproducir_alarma: reproducirAlarma,
-                mostrar_widget: mostrarWidget,
                 auto_reproduccion_fases: autoReproduccion
             }
         );
@@ -845,12 +839,12 @@ async function loadMateriasCursando() {
     }
 
     const savedRaw = localStorage.getItem('cursus_selected_materia');
-    if (savedRaw === 'independiente') {
+    if (!savedRaw || savedRaw === 'independiente') {
         selectMateria(null);
     } else {
         const saved = parseInt(savedRaw, 10);
         const savedValida = materiasCursando.find(m => m.id === saved);
-        selectMateria(savedValida ? saved : materiasCursando[0].id);
+        selectMateria(savedValida ? saved : null);
     }
 }
 

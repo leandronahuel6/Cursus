@@ -22,7 +22,6 @@ return new class extends Migration
             $table->enum('sonido_alarma', ['chime', 'beep', 'zen'])->default('chime');
             $table->boolean('modo_estricto')->default(false);
             $table->boolean('reproducir_alarma')->default(true);
-            $table->boolean('mostrar_widget')->default(true);
             $table->boolean('auto_reproduccion_fases')->default(true);
             $table->timestamps();
         });

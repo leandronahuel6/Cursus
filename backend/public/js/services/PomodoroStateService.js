@@ -88,7 +88,6 @@ class PomodoroStateService extends EventTarget {
             sonido_alarma:           'chime',
             modo_estricto:           false,
             reproducir_alarma:       true,
-            mostrar_widget:          true,
             auto_reproduccion_fases: true,
         };
 
@@ -238,10 +237,6 @@ class PomodoroStateService extends EventTarget {
                         this._state.fase_actual = faseActualLocal;
                         this._state.tiempo_restante = Math.max(0, tiempoRestanteLocal - segundosAusente);
                         this._state.timestamp_ultimo_cambio = ahora;
-                        
-                        if (!autoPlay) {
-                            this._state.estado_reloj = 'detenido';
-                        }
                         
                         this._persistirEstado();
                         this._persistirCiclos();
@@ -1017,16 +1012,15 @@ class PomodoroStateService extends EventTarget {
         if (!("Notification" in window) || Notification.permission !== "granted") return;
         
         const isAreaEstudio = window.location.pathname.includes('/area-estudio');
-        const widgetDismissed = localStorage.getItem('cursus_pomo_float_dismissed') === 'true';
-        const widgetDisabled = this._config.mostrar_widget === false;
+        const widgetVisible = localStorage.getItem('cursus_pomo_widget_visible') === 'true';
 
         let shouldNotify = false;
         if (document.hidden) {
             shouldNotify = true;
         } else {
-            // Si la pestaña está activa, pero NO estamos en area-estudio y el widget está cerrado/desactivado,
+            // Si la pestaña está activa, pero NO estamos en area-estudio y el widget NO está visible,
             // no hay interfaz visual, por lo que DEBEMOS mostrar la notificación push.
-            if (!isAreaEstudio && (widgetDismissed || widgetDisabled)) {
+            if (!isAreaEstudio && !widgetVisible) {
                 shouldNotify = true;
             }
         }
