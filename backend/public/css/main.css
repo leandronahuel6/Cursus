@@ -486,8 +486,8 @@ body {
   min-height: 100vh;
   overflow-y: overlay;
 }
-button { font-family: inherit; cursor: pointer; border: none; background: none; outline: none; }
-select { font-family: inherit; }
+button, select, input, textarea { font-family: inherit; }
+button { cursor: pointer; border: none; background: none; outline: none; }
 a { text-decoration: none; color: inherit; }
 
 .theme-toggle-btn {
@@ -822,8 +822,7 @@ h1, h2, h3, h4, h5, h6, .display-text {
 .study-cta {
   width: 100%; padding: 9px;
   background: var(--brand); color: #fff;
-  font-family: 'Outfit', sans-serif;
-  font-size: 13px; font-weight: 600;
+font-size: 13px; font-weight: 600;
   border-radius: var(--r); cursor: pointer;
   transition: background .15s, transform .15s, box-shadow .15s;
   margin-bottom: 7px;
@@ -1644,8 +1643,7 @@ h1, h2, h3, h4, h5, h6, .display-text {
   font-size: 120px;
   font-weight: 800;
   color: rgba(255,255,255,.07);
-  font-family: inherit;
-  pointer-events: none;
+pointer-events: none;
 }
 .pay-tag {
   font-size: 10px;
@@ -3005,8 +3003,7 @@ body.dark-mode .btn-rect-mobile-purple:hover {
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
-  font-family: inherit;
-  font-size: 14px;
+font-size: 14px;
   color: var(--t1);
   transition: border-color .15s, box-shadow .15s;
 }
@@ -3139,6 +3136,7 @@ body.dark-mode .btn-rect-mobile-purple:hover {
 }
 .dark-header {
   background: #1e293b !important;
+  padding-bottom: 13px;
 }
 .dark-header .card-title {
   color: #f9fafb !important;
@@ -4063,8 +4061,7 @@ body.dark-mode .btn-rect-mobile-purple:hover {
   border-radius: 4px;
   color: #fff;
   padding: 4px 6px;
-  font-family: inherit;
-  font-size: 11px;
+font-size: 11px;
   outline: none;
 }
 .editor-btn-delete {
@@ -4170,7 +4167,6 @@ body.dark-mode .btn-rect-mobile-purple:hover {
   color: var(--t1);
   outline: none;
   cursor: pointer;
-  font-family: inherit;
 }
 .sched-modal-ft {
   display: flex;
@@ -4402,7 +4398,6 @@ body.dark-mode .btn-rect-mobile-purple:hover {
   text-align: left;
   transition: background .15s, color .15s;
   cursor: pointer;
-  font-family: inherit;
 }
 .profile-menu-item:hover { background: rgba(255,255,255,.07); color: #f9fafb; }
 
@@ -4558,8 +4553,7 @@ body.no-animations *::after {
   border-radius: var(--r-sm);
   padding: 9px 11px;
   font-size: 13px;
-  font-family: inherit;
-  color: var(--t1);
+color: var(--t1);
   background: var(--surface);
   outline: none;
   transition: border-color .15s, box-shadow .15s;
@@ -4577,8 +4571,7 @@ body.no-animations *::after {
   font-size: 13px; font-weight: 500;
   border-radius: var(--r-sm);
   background: #f3f4f6; color: var(--t2);
-  border: none; cursor: pointer; font-family: inherit;
-  transition: background .15s;
+  border: none; cursor: pointer;transition: background .15s;
 }
 .contact-btn-cancel:hover { background: var(--border); }
 .contact-btn-send {
@@ -4586,8 +4579,7 @@ body.no-animations *::after {
   font-size: 13px; font-weight: 600;
   border-radius: var(--r-sm);
   background: var(--brand); color: #fff;
-  border: none; cursor: pointer; font-family: inherit;
-  transition: background .15s, transform .15s;
+  border: none; cursor: pointer;transition: background .15s, transform .15s;
 }
 .contact-btn-send:hover:not(:disabled) { background: var(--brand-hover); transform: translateY(-1px); }
 .contact-btn-send:disabled { cursor: default; }
@@ -4605,8 +4597,7 @@ body.no-animations *::after {
   border: 1px solid var(--brand-dim);
   border-radius: var(--r-sm);
   cursor: pointer;
-  font-family: inherit;
-  transition: background .15s, border-color .15s;
+transition: background .15s, border-color .15s;
 }
 .btn-change-pwd:hover { background: var(--brand-dim); border-color: var(--brand); }
 

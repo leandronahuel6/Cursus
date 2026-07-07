@@ -15,7 +15,6 @@
     align-items: center;
     justify-content: center;
     color: #ffffff;
-    font-family: 'Outfit', sans-serif;
 }
 
 #focus-mode-overlay.show {
@@ -584,8 +583,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    font-family: 'Outfit', sans-serif;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .btn-focus-mode-trigger:hover {
@@ -781,8 +779,7 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
     border-radius: 999px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    font-family: 'Outfit', sans-serif;
-    outline: none;
+outline: none;
 }
 
 .focus-phase-tab:hover {
@@ -900,8 +897,7 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
     padding: 0.5rem;
     font-size: 0.82rem;
     outline: none;
-    font-family: 'Outfit', sans-serif;
-    cursor: pointer;
+cursor: pointer;
     transition: all 0.2s;
 }
 
