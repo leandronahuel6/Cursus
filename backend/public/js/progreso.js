@@ -846,7 +846,7 @@ function renderDonutChart(distribucionMaterias) {
     
     circlesSvg += `
       <circle cx="${cx}" cy="${cy}" r="${radius}" 
-              fill="transparent" 
+              fill="none" 
               stroke="${d.color}" 
               stroke-width="16" 
               stroke-dasharray="${strokeDash} ${strokeGap}" 
