@@ -45,7 +45,8 @@ function getAuthHeaders() {
   return {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'Authorization': 'Bearer ' + getStoredToken()
+    'Authorization': 'Bearer ' + getStoredToken(),
+    'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone
   };
 }
 
@@ -588,9 +589,8 @@ function renderLineChart() {
     }
   });
 
-  const tooltip = document.getElementById('tooltip-chart-line');
-
   container.innerHTML = `
+    <div class="chart-tooltip" id="tooltip-chart-line"></div>
     <svg class="svg-chart" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
       <defs>
         <linearGradient id="line-grad" x1="0" y1="0" x2="0" y2="1">
@@ -607,6 +607,7 @@ function renderLineChart() {
   `;
 
   // Controlar eventos del tooltip
+  const tooltip = document.getElementById('tooltip-chart-line');
   const points = container.querySelectorAll('.chart-point');
   points.forEach(point => {
     point.addEventListener('mouseenter', (e) => {
@@ -682,6 +683,7 @@ function renderHistoChart() {
   const baseLine = `<line x1="${paddingX}" y1="${lineY}" x2="${width - paddingX}" y2="${lineY}" stroke="#e2e8f0" stroke-width="1.5" />`;
 
   container.innerHTML = `
+    <div class="chart-tooltip" id="tooltip-chart-histo"></div>
     <svg class="svg-chart" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
       ${baseLine}
       ${bars}
@@ -761,6 +763,7 @@ function renderWeeklyChart(horasPorDia) {
   const baseLine = `<line x1="${paddingX}" y1="${height - paddingY}" x2="${width - paddingX}" y2="${height - paddingY}" stroke="#e2e8f0" stroke-width="1.5" />`;
 
   container.innerHTML = `
+    <div class="chart-tooltip" id="tooltip-chart-weekly"></div>
     <svg class="svg-chart" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
       ${baseLine}
       ${bars}
@@ -839,15 +842,15 @@ function renderDonutChart(distribucionMaterias) {
   distribution.forEach(d => {
     const pct = d.hours / total;
     const strokeDash = pct * circumference;
-    const strokeOffset = circumference - strokeDash + currentOffset;
+    const strokeGap = circumference - strokeDash;
     
     circlesSvg += `
       <circle cx="${cx}" cy="${cy}" r="${radius}" 
               fill="transparent" 
               stroke="${d.color}" 
               stroke-width="16" 
-              stroke-dasharray="${circumference}" 
-              stroke-dashoffset="${strokeOffset}" 
+              stroke-dasharray="${strokeDash} ${strokeGap}" 
+              stroke-dashoffset="${-currentOffset}" 
               transform="rotate(-90 ${cx} ${cy})"
               class="donut-segment"
               data-name="${d.name}"
