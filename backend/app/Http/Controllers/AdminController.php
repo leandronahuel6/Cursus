@@ -103,8 +103,14 @@ class AdminController extends Controller
         ]);
 
         $hoy          = now()->toDateString();
-        $cuotaVigente = Cuota::where('vigente_desde', '<=', $hoy)->orderBy('vigente_desde', 'desc')->first();
-        $cuotaProxima = Cuota::where('vigente_desde', '>', $hoy)->orderBy('vigente_desde', 'asc')->first();
+        $cuotaVigente = Cuota::where('vigente_desde', '<=', $hoy)
+                             ->orderBy('vigente_desde', 'desc')
+                             ->orderBy('id', 'desc')
+                             ->first();
+        $cuotaProxima = Cuota::where('vigente_desde', '>', $hoy)
+                             ->orderBy('vigente_desde', 'asc')
+                             ->orderBy('id', 'desc')
+                             ->first();
         $carreras     = Carrera::all(['id', 'nombre']);
 
         return response()->json([
@@ -137,14 +143,23 @@ class AdminController extends Controller
 
         $hoy = now()->toDateString();
 
-        // Si la fecha es futura, reemplazar cuotas futuras existentes para esa carrera
+        // Si la fecha es futura, reemplazar TODAS las cuotas futuras existentes para esa carrera
         if ($request->vigente_desde > $hoy) {
             Cuota::where('carrera_id', $request->carrera_id)
                  ->where('vigente_desde', '>', $hoy)
                  ->delete();
         }
 
-        $cuota = Cuota::create($request->only(['carrera_id', 'valor_mensual', 'vigente_desde']));
+        // updateOrCreate evita duplicados inútiles si se carga una cuota con la misma fecha exacta
+        $cuota = Cuota::updateOrCreate(
+            [
+                'carrera_id'    => $request->carrera_id,
+                'vigente_desde' => $request->vigente_desde,
+            ],
+            [
+                'valor_mensual' => $request->valor_mensual,
+            ]
+        );
 
         return response()->json($cuota, 201);
     }
