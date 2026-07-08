@@ -1294,6 +1294,10 @@ font-size: 13px; font-weight: 600;
   color: var(--t2);
   box-shadow: var(--sh);
 }
+
+[hidden] {
+  display: none !important;
+}
 .career-select {
   border: none;
   background: transparent;
