@@ -141,7 +141,7 @@ function saveSimulationState() {
     simulation: state.simulation,
     pace: state.pace
   }));
-  showToast('¡Simulación guardada con éxito!');
+  showToast('¡Simulación guardada con éxito!', 'success');
 }
 
 // ================= CONTROL DE PESTAÑAS =================
@@ -932,23 +932,6 @@ function renderHeatmap(actividad) {
     day.title = `${clave}: ${cantidad} pomodoro${cantidad !== 1 ? 's' : ''} completado${cantidad !== 1 ? 's' : ''}`;
     grid.appendChild(day);
   }
-}
-
-// ================= UTILIDADES =================
-
-function showToast(message) {
-  let toast = document.getElementById('avg-toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'avg-toast';
-    toast.className = 'avg-toast-box';
-    document.body.appendChild(toast);
-  }
-  toast.textContent = message;
-  toast.classList.add('show');
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3000);
 }
 
 // Inicializar al cargar
