@@ -168,10 +168,18 @@
     btnEdit.hidden = isShowing;
 
     if (isShowing) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      
+      const dateInput = document.getElementById('ac-desde');
       // Prellenar fecha de hoy
-      document.getElementById('ac-desde').value = new Date().toISOString().split('T')[0];
+      dateInput.value = today.toISOString().split('T')[0];
+      // Limitar mínimo al primer día del mes
+      dateInput.min = `${year}-${month}-01`;
     }
   }
+
 
   async function acGuardarCuota(e) {
     e.preventDefault();
@@ -199,11 +207,22 @@
         document.getElementById('ac-btn-edit').hidden = false;
         document.getElementById('ac-valor').value = '';
         await cargarDatos();
+        showToast('Cuota actualizada correctamente.', 'success');
       } else {
-        alert(data.message ?? 'Error al guardar la cuota.');
+        let errorMsg = 'Error al guardar la cuota.';
+        if (res.status === 422 && data.errors) {
+          if (data.errors.vigente_desde) {
+            errorMsg = 'La fecha de vigencia no puede ser anterior al primer día del mes actual.';
+          } else {
+            errorMsg = Object.values(data.errors)[0][0];
+          }
+        } else if (data.message) {
+          errorMsg = data.message;
+        }
+        showToast(errorMsg, 'error');
       }
     } catch {
-      alert('Error de conexión.');
+      showToast('Error de conexión.', 'error');
     } finally {
       btn.disabled = false;
       btn.textContent = 'Guardar';

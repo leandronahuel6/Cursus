@@ -123,10 +123,12 @@ class AdminController extends Controller
 
     public function setCuota(Request $request)
     {
+        $primerDiaMes = now()->startOfMonth()->toDateString();
+
         $request->validate([
             'carrera_id'    => 'required|exists:carreras,id',
             'valor_mensual' => 'required|numeric|min:0',
-            'vigente_desde' => 'required|date',
+            'vigente_desde' => 'required|date|after_or_equal:' . $primerDiaMes,
         ]);
 
         $hoy = now()->toDateString();
