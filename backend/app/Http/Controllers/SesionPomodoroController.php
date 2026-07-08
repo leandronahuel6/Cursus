@@ -320,11 +320,17 @@ class SesionPomodoroController extends Controller
             ])
             ->values();
 
-        $segundosPorHora = SesionPomodoro::where('usuario_id', $usuarioId)
+        $sesionesHora = SesionPomodoro::where('usuario_id', $usuarioId)
             ->where('completada_en', '>=', now()->subDays(30)->startOfDay())
-            ->selectRaw('HOUR(completada_en) as hora, SUM(duracion_segundos) as segundos')
-            ->groupBy('hora')
-            ->pluck('segundos', 'hora');
+            ->get(['completada_en', 'duracion_segundos']);
+
+        $tz = $request->header('X-Timezone', config('app.timezone'));
+        $segundosPorHora = collect();
+        foreach ($sesionesHora as $sesion) {
+            // Utilizamos la zona horaria enviada por el frontend para extraer la hora correcta
+            $horaLocal = $sesion->completada_en->timezone($tz)->hour;
+            $segundosPorHora[$horaLocal] = ($segundosPorHora[$horaLocal] ?? 0) + $sesion->duracion_segundos;
+        }
 
         $horaPico = null;
         if ($segundosPorHora->isNotEmpty()) {

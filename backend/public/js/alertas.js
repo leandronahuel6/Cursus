@@ -35,29 +35,6 @@ const ALERT_COLOR_PALETTE = [
   '#8b5cf6'
 ];
 
-let alertPopupTimer = null;
-
-function showAlertPopup(message, type = 'success') {
-  let popup = document.getElementById('alert-popup-notification');
-  if (!popup) {
-    popup = document.createElement('div');
-    popup.id = 'alert-popup-notification';
-    popup.className = 'alert-popup-notification';
-    document.body.appendChild(popup);
-  }
-
-  popup.className = `alert-popup-notification ${type}`;
-  popup.textContent = message;
-  popup.classList.add('show');
-
-  if (alertPopupTimer) {
-    clearTimeout(alertPopupTimer);
-  }
-
-  alertPopupTimer = setTimeout(() => {
-    popup.classList.remove('show');
-  }, 2600);
-}
 
 // Estado global de la aplicación
 let state = {
@@ -227,7 +204,7 @@ window.closePagoModal = function() {
 window.confirmarPago = async function() {
   const fecha = document.getElementById('pago-fecha').value;
   if (!fecha) {
-    showAlertPopup('Elegí una fecha de pago.', 'info');
+    showToast('Elegí una fecha de pago.', 'warn');
     return;
   }
 
@@ -242,10 +219,10 @@ window.confirmarPago = async function() {
     const estado = await response.json();
     renderEstadoPagoCuota(estado);
     window.closePagoModal();
-    showAlertPopup('Pago registrado con éxito.', 'success');
+    showToast('Pago registrado con éxito.', 'success');
   } catch (e) {
     console.error(e);
-    showAlertPopup('No se pudo registrar el pago. Intentá de nuevo.', 'error');
+    showToast('No se pudo registrar el pago. Intentá de nuevo.', 'error');
   }
 };
 
@@ -284,10 +261,10 @@ window.completeAlert = async function(id) {
       headers: getAuthHeaders(),
       body: JSON.stringify({ completada: true })
     });
-    showAlertPopup('Alerta marcada como completada.', 'success');
+    showToast('Alerta marcada como completada.', 'success');
   } catch (e) {
     console.error('No se pudo marcar la alerta como completada', e);
-    showAlertPopup('No se pudo completar la alerta.', 'error');
+    showToast('No se pudo completar la alerta.', 'error');
   }
 };
 
@@ -298,10 +275,10 @@ window.deleteAlert = async function(id) {
 
   try {
     await fetch(`${API_BASE}/alertas/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
-    showAlertPopup('Alerta eliminada.', 'success');
+    showToast('Alerta eliminada.', 'success');
   } catch (e) {
     console.error('No se pudo eliminar la alerta', e);
-    showAlertPopup('No se pudo eliminar la alerta.', 'error');
+    showToast('No se pudo eliminar la alerta.', 'error');
   }
 };
 
@@ -342,10 +319,10 @@ window.handleAlertSubmit = async function(event) {
     if (colorInput) colorInput.value = ALERT_COLOR_PALETTE[0];
     setupColorPalette();
 
-    showAlertPopup('Alerta creada con éxito.', 'success');
+    showToast('Alerta creada con éxito.', 'success');
   } catch (e) {
     console.error(e);
-    showAlertPopup('No se pudo guardar la alerta. Intentá de nuevo.', 'error');
+    showToast('No se pudo guardar la alerta. Intentá de nuevo.', 'error');
   }
 };
 

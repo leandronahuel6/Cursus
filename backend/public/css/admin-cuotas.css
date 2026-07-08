@@ -1,5 +1,6 @@
 .admin-cuotas-page {
   max-width: 860px;
+  width: 100%;
   margin: 0 auto;
   padding: 24px 16px;
   display: flex;
@@ -11,7 +12,7 @@
 .ac-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   padding: 20px 24px;
   display: flex;
   flex-direction: column;
@@ -55,7 +56,6 @@
 }
 
 .ac-proxima-notice {
-  display: inline-block;
   margin-top: 8px;
   font-size: 12px;
   color: #d97706;
@@ -65,6 +65,10 @@
   padding: 3px 10px;
 }
 
+.ac-proxima-notice:not([hidden]) {
+  display: inline-block;
+}
+
 .ac-btn-edit {
   display: flex;
   align-items: center;
@@ -72,8 +76,7 @@
   padding: 7px 14px;
   font-size: 13px;
   font-weight: 500;
-  font-family: inherit;
-  color: var(--brand);
+color: var(--brand);
   background: var(--brand-light);
   border: 1px solid var(--brand-dim);
   border-radius: var(--r-sm);
@@ -85,6 +88,21 @@
 
 /* ---- Formulario nueva cuota ---- */
 .ac-form {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-top: 0;
+  transition: grid-template-rows 0.3s linear, opacity 0.3s linear, margin-top 0.3s linear;
+}
+
+.ac-form.show {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 16px;
+}
+
+.ac-form-inner {
+  overflow: hidden;
   border-top: 1px solid var(--border);
   padding-top: 16px;
 }
@@ -101,6 +119,15 @@
   gap: 5px;
   flex: 1;
   min-width: 140px;
+}
+
+.ac-field:first-child {
+  flex: 2;
+}
+
+select.aa-input option {
+  padding-right: 15px;
+  padding-left: 5px;
 }
 
 .ac-field label {
@@ -156,8 +183,7 @@
 .ac-filter-btn {
   padding: 5px 14px;
   font-size: 13px;
-  font-family: inherit;
-  font-weight: 500;
+font-weight: 500;
   color: var(--text-muted);
   background: var(--bg);
   border: 1px solid var(--border);

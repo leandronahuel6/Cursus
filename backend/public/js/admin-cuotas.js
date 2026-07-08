@@ -162,10 +162,23 @@
   // ---- Formulario nueva cuota ----
   function acToggleForm() {
     const form = document.getElementById('ac-form');
-    form.hidden = !form.hidden;
-    if (!form.hidden) {
+    const btnEdit = document.getElementById('ac-btn-edit');
+    
+    const isShowing = form.classList.toggle('show');
+    btnEdit.hidden = isShowing;
+
+    if (isShowing) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      
+      const dateInput = document.getElementById('ac-desde');
       // Prellenar fecha de hoy
-      document.getElementById('ac-desde').value = new Date().toISOString().split('T')[0];
+      dateInput.value = today.toISOString().split('T')[0];
+      // Limitar mínimo al primer día del mes
+      dateInput.min = `${year}-${month}-01`;
+      // Limitar máximo al final del año próximo
+      dateInput.max = `${year + 1}-12-31`;
     }
   }
 
@@ -191,14 +204,23 @@
 
       const data = await res.json();
       if (res.ok) {
-        document.getElementById('ac-form').hidden = true;
+        document.getElementById('ac-form').classList.remove('show');
+        document.getElementById('ac-btn-edit').hidden = false;
         document.getElementById('ac-valor').value = '';
         await cargarDatos();
+        showToast('Cuota actualizada correctamente.', 'success');
       } else {
-        alert(data.message ?? 'Error al guardar la cuota.');
+        let errorMsg = 'Error al guardar la cuota.';
+        if (res.status === 422 && data.errors) {
+          // Tomamos siempre el primer error de validación que devuelve Laravel (ya vienen traducidos)
+          errorMsg = Object.values(data.errors)[0][0];
+        } else if (data.message) {
+          errorMsg = data.message;
+        }
+        showToast(errorMsg, 'error');
       }
     } catch {
-      alert('Error de conexión.');
+      showToast('Error de conexión.', 'error');
     } finally {
       btn.disabled = false;
       btn.textContent = 'Guardar';

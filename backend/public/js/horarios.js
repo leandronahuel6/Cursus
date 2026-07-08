@@ -1074,30 +1074,13 @@ document.getElementById('btn-save-schedule').addEventListener('click', async () 
       return;
     }
 
-    showToastConflict('¡Horario semanal guardado con éxito!');
+    showToast('¡Horario semanal guardado con éxito!', 'success');
     deselectBlock();
   } catch (e) {
     console.error('No se pudo guardar el horario', e);
   }
 });
 
-// Toast notification helper
-function showToastConflict(message) {
-  let toast = document.getElementById('sched-toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'sched-toast';
-    toast.className = 'avg-toast-box';
-    document.body.appendChild(toast);
-  }
-
-  toast.textContent = message;
-  toast.classList.add('show');
-
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3500);
-}
 
 // Inicialización de la página
 document.addEventListener('DOMContentLoaded', async () => {
@@ -1182,7 +1165,7 @@ window.exportToICS = function() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
   
-  showToastConflict('¡Archivo iCal (.ics) descargado con éxito!');
+  showToast('¡Archivo iCal (.ics) descargado con éxito!', 'success');
 };
 
 // Imprimir y guardar en PDF
@@ -1266,7 +1249,7 @@ window.searchCompareUser = async function() {
     input.value = '';
     renderComparisonSidebar();
     renderBlocksOnTracks();
-    showToastConflict(`Comparando horario con ${user.nombre}`);
+    showToast(`Comparando horario con ${user.nombre}`, 'success');
   } catch (e) {
     console.error(e);
     renderComparisonSidebar();
@@ -1307,7 +1290,7 @@ window.removeComparedUser = function(userId) {
 
   renderComparisonSidebar();
   renderBlocksOnTracks();
-  showToastConflict('Compañero quitado de la comparación');
+  showToast('Compañero quitado de la comparación', 'info');
 };
 
 // Limpiar toda la comparación
@@ -1317,7 +1300,7 @@ window.clearComparison = function() {
   
   renderComparisonSidebar();
   renderBlocksOnTracks();
-  showToastConflict('Comparación desactivada');
+  showToast('Comparación desactivada', 'info');
 };
 
 // Cambiar de Versión (A o B) de Horario
@@ -1342,7 +1325,7 @@ window.switchVersion = function(version) {
 
   renderBlocksOnTracks();
   checkOverlaps();
-  showToastConflict(`Cargada la Versión ${version}`);
+  showToast(`Cargada la Versión ${version}`, 'success');
 };
 
 // Cambiar el color de un bloque seleccionado
@@ -1368,7 +1351,7 @@ window.changeBlockColor = function(colorHex) {
       }
     });
     
-    showToastConflict('Color de bloque actualizado');
+    showToast('Color de bloque actualizado', 'success');
   }
 };
 
@@ -1580,7 +1563,7 @@ window.loadUTNPresetSchedule = function() {
       renderBlocksOnTracks();
       checkOverlaps();
       saveScheduleState();
-      showToastConflict(`Horario ${selectOptionText} cargado con éxito`);
+      showToast(`Horario ${selectOptionText} cargado con éxito`, 'success');
       
       // Resetear visualmente el dropdown select
       select.value = "";
@@ -1632,7 +1615,7 @@ window.applyCommissionAlternative = function(subjectName, presetKey) {
   renderBlocksOnTracks();
   checkOverlaps();
   saveScheduleState();
-  showToastConflict(`Comisión cambiada a ${presetKey.split('_')[0]} para resolver conflicto`);
+  showToast(`Comisión cambiada a ${presetKey.split('_')[0]} para resolver conflicto`, 'info');
 };
 
 window.checkAlternativeCommissions = function(block) {

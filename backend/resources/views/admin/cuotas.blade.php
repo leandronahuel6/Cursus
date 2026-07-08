@@ -13,7 +13,7 @@
     <div style="display: flex; flex-direction: column;">
       <div class="mob-greet" style="display: flex; align-items: center; gap: 8px;">
         <svg width="20" height="20" style="fill: none; stroke: currentColor; stroke-width: 2; color: var(--brand); flex-shrink: 0;" aria-hidden="true">
-          <use href="{{ asset('assets/icons/sprite.svg#wallet') }}"></use>
+          <use href="{{ asset('assets/icons/sprite.svg') }}#wallet"></use>
         </svg>
         Gestión de Cuotas
       </div>
@@ -26,7 +26,7 @@
 @section('topbar-content')
 <span class="topbar-title" style="display: flex; align-items: center; gap: 10px;">
   <svg width="22" height="22" style="fill: none; stroke: currentColor; stroke-width: 2; color: var(--brand); flex-shrink: 0;" aria-hidden="true">
-    <use href="{{ asset('assets/icons/sprite.svg#wallet') }}"></use>
+    <use href="{{ asset('assets/icons/sprite.svg') }}#wallet"></use>
   </svg>
   Administración — Cuotas
 </span>
@@ -38,7 +38,7 @@
   <!-- Cuota vigente + formulario para cambiarla -->
   <div class="ac-card">
     <div class="ac-card-header">
-      <svg width="18" height="18" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#dollar-sign') }}"></use></svg>
+      <svg width="18" height="18" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#banknote"></use></svg>
       <h2 class="ac-card-title">Cuota mensual vigente</h2>
     </div>
 
@@ -49,17 +49,21 @@
         <div class="ac-proxima-notice" id="ac-proxima-notice" hidden></div>
       </div>
       <button class="ac-btn-edit" id="ac-btn-edit" onclick="window.acToggleForm()">
-        <svg width="14" height="14" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#pencil') }}"></use></svg>
+        <svg width="14" height="14" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#pen"></use></svg>
         Actualizar
       </button>
     </div>
 
     <!-- Formulario nuevo valor -->
-    <form id="ac-form" class="ac-form" hidden onsubmit="window.acGuardarCuota(event)">
+    <form id="ac-form" class="ac-form" onsubmit="window.acGuardarCuota(event)">
+      <div class="ac-form-inner">
       <div class="ac-form-row">
         <div class="ac-field">
           <label for="ac-carrera">Carrera</label>
-          <select id="ac-carrera" class="aa-input" required></select>
+          <div class="aa-select-wrapper">
+            <select id="ac-carrera" class="aa-input" required></select>
+            <svg class="aa-select-chevron" width="16" height="16" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#chevron-down"></use></svg>
+          </div>
         </div>
         <div class="ac-field">
           <label for="ac-valor">Nuevo valor ($)</label>
@@ -74,13 +78,14 @@
         <button type="button" class="aa-btn-cancel" onclick="window.acToggleForm()">Cancelar</button>
         <button type="submit" class="aa-btn-search" id="ac-btn-guardar">Guardar</button>
       </div>
+      </div>
     </form>
   </div>
 
   <!-- Resumen del mes -->
   <div class="ac-card">
     <div class="ac-card-header">
-      <svg width="18" height="18" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#users') }}"></use></svg>
+      <svg width="18" height="18" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#users"></use></svg>
       <h2 class="ac-card-title">Estado de pagos — <span id="ac-periodo-label">…</span></h2>
     </div>
 

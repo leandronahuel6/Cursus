@@ -75,20 +75,6 @@ let state = {
 // Guardar nota temporalmente mientras se abre el modal
 let activeModalSubjectId = null;
 
-let materiasToastTimer = null;
-
-// Toast no intrusivo para avisos (reemplaza alert() nativo)
-function showMateriasToast(message, type = 'warn') {
-  const toast = document.getElementById('materias-toast');
-  if (!toast) return;
-
-  toast.className = `alert-popup-notification ${type}`;
-  toast.textContent = message;
-  toast.classList.add('show');
-
-  if (materiasToastTimer) clearTimeout(materiasToastTimer);
-  materiasToastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
-}
 
 function getStatusLabel(status, isLocked) {
   if (isLocked) return 'Bloqueada';
@@ -230,7 +216,7 @@ window.changeSubjectStatus = function(id, newStatus) {
   
   // Si está bloqueada, no permitir cambiar
   if (isSubjectLocked(sub, newStatus) && newStatus !== 'disponible') {
-    showMateriasToast('Esta materia está bloqueada. Cumplí sus correlativas primero.', 'warn');
+    showToast('Esta materia está bloqueada. Cumplí sus correlativas primero.', 'warn');
     return;
   }
   
