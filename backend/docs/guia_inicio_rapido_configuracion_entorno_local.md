@@ -2,6 +2,19 @@
 
 Esta guía detalla los pasos exactos para configurar tu computadora, clonar el repositorio y levantar el proyecto correctamente por primera vez. Sigue los pasos en orden.
 
+## Repositorio (GitHub)
+
+[https://github.com/leandronahuel6/Cursus](https://github.com/leandronahuel6/Cursus)
+
+## Requisitos de Instalación
+
+Asegúrate de contar con el siguiente entorno de desarrollo en tu PC (Laragon o XAMPP son recomendados):
+
+- **PHP >= 8.3**
+- **Composer** (gestor de dependencias de PHP)
+- **Node.js y npm** (Opcional, para empaquetado de assets de Vite que de momento no se usa)
+- **Un navegador web moderno** (Chrome, Firefox, Safari, Edge)
+
 ---
 
 ## 1. Entorno Local (Laragon)
