@@ -109,20 +109,7 @@
         </div>
       </div>
 
-      <div class="sched-panel-section">
-        <div class="sched-section-hd">
-          <span>Comparar con Compañero 👥</span>
-        </div>
-        <div class="sched-compare-box">
-          <div class="compare-input-group">
-            <input type="text" id="compare-search-input" placeholder="Email o Legajo">
-            <button id="btn-compare-search" onclick="searchCompareUser()">Buscar</button>
-          </div>
-          <div id="compare-status-list" style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: rgba(255,255,255,0.6); min-height: 20px;">
-            <div style="color: rgba(255,255,255,0.45); padding: 4px 0;">Sin comparación activa</div>
-          </div>
-        </div>
-      </div>
+
 
     </div>
 

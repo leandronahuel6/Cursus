@@ -285,3 +285,20 @@ body.dark-mode .nav-item.active {
     max-width: 100%;
   }
 }
+
+/* ==============================
+   ADMIN SCHEME FOR SIDEBAR
+============================== */
+body.is-admin .sidebar {
+  background: #0f172a;
+  border-right: 2px solid #ef4444;
+}
+
+body.is-admin .nav-item.active {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #fca5a5 !important;
+}
+
+body.is-admin .nav-item.active::before {
+  background: #ef4444 !important;
+}

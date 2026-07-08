@@ -229,9 +229,9 @@
       const presetsMap = {
         'none': 'none',
         'utn-haedo': "url('/assets/img/default_dashboard_bg.jpg')",
-        'utn-building': "url('/assets/img/utn-haedo.jpg')",
-        'study-cozy': "url('/assets/img/contact_bg.png')",
-        'code-abstract': "url('/assets/img/code_abstract.jpg')",
+        'utn-building': "url('/assets/img/utn-haedo.png')",
+        'study-cozy': "url('/assets/img/contact_bg.jpg')",
+        'minecraft': "url('/assets/img/minecraft.jpg')",
         'lofi-room': "url('/assets/img/lofi_room.jpg')",
         'custom': user.bg_custom_url ? `url('${user.bg_custom_url}')` : 'none'
       };
@@ -250,9 +250,9 @@
   const presetsMap = {
     'none': 'none',
     'utn-haedo': "url('/assets/img/default_dashboard_bg.jpg')",
-    'utn-building': "url('/assets/img/utn-haedo.jpg')",
-    'study-cozy': "url('/assets/img/contact_bg.png')",
-    'code-abstract': "url('/assets/img/code_abstract.jpg')",
+    'utn-building': "url('/assets/img/utn-haedo.png')",
+    'study-cozy': "url('/assets/img/contact_bg.jpg')",
+    'minecraft': "url('/assets/img/minecraft.jpg')",
     'lofi-room': "url('/assets/img/lofi_room.jpg')"
   };
 
@@ -503,6 +503,13 @@
     const allowedTypes = ['image/png', 'image/jpeg'];
     if (!allowedTypes.includes(file.type)) {
       errorEl.textContent = 'Solo se permiten imágenes PNG o JPG.';
+      e.target.value = '';
+      return;
+    }
+
+    // Validación de tamaño máximo (4 MB)
+    if (file.size > 4 * 1024 * 1024) {
+      errorEl.textContent = 'La imagen es muy grande. El tamaño máximo permitido es 4 MB.';
       e.target.value = '';
       return;
     }

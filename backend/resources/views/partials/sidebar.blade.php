@@ -13,7 +13,17 @@
           <use href="{{ asset('assets/icons/sprite.svg#panel-left-open') }}"></use>
         </svg>
       </div>
-      <div class="sb-logo-text" id="sb-logo-text">Cursus<small>Tec. en Programación</small></div>
+      <div class="sb-logo-text" id="sb-logo-text">
+        Cursus
+        @if(Auth::check() && Auth::user()->role === 'admin')
+          <small style="color: #ef4444; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; font-size: 9px; display: inline-flex; align-items: center; gap: 3px;">
+            <span style="display: inline-block; width: 5px; height: 5px; background: #ef4444; border-radius: 50%;"></span>
+            Panel Admin
+          </small>
+        @else
+          <small>Tec. en Programación</small>
+        @endif
+      </div>
     </a>
     <button type="button" class="sb-toggle-btn" id="sb-toggle-btn" onclick="window.toggleSidebar(event)" aria-label="Cerrar barra lateral" title="Cerrar barra lateral">
       <svg class="sb-toggle-ic-default" aria-hidden="true" width="20" height="20">

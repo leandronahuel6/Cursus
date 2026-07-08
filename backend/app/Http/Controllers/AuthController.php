@@ -137,7 +137,7 @@ class AuthController extends Controller
             'nombre' => 'required|string|max:255',
             'legajo' => 'nullable|string|max:255|unique:users,legajo,' . $user->id,
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'bg_preset' => 'required|string|in:none,utn-haedo,utn-building,study-cozy,code-abstract,lofi-room,custom',
+            'bg_preset' => 'required|string|in:none,utn-haedo,utn-building,study-cozy,minecraft,lofi-room,custom',
             'bg_opacity' => 'required|integer|min:0|max:30',
             'bg_blur' => 'required|numeric|min:0|max:8',
         ]);

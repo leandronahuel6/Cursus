@@ -331,10 +331,10 @@
           <label for="profile-bg-preset">Fondo de Pantalla</label>
           <select id="profile-bg-preset" class="contact-input" onchange="window.handleBgPresetChange(this.value)">
             <option value="none">Sin imagen (Fondo plano)</option>
-            <option value="utn-haedo">Fondo UTN Haedo (Escudo + Logo)</option>
+            <option value="utn-haedo">Fondo UTN Haedo (Fachada - Defecto)</option>
             <option value="utn-building">Fondo UTN Haedo (Edificio)</option>
             <option value="study-cozy">Escritorio Cozy (Programación)</option>
-            <option value="code-abstract">Código Abstracto (Cyberpunk)</option>
+            <option value="minecraft">Minecraft (Relajante)</option>
             <option value="lofi-room">Habitación Lo-Fi (Estilo de estudio)</option>
             <option value="custom">Subir imagen propia...</option>
           </select>
@@ -348,6 +348,9 @@
             <button type="button" class="contact-btn-cancel" id="profile-bg-delete-btn" style="background: #ef4444; color: white; border: none; padding: 8px 16px; font-size: 13px; border-radius: 6px; display: none; width: auto;" onclick="window.handleBgDelete()">
               Eliminar imagen
             </button>
+          </div>
+          <div style="font-size: 11px; color: var(--t3); margin-top: 6px;">
+            Tamaño máximo permitido: <strong>4 MB</strong> (Formatos: JPG, PNG).
           </div>
           <input type="file" id="profile-bg-input" accept="image/png,image/jpeg" style="display:none;" onchange="window.handleBgFileChange(event)">
           <span id="profile-bg-error" class="error-message" style="display:block; margin-top: 6px;"></span>

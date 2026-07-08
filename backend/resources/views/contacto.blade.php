@@ -544,7 +544,7 @@
     </header>
 
     <!-- CONTAINER PRINCIPAL DE LA PÁGINA DE CONTACTO -->
-    <main class="contact-page" style="--hero-bg-url: url('{{ asset('assets/img/contact_bg.png') }}');">
+    <main class="contact-page" style="--hero-bg-url: url('{{ asset('assets/img/contact_bg_page.png') }}');">
         <div class="contact-layout">
                 <div class="contact-info">
                     <div>
