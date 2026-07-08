@@ -133,6 +133,13 @@ color: #fff;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.aa-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .aa-student-info { flex: 1; min-width: 0; }

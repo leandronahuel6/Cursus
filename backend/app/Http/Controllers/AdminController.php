@@ -56,10 +56,11 @@ class AdminController extends Controller
 
         return response()->json([
             'usuario' => [
-                'id'     => $usuario->id,
-                'nombre' => $usuario->nombre,
-                'legajo' => $usuario->legajo,
-                'email'  => $usuario->email,
+                'id'         => $usuario->id,
+                'nombre'     => $usuario->nombre,
+                'legajo'     => $usuario->legajo,
+                'email'      => $usuario->email,
+                'avatar_url' => $usuario->avatar_url,
             ],
             'materias' => $materias->values(),
             'pomodoro' => [
