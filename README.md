@@ -29,10 +29,12 @@ Como respuesta a esa situación, **Cursus** es un asistente estudiantil que cent
 
 ## 🛠 Tecnologías Utilizadas
 
-- **Frontend:** HTML5, CSS3, JavaScript Vanilla (Interacción dinámica y asíncrona mediante Fetch API).
-- **Backend:** PHP 8.x con framework Laravel 11.x (Arquitectura MVC y plantillas Blade).
-- **Base de Datos:** MySQL.
-- **Íconos:** Lucide Icons.
+- **Lenguaje Principal**: PHP 8.3
+- **Framework Backend**: Laravel 11 (Arquitectura MVC, Eloquent ORM, API REST con Laravel Sanctum)
+- **Base de Datos**: MySQL (compatible modificando las variables en el `.env`) / MariaDB
+- **Frontend**: HTML5, Vanilla CSS (diseño responsivo con variables personalizables y Glassmorphism) y Vanilla Javascript (lógica asíncrona de Fetch API e interactividad dinámica)
+- **Iconografía**: Lucide Icons
+- **Manejo de Archivos**: Sistema de almacenamiento (`Storage`) local de Laravel para avatars y fondos personalizados.
 
 ## 🏗 Arquitectura del Sistema
 
