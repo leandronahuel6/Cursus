@@ -1,0 +1,113 @@
+/* ==========================================================================
+   SISTEMA GLOBAL DE TOASTS — Cursus
+   Archivo: public/css/components/toast.css
+   Propósito: Notificaciones flotantes no intrusivas (bottom-right).
+   Reemplaza: .avg-toast-box, .alert-popup-notification (legacy).
+   Cargado en: layouts/app.blade.php (global para toda la app).
+   ========================================================================== */
+
+/* ── Contenedor posicionado ── */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 999999;
+  pointer-events: none;
+}
+
+/* ── Elemento Toast base ── */
+.toast {
+  background: #1f2937;
+  color: #fff;
+  border-radius: var(--r);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--sh-md);
+  font-size: 12.5px;
+  font-weight: 500;
+  min-width: 250px;
+  max-width: 360px;
+  pointer-events: auto;
+  animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Variantes por tipo ── */
+.toast.success { border-left: 4px solid var(--green); }
+.toast.error   { border-left: 4px solid var(--red); }
+.toast.warn    { border-left: 4px solid var(--orange); }
+.toast.info    { border-left: 4px solid var(--brand); }
+
+/* ── Ícono SVG ── */
+.toast__icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Color del ícono por tipo */
+.toast.success .toast__icon { color: var(--green); }
+.toast.error   .toast__icon { color: var(--red); }
+.toast.warn    .toast__icon { color: var(--orange); }
+.toast.info    .toast__icon { color: var(--brand); }
+
+/* ── Texto del mensaje ── */
+.toast__message {
+  flex: 1;
+  line-height: 1.4;
+}
+
+/* ── Botón de cierre ── */
+.toast__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+.toast__close:hover { color: #fff; }
+
+/* ── Animaciones ── */
+@keyframes toastIn {
+  from { transform: translateY(12px) scale(0.95); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes toastOut {
+  to { transform: translateY(12px) scale(0.95); opacity: 0; }
+}
+
+/* ── Dark mode ── */
+body.dark-mode .toast {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Responsivo móvil ── */
+/* Evitar tapar el menú de navegación inferior en mobile */
+@media (max-width: 768px) {
+  .toast-container {
+    bottom: calc(51px + env(safe-area-inset-bottom, 0px));
+    right: 12px;
+    left: auto;
+    align-items: flex-end;
+  }
+  .toast {
+    min-width: auto;
+    max-width: calc(100vw - 24px);
+    font-size: 11.5px;
+    padding: 8px 14px;
+    border-radius: var(--r-md);
+  }
+}
