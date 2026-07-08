@@ -1,5 +1,6 @@
 .admin-alumnos-page {
   max-width: 860px;
+  width: 100%;
   margin: 0 auto;
   padding: 24px 16px;
   display: flex;
@@ -11,7 +12,7 @@
 .aa-search-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   padding: 20px 24px;
 }
 
@@ -45,8 +46,35 @@ color: var(--text);
   border-radius: var(--r-sm);
   outline: none;
   transition: border-color .15s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 .aa-input:focus { border-color: var(--brand); }
+
+select.aa-input {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 36px;
+}
+
+.aa-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1; /* To ensure it grows like the select used to */
+}
+
+.aa-select-wrapper select {
+  width: 100%;
+}
+
+.aa-select-chevron {
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+  color: var(--text-muted); /* or #6b7280 */
+}
 
 .aa-btn-search {
   padding: 9px 20px;
@@ -70,13 +98,20 @@ color: #fff;
 }
 .aa-success { color: var(--success, #38a169); }
 
-/* ---- Student card ---- */
-.aa-student-card,
-.aa-materias-card {
+#aa-result {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.aa-student-card,
+.aa-materias-card {
   padding: 20px 24px;
+}
+
+.aa-student-card {
+  border-bottom: 1px solid var(--border);
 }
 
 .aa-student-header {
@@ -159,6 +194,9 @@ color: var(--danger, #e53e3e);
   font-size: 22px;
   font-weight: 700;
   color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .text-ok   { color: var(--success, #38a169); }
 .text-warn { color: var(--warning, #d97706); }
@@ -242,7 +280,7 @@ color: var(--danger, #e53e3e);
 .aa-confirm-box {
   background: var(--card);
   border: 1px solid rgba(229,62,62,.35);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   padding: 32px 32px 28px;
   max-width: 400px;
   width: 90%;
@@ -287,12 +325,16 @@ color: var(--danger, #e53e3e);
   margin-top: 8px;
   width: 100%;
 }
+.aa-confirm-actions button {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
 
 .aa-btn-cancel {
-  flex: 1;
   padding: 10px 18px;
   font-size: 14px;
-font-weight: 500;
+  font-weight: 500;
   color: var(--text);
   background: var(--bg);
   border: 1px solid var(--border);

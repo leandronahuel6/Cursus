@@ -162,8 +162,12 @@
   // ---- Formulario nueva cuota ----
   function acToggleForm() {
     const form = document.getElementById('ac-form');
-    form.hidden = !form.hidden;
-    if (!form.hidden) {
+    const btnEdit = document.getElementById('ac-btn-edit');
+    
+    const isShowing = form.classList.toggle('show');
+    btnEdit.hidden = isShowing;
+
+    if (isShowing) {
       // Prellenar fecha de hoy
       document.getElementById('ac-desde').value = new Date().toISOString().split('T')[0];
     }
@@ -191,7 +195,8 @@
 
       const data = await res.json();
       if (res.ok) {
-        document.getElementById('ac-form').hidden = true;
+        document.getElementById('ac-form').classList.remove('show');
+        document.getElementById('ac-btn-edit').hidden = false;
         document.getElementById('ac-valor').value = '';
         await cargarDatos();
       } else {
