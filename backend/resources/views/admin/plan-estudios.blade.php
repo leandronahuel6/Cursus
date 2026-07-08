@@ -13,7 +13,7 @@
     <div style="display: flex; flex-direction: column;">
       <div class="mob-greet" style="display: flex; align-items: center; gap: 8px;">
         <svg width="20" height="20" style="fill: none; stroke: currentColor; stroke-width: 2; color: var(--brand); flex-shrink: 0;" aria-hidden="true">
-          <use href="{{ asset('assets/icons/sprite.svg#graduation-cap') }}"></use>
+          <use href="{{ asset('assets/icons/sprite.svg') }}#graduation-cap"></use>
         </svg>
         Plan de Estudios
       </div>
@@ -26,7 +26,7 @@
 @section('topbar-content')
 <span class="topbar-title" style="display: flex; align-items: center; gap: 10px;">
   <svg width="22" height="22" style="fill: none; stroke: currentColor; stroke-width: 2; color: var(--brand); flex-shrink: 0;" aria-hidden="true">
-    <use href="{{ asset('assets/icons/sprite.svg#graduation-cap') }}"></use>
+    <use href="{{ asset('assets/icons/sprite.svg') }}#graduation-cap"></use>
   </svg>
   Administración — Plan de Estudios
 </span>
@@ -52,7 +52,7 @@
       <span class="pe-anio-label">1° Año</span>
       <span class="pe-anio-count" id="pe-count-1"></span>
     </div>
-    <div class="ac-table-wrap">
+    <div class="pe-table-wrap">
       <table class="aa-table">
         <thead><tr><th>Materia</th><th>Para cursar (Regular)</th><th>Para acreditar (Aprobada)</th><th></th></tr></thead>
         <tbody id="pe-tbody-1"></tbody>
@@ -65,7 +65,7 @@
       <span class="pe-anio-label">2° Año</span>
       <span class="pe-anio-count" id="pe-count-2"></span>
     </div>
-    <div class="ac-table-wrap">
+    <div class="pe-table-wrap">
       <table class="aa-table">
         <thead><tr><th>Materia</th><th>Para cursar (Regular)</th><th>Para acreditar (Aprobada)</th><th></th></tr></thead>
         <tbody id="pe-tbody-2"></tbody>
@@ -76,27 +76,32 @@
 </div>
 
 <!-- Modal alta/edición -->
-<div class="aa-confirm-overlay" id="pe-modal" hidden>
+<div class="aa-confirm-overlay" id="pe-modal" onclick="if(event.target === this) window.peCerrarModal()" hidden>
   <div class="pe-modal-box">
     <div class="pe-modal-header">
       <h3 class="pe-modal-title" id="pe-modal-title">Nueva materia</h3>
-      <button class="contact-close" onclick="window.peCerrarModal()">✕</button>
+      <button class="pe-modal-close" onclick="window.peCerrarModal()">
+        <svg width="20" height="20" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#x"></use></svg>
+      </button>
     </div>
 
     <form id="pe-form" onsubmit="window.peGuardar(event)">
       <input type="hidden" id="pe-id">
 
       <div class="pe-form-grid">
-        <div class="ac-field" style="flex: 2;">
-          <label>Nombre</label>
+        <div class="pe-field" style="flex: 2;">
+          <label for="pe-nombre">Nombre</label>
           <input type="text" id="pe-nombre" class="aa-input" placeholder="Ej: Programación V" required maxlength="255">
         </div>
-        <div class="ac-field" style="flex: 1;">
-          <label>Año</label>
-          <select id="pe-nivel" class="aa-input" required>
-            <option value="1">1° Año</option>
-            <option value="2">2° Año</option>
-          </select>
+        <div class="pe-field" style="flex: 1;">
+          <label for="pe-nivel">Año</label>
+          <div class="aa-select-wrapper">
+            <select id="pe-nivel" class="aa-input" required>
+              <option value="1">1° Año</option>
+              <option value="2">2° Año</option>
+            </select>
+            <svg class="aa-select-chevron" width="16" height="16" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#chevron-down"></use></svg>
+          </div>
         </div>
       </div>
 
@@ -111,7 +116,7 @@
         </div>
       </div>
 
-      <div class="ac-form-actions" style="margin-top: 16px;">
+      <div class="pe-form-actions">
         <button type="button" class="aa-btn-cancel" onclick="window.peCerrarModal()">Cancelar</button>
         <button type="submit" class="aa-btn-search" id="pe-btn-guardar">Guardar</button>
       </div>
@@ -120,10 +125,10 @@
 </div>
 
 <!-- Modal confirmación eliminar -->
-<div class="aa-confirm-overlay" id="pe-confirm-overlay" hidden>
+<div class="aa-confirm-overlay" id="pe-confirm-overlay" onclick="if(event.target === this) window.peCancelarEliminar()" hidden>
   <div class="aa-confirm-box">
     <div class="aa-confirm-icon">
-      <svg width="24" height="24" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#trash-2') }}"></use></svg>
+      <svg width="24" height="24" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#trash-2"></use></svg>
     </div>
     <h3 class="aa-confirm-title">¿Eliminar materia?</h3>
     <p class="aa-confirm-msg" id="pe-confirm-msg"></p>
