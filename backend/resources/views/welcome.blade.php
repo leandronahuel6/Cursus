@@ -1508,7 +1508,7 @@
 <body>
 
     <!-- FONDO FIJO GLOBAL DE LA FACULTAD -->
-    <div class="global-fixed-bg" style="--hero-bg-url: url('{{ asset('assets/img/utn-haedo.jpg') }}');"></div>
+    <div class="global-fixed-bg" style="--hero-bg-url: url('{{ asset('assets/img/inicio_nosotros.jpg') }}');"></div>
 
     <!-- BACKGROUND BLOBS FLOTANTES -->
     <div class="blob blob-1"></div>

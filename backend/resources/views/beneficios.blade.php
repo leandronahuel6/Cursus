@@ -594,7 +594,7 @@
         <div class="benefit-card-reqs">
           <strong>Requisito:</strong> Acreditar estatus de estudiante activo.
         </div>
-        <a href="https://aws.amazon.com/education/aws-educate/" target="_blank" class="btn-benefit-action">Solicitar beneficio</a>
+        <a href="https://aws.amazon.com/education/awseducate/" target="_blank" class="btn-benefit-action">Solicitar beneficio</a>
       </div>
     </div>
 
@@ -617,7 +617,7 @@
         <div class="benefit-card-reqs">
           <strong>Requisito:</strong> Vivir en PBA, SUBE registrada a tu nombre y regularidad.
         </div>
-        <a href="https://www.argentina.gob.ar/servicio/boleto-estudiantil-universitario" target="_blank" class="btn-benefit-action">Solicitar beneficio</a>
+        <a href="https://www.gba.gob.ar/transporte/boleto_estudiantil" target="_blank" class="btn-benefit-action">Solicitar beneficio</a>
       </div>
     </div>
 
@@ -709,7 +709,7 @@
         <div class="benefit-card-reqs">
           <strong>Requisito:</strong> Activar a través del GitHub Student Developer Pack.
         </div>
-        <a href="https://www.digitalocean.com/products/github-student-developer-pack" target="_blank" class="btn-benefit-action">Solicitar beneficio</a>
+        <a href="https://education.github.com/pack" target="_blank" class="btn-benefit-action">Solicitar beneficio</a>
       </div>
     </div>
 
@@ -801,7 +801,7 @@
         <div class="benefit-card-reqs">
           <strong>Requisito:</strong> Correo institucional (.edu.ar) activo.
         </div>
-        <a href="https://platzi.com/expert-estudiantes/" target="_blank" class="btn-benefit-action">Solicitar beneficio</a>
+        <a href="https://platzi.com/universidad/" target="_blank" class="btn-benefit-action">Solicitar beneficio</a>
       </div>
     </div>
 

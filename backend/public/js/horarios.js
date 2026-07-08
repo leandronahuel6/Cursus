@@ -978,17 +978,22 @@ function checkOverlaps() {
 // Limpiar bloques del día activo
 document.getElementById('btn-clear-grid').addEventListener('click', () => {
   // Para limpiar de forma lógica: limpia todos los bloques de la grilla
-  const userConfirm = confirm(`¿Seguro que deseas vaciar toda tu grilla horaria semanal (Versión ${schedState.currentVersion || 'A'})?`);
-  if (userConfirm) {
-    schedState.blocks = schedState.blocks.filter(b => (b.version || 'A') !== (schedState.currentVersion || 'A'));
-    deselectBlock();
-    renderBlocksOnTracks();
-    checkOverlaps();
-  }
+  showCustomConfirm(
+    'Vaciar Grilla',
+    `¿Seguro que deseas vaciar toda tu grilla horaria semanal (Versión ${schedState.currentVersion || 'A'})? Esta acción no se puede deshacer.`,
+    () => {
+      schedState.blocks = schedState.blocks.filter(b => (b.version || 'A') !== (schedState.currentVersion || 'A'));
+      deselectBlock();
+      renderBlocksOnTracks();
+      checkOverlaps();
+    },
+    'Vaciar',
+    'btn-confirm-delete'
+  );
 });
 
 // Guardar Horario completo
-document.getElementById('btn-save-schedule').addEventListener('click', async () => {
+document.getElementById('btn-save-schedule').addEventListener('click', () => {
   // 1. Validación estricta semanal
   // Buscamos cualquier conflicto en los 6 días
   let conflicts = [];
@@ -1036,49 +1041,54 @@ document.getElementById('btn-save-schedule').addEventListener('click', async () 
     return;
   }
 
-  // 2. Advertencia de actividades huérfanas en el panel lateral
-  const userConfirm = confirm('Atención: Tienes actividades en el panel inferior que no fueron ubicadas en ninguna pista. No se guardarán en tu cronograma. ¿Deseas continuar?');
-  if (!userConfirm) return;
+  // 2. Diálogo de confirmación personalizado de guardado
+  showCustomConfirm(
+    'Guardar Horario',
+    `¿Deseas guardar los cambios en tu grilla horaria (Versión ${schedState.currentVersion || 'A'})? Las actividades que estén en el panel inferior no se guardarán en tu cronograma.`,
+    async () => {
+      // 3. Guardar la grilla en la base de datos (reemplaza todo el horario anterior)
+      try {
+        const response = await fetch(`${API_BASE}/horarios/sync`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({
+            version: schedState.currentVersion || 'A',
+            blocks: schedState.blocks
+              .filter(b => (b.version || 'A') === (schedState.currentVersion || 'A'))
+              .map(b => ({
+                tipo: b.tipo,
+                materia_id: b.tipo === 'materia' ? b.materia_id : null,
+                titulo_actividad: b.tipo === 'actividad' ? b.nombre : null,
+                dia_semana: b.dia,
+                hora_inicio: b.inicio,
+                hora_fin: b.fin,
+                color: b.color || null
+              }))
+          })
+        });
 
-  // 3. Guardar la grilla en la base de datos (reemplaza todo el horario anterior)
-  try {
-    const response = await fetch(`${API_BASE}/horarios/sync`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({
-        version: schedState.currentVersion || 'A',
-        blocks: schedState.blocks
-          .filter(b => (b.version || 'A') === (schedState.currentVersion || 'A'))
-          .map(b => ({
-            tipo: b.tipo,
-            materia_id: b.tipo === 'materia' ? b.materia_id : null,
-            titulo_actividad: b.tipo === 'actividad' ? b.nombre : null,
-            dia_semana: b.dia,
-            hora_inicio: b.inicio,
-            hora_fin: b.fin,
-            color: b.color || null
-          }))
-      })
-    });
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          const editor = document.getElementById('sched-manual-editor');
+          editor.style.display = 'flex';
+          document.getElementById('editor-selected-title').textContent = '⚠️ No se pudo guardar';
+          document.getElementById('editor-selected-type').textContent = 'ERROR';
+          document.getElementById('editor-selected-type').className = 'editor-block-type-badge error';
+          const notif = document.getElementById('editor-notification-area');
+          notif.textContent = data.message || 'No se pudo guardar el horario.';
+          notif.style.color = '#dc2626';
+          return;
+        }
 
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      const editor = document.getElementById('sched-manual-editor');
-      editor.style.display = 'flex';
-      document.getElementById('editor-selected-title').textContent = '⚠️ No se pudo guardar';
-      document.getElementById('editor-selected-type').textContent = 'ERROR';
-      document.getElementById('editor-selected-type').className = 'editor-block-type-badge error';
-      const notif = document.getElementById('editor-notification-area');
-      notif.textContent = data.message || 'No se pudo guardar el horario.';
-      notif.style.color = '#dc2626';
-      return;
-    }
-
-    showToastConflict('¡Horario semanal guardado con éxito!');
-    deselectBlock();
-  } catch (e) {
-    console.error('No se pudo guardar el horario', e);
-  }
+        showToastConflict('¡Horario semanal guardado con éxito!');
+        deselectBlock();
+      } catch (e) {
+        console.error('No se pudo guardar el horario', e);
+      }
+    },
+    'Guardar',
+    'btn-primary'
+  );
 });
 
 // Toast notification helper
@@ -1374,7 +1384,7 @@ window.changeBlockColor = function(colorHex) {
 
 
 // Diálogo de confirmación personalizado
-window.showCustomConfirm = function(title, message, onConfirm) {
+window.showCustomConfirm = function(title, message, onConfirm, confirmText = 'Eliminar', confirmClass = 'btn-confirm-delete') {
   const backdrop = document.createElement('div');
   backdrop.className = 'custom-confirm-backdrop';
   
@@ -1387,7 +1397,7 @@ window.showCustomConfirm = function(title, message, onConfirm) {
       <div class="custom-confirm-body">${message}</div>
       <div class="custom-confirm-footer">
         <button class="btn-secondary" id="confirm-btn-cancel" style="padding: 7px 16px; border-radius: 8px; font-size: 13px;">Cancelar</button>
-        <button class="btn-confirm-delete" id="confirm-btn-ok">Eliminar</button>
+        <button class="${confirmClass}" id="confirm-btn-ok" style="padding: 7px 16px; border-radius: 8px; font-size: 13px;">${confirmText}</button>
       </div>
     </div>
   `;
@@ -1584,7 +1594,9 @@ window.loadUTNPresetSchedule = function() {
       
       // Resetear visualmente el dropdown select
       select.value = "";
-    }
+    },
+    'Cargar',
+    'btn-primary'
   );
   
   // Limpiar selector si cancela

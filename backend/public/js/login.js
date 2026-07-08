@@ -19,7 +19,12 @@ function getStoredToken() {
             headers: { 'Authorization': 'Bearer ' + storedToken, 'Accept': 'application/json' }
         });
         if (response.ok) {
-            window.location.href = '/dashboard';
+            const user = await response.json();
+            if (user.role === 'admin') {
+                window.location.href = '/admin/alumnos';
+            } else {
+                window.location.href = '/dashboard';
+            }
         } else {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
@@ -102,7 +107,11 @@ const handleSubmit = async (e) => {
         passwordInput.value = '';
 
         // redirigir
-        window.location.href = "/dashboard";
+        if (data.user.role === 'admin') {
+            window.location.href = '/admin/alumnos';
+        } else {
+            window.location.href = '/dashboard';
+        }
 
     } catch (error) {
         console.error("Error en login:", error);
