@@ -177,9 +177,10 @@
       dateInput.value = today.toISOString().split('T')[0];
       // Limitar mínimo al primer día del mes
       dateInput.min = `${year}-${month}-01`;
+      // Limitar máximo al final del año próximo
+      dateInput.max = `${year + 1}-12-31`;
     }
   }
-
 
   async function acGuardarCuota(e) {
     e.preventDefault();
@@ -211,11 +212,8 @@
       } else {
         let errorMsg = 'Error al guardar la cuota.';
         if (res.status === 422 && data.errors) {
-          if (data.errors.vigente_desde) {
-            errorMsg = 'La fecha de vigencia no puede ser anterior al primer día del mes actual.';
-          } else {
-            errorMsg = Object.values(data.errors)[0][0];
-          }
+          // Tomamos siempre el primer error de validación que devuelve Laravel (ya vienen traducidos)
+          errorMsg = Object.values(data.errors)[0][0];
         } else if (data.message) {
           errorMsg = data.message;
         }

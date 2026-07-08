@@ -124,11 +124,15 @@ class AdminController extends Controller
     public function setCuota(Request $request)
     {
         $primerDiaMes = now()->startOfMonth()->toDateString();
+        $finAnioProximo = now()->addYear()->endOfYear()->toDateString();
 
         $request->validate([
             'carrera_id'    => 'required|exists:carreras,id',
             'valor_mensual' => 'required|numeric|min:0',
-            'vigente_desde' => 'required|date|after_or_equal:' . $primerDiaMes,
+            'vigente_desde' => 'required|date|after_or_equal:' . $primerDiaMes . '|before_or_equal:' . $finAnioProximo,
+        ], [
+            'vigente_desde.after_or_equal' => 'La fecha de vigencia no puede ser anterior al primer día del mes actual.',
+            'vigente_desde.before_or_equal' => 'La fecha de vigencia no puede superar el 31 de diciembre del próximo año.',
         ]);
 
         $hoy = now()->toDateString();
