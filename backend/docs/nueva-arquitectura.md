@@ -36,7 +36,7 @@ public/
 │   │   ├── cards.css       # Tarjetas de contenido, estadísticas
 │   │   ├── modals.css      # Estilos compartidos para modales/overlays
 │   │   ├── tabs.css        # Sistema de pestañas
-│   │   ├── toast.css       # Notificaciones flotantes
+│   │   ├── toast.css       # Notificaciones flotantes (sistema centralizado)
 │   │   ├── filters.css     # Chips de filtrado y selectores
 │   │   ├── forms.css       # Switches, inputs, textareas
 │   │   └── pomo-float.css  # Widget flotante Pomodoro minimizable
@@ -60,8 +60,10 @@ public/
 │   ├── shared/             # Scripts transversales a toda la app
 │   │   ├── api.js          # Utilidades para llamadas fetch al backend
 │   │   ├── router.js       # Manejo de navegación/historial
-│   │   ├── utils.js        # Funciones auxiliares (fechas, toasts, cálculo de alertas)
-│   │   ├── profile.js      # Lógica del menú de perfil de usuario
+│   │   ├── toast.js        # ★ Sistema centralizado de notificaciones (window.showToast)
+│   │   ├── sidebar.js      # Lógica del menú lateral: colapso, tooltips y navegación activa
+│   │   ├── utils.js        # Funciones auxiliares reutilizables: formato de fechas, cálculo de alertas próximas
+│   │   ├── profile.js      # Menú de perfil de usuario: cambio de carrera, modal de contraseña, cierre de sesión
 │   │   └── pomo-audio-player.js # Módulo de UI puro: sintetiza alarmas con Web Audio API. Importado por area-estudio.js y pomo-float.js.
 │   └── views/              # Lógica específica por página (orquestadores)
 │       ├── welcome.js      # Animaciones de la landing
@@ -120,22 +122,57 @@ resources/views/
 
 ---
 
-## 3. Patrones de Diseño Implementados (Lote 1 — Área de Estudio)
+## 4. Sistema Global de Toasts (`shared/toast.js` + `components/toast.css`)
 
-| Patrón | Módulo | Descripción |
-|--------|--------|-------------|
-| **State Pattern** | `js/models/PomodoroStates.js` | Cada fase (Enfoque, DescansoCorto, DescansoLargo) es un objeto inmutable con sus propias reglas de duración y transición. Elimina todos los `if (fase === 'enfoque')` dispersos. |
-| **Observer / Pub-Sub** | `js/services/PomodoroStateService.js` | Extiende `EventTarget`. Emite `pomo:tick`, `pomo:estadoCambiado`, `pomo:faseCompletada`. El Timer Principal, el Modo Concentración y el Widget Flotante se suscriben y renderizan de forma totalmente independiente. |
-| **Repository Pattern** | `js/services/ApiService.js` | Abstrae TODOS los `fetch` de la vista. Ninguna función del DOM hace peticiones HTTP directamente. Retorna promesas limpias al llamador. Permite migrar de mock a real cambiando un único punto. |
-| **Time Deltas** | `PomodoroStateService._iniciarTicker()` | El tiempo restante se calcula como `Date.now() - tsInicio` en cada tick (500 ms). Inmune al throttling de navegadores en pestañas inactivas donde `setInterval` puede demorar 1+ segundo. |
-| **Singleton** | `pomodoroService` (exportado) | Una única instancia del servicio para garantizar el SSOT. Consumidores (`pomo-float.js`, futuros módulos) deben importarlo directamente. |
-| **SRP — Módulo de Audio** | `js/shared/pomo-audio-player.js` | Encapsula exclusivamente la síntesis de sonido con la Web Audio API. No conoce el estado del Pomodoro ni el DOM. Las vistas lo importan y lo activan al recibir el evento `pomo:faseCompletada`. |
-| **Web Locks API** | `_registrarSesionConDedup()` en `area-estudio.js` | Sustituye el token de localStorage para la deduplicación multi-pestaña. `navigator.locks.request('cursus_pomo_dedup', { mode: 'exclusive' }, ...)` garantiza exclusión atómica: si N pestañas intentan registrar al mismo milisegundo, el navegador las encola y solo el líder realiza el `fetch`. |
-| **Offline-First / Queue** | `js/services/PomodoroSyncQueue.js` | Cola de sincronización local que retiene sesiones terminadas (localStorage) si el servidor falla o no hay conexión, reintentando automáticamente al volver a estar online sin bloquear la UI principal. |
+El sistema de notificaciones flotantes está **centralizado en un único punto de verdad**:
+
+| Capa                | Archivo                           | Responsabilidad                                                                     |
+| ------------------- | --------------------------------- | ----------------------------------------------------------------------------------- |
+| **Lógica**          | `js/shared/toast.js`              | Define `window.showToast(message, type, duration)`. IIFE pattern, sin dependencias. |
+| **Estilos**         | `css/components/toast.css`        | Clases BEM: `.toast`, `.toast__icon`, `.toast__message`, `.toast__close`.           |
+| **Contenedor HTML** | `layouts/app.blade.php` línea 431 | `<div class="toast-container" id="toast-container">` — único en el DOM.             |
+
+### Cómo consumirlo
+
+```js
+// En cualquier script (legacy o ES6 module):
+window.showToast("Operación exitosa", "success");
+window.showToast("Error al guardar", "error");
+window.showToast("Atención", "warn");
+window.showToast("Información", "info", 6000); // duración custom en ms
+```
+
+### Tipos soportados
+
+| `type`    | Ícono Sprite      | ID en Sprite     | Color borde     |
+| --------- | ----------------- | ---------------- | --------------- |
+| `success` | `circle-check.svg`| `#circle-check`  | `var(--green)`  |
+| `error`   | `circle-x.svg`    | `#circle-x`      | `var(--red)`    |
+| `warn`    | `circle-alert.svg`| `#circle-alert`  | `var(--orange)` |
+| `info`    | `info.svg`        | `#info`          | `var(--brand)`  |
+
+### Regla de Oro
+
+> **PROHIBIDO** definir funciones locales tipo `showToast`, `showXyzToast` o similares en ningún script de vista. Si una vista necesita mostrar una notificación, usa `window.showToast` directamente.
 
 ---
 
-## 4. Reglas de Oro Post-Refactorización
+## 5. Patrones de Diseño Implementados (Lote 1 — Área de Estudio)
+
+| Patrón                    | Módulo                                            | Descripción                                                                                                                                                                                                                                                                                        |
+| ------------------------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **State Pattern**         | `js/models/PomodoroStates.js`                     | Cada fase (Enfoque, DescansoCorto, DescansoLargo) es un objeto inmutable con sus propias reglas de duración y transición. Elimina todos los `if (fase === 'enfoque')` dispersos.                                                                                                                   |
+| **Observer / Pub-Sub**    | `js/services/PomodoroStateService.js`             | Extiende `EventTarget`. Emite `pomo:tick`, `pomo:estadoCambiado`, `pomo:faseCompletada`. El Timer Principal, el Modo Concentración y el Widget Flotante se suscriben y renderizan de forma totalmente independiente.                                                                               |
+| **Repository Pattern**    | `js/services/ApiService.js`                       | Abstrae TODOS los `fetch` de la vista. Ninguna función del DOM hace peticiones HTTP directamente. Retorna promesas limpias al llamador. Permite migrar de mock a real cambiando un único punto.                                                                                                    |
+| **Time Deltas**           | `PomodoroStateService._iniciarTicker()`           | El tiempo restante se calcula como `Date.now() - tsInicio` en cada tick (500 ms). Inmune al throttling de navegadores en pestañas inactivas donde `setInterval` puede demorar 1+ segundo.                                                                                                          |
+| **Singleton**             | `pomodoroService` (exportado)                     | Una única instancia del servicio para garantizar el SSOT. Consumidores (`pomo-float.js`, futuros módulos) deben importarlo directamente.                                                                                                                                                           |
+| **SRP — Módulo de Audio** | `js/shared/pomo-audio-player.js`                  | Encapsula exclusivamente la síntesis de sonido con la Web Audio API. No conoce el estado del Pomodoro ni el DOM. Las vistas lo importan y lo activan al recibir el evento `pomo:faseCompletada`.                                                                                                   |
+| **Web Locks API**         | `_registrarSesionConDedup()` en `area-estudio.js` | Sustituye el token de localStorage para la deduplicación multi-pestaña. `navigator.locks.request('cursus_pomo_dedup', { mode: 'exclusive' }, ...)` garantiza exclusión atómica: si N pestañas intentan registrar al mismo milisegundo, el navegador las encola y solo el líder realiza el `fetch`. |
+| **Offline-First / Queue** | `js/services/PomodoroSyncQueue.js`                | Cola de sincronización local que retiene sesiones terminadas (localStorage) si el servidor falla o no hay conexión, reintentando automáticamente al volver a estar online sin bloquear la UI principal.                                                                                            |
+
+---
+
+## 6. Reglas de Oro Post-Refactorización
 
 Para el equipo de desarrollo, estas son las nuevas normativas a cumplir al agregar código:
 
