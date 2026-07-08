@@ -68,3 +68,43 @@ Este documento contiene la especificación clara, mejorada y ordenada de dónde 
 - `zap.svg`: "Productividad de Estudio" (`/progreso`).
 - `wallet.svg`: Icono específico para Alerta categoría "Pago" (`/alertas`).
 - `briefcase-business.svg`: Icono específico para Alerta categoría "Administrativa" (`/alertas`).
+
+---
+
+## Iconos del Sistema de Toasts (`shared/toast.js`)
+
+El sistema global de toasts (`js/shared/toast.js`) utiliza exclusivamente íconos del sprite SVG local. Cada tipo tiene su propio ícono semánticamente apropiado:
+
+| Estado (`type`) | Ícono Sprite | ID en Sprite | Color aplicado |
+|----------------|--------------|-------------|----------------|
+| `success` | `circle-check.svg` | `#circle-check` | `var(--green)` (borde izquierdo) |
+| `error` | `circle-x.svg` | `#circle-x` | `var(--red)` (borde izquierdo) |
+| `warn` | `circle-alert.svg` | `#circle-alert` | `var(--orange)` (borde izquierdo) |
+| `info` | `info.svg` | `#info` | `var(--brand)` (borde izquierdo) |
+
+El botón de cierre de cada toast utiliza:
+
+| Elemento | Ícono Sprite | ID en Sprite |
+|----------|-------------|-------------|
+| Botón "cerrar" | `x.svg` | `#x` |
+
+### Uso en HTML generado
+
+```html
+<!-- Ícono de estado (ej: success) -->
+<svg class="toast__icon" aria-hidden="true" focusable="false">
+  <use href="/assets/icons/sprite.svg#circle-check"></use>
+</svg>
+
+<!-- Ícono de estado (ej: error) -->
+<svg class="toast__icon" aria-hidden="true" focusable="false">
+  <use href="/assets/icons/sprite.svg#circle-x"></use>
+</svg>
+
+<!-- Botón de cierre (todos los tipos) -->
+<svg width="14" height="14" aria-hidden="true" focusable="false">
+  <use href="/assets/icons/sprite.svg#x"></use>
+</svg>
+```
+
+> **Nota:** `circle-alert` y `x` ya estaban documentados en secciones anteriores con otros usos. `circle-check`, `circle-x` e `info` son íconos cuyo uso principal es el sistema de toasts.

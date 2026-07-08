@@ -112,7 +112,21 @@
   function renderAlumno(data) {
     const { usuario, materias, pomodoro, cuota_actual, resumen } = data;
 
-    document.getElementById('aa-av').textContent      = initials(usuario.nombre);
+    const av = document.getElementById('aa-av');
+    av.innerHTML = '';
+    if (usuario.avatar_url) {
+      const img = document.createElement('img');
+      img.src = usuario.avatar_url;
+      img.alt = usuario.nombre;
+      img.onerror = () => {
+        img.style.display = 'none';
+        av.textContent = initials(usuario.nombre);
+      };
+      av.appendChild(img);
+    } else {
+      av.textContent = initials(usuario.nombre);
+    }
+
     document.getElementById('aa-nombre').textContent  = usuario.nombre;
     document.getElementById('aa-legajo-txt').textContent = `Legajo ${usuario.legajo}`;
     document.getElementById('aa-email').textContent   = usuario.email;

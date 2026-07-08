@@ -56,10 +56,11 @@ class AdminController extends Controller
 
         return response()->json([
             'usuario' => [
-                'id'     => $usuario->id,
-                'nombre' => $usuario->nombre,
-                'legajo' => $usuario->legajo,
-                'email'  => $usuario->email,
+                'id'         => $usuario->id,
+                'nombre'     => $usuario->nombre,
+                'legajo'     => $usuario->legajo,
+                'email'      => $usuario->email,
+                'avatar_url' => $usuario->avatar_url,
             ],
             'materias' => $materias->values(),
             'pomodoro' => [
@@ -102,8 +103,14 @@ class AdminController extends Controller
         ]);
 
         $hoy          = now()->toDateString();
-        $cuotaVigente = Cuota::where('vigente_desde', '<=', $hoy)->orderBy('vigente_desde', 'desc')->first();
-        $cuotaProxima = Cuota::where('vigente_desde', '>', $hoy)->orderBy('vigente_desde', 'asc')->first();
+        $cuotaVigente = Cuota::where('vigente_desde', '<=', $hoy)
+                             ->orderBy('vigente_desde', 'desc')
+                             ->orderBy('id', 'desc')
+                             ->first();
+        $cuotaProxima = Cuota::where('vigente_desde', '>', $hoy)
+                             ->orderBy('vigente_desde', 'asc')
+                             ->orderBy('id', 'desc')
+                             ->first();
         $carreras     = Carrera::all(['id', 'nombre']);
 
         return response()->json([
@@ -122,22 +129,37 @@ class AdminController extends Controller
 
     public function setCuota(Request $request)
     {
+        $primerDiaMes = now()->startOfMonth()->toDateString();
+        $finAnioProximo = now()->addYear()->endOfYear()->toDateString();
+
         $request->validate([
             'carrera_id'    => 'required|exists:carreras,id',
             'valor_mensual' => 'required|numeric|min:0',
-            'vigente_desde' => 'required|date',
+            'vigente_desde' => 'required|date|after_or_equal:' . $primerDiaMes . '|before_or_equal:' . $finAnioProximo,
+        ], [
+            'vigente_desde.after_or_equal' => 'La fecha de vigencia no puede ser anterior al primer día del mes actual.',
+            'vigente_desde.before_or_equal' => 'La fecha de vigencia no puede superar el 31 de diciembre del próximo año.',
         ]);
 
         $hoy = now()->toDateString();
 
-        // Si la fecha es futura, reemplazar cuotas futuras existentes para esa carrera
+        // Si la fecha es futura, reemplazar TODAS las cuotas futuras existentes para esa carrera
         if ($request->vigente_desde > $hoy) {
             Cuota::where('carrera_id', $request->carrera_id)
                  ->where('vigente_desde', '>', $hoy)
                  ->delete();
         }
 
-        $cuota = Cuota::create($request->only(['carrera_id', 'valor_mensual', 'vigente_desde']));
+        // updateOrCreate evita duplicados inútiles si se carga una cuota con la misma fecha exacta
+        $cuota = Cuota::updateOrCreate(
+            [
+                'carrera_id'    => $request->carrera_id,
+                'vigente_desde' => $request->vigente_desde,
+            ],
+            [
+                'valor_mensual' => $request->valor_mensual,
+            ]
+        );
 
         return response()->json($cuota, 201);
     }

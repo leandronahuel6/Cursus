@@ -84,8 +84,6 @@
 
   </div>
 
-  <!-- Toast de avisos (correlativas bloqueadas, etc.) -->
-  <div class="alert-popup-notification" id="materias-toast" aria-live="polite"></div>
 
   <!-- ===================== MODAL DE DETALLE DE MATERIA ===================== -->
   <div class="grade-modal-overlay" id="subject-info-modal" role="dialog" aria-modal="true" aria-labelledby="subject-info-modal-title">

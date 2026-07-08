@@ -77,38 +77,6 @@ function testSelectedSound() {
 }
 
 /* ==========================================================================
-   SISTEMA DE TOASTS
-   ========================================================================== */
-
-/**
- * Muestra una notificación flotante de feedback al usuario.
- * @param {string} message - Texto del mensaje a mostrar.
- * @param {'error'|'success'|'warn'} [type='error'] - Tipo visual del toast.
- */
-function showToast(message, type = 'error') {
-    const container = document.getElementById('toast-container');
-    if (!container) return;
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    let icon = 'ℹ️';
-    if (type === 'error')   icon = '❌';
-    if (type === 'success') icon = '✅';
-    if (type === 'warn')    icon = '⚠️';
-    toast.innerHTML = `
-      <span class="toast-ic">${icon}</span>
-      <span>${message}</span>
-      <span class="toast-close" onclick="this.parentElement.remove()">✕</span>
-    `;
-    container.appendChild(toast);
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.style.animation = 'toastOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
-            setTimeout(() => toast.remove(), 300);
-        }
-    }, 4000);
-}
-
-/* ==========================================================================
    HELPER HTML
    ========================================================================== */
 

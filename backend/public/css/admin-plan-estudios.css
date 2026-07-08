@@ -1,4 +1,5 @@
 .admin-pe-page {
+  width: 100%;
   max-width: 1000px;
   margin: 0 auto;
   padding: 24px 16px;
@@ -35,7 +36,7 @@
 .pe-anio-block {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   overflow: hidden;
 }
 
@@ -97,8 +98,7 @@
 .pe-btn-del {
   padding: 5px 11px;
   font-size: 12px;
-  font-family: inherit;
-  font-weight: 500;
+font-weight: 500;
   border-radius: var(--r-sm);
   cursor: pointer;
   transition: opacity .15s;
@@ -123,7 +123,7 @@
 .pe-modal-box {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   padding: 24px;
   width: min(680px, 95vw);
@@ -146,11 +146,56 @@
   margin: 0;
 }
 
+#pe-confirm-msg {
+  text-align: center;
+  text-wrap: balance;
+  margin: 0 auto;
+}
+
+.pe-modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pe-modal-close:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
 .pe-form-grid {
   display: flex;
   gap: 12px;
   margin-bottom: 20px;
   flex-wrap: wrap;
+}
+
+.pe-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.pe-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.pe-field label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
 }
 
 /* ---- Prereq checkboxes ---- */
@@ -197,9 +242,8 @@
 .pe-check-item:hover { background: var(--border); }
 .pe-check-item input { accent-color: var(--brand); cursor: pointer; }
 
-.ac-table-wrap {
+.pe-table-wrap {
   width: 100%;
-  max-width: 100%;
   overflow-x: auto;
   box-sizing: border-box;
 }
@@ -229,7 +273,8 @@
     padding: 11px 16px;
   }
 
-  .admin-pe-page .ac-table-wrap { 
+  .admin-pe-page .pe-table-wrap { 
+    margin: 0 -20px;
     display: block;
     width: 100%; 
     overflow-x: auto; 
@@ -309,7 +354,8 @@
     justify-content: center;
   }
 
-  .admin-pe-page .ac-table-wrap {
+  .admin-pe-page .pe-table-wrap {
+    margin: 0 -24px;
     display: block;
     width: 100%;
     overflow-x: auto;

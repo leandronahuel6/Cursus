@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="{{ asset('css/layout/sidebar.css') }}">
   <link rel="icon" href="{{ asset('assets/icons/cursus-logo.svg') }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ asset('css/components/pomo-float.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/components/toast.css') }}">
   @stack('styles')
   <style>
     .dashboard-bg {
@@ -438,6 +439,7 @@
 <script src="{{ asset('js/animations.js') }}"></script>
 <script src="{{ asset('js/celebracion.js') }}"></script>
 <script src="{{ asset('js/shared/sidebar.js') }}"></script>
+<script src="{{ asset('js/shared/toast.js') }}"></script>
 <script src="{{ asset('js/profile.js') }}"></script>
 <script type="module" src="{{ asset('js/pomo-float.js') }}?v={{ filemtime(public_path('js/pomo-float.js')) }}"></script>
 @if(Request::routeIs('dashboard') || Request::routeIs('area-estudio'))

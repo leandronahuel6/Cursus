@@ -3581,49 +3581,6 @@
         window.speechSynthesis.speak(utterance);
     }
 
-    // Toast helper para notificaciones
-    function showToast(message, type = 'error') {
-        let container = document.getElementById('toast-container');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'toast-container';
-            container.style.position = 'fixed';
-            container.style.top = '1.5rem';
-            container.style.right = '1.5rem';
-            container.style.zIndex = '9999';
-            container.style.display = 'flex';
-            container.style.flexDirection = 'column';
-            container.style.gap = '0.5rem';
-            container.style.maxWidth = '320px';
-            document.body.appendChild(container);
-        }
-        
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.style.background = type === 'success' ? '#10b981' : '#ef4444'; // Fondo 100% sólido y de alto contraste
-        toast.style.color = '#ffffff';
-        toast.style.padding = '0.75rem 1.25rem';
-        toast.style.borderRadius = 'var(--r-sm)';
-        toast.style.fontSize = '0.85rem';
-        toast.style.fontWeight = '600';
-        toast.style.boxShadow = 'var(--sh-md)';
-        toast.style.display = 'flex';
-        toast.style.alignItems = 'center';
-        toast.style.gap = '0.5rem';
-        toast.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-        toast.style.animation = 'fadeInEffect 0.3s ease';
-        
-        let icon = type === 'success' ? '✓' : '✕';
-        toast.innerHTML = `<span style="font-size:1.1rem; line-height:1;">${icon}</span> <span>${message}</span>`;
-        container.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(-10px)';
-            setTimeout(() => toast.remove(), 300);
-        }, 4000);
-    }
-
     function handleAIDeckSelectCategoryChange() {
         const select = document.getElementById('ai-deck-select-category');
         const wrapper = document.getElementById('ai-new-category-input-wrapper');

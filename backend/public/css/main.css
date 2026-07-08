@@ -486,8 +486,8 @@ body {
   min-height: 100vh;
   overflow-y: overlay;
 }
-button { font-family: inherit; cursor: pointer; border: none; background: none; outline: none; }
-select { font-family: inherit; }
+button, select, input, textarea { font-family: inherit; }
+button { cursor: pointer; border: none; background: none; outline: none; }
 a { text-decoration: none; color: inherit; }
 
 .theme-toggle-btn {
@@ -822,8 +822,7 @@ h1, h2, h3, h4, h5, h6, .display-text {
 .study-cta {
   width: 100%; padding: 9px;
   background: var(--brand); color: #fff;
-  font-family: 'Outfit', sans-serif;
-  font-size: 13px; font-weight: 600;
+font-size: 13px; font-weight: 600;
   border-radius: var(--r); cursor: pointer;
   transition: background .15s, transform .15s, box-shadow .15s;
   margin-bottom: 7px;
@@ -1295,6 +1294,10 @@ h1, h2, h3, h4, h5, h6, .display-text {
   color: var(--t2);
   box-shadow: var(--sh);
 }
+
+[hidden] {
+  display: none !important;
+}
 .career-select {
   border: none;
   background: transparent;
@@ -1644,8 +1647,7 @@ h1, h2, h3, h4, h5, h6, .display-text {
   font-size: 120px;
   font-weight: 800;
   color: rgba(255,255,255,.07);
-  font-family: inherit;
-  pointer-events: none;
+pointer-events: none;
 }
 .pay-tag {
   font-size: 10px;
@@ -1821,48 +1823,6 @@ h1, h2, h3, h4, h5, h6, .display-text {
   background: var(--brand-hover);
 }
 
-.alert-popup-notification {
-  position: fixed;
-  right: 18px;
-  top: 18px;
-  z-index: 1200;
-  min-width: 260px;
-  max-width: 360px;
-  border-radius: var(--r);
-  padding: 12px 14px;
-  font-size: 12.5px;
-  font-weight: 600;
-  box-shadow: var(--sh-md);
-  border: 1px solid transparent;
-  opacity: 0;
-  transform: translateY(-10px);
-  pointer-events: none;
-  transition: opacity .18s ease, transform .18s ease;
-}
-.alert-popup-notification.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-.alert-popup-notification.success {
-  background: #ecfdf5;
-  border-color: #a7f3d0;
-  color: #065f46;
-}
-.alert-popup-notification.error {
-  background: #fef2f2;
-  border-color: #fecaca;
-  color: #991b1b;
-}
-.alert-popup-notification.info {
-  background: #eff6ff;
-  border-color: #bfdbfe;
-  color: #1e40af;
-}
-.alert-popup-notification.warn {
-  background: #fffbeb;
-  border-color: #fde68a;
-  color: #92400e;
-}
 
 /* ==============================
    PÁGINA DE MIS MATERIAS
@@ -2809,15 +2769,6 @@ body.dark-mode .btn-rect-mobile-purple:hover {
   .bn { font-size: 11px; }
   .bn-ic { width: 19px !important; height: 19px !important; }
 
-  /* Evitar tapar el menú móvil con los toasts */
-  body .avg-toast-box {
-    bottom: calc(51px + env(safe-area-inset-bottom, 0px));
-    right: 12px;
-    left: auto;
-    font-size: 11.5px;
-    padding: 8px 14px;
-    border-radius: var(--r-md);
-  }
   body .toast-container {
     bottom: calc(51px + env(safe-area-inset-bottom, 0px));
     right: 12px;
@@ -3005,8 +2956,7 @@ body.dark-mode .btn-rect-mobile-purple:hover {
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
-  font-family: inherit;
-  font-size: 14px;
+font-size: 14px;
   color: var(--t1);
   transition: border-color .15s, box-shadow .15s;
 }
@@ -3139,6 +3089,7 @@ body.dark-mode .btn-rect-mobile-purple:hover {
 }
 .dark-header {
   background: #1e293b !important;
+  padding-bottom: 13px;
 }
 .dark-header .card-title {
   color: #f9fafb !important;
@@ -3561,29 +3512,6 @@ body.dark-mode .btn-rect-mobile-purple:hover {
   padding: 11px;
   font-weight: 700;
   border-radius: var(--r-sm);
-}
-
-/* Toast */
-.avg-toast-box {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: #1e293b;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: var(--r-lg);
-  font-size: 12.5px;
-  font-weight: 600;
-  box-shadow: var(--sh-md);
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.3s ease;
-  z-index: 9999;
-  pointer-events: none;
-}
-.avg-toast-box.show {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 
@@ -4063,8 +3991,7 @@ body.dark-mode .btn-rect-mobile-purple:hover {
   border-radius: 4px;
   color: #fff;
   padding: 4px 6px;
-  font-family: inherit;
-  font-size: 11px;
+font-size: 11px;
   outline: none;
 }
 .editor-btn-delete {
@@ -4170,7 +4097,6 @@ body.dark-mode .btn-rect-mobile-purple:hover {
   color: var(--t1);
   outline: none;
   cursor: pointer;
-  font-family: inherit;
 }
 .sched-modal-ft {
   display: flex;
@@ -4402,7 +4328,6 @@ body.dark-mode .btn-rect-mobile-purple:hover {
   text-align: left;
   transition: background .15s, color .15s;
   cursor: pointer;
-  font-family: inherit;
 }
 .profile-menu-item:hover { background: rgba(255,255,255,.07); color: #f9fafb; }
 
@@ -4558,8 +4483,7 @@ body.no-animations *::after {
   border-radius: var(--r-sm);
   padding: 9px 11px;
   font-size: 13px;
-  font-family: inherit;
-  color: var(--t1);
+color: var(--t1);
   background: var(--surface);
   outline: none;
   transition: border-color .15s, box-shadow .15s;
@@ -4577,8 +4501,7 @@ body.no-animations *::after {
   font-size: 13px; font-weight: 500;
   border-radius: var(--r-sm);
   background: #f3f4f6; color: var(--t2);
-  border: none; cursor: pointer; font-family: inherit;
-  transition: background .15s;
+  border: none; cursor: pointer;transition: background .15s;
 }
 .contact-btn-cancel:hover { background: var(--border); }
 .contact-btn-send {
@@ -4586,8 +4509,7 @@ body.no-animations *::after {
   font-size: 13px; font-weight: 600;
   border-radius: var(--r-sm);
   background: var(--brand); color: #fff;
-  border: none; cursor: pointer; font-family: inherit;
-  transition: background .15s, transform .15s;
+  border: none; cursor: pointer;transition: background .15s, transform .15s;
 }
 .contact-btn-send:hover:not(:disabled) { background: var(--brand-hover); transform: translateY(-1px); }
 .contact-btn-send:disabled { cursor: default; }
@@ -4605,8 +4527,7 @@ body.no-animations *::after {
   border: 1px solid var(--brand-dim);
   border-radius: var(--r-sm);
   cursor: pointer;
-  font-family: inherit;
-  transition: background .15s, border-color .15s;
+transition: background .15s, border-color .15s;
 }
 .btn-change-pwd:hover { background: var(--brand-dim); border-color: var(--brand); }
 
@@ -4639,26 +4560,6 @@ body.dark-mode .streak-chip {
   background: rgba(234, 88, 12, 0.18);
   border-color: rgba(234, 88, 12, 0.4);
   color: #fdba74;
-}
-body.dark-mode .alert-popup-notification.success {
-  background: rgba(16, 185, 129, 0.16);
-  border-color: rgba(16, 185, 129, 0.4);
-  color: #6ee7b7;
-}
-body.dark-mode .alert-popup-notification.error {
-  background: rgba(220, 38, 38, 0.16);
-  border-color: rgba(220, 38, 38, 0.4);
-  color: #fca5a5;
-}
-body.dark-mode .alert-popup-notification.info {
-  background: rgba(59, 130, 246, 0.16);
-  border-color: rgba(59, 130, 246, 0.4);
-  color: #93c5fd;
-}
-body.dark-mode .alert-popup-notification.warn {
-  background: rgba(234, 179, 8, 0.16);
-  border-color: rgba(234, 179, 8, 0.4);
-  color: #fde68a;
 }
 
 /* Posicionamiento móvil del menú de perfil (al final para ganancia de cascada) */
@@ -4730,49 +4631,6 @@ body.dark-mode .alert-popup-notification.warn {
   }
 }
 
-/* ==========================================================================
-   GLOBAL TOAST SYSTEM (Notificaciones no intrusivas)
-   ========================================================================== */
-.toast-container {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 999999;
-  pointer-events: none;
-}
-.toast {
-  background: #1f2937;
-  color: #fff;
-  border-radius: var(--r);
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: var(--sh-md);
-  font-size: 12.5px;
-  font-weight: 500;
-  min-width: 250px;
-  max-width: 350px;
-  pointer-events: auto;
-  animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-.toast.error { border-left: 4px solid var(--red); }
-.toast.success { border-left: 4px solid var(--green); }
-.toast.warn { border-left: 4px solid var(--orange); }
-.toast-ic { width: 18px; height: 18px; flex-shrink: 0; }
-.toast-close { margin-left: auto; color: rgba(255,255,255,0.4); cursor: pointer; }
-.toast-close:hover { color: #fff; }
-
-@keyframes toastIn {
-  from { transform: translateY(12px) scale(0.95); opacity: 0; }
-  to { transform: translateY(0) scale(1); opacity: 1; }
-}
-@keyframes toastOut {
-  to { transform: translateY(12px) scale(0.95); opacity: 0; }
-}
 
 /* ==========================================================================
    ESTILOS DE COMPARACIÓN Y VISTA IMPRIMIBLE (PDF)
@@ -4871,7 +4729,7 @@ body.dark-mode .alert-popup-notification.warn {
   .sched-editor-bar,
   .tb-actions,
   .sched-alert-banner,
-  #sched-toast,
+  .toast-container,
   .horarios-mobile-hdr-actions {
     display: none !important;
   }

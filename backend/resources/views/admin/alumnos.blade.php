@@ -12,7 +12,7 @@
     <div style="display: flex; flex-direction: column;">
       <div class="mob-greet" style="display: flex; align-items: center; gap: 8px;">
         <svg width="20" height="20" style="fill: none; stroke: currentColor; stroke-width: 2; color: var(--brand); flex-shrink: 0;" aria-hidden="true">
-          <use href="{{ asset('assets/icons/sprite.svg#user') }}"></use>
+          <use href="{{ asset('assets/icons/sprite.svg') }}#user"></use>
         </svg>
         Gestión de Alumnos
       </div>
@@ -25,7 +25,7 @@
 @section('topbar-content')
 <span class="topbar-title" style="display: flex; align-items: center; gap: 10px;">
   <svg width="22" height="22" style="fill: none; stroke: currentColor; stroke-width: 2; color: var(--brand); flex-shrink: 0;" aria-hidden="true">
-    <use href="{{ asset('assets/icons/sprite.svg#user') }}"></use>
+    <use href="{{ asset('assets/icons/sprite.svg') }}#user"></use>
   </svg>
   Administración — Alumnos
 </span>
@@ -37,7 +37,7 @@
   <!-- Buscador -->
   <div class="aa-search-card">
     <div class="aa-search-header">
-      <svg width="18" height="18" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#search') }}"></use></svg>
+      <svg width="18" height="18" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#search"></use></svg>
       <h2 class="aa-search-title">Buscar alumno por legajo</h2>
     </div>
     <form id="aa-form" onsubmit="window.aaBuscar(event)">
@@ -75,7 +75,7 @@
           </div>
         </div>
         <button class="aa-btn-delete" id="aa-btn-delete" onclick="window.aaEliminar()">
-          <svg width="14" height="14" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#trash-2') }}"></use></svg>
+          <svg width="14" height="14" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#trash-2"></use></svg>
           Dar de baja
         </button>
       </div>
@@ -132,7 +132,7 @@
   <div class="aa-confirm-overlay" id="aa-confirm-overlay" hidden>
     <div class="aa-confirm-box">
       <div class="aa-confirm-icon">
-        <svg width="24" height="24" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#trash-2') }}"></use></svg>
+        <svg width="24" height="24" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#trash-2"></use></svg>
       </div>
       <h3 class="aa-confirm-title">¿Dar de baja al alumno?</h3>
       <p class="aa-confirm-msg" id="aa-confirm-msg"></p>

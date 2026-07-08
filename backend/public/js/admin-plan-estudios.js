@@ -120,10 +120,12 @@
     }
 
     document.getElementById('pe-modal').hidden = false;
+    document.documentElement.style.overflow = 'hidden';
   }
 
   function peCerrarModal() {
     document.getElementById('pe-modal').hidden = true;
+    document.documentElement.style.overflow = '';
   }
 
   function buildChecks(containerId, materias) {
@@ -206,10 +208,12 @@
     document.getElementById('pe-confirm-msg').textContent =
       `Estás por eliminar "${m?.nombre}". Se eliminarán también sus correlatividades. Esta acción no se puede deshacer.`;
     document.getElementById('pe-confirm-overlay').hidden = false;
+    document.documentElement.style.overflow = 'hidden';
   }
 
   function peCancelarEliminar() {
     document.getElementById('pe-confirm-overlay').hidden = true;
+    document.documentElement.style.overflow = '';
     eliminandoId = null;
   }
 
