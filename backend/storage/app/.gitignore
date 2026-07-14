@@ -2,3 +2,4 @@
 !private/
 !public/
 !.gitignore
+!extract_text.py
