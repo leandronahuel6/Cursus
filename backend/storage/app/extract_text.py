@@ -39,14 +39,6 @@ def extract_pptx(path):
         sys.stderr.write(f"PPTX Error: {str(e)}\n")
     return "\n".join(text)
 
-def extract_txt(path):
-    try:
-        with open(path, 'r', encoding='utf-8', errors='ignore') as f:
-            return f.read()
-    except Exception as e:
-        sys.stderr.write(f"TXT Error: {str(e)}\n")
-        return ""
-
 def main():
     if len(sys.argv) < 2:
         sys.exit(1)
@@ -62,8 +54,6 @@ def main():
         text = extract_docx(path)
     elif ext == '.pptx':
         text = extract_pptx(path)
-    elif ext in ['.txt', '.md']:
-        text = extract_txt(path)
     else:
         sys.exit(1)
         
