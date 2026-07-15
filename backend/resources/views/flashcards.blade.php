@@ -1229,7 +1229,7 @@
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         transform: scale(0.95);
         transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-        overflow: hidden;
+        overflow: visible;
     }
 
     body.dark-mode .fc-modal-box {
@@ -1248,6 +1248,8 @@
     }
 
     .fc-modal-header {
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
         padding: 1.25rem 1.5rem;
         border-bottom: 1px solid var(--border-light);
         display: flex;
@@ -1315,6 +1317,8 @@
     }
 
     .fc-modal-footer {
+        border-bottom-left-radius: inherit;
+        border-bottom-right-radius: inherit;
         padding: 1rem 1.5rem;
         background: var(--border-light);
         border-top: 1px solid var(--border-light);
@@ -1839,7 +1843,18 @@
                     Sube un archivo de estudio (**PDF, Word, PowerPoint, Texto, Markdown o Imagen**) y nuestra IA analizará el contenido para extraer y generar automáticamente un mazo completo de preguntas y respuestas.
                 </p>
                 <div class="form-group">
-                    <label for="ai-deck-file" style="font-size: 0.85rem; font-weight: 600; color: var(--t2); display: block; margin-bottom: 0.4rem;">Seleccionar documento o imagen (.pdf, .docx, .pptx, .txt, .md, .jpg, .png)</label>
+                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem;">
+                        <label for="ai-deck-file" style="font-size: 0.85rem; font-weight: 600; color: var(--t2); margin: 0;">Seleccionar documento o imagen (.pdf, .docx, .pptx, .txt, .md, .jpg, .png)</label>
+                        <div class="ai-help-tooltip-container" style="position: relative; display: inline-flex; align-items: center;">
+                            <button type="button" id="btn-ai-help" onclick="toggleAIHelpTooltip(event)" aria-label="Información sobre documentos escaneados" style="background: none; border: none; padding: 0; cursor: pointer; color: var(--brand); display: flex; align-items: center; justify-content: center; opacity: 0.8; transition: opacity 0.2s;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="/assets/icons/sprite.svg#circle-question-mark"></use></svg>
+                            </button>
+                            <div id="ai-help-tooltip-content" class="ai-help-tooltip-content" style="position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(5px); margin-bottom: 8px; width: 280px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 0.75rem; font-size: 0.75rem; color: var(--t1); line-height: 1.4; box-shadow: var(--sh-md); opacity: 0; visibility: hidden; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2000; text-align: left; backdrop-filter: blur(8px);">
+                                <strong style="display: block; margin-bottom: 0.25rem; color: var(--brand);">💡 Aviso sobre OCR</strong>
+                                Asegúrate de subir documentos con texto seleccionable. Si tus apuntes son fotos o PDF/PPTX escaneados, por favor súbelos en <strong>formato de imagen (JPG/PNG)</strong> para que la IA pueda procesarlos correctamente.
+                            </div>
+                        </div>
+                    </div>
                     <input type="file" id="ai-deck-file" name="file" accept=".pdf,.docx,.pptx,.txt,.md,.jpg,.jpeg,.png" required style="width: 100%; padding: 0.6rem; border: 2px dashed var(--border); border-radius: var(--r-sm); background: var(--border-light); font-size: 0.85rem; outline: none; cursor: pointer;">
                 </div>
                 <div class="form-group" style="margin-top: 1.25rem;">
@@ -1958,6 +1973,27 @@
 <!-- Canvas Confetti para celebrar al terminar el mazo -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
+    // UX: Función para mostrar/ocultar el tooltip de ayuda de IA
+    function toggleAIHelpTooltip(event) {
+        event.stopPropagation();
+        const tooltip = document.getElementById('ai-help-tooltip-content');
+        if (!tooltip) return;
+        const isVisible = tooltip.style.visibility === 'visible';
+        tooltip.style.opacity = isVisible ? '0' : '1';
+        tooltip.style.visibility = isVisible ? 'hidden' : 'visible';
+        tooltip.style.transform = isVisible ? 'translateX(-50%) translateY(5px)' : 'translateX(-50%) translateY(0)';
+    }
+
+    // UX: Cerrar tooltip al hacer clic fuera
+    document.addEventListener('click', function(event) {
+        const tooltip = document.getElementById('ai-help-tooltip-content');
+        const btn = document.getElementById('btn-ai-help');
+        if (tooltip && tooltip.style.visibility === 'visible' && btn && !btn.contains(event.target) && !tooltip.contains(event.target)) {
+            tooltip.style.opacity = '0';
+            tooltip.style.visibility = 'hidden';
+            tooltip.style.transform = 'translateX(-50%) translateY(5px)';
+        }
+    });
     // Variables de estado
     let activeToken = localStorage.getItem('token') || sessionStorage.getItem('token');
     let currentDecks = [];
