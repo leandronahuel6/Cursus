@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Gemini (Google AI)
+    |--------------------------------------------------------------------------
+    | Clave de API para el servicio de inteligencia artificial de Google Gemini.
+    | Se usa para la generación automática de flashcards a partir de documentos.
+    */
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+    ],
+
 ];
