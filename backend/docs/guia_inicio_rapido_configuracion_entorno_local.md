@@ -12,6 +12,7 @@ Asegúrate de contar con el siguiente entorno de desarrollo en tu PC (Laragon o 
 
 - **PHP >= 8.3**
 - **Composer** (gestor de dependencias de PHP)
+- **Python y pip** (Para la extracción de texto en los documentos IA)
 - **Node.js y npm** (Opcional, para empaquetado de assets de Vite que de momento no se usa)
 - **Un navegador web moderno** (Chrome, Firefox, Safari, Edge)
 
@@ -37,7 +38,7 @@ Para poder usar comandos como `php` o `composer` desde cualquier terminal, neces
 
 1. Asegúrate de que la carpeta raíz del proyecto esté ubicada estrictamente dentro del directorio de Laragon: `C:\laragon\www\`. (Ejemplo: `C:\laragon\www\cursus\`).
 2. En la interfaz de Laragon, presiona **Iniciar Todo** (Start All) para encender Apache, MySQL y Mailpit.
-3. _Nota importante:_ Actualmente hay problemas al visualizar el proyecto desde el servidor web de Laragon (ej. `http://cursus.test`) posiblemente porque el proyecto Laravel en sí no está ubicado en la raíz de `/Cursus` sino en la carpeta `/backend`. Por esto, **la gran recomendación es visualizar el proyecto mediante `php artisan serve`** (como se explica en el paso 10 de la puesta en marcha).
+3. _Nota importante:_ Actualmente hay problemas al visualizar el proyecto desde el servidor web de Laragon (ej. `http://cursus.test`) posiblemente porque el proyecto Laravel en sí no está ubicado en la raíz de `/Cursus` sino en la carpeta `/backend`. Por esto, **la gran recomendación es visualizar el proyecto mediante `php artisan serve`** (como se explica en el paso 11 de la puesta en marcha).
 
 ---
 
@@ -80,7 +81,18 @@ cd Cursus/backend
 composer install
 ```
 
-**3. Configurar variables de entorno:**
+**3. Instalar dependencias de Python (Flashcards IA):**
+Para que la funcionalidad de IA pueda leer los apuntes subidos en formato PDF, DOCX o PPTX, necesitamos aislar las librerías en un entorno virtual (esto evita conflictos de versiones de Python entre desarrolladores). Ejecuta lo siguiente en la terminal desde la carpeta `backend`:
+
+```bash
+# 1. Crear el entorno virtual dentro del proyecto
+python -m venv storage/app/venv
+
+# 2. Instalar las librerías directamente en ese entorno aislado
+storage\app\venv\Scripts\python.exe -m pip install pypdf python-docx python-pptx
+```
+
+**4. Configurar variables de entorno:**
 Crea tu archivo `.env` local copiando la plantilla.
 
 ```bash
@@ -88,7 +100,7 @@ Crea tu archivo `.env` local copiando la plantilla.
 copy .env.example .env
 ```
 
-**4. Configurar servicios y variables en el archivo `.env`:**
+**5. Configurar servicios y variables en el archivo `.env`:**
 Abre el nuevo archivo `.env` en tu editor y asegúrate de configurar lo siguiente:
 
 - **Base de Datos:**
@@ -113,13 +125,13 @@ Abre el nuevo archivo `.env` en tu editor y asegúrate de configurar lo siguient
     GEMINI_API_KEY="tu_api_key_aqui"
     ```
 
-**5. Generar la clave de seguridad:**
+**6. Generar la clave de seguridad:**
 
 ```bash
 php artisan key:generate
 ```
 
-**6. Error de Sesiones al iniciar la aplicación:**
+**7. Error de Sesiones al iniciar la aplicación:**
 Un error muy común en versiones recientes de Laravel al clonar un proyecto es recibir un pantallazo de error relacionado con las sesiones o tablas inexistentes antes de poder hacer la migración. Esto ocurre porque el sistema intenta guardar la sesión del usuario en la base de datos, pero la tabla `sessions` aún no ha sido creada.
 
 **Solución:** Abre tu archivo `.env`, busca la variable `SESSION_DRIVER` y asegúrate de configurarla correctamente:
@@ -130,21 +142,21 @@ Un error muy común en versiones recientes de Laravel al clonar un proyecto es r
     ```
 - **Si debe ser `database`:** Asegúrate de ejecutar `php artisan migrate` **antes** de intentar abrir el proyecto en el navegador. Si el error persiste, borra la caché con `php artisan optimize:clear`.
 
-**7. Construir y sembrar la base de datos:**
+**8. Construir y sembrar la base de datos:**
 Ejecuta las migraciones y los seeders para crear la estructura de tablas y cargar las materias, carreras y usuarios de prueba por defecto:
 
 ```bash
 php artisan migrate --seed
 ```
 
-**8. Crear el enlace simbólico del Storage:**
+**9. Crear el enlace simbólico del Storage:**
 Para que las fotos de perfil de los alumnos y las imágenes de fondo del espacio de trabajo cargadas por el usuario sean visibles en el navegador, ejecuta:
 
 ```bash
 php artisan storage:link
 ```
 
-**9. (Opcional) Instalar y compilar el Frontend (Vite):**
+**10. (Opcional) Instalar y compilar el Frontend (Vite):**
 
 ```bash
 npm install
@@ -153,14 +165,14 @@ npm run dev
 
 _(Deja la terminal con `npm run dev` abierta en segundo plano para habilitar la actualización automática del navegador al modificar CSS/JS/Blade)._
 
-**10. Iniciar el servidor de desarrollo local:**
+**11. Iniciar el servidor de desarrollo local:**
 Abre una nueva terminal y ejecuta:
 
 ```bash
 php artisan serve
 ```
 
-**11. Ingresar a la aplicación:**
+**12. Ingresar a la aplicación:**
 Abre tu navegador e ingresa a:
 👉 [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
