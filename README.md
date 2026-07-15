@@ -33,6 +33,8 @@ Como respuesta a esa situación, **Cursus** es un asistente estudiantil que cent
 - **Framework Backend**: Laravel 11 (Arquitectura MVC, Eloquent ORM, API REST con Laravel Sanctum)
 - **Base de Datos**: MySQL (compatible modificando las variables en el `.env`) / MariaDB
 - **Frontend**: HTML5, Vanilla CSS (diseño responsivo con variables personalizables y Glassmorphism) y Vanilla Javascript (lógica asíncrona de Fetch API e interactividad dinámica)
+- **Inteligencia Artificial**: API de Google Gemini (Gemini 2.5 Flash) para la generación automática de mazos de estudio (Flashcards) y opciones incorrectas (distractores).
+- **Procesamiento de Documentos**: Entorno virtual aislado de Python (`venv`) con librerías nativas (`pypdf`, `python-docx`, `python-pptx`) para extraer texto de apuntes académicos (PDF, DOCX, PPTX) de forma robusta e integrarlo con la IA.
 - **Iconografía**: Lucide Icons
 - **Manejo de Archivos**: Sistema de almacenamiento (`Storage`) local de Laravel para avatars y fondos personalizados.
 
