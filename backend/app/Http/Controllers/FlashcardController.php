@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Models\FlashcardDeck;
 use App\Models\Flashcard;
+use App\Models\FlashcardDeck;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Facades\Storage;
 
 class FlashcardController extends Controller
 {
@@ -61,7 +65,7 @@ class FlashcardController extends Controller
                     'correctas_count' => (int) $totalCorrect,
                     'incorrectas_count' => (int) $totalIncorrect,
                     'porcentaje_acierto' => $accuracy,
-                    'ultimo_repaso' => $lastReviewed ? \Carbon\Carbon::parse($lastReviewed)->format('d/m/Y H:i') : null,
+                    'ultimo_repaso' => $lastReviewed ? Carbon::parse($lastReviewed)->format('d/m/Y H:i') : null,
                 ];
             });
 
@@ -207,14 +211,14 @@ class FlashcardController extends Controller
         if ($request->resultado === 'correcto') {
             $card->increment('correctas');
             $card->ultimo_resultado = 'correcto';
-            
+
             // Leitner System: Aumenta nivel de caja hasta máximo 5
             $currentBox = $card->caja ?? 1;
             $card->caja = min(5, $currentBox + 1);
         } else {
             $card->increment('incorrectas');
             $card->ultimo_resultado = 'incorrecto';
-            
+
             // Leitner System: Resetea a caja 1
             $card->caja = 1;
         }
@@ -244,7 +248,7 @@ class FlashcardController extends Controller
 
         $userId = $request->user()->id;
 
-        $deck = \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $userId) {
+        $deck = DB::transaction(function () use ($validated, $userId) {
             $deck = FlashcardDeck::create([
                 'usuario_id' => $userId,
                 'nombre' => $validated['nombre'],
@@ -271,7 +275,11 @@ class FlashcardController extends Controller
     }
 
     /**
-     * Generate a new deck using AI (Gemini) from a document or image file.
+     * Genera un nuevo mazo de flashcards usando la IA de Gemini a partir de un documento o imagen.
+     *
+     * Los archivos de texto plano (.txt, .md) se leen directamente en PHP para evitar el overhead
+     * de invocar Python. Los documentos binarios (PDF, DOCX, PPTX) se procesan mediante un script
+     * Python aislado dentro del entorno virtual del servidor.
      */
     public function generateFromIA(Request $request)
     {
@@ -284,7 +292,7 @@ class FlashcardController extends Controller
         $file = $request->file('file');
         $extension = strtolower($file->getClientOriginalExtension());
         $allowedExtensions = ['pdf', 'docx', 'pptx', 'txt', 'md', 'jpg', 'jpeg', 'png'];
-        if (!in_array($extension, $allowedExtensions)) {
+        if (! in_array($extension, $allowedExtensions)) {
             return response()->json(['message' => 'El archivo debe ser de tipo: pdf, docx, pptx, txt, md, jpg, jpeg, png.'], 422);
         }
 
@@ -293,9 +301,12 @@ class FlashcardController extends Controller
 
         $userCategory = $request->input('categoria', '__AUTO__');
 
-        $apiKey = env('GEMINI_API_KEY');
-        if (!$apiKey) {
-            return response()->json(['message' => 'La clave API de Gemini (GEMINI_API_KEY) no está configurada en el archivo .env.'], 500);
+        // Usamos config() en lugar de env() para que funcione correctamente cuando
+        // la configuración está cacheada con `php artisan config:cache` en producción.
+        $apiKey = config('services.gemini.key');
+
+        if (! $apiKey) {
+            return response()->json(['message' => 'La clave API de Gemini no está configurada en el servidor.'], 500);
         }
 
         $isImage = in_array($extension, ['jpg', 'jpeg', 'png']);
@@ -308,8 +319,8 @@ class FlashcardController extends Controller
                 [
                     'inlineData' => [
                         'mimeType' => $mimeType,
-                        'data' => $fileData
-                    ]
+                        'data' => $fileData,
+                    ],
                 ],
                 [
                     'text' => "Analiza la siguiente imagen de apuntes o apuntes académicos y genera un mazo de estudio de flashcards con preguntas y respuestas significativas en español. El mazo debe tener exactamente {$cantidad} flashcards.
@@ -330,44 +341,66 @@ Devuelve el resultado estrictamente en formato JSON utilizando el siguiente esqu
       ]
     }
   ]
-}"
-                ]
+}",
+                ],
             ];
         } else {
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $tempPath = $file->storeAs('temp_ia', $fileName);
-            $fullPath = \Illuminate\Support\Facades\Storage::path($tempPath);
+            // Extracción nativa para archivos de texto plano (no requiere Python)
+            if (in_array($extension, ['txt', 'md'])) {
+                $text = file_get_contents($file->getRealPath());
 
-            $scriptPath = storage_path('app/extract_text.py');
-            $escapedPath = escapeshellarg($fullPath);
-            $escapedScript = escapeshellarg($scriptPath);
+                if (empty(trim($text))) {
+                    return response()->json(['message' => 'No se pudo extraer texto del archivo o el archivo está vacío.'], 400);
+                }
+            } else {
+                // Extracción mediante Python para PDF, DOCX y PPTX
+                $scriptPath = storage_path('app/extract_text.py');
 
-            // Ejecutar extracción mediante Python (capturando errores con 2>&1)
-            $command = "py $escapedScript $escapedPath 2>&1";
-            $output = shell_exec($command);
+                if (! file_exists($scriptPath)) {
+                    return response()->json(['message' => 'El servidor no está configurado correctamente para procesar este tipo de archivo.'], 500);
+                }
 
-            // Fallback a 'python' si 'py' no está en la ruta del servidor de Laragon
-            if (empty($output) || str_contains(strtolower($output), 'no se reconoce') || str_contains(strtolower($output), 'not recognized')) {
-                $command = "python $escapedScript $escapedPath 2>&1";
-                $output = shell_exec($command);
+                $fileName = time().'_'.$file->getClientOriginalName();
+                $tempPath = $file->storeAs('temp_ia', $fileName);
+
+                // Verificamos que el archivo temporal se haya guardado correctamente antes
+                // de intentar procesarlo, para evitar pasar una ruta inválida a Python.
+                if ($tempPath === false) {
+                    return response()->json(['message' => 'Error al guardar el archivo temporalmente. Verifica los permisos de escritura del servidor.'], 500);
+                }
+
+                $fullPath = Storage::path($tempPath);
+
+                $pythonExe = storage_path('app/venv/Scripts/python.exe');
+
+                if (! file_exists($pythonExe)) {
+                    $pythonExe = storage_path('app/venv/bin/python'); // Fallback Linux/Mac
+                }
+
+                if (! file_exists($pythonExe)) {
+                    $pythonExe = 'python'; // Fallback global si no hay venv
+                }
+
+                $process = Process::run([$pythonExe, $scriptPath, $fullPath]);
+
+                // Limpiar el archivo temporal independientemente del resultado
+                if (file_exists($fullPath)) {
+                    unlink($fullPath);
+                }
+
+                if (! $process->successful()) {
+                    return response()->json(['message' => 'Error al procesar el documento. Verifica que el archivo no esté dañado.'], 400);
+                }
+
+                $text = $process->output();
+
+                if (empty(trim($text))) {
+                    return response()->json(['message' => 'No se pudo extraer texto del archivo o el archivo está vacío.'], 400);
+                }
             }
 
-            // Limpiar el archivo temporal
-            if (file_exists($fullPath)) {
-                unlink($fullPath);
-            }
-
-            if (empty($output)) {
-                return response()->json(['message' => 'No se pudo extraer texto del archivo (salida de comando vacía o sin texto legible).'], 400);
-            }
-
-            // Si la salida contiene un mensaje de error del sistema operativo o de ejecución de Python
-            if (str_contains(strtolower($output), 'no se reconoce') || str_contains(strtolower($output), 'not recognized') || str_contains(strtolower($output), 'traceback') || str_contains(strtolower($output), 'error:')) {
-                return response()->json(['message' => 'Error en script de extracción: ' . trim($output)], 500);
-            }
-
-            // Limitar a los primeros 45,000 caracteres para evitar exceder límites razonables
-            $text = mb_substr($output, 0, 45000, 'UTF-8');
+            // Limitar a los primeros 45,000 caracteres para no exceder los límites de la API
+            $text = mb_substr($text, 0, 45000, 'UTF-8');
             $parts = [
                 [
                     'text' => "Analiza el siguiente texto académico y genera un mazo de estudio de flashcards con preguntas y respuestas significativas en español. El mazo debe tener exactamente {$cantidad} flashcards.
@@ -391,48 +424,49 @@ Devuelve el resultado estrictamente en formato JSON utilizando el siguiente esqu
 }
 
 Texto académico:
-" . $text
-                ]
+".$text,
+                ],
             ];
         }
 
         // Consultar API de Gemini
         try {
-            $response = \Illuminate\Support\Facades\Http::withHeaders([
+            $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-            ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $apiKey, [
+            ])->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='.$apiKey, [
                 'contents' => [
                     [
-                        'parts' => $parts
-                    ]
+                        'parts' => $parts,
+                    ],
                 ],
                 'generationConfig' => [
-                    'responseMimeType' => 'application/json'
-                ]
+                    'responseMimeType' => 'application/json',
+                ],
             ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 $errorMsg = $response->json()['error']['message'] ?? 'Error desconocido al consultar la API de Gemini.';
-                return response()->json(['message' => 'Error de Gemini: ' . $errorMsg], 502);
+
+                return response()->json(['message' => 'Error de Gemini: '.$errorMsg], 502);
             }
 
             $result = $response->json();
             $rawText = $result['candidates'][0]['content']['parts'][0]['text'] ?? null;
 
-            if (!$rawText) {
+            if (! $rawText) {
                 return response()->json(['message' => 'La Inteligencia Artificial no devolvió un formato válido.'], 502);
             }
 
             $deckData = json_decode(trim($rawText), true);
-            if (json_last_error() !== JSON_ERROR_NONE || !isset($deckData['nombre']) || !isset($deckData['cards'])) {
+            if (json_last_error() !== JSON_ERROR_NONE || ! isset($deckData['nombre']) || ! isset($deckData['cards'])) {
                 return response()->json(['message' => 'Error al decodificar la estructura JSON generada por la IA.'], 502);
             }
 
             $userId = $request->user()->id;
 
-            $deck = \Illuminate\Support\Facades\DB::transaction(function () use ($deckData, $userId, $userCategory) {
-                $finalCategory = ($userCategory === '__AUTO__') 
-                    ? ($deckData['categoria'] ?? 'General') 
+            $deck = DB::transaction(function () use ($deckData, $userId, $userCategory) {
+                $finalCategory = ($userCategory === '__AUTO__')
+                    ? ($deckData['categoria'] ?? 'General')
                     : $userCategory;
 
                 $deck = FlashcardDeck::create([
@@ -466,11 +500,15 @@ Texto académico:
                 'categoria' => $deck->categoria,
                 'cards_count' => count($deckData['cards']),
                 'porcentaje_acierto' => null,
-                'ultimo_repaso' => null
+                'ultimo_repaso' => null,
             ], 201);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Ocurrió un error inesperado al procesar la solicitud: ' . $e->getMessage()], 500);
+            // No exponemos el getMessage() al cliente para no filtrar rutas internas
+            // ni detalles técnicos del servidor. El error completo se registra en los logs.
+            report($e);
+
+            return response()->json(['message' => 'Ocurrió un error inesperado al procesar la solicitud. Inténtalo de nuevo.'], 500);
         }
     }
 
@@ -490,7 +528,7 @@ Texto académico:
         $categoria = $request->input('categoria', 'General');
 
         $apiKey = env('GEMINI_API_KEY');
-        if (!$apiKey) {
+        if (! $apiKey) {
             return response()->json(['message' => 'La clave API de Gemini no está configurada.'], 500);
         }
 
@@ -507,35 +545,36 @@ Devuelve los datos estrictamente en formato JSON utilizando el siguiente esquema
 }";
 
         try {
-            $response = \Illuminate\Support\Facades\Http::withHeaders([
+            $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-            ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $apiKey, [
+            ])->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='.$apiKey, [
                 'contents' => [
                     [
                         'parts' => [
-                            ['text' => $prompt]
-                        ]
-                    ]
+                            ['text' => $prompt],
+                        ],
+                    ],
                 ],
                 'generationConfig' => [
-                    'responseMimeType' => 'application/json'
-                ]
+                    'responseMimeType' => 'application/json',
+                ],
             ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 $errorMsg = $response->json()['error']['message'] ?? 'Error al conectar con la API de Gemini.';
-                return response()->json(['message' => 'Error de Gemini: ' . $errorMsg], 502);
+
+                return response()->json(['message' => 'Error de Gemini: '.$errorMsg], 502);
             }
 
             $result = $response->json();
             $rawText = $result['candidates'][0]['content']['parts'][0]['text'] ?? null;
 
-            if (!$rawText) {
+            if (! $rawText) {
                 return response()->json(['message' => 'La IA no devolvió un formato válido.'], 502);
             }
 
             $distractorsData = json_decode(trim($rawText), true);
-            if (json_last_error() !== JSON_ERROR_NONE || !isset($distractorsData['distractor_1'])) {
+            if (json_last_error() !== JSON_ERROR_NONE || ! isset($distractorsData['distractor_1'])) {
                 return response()->json(['message' => 'Error al decodificar la estructura generada por la IA.'], 502);
             }
 
@@ -546,7 +585,7 @@ Devuelve los datos estrictamente en formato JSON utilizando el siguiente esquema
             ]);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error: '.$e->getMessage()], 500);
         }
     }
 }
