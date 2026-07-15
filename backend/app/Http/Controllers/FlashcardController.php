@@ -527,7 +527,8 @@ Texto académico:
         $respuesta = $request->input('respuesta');
         $categoria = $request->input('categoria', 'General');
 
-        $apiKey = env('GEMINI_API_KEY');
+        // Usamos config() en lugar de env() para soportar config:cache en producción
+        $apiKey = config('services.gemini.key');
         if (! $apiKey) {
             return response()->json(['message' => 'La clave API de Gemini no está configurada.'], 500);
         }
@@ -585,7 +586,9 @@ Devuelve los datos estrictamente en formato JSON utilizando el siguiente esquema
             ]);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error: '.$e->getMessage()], 500);
+            report($e);
+
+            return response()->json(['message' => 'Ocurrió un error inesperado al procesar la solicitud. Inténtalo de nuevo.'], 500);
         }
     }
 }
