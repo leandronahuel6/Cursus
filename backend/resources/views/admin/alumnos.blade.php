@@ -59,6 +59,29 @@
     </form>
   </div>
 
+  <!-- Directorio de Alumnos (Estado Vacío) -->
+  <div class="aa-materias-card" id="aa-directory-card" style="margin-top: 1rem; margin-bottom: 1.5rem;">
+    <div class="aa-search-header" style="border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+      <svg width="18" height="18" aria-hidden="true" style="color: var(--brand); fill: none; stroke: currentColor; stroke-width: 2;"><use href="{{ asset('assets/icons/sprite.svg') }}#users"></use></svg>
+      <h2 class="aa-search-title" style="margin: 0; font-size: 1.1rem;">Directorio de Alumnos</h2>
+    </div>
+    <div class="aa-materias-table-wrap" style="max-height: 380px; overflow-y: auto;">
+      <table class="aa-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Legajo</th>
+            <th>Email</th>
+            <th style="text-align: right;">Acción</th>
+          </tr>
+        </thead>
+        <tbody id="aa-directory-body">
+          <tr><td colspan="4" class="aa-table-empty">Cargando alumnos registrados...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- Resultado -->
   <div id="aa-result" hidden>
 
@@ -74,10 +97,16 @@
             <span id="aa-email"></span>
           </div>
         </div>
-        <button class="aa-btn-delete" id="aa-btn-delete" onclick="window.aaEliminar()">
-          <svg width="14" height="14" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#trash-2"></use></svg>
-          Dar de baja
-        </button>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button type="button" class="aa-btn-cancel" onclick="window.aaVolverAlDirectorio()" style="display: flex; align-items: center; gap: 6px; padding: 0.5rem 0.85rem; font-size: 0.82rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--t2); cursor: pointer; transition: all 0.2s;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.8;"><path d="m12 19-7-7 7-7M5 12h14"/></svg>
+            Volver al directorio
+          </button>
+          <button class="aa-btn-delete" id="aa-btn-delete" onclick="window.aaEliminar()">
+            <svg width="14" height="14" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#trash-2"></use></svg>
+            Dar de baja
+          </button>
+        </div>
       </div>
 
       <!-- Stats rápidas -->
@@ -107,7 +136,16 @@
 
     <!-- Detalle materias -->
     <div class="aa-materias-card">
-      <h3 class="aa-section-title">Materias</h3>
+      <div class="aa-header-filters" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+        <h3 class="aa-section-title" style="margin-bottom: 0;">Materias</h3>
+        <div class="aa-filters" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button type="button" class="aa-filter-btn" data-filter="todas" onclick="window.aaFiltrarMaterias('todas')" style="background: var(--brand); color: white; border: none; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Todas</button>
+          <button type="button" class="aa-filter-btn" data-filter="aprobada" onclick="window.aaFiltrarMaterias('aprobada')" style="background: var(--surface); color: var(--t2); border: 1px solid var(--border); padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Aprobadas</button>
+          <button type="button" class="aa-filter-btn" data-filter="regular" onclick="window.aaFiltrarMaterias('regular')" style="background: var(--surface); color: var(--t2); border: 1px solid var(--border); padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Regulares</button>
+          <button type="button" class="aa-filter-btn" data-filter="cursando" onclick="window.aaFiltrarMaterias('cursando')" style="background: var(--surface); color: var(--t2); border: 1px solid var(--border); padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Cursando</button>
+          <button type="button" class="aa-filter-btn" data-filter="libre" onclick="window.aaFiltrarMaterias('libre')" style="background: var(--surface); color: var(--t2); border: 1px solid var(--border); padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Libres</button>
+        </div>
+      </div>
       <div class="aa-materias-table-wrap">
         <table class="aa-table">
           <thead>

@@ -2226,13 +2226,7 @@
             groups[cat].push(deck);
         });
 
-        // Mostrar también las materias en curso que todavía no tienen ningún mazo,
-        // para que el alumno pueda elegirlas aunque estén vacías.
-        materiasCursandoFlashcards.forEach(m => {
-            if (!groups[m.nombre]) {
-                groups[m.nombre] = [];
-            }
-        });
+
 
         // Materias que el alumno está cursando ahora mismo (vienen de la base de datos vía /api/mis-materias)
         const materiaNombres = materiasCursandoFlashcards.map(m => m.nombre);

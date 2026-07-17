@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CarrerasSeeder::class,
             MateriasSeeder::class,
+            DemoDataSeeder::class,
         ]);
     }
 }

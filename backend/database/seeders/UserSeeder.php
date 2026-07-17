@@ -22,6 +22,7 @@ class UserSeeder extends Seeder
             'email' => 'Testuser@cursus.com',
             'password' => Hash::make('user12345'),
             'role' => 'general',
+            'legajo' => '54321',
         ]);
     }
 }

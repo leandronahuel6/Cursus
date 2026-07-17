@@ -141,13 +141,40 @@
     // Guardar id para el delete
     document.getElementById('aa-btn-delete').dataset.id = usuario.id;
 
-    // Tabla materias
+    aaFiltrarMaterias('todas');
+    document.getElementById('aa-directory-card').hidden = true;
+    document.getElementById('aa-result').hidden = false;
+  }
+
+  function aaFiltrarMaterias(filter) {
+    if (!alumnoActual) return;
+    
+    // Actualizar botones de filtro
+    const buttons = document.querySelectorAll('.aa-filter-btn');
+    buttons.forEach(btn => {
+      if (btn.dataset.filter === filter) {
+        btn.style.background = 'var(--brand)';
+        btn.style.color = 'white';
+        btn.style.borderColor = 'transparent';
+      } else {
+        btn.style.background = 'var(--surface)';
+        btn.style.color = 'var(--t2)';
+        btn.style.borderColor = 'var(--border)';
+      }
+    });
+
     const tbody = document.getElementById('aa-materias-body');
     tbody.innerHTML = '';
-    if (materias.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" class="aa-table-empty">Sin materias registradas</td></tr>';
+
+    const materias = alumnoActual.materias;
+    const filtered = filter === 'todas'
+      ? materias
+      : materias.filter(m => m.estado === filter);
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="aa-table-empty">Sin materias en estado "${filter}"</td></tr>`;
     } else {
-      materias.forEach(m => {
+      filtered.forEach(m => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${m.nombre}</td>
@@ -158,8 +185,6 @@
         tbody.appendChild(tr);
       });
     }
-
-    document.getElementById('aa-result').hidden = false;
   }
 
   // ---- Eliminar alumno ----
@@ -197,6 +222,8 @@
         err.className = 'aa-error aa-success';
         err.hidden = false;
         setTimeout(() => { err.hidden = true; err.className = 'aa-error'; }, 3000);
+        // Volver al directorio
+        aaVolverAlDirectorio();
       } else {
         alert(data.message ?? 'Error al eliminar.');
       }
@@ -208,9 +235,72 @@
     }
   }
 
+  // ---- Cargar directorio de alumnos ----
+  async function cargarDirectorio() {
+    try {
+      const res = await fetch('/api/admin/alumnos', {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (res.ok) {
+        const alumnos = await res.json();
+        renderDirectorio(alumnos);
+      } else {
+        console.error('Error al cargar alumnos');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function renderDirectorio(alumnos) {
+    const tbody = document.getElementById('aa-directory-body');
+    tbody.innerHTML = '';
+    
+    if (alumnos.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="aa-table-empty">No hay alumnos registrados.</td></tr>';
+      return;
+    }
+
+    alumnos.forEach(u => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-weight: 600; color: var(--t1);">${u.nombre}</td>
+        <td>${u.legajo || '—'}</td>
+        <td style="color: var(--t2); font-size: 0.88rem;">${u.email}</td>
+        <td style="text-align: right;">
+          <button type="button" class="aa-btn-search" onclick="window.aaSeleccionarPreview('${u.legajo}')" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: all 0.2s;">
+            Ver Expediente
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function aaSeleccionarPreview(legajo) {
+    if (!legajo) return;
+    document.getElementById('aa-legajo').value = legajo;
+    aaBuscar({ preventDefault: () => {} });
+  }
+
+  function aaVolverAlDirectorio() {
+    alumnoActual = null;
+    document.getElementById('aa-legajo').value = '';
+    document.getElementById('aa-result').hidden = true;
+    document.getElementById('aa-directory-card').hidden = false;
+    hideError();
+    cargarDirectorio();
+  }
+
+  // Cargar al inicializar
+  cargarDirectorio();
+
   // Exportar al scope global
-  window.aaBuscar          = aaBuscar;
-  window.aaEliminar        = aaEliminar;
-  window.aaCancelEliminar  = aaCancelEliminar;
+  window.aaBuscar            = aaBuscar;
+  window.aaEliminar          = aaEliminar;
+  window.aaCancelEliminar    = aaCancelEliminar;
   window.aaConfirmarEliminar = aaConfirmarEliminar;
+  window.aaFiltrarMaterias   = aaFiltrarMaterias;
+  window.aaSeleccionarPreview = aaSeleccionarPreview;
+  window.aaVolverAlDirectorio = aaVolverAlDirectorio;
 })();

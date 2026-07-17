@@ -13,6 +13,15 @@ use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
+    public function listarAlumnos()
+    {
+        $alumnos = User::where('role', 'general')
+            ->orderBy('nombre')
+            ->get(['id', 'nombre', 'legajo', 'email']);
+
+        return response()->json($alumnos);
+    }
+
     public function buscarAlumno(Request $request)
     {
         $request->validate(['legajo' => 'required|string']);
