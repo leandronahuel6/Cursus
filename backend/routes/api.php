@@ -103,6 +103,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Rutas de administración
     Route::middleware('admin')->prefix('admin')->group(function () {
+        Route::get('/alumnos', [AdminController::class, 'listarAlumnos']);
         Route::get('/alumnos/buscar', [AdminController::class, 'buscarAlumno']);
         Route::delete('/alumnos/{id}', [AdminController::class, 'eliminarAlumno']);
         Route::get('/cuotas/estado', [AdminController::class, 'cuotasEstado']);

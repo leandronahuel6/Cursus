@@ -14,7 +14,10 @@
 .mat-dropdown {
   position: absolute; top: calc(100% + 8px); left: 0;
   min-width: 240px; max-height: 280px; overflow-y: auto;
-  background: var(--surface); border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
   border-radius: var(--r); box-shadow: var(--sh-md);
   padding: 6px; z-index: 50;
   opacity: 0; transform: translateY(-6px);
@@ -779,8 +782,10 @@ body.dark-mode select.modal-input option {
 
 /* Menú desplegable de materias en modo oscuro (fondo sólido) */
 body.dark-mode .mat-dropdown {
-  background-color: var(--surface);
-  border: 1px solid var(--border);
+  background-color: rgba(17, 24, 39, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 body.dark-mode .mat-dropdown-item:hover {
