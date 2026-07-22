@@ -2194,6 +2194,6 @@
     </button>
 
     <!-- SCRIPT DE LOGICA INTERACTIVA -->
-    <script src="{{ asset('js/welcome.js') }}"></script>
+    <script src="{{ asset('js/views/welcome.js') }}"></script>
 </body>
 </html>

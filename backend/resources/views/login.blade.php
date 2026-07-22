@@ -73,6 +73,6 @@
             </div>
         </div>
     </main>
-    <script src="{{ asset('js/login.js') }}"></script>
+    <script src="{{ asset('js/views/login.js') }}"></script>
 </body>
 </html>

@@ -124,5 +124,5 @@
 @endsection
 
 @push('scripts')
-  <script src="{{ asset('js/materias.js') }}"></script>
+  <script src="{{ asset('js/views/materias.js') }}"></script>
 @endpush

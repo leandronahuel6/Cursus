@@ -441,9 +441,9 @@
 <script src="{{ asset('js/shared/sidebar.js') }}"></script>
 <script src="{{ asset('js/shared/toast.js') }}"></script>
 <script src="{{ asset('js/shared/profile.js') }}"></script>
-<script type="module" src="{{ asset('js/pomo-float.js') }}?v={{ filemtime(public_path('js/pomo-float.js')) }}"></script>
+<script type="module" src="{{ asset('js/views/pomo-float.js') }}?v={{ filemtime(public_path('js/views/pomo-float.js')) }}"></script>
 @if(Request::routeIs('dashboard') || Request::routeIs('area-estudio'))
-<script src="{{ asset('js/onboarding.js') }}?v={{ filemtime(public_path('js/onboarding.js')) }}"></script>
+<script src="{{ asset('js/views/onboarding.js') }}?v={{ filemtime(public_path('js/views/onboarding.js')) }}"></script>
 @endif
 <script>
   function toggleStudentMenu(event) {

@@ -50,6 +50,6 @@
             </div>
         </div>
     </main>
-    <script src="{{ asset('js/forgot-password.js') }}"></script>
+    <script src="{{ asset('js/views/forgot-password.js') }}"></script>
 </body>
 </html>

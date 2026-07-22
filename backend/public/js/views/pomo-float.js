@@ -22,8 +22,8 @@
 
 'use strict';
 
-import { pomodoroService, LS_KEYS } from './services/PomodoroStateService.js';
-import { playPomoAlarm, unlockPomoAudio } from './shared/pomo-audio-player.js';
+import { pomodoroService, LS_KEYS } from '../services/PomodoroStateService.js';
+import { playPomoAlarm, unlockPomoAudio } from '../shared/pomo-audio-player.js';
 
 /* ==========================================================================
    GUARDIA: No montar el widget en el Área de Estudio (tiene su propio UI)

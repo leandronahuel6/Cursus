@@ -651,6 +651,6 @@
         // Inicializar Iconos de Lucide
         lucide.createIcons();
     </script>
-    <script src="{{ asset('js/welcome.js') }}"></script>
+    <script src="{{ asset('js/views/welcome.js') }}"></script>
 </body>
 </html>
