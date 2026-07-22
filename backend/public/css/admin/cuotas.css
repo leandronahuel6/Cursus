@@ -125,7 +125,7 @@ color: var(--brand);
   flex: 2;
 }
 
-select.aa-input option {
+select.admin-input option {
   padding-right: 15px;
   padding-left: 5px;
 }
@@ -249,7 +249,7 @@ font-weight: 500;
     margin: 0 auto 12px auto; 
   }
 
-  .admin-cuotas-page .ac-table-wrap .aa-table {
+  .admin-cuotas-page .ac-table-wrap .admin-table {
     width: 100%;
     margin: 0;
   }

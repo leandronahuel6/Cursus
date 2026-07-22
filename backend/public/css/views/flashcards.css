@@ -1,0 +1,1632 @@
+/* ==========================================================================
+       VARIABLES Y TEMA OSCURO LOCAL (FLASHCARDS)
+       ========================================================================== */
+body.dark-mode {
+    --bg: #070a13;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-light: rgba(255, 255, 255, 0.04);
+    --surface: rgba(17, 24, 39, 0.6);
+    --t1: #f3f4f6;
+    --t2: #cbd5e1;
+    --t3: #94a3b8;
+}
+
+body {
+    background-image: none;
+    background-color: var(--bg);
+}
+
+/* Fondo Aurora Mesh Gradient Animado en Modo Oscuro */
+body.dark-mode {
+    background-image:
+        radial-gradient(
+            at 0% 0%,
+            rgba(99, 102, 241, 0.12) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 100% 0%,
+            rgba(6, 182, 212, 0.08) 0px,
+            transparent 50%
+        );
+    background-size:
+        100% 100%,
+        100% 100%;
+    background-attachment: fixed;
+    animation: aurora-bg 20s infinite alternate ease-in-out;
+}
+
+@keyframes aurora-bg {
+    0% {
+        background-position:
+            0% 0%,
+            100% 100%;
+    }
+    50% {
+        background-position:
+            50% 50%,
+            50% 50%;
+    }
+    100% {
+        background-position:
+            100% 100%,
+            0% 0%;
+    }
+}
+
+/* ==========================================================================
+       DISEÑO DE LA INTERFAZ DE FLASHCARDS
+       ========================================================================== */
+.fc-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 0.5rem;
+}
+
+.fc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.fc-title-group h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--t1);
+    margin: 0 0 0.25rem 0;
+}
+
+.fc-title-group p {
+    color: var(--t3);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.fc-header-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-create-deck {
+    background: var(--brand);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--r);
+    padding: 0.75rem 1.25rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+}
+
+.btn-create-deck:hover {
+    background: var(--brand-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+}
+
+/* Grilla de mazos */
+.decks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+    overflow: hidden;
+}
+
+.category-group.collapsed .decks-grid {
+    max-height: 0 !important;
+    opacity: 0;
+    margin-top: 0;
+    overflow: hidden;
+}
+
+/* Tarjetas de Mazos (Decks) */
+.deck-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 200px;
+    box-shadow: var(--sh);
+}
+
+.deck-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--sh-md);
+    border-color: var(--brand-dim);
+}
+
+/* Efecto Cursor Glow en las Tarjetas */
+.deck-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        800px circle at var(--mouse-x, 0) var(--mouse-y, 0),
+        rgba(99, 102, 241, 0.08),
+        transparent 40%
+    );
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.deck-card:hover::before {
+    opacity: 1;
+}
+
+/* Decoración de gradiente superior */
+.deck-card-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    z-index: 2;
+}
+
+/* Gradientes dinámicos del mazo */
+.deck-color-indigo {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+}
+.deck-color-emerald {
+    background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+}
+.deck-color-rose {
+    background: linear-gradient(135deg, #fb7185 0%, #e11d48 100%);
+}
+.deck-color-amber {
+    background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+}
+.deck-color-violet {
+    background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+}
+.deck-color-cyan {
+    background: linear-gradient(135deg, #22d3ee 0%, #0891b2 100%);
+}
+
+.deck-info {
+    position: relative;
+    z-index: 2;
+}
+
+.deck-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--t1);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.3;
+}
+
+.deck-desc {
+    font-size: 0.88rem;
+    color: var(--t3);
+    margin: 0 0 1.25rem 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.deck-stats-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.82rem;
+    color: var(--t2);
+}
+
+.deck-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.deck-stat-icon {
+    width: 14px;
+    height: 14px;
+    opacity: 0.7;
+}
+
+/* Insignia de porcentaje de acierto */
+.accuracy-badge {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+.accuracy-high {
+    background: rgba(5, 150, 105, 0.1);
+    color: var(--green);
+}
+.accuracy-medium {
+    background: rgba(217, 119, 6, 0.1);
+    color: var(--yellow);
+}
+.accuracy-low {
+    background: rgba(220, 38, 38, 0.1);
+    color: var(--red);
+}
+.accuracy-none {
+    background: var(--border-light);
+    color: var(--t3);
+}
+
+.deck-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    position: relative;
+    z-index: 2;
+}
+
+.btn-study {
+    flex: 1;
+    background: var(--brand-light);
+    color: var(--brand);
+    border: 1px solid var(--brand-dim);
+    border-radius: var(--r-sm);
+    padding: 0.5rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    transition: all 0.2s ease;
+}
+
+.btn-study:hover:not(:disabled) {
+    background: var(--brand);
+    color: #ffffff;
+    border-color: var(--brand);
+}
+
+.btn-study:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-deck-icon {
+    background: transparent;
+    color: var(--t3);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-deck-icon:hover {
+    background: var(--border-light);
+    color: var(--t1);
+    border-color: var(--t3);
+}
+
+.btn-deck-icon.delete-btn:hover {
+    background: rgba(220, 38, 38, 0.08);
+    color: var(--red);
+    border-color: rgba(220, 38, 38, 0.3);
+}
+
+/* ==========================================================================
+       SECCIÓN DE ESTUDIO ACTIVO (3D FLIP CARD CAROUSEL & MÚLTIPLE OPCIÓN)
+       ========================================================================== */
+.study-layout {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem 0;
+}
+
+.study-bar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.btn-back-link {
+    background: transparent;
+    border: none;
+    color: var(--t2);
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.2s;
+}
+
+.btn-back-link:hover {
+    color: var(--brand);
+}
+
+.study-progress-info {
+    font-size: 0.85rem;
+    color: var(--t3);
+    font-weight: 500;
+}
+
+/* Barra de progreso animada */
+.study-progress-container {
+    height: 6px;
+    background: var(--border-light);
+    border-radius: 999px;
+    margin-bottom: 2.5rem;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.study-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand), #06b6d4);
+    border-radius: 999px;
+    width: 0%;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Envoltura de tarjeta 3D */
+.study-card-wrapper {
+    perspective: 1200px;
+    width: 100%;
+    height: 360px;
+    margin-bottom: 2rem;
+}
+
+.flip-card {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.flip-card.flipped .flip-card-inner {
+    transform: rotateY(180deg);
+}
+
+/* Animación de Sacudida (Shake) para tarjetas incorrectas */
+@keyframes card-shake {
+    0%,
+    100% {
+        transform: rotateY(180deg) translateX(0);
+    }
+    20%,
+    60% {
+        transform: rotateY(180deg) translateX(-10px);
+    }
+    40%,
+    80% {
+        transform: rotateY(180deg) translateX(10px);
+    }
+}
+
+.flip-card.shake-incorrect .flip-card-inner {
+    animation: card-shake 0.4s ease;
+}
+
+.flip-card-front,
+.flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    padding: 3rem 2.5rem 3.5rem 3.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow:
+        0 10px 25px -5px rgba(0, 0, 0, 0.05),
+        0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border);
+    /* Lined index card effect (Ruled paper theme) */
+    background-color: #fcfcfc;
+    background-image: 
+            /* Red left vertical line */
+        linear-gradient(
+            90deg,
+            transparent 2.75rem,
+            rgba(239, 68, 68, 0.35) 2.75rem,
+            rgba(239, 68, 68, 0.35) 2.85rem,
+            transparent 2.85rem
+        ),
+        /* Light blue horizontal lines */
+        linear-gradient(rgba(59, 130, 246, 0.12) 1px, transparent 1px);
+    background-size:
+        100% 100%,
+        100% 2.2rem;
+    background-position:
+        0 0,
+        0 1.2rem;
+    color: #1e293b; /* Premium slate color for text */
+    transition:
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
+}
+
+body.dark-mode .flip-card-front,
+body.dark-mode .flip-card-back {
+    background-color: #1e293b; /* Slate background for dark mode index cards */
+    background-image: 
+            /* Subtle red left vertical line */
+        linear-gradient(
+            90deg,
+            transparent 2.75rem,
+            rgba(239, 68, 68, 0.25) 2.75rem,
+            rgba(239, 68, 68, 0.25) 2.85rem,
+            transparent 2.85rem
+        ),
+        /* Subtle white horizontal lines */
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size:
+        100% 100%,
+        100% 2.2rem;
+    background-position:
+        0 0,
+        0 1.2rem;
+    color: #f8fafc;
+    border-color: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+.flip-card-front {
+    /* standard front side */
+}
+
+.flip-card-back {
+    transform: rotateY(180deg);
+}
+
+.flip-card-front:hover,
+.flip-card-back:hover {
+    box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.12);
+    border-color: var(--brand-dim);
+}
+
+/* Decorativos de tarjetas */
+.card-side-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--r-sm);
+    background: var(--border-light);
+    color: var(--t3);
+    border: 1px solid var(--border);
+}
+
+.card-text {
+    font-size: 1.45rem;
+    font-weight: 500;
+    line-height: 1.6;
+    text-align: center;
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 0 0.5rem;
+    margin: auto 0; /* Vertically center in the flexbox */
+    word-break: break-word;
+    width: 100%;
+    font-family: var(--font-display);
+}
+
+/* Teclas de atajos estilizadas (Keycaps) */
+.key-hint {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    padding: 0.15rem 0.35rem;
+    font-size: 0.72rem;
+    font-family: var(--font-display), monospace;
+    margin-left: 0.25rem;
+    color: rgba(0, 0, 0, 0.5);
+    font-weight: 700;
+    box-shadow: 0 1.5px 0 rgba(0, 0, 0, 0.08);
+}
+
+body.dark-mode .key-hint {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 1.5px 0 rgba(0, 0, 0, 0.3);
+}
+
+.btn-outcome .key-hint {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    box-shadow: 0 1.5px 0 rgba(0, 0, 0, 0.15);
+}
+
+.card-study-stats {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--t3);
+    background: var(--border-light);
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--border);
+}
+
+.card-action-hint {
+    position: absolute;
+    bottom: 1.25rem;
+    font-size: 0.78rem;
+    color: var(--t3);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    opacity: 0.8;
+}
+
+/* Controles de estudio (Botones) */
+.study-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.study-controls.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.btn-outcome {
+    flex: 1;
+    max-width: 220px;
+    border: none;
+    border-radius: var(--r);
+    padding: 0.85rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #ffffff;
+    transition: all 0.2s ease;
+    box-shadow: var(--sh);
+}
+
+.btn-outcome-incorrect {
+    background: var(--red);
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.15);
+}
+
+.btn-outcome-incorrect:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(220, 38, 38, 0.25);
+}
+
+.btn-outcome-correct {
+    background: var(--green);
+    box-shadow: 0 4px 10px rgba(5, 150, 105, 0.15);
+}
+
+.btn-outcome-correct:hover {
+    background: #047857;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(5, 150, 105, 0.25);
+}
+
+/* Hint inicial para voltear */
+.flip-instruction-hint {
+    text-align: center;
+    color: var(--brand);
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin: 1.5rem 0;
+    transition: opacity 0.3s;
+}
+
+.flip-instruction-hint.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Estilos para el Modo Examen (Opción Múltiple estilo Quizlet) */
+.btn-exam-option {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1.1rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--t1);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--sh);
+    outline: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.btn-exam-option:hover:not(:disabled) {
+    border-color: var(--brand);
+    background: var(--border-light);
+    transform: translateY(-2px);
+    box-shadow: var(--sh-md);
+}
+
+.btn-exam-option.option-correct {
+    background: rgba(5, 150, 105, 0.15) !important;
+    border-color: var(--green) !important;
+    color: var(--green) !important;
+    font-weight: 600;
+}
+
+.btn-exam-option.option-incorrect {
+    background: rgba(220, 38, 38, 0.15) !important;
+    border-color: var(--red) !important;
+    color: var(--red) !important;
+    font-weight: 600;
+}
+
+.btn-exam-option:disabled {
+    cursor: default;
+    opacity: 0.85;
+}
+
+#exam-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+/* ==========================================================================
+       SECCIÓN DE RESUMEN FINAL
+       ========================================================================== */
+.summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: var(--sh-md);
+}
+
+.summary-icon-celebrate {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    animation: pulse-bounce 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes pulse-bounce {
+    0% {
+        transform: scale(1) translateY(0);
+    }
+    100% {
+        transform: scale(1.1) translateY(-6px);
+    }
+}
+
+.summary-card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--t1);
+    margin: 0 0 0.5rem 0;
+}
+
+.summary-card p {
+    color: var(--t3);
+    font-size: 0.95rem;
+    margin: 0 0 2rem 0;
+}
+
+/* Widget circular de progreso */
+.circular-progress-wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 2rem auto;
+}
+
+.circular-progress {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+}
+
+.circular-progress .bg-circle {
+    fill: none;
+    stroke: var(--border-light);
+    stroke-width: 10;
+}
+
+.circular-progress .fg-circle {
+    fill: none;
+    stroke: var(--brand);
+    stroke-width: 10;
+    stroke-dasharray: 377;
+    stroke-dashoffset: 377;
+    transition: stroke-dashoffset 1s ease-out;
+}
+
+.circular-progress-wrapper .percentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--t1);
+}
+
+/* Stats del resumen */
+.summary-stats-grid {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+}
+
+.summary-stat-box {
+    background: var(--border-light);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 0.75rem 1.25rem;
+    min-width: 110px;
+}
+
+.summary-stat-val {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.15rem;
+}
+
+.val-correct {
+    color: var(--green);
+}
+.val-incorrect {
+    color: var(--red);
+}
+.val-total {
+    color: var(--t1);
+}
+
+.summary-stat-lbl {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--t3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Recomendaciones de estudio */
+.summary-feedback-box {
+    background: var(--brand-light);
+    border: 1px solid var(--brand-dim);
+    border-radius: var(--r);
+    padding: 1rem;
+    font-size: 0.88rem;
+    color: var(--t2);
+    margin-bottom: 2.5rem;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: left;
+}
+
+.summary-feedback-box svg {
+    flex-shrink: 0;
+    color: var(--brand);
+}
+
+.summary-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.btn-summary-restart {
+    background: var(--brand);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--r);
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+}
+
+.btn-summary-restart:hover {
+    background: var(--brand-hover);
+    transform: translateY(-2px);
+}
+
+.btn-summary-back {
+    background: transparent;
+    color: var(--t2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-summary-back:hover {
+    background: var(--border-light);
+    color: var(--t1);
+}
+
+/* ==========================================================================
+       SECCIÓN DE GESTIÓN DE TARJETAS (MANAGE DECK)
+       ========================================================================== */
+.manage-layout {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.manage-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.distractors-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+/* ==========================================================================
+       ESTILOS RESPONSIVOS PARA DISPOSITIVOS MÓVILES
+       ========================================================================== */
+@media (max-width: 768px) {
+    .fc-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .fc-title-group {
+        text-align: center;
+    }
+
+    .fc-header-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .btn-create-deck {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .manage-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .cards-list-container {
+        max-height: 400px;
+    }
+}
+
+@media (max-width: 576px) {
+    .fc-container {
+        padding: 1rem 0.75rem;
+    }
+
+    /* Ajustes de estudio activo */
+    .study-layout {
+        padding: 0.5rem 0;
+    }
+
+    .study-card-wrapper {
+        height: 280px;
+        margin-bottom: 1.5rem;
+    }
+
+    .flip-card-front,
+    .flip-card-back {
+        padding: 2rem 1.5rem 2.5rem 1.5rem;
+    }
+
+    .card-text {
+        font-size: 1.15rem;
+    }
+
+    .card-action-hint {
+        font-size: 0.72rem;
+        bottom: 1rem;
+    }
+
+    .btn-outcome .key-hint {
+        display: none;
+    }
+
+    .btn-outcome {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    /* Ajustes de examen */
+    .exam-card-wrapper {
+        min-height: auto;
+    }
+
+    .exam-card-wrapper .summary-card {
+        padding: 1.5rem;
+        min-height: auto;
+    }
+
+    .exam-card-wrapper #exam-options-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    /* Ajustes de resumen final */
+    .summary-card {
+        padding: 2rem 1rem;
+    }
+
+    .summary-stats-grid {
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .summary-stat-box {
+        flex: 1;
+        min-width: 80px;
+        padding: 0.6rem 0.5rem;
+    }
+
+    .summary-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
+    }
+
+    .btn-summary-restart,
+    .btn-summary-back {
+        width: 100%;
+        max-width: none;
+        justify-content: center;
+    }
+
+    /* Modales */
+    .fc-overlay {
+        padding: 1rem;
+    }
+
+    .fc-modal-box {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .fc-modal-body {
+        padding: 1.25rem;
+    }
+
+    .fc-modal-footer {
+        padding: 0.85rem 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .deck-actions {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .btn-study {
+        width: 100%;
+        flex: none;
+    }
+
+    .btn-deck-icon {
+        flex: 1;
+        justify-content: center;
+    }
+
+    /* Formulario de añadir tarjeta */
+    .distractors-header-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    #btn-suggest-distractors {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.manage-form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 1.5rem;
+    box-shadow: var(--sh);
+    align-self: start;
+}
+
+.manage-form-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 1.25rem 0;
+    color: var(--t1);
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--t3);
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.fc-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 0.6rem 0.8rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--t1);
+    outline: none;
+    transition: all 0.2s;
+}
+
+.fc-input:focus {
+    border-color: var(--brand);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.fc-select {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    color: var(--t1);
+    font-size: 0.85rem;
+    outline: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all 0.2s;
+}
+
+.fc-select:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* Adaptación de menús desplegables al modo oscuro */
+body.dark-mode select.fc-input,
+body.dark-mode select.fc-select {
+    background-color: #1f2937;
+    color: #f3f4f6;
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+body.dark-mode select option,
+body.dark-mode select optgroup {
+    background-color: #111827;
+    color: #f3f4f6;
+}
+
+.fc-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.btn-add-card {
+    width: 100%;
+    background: var(--brand);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--r-sm);
+    padding: 0.65rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-add-card:hover {
+    background: var(--brand-hover);
+}
+
+/* Listado de tarjetas existentes */
+.cards-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.card-list-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1.25rem;
+    position: relative;
+    box-shadow: var(--sh);
+    transition: border-color 0.2s;
+}
+
+.card-list-item:hover {
+    border-color: var(--t3);
+}
+
+.card-item-qa {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-right: 2.5rem;
+}
+
+.qa-block {
+    font-size: 0.9rem;
+}
+
+.qa-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--t3);
+    margin-bottom: 0.15rem;
+}
+
+.qa-content {
+    color: var(--t1);
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.card-item-actions {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.25rem;
+}
+
+/* Edición inline de tarjetas */
+.card-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.card-edit-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 0.25rem;
+}
+
+.btn-card-save {
+    background: var(--green);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--r-sm);
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-card-cancel {
+    background: transparent;
+    color: var(--t2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ==========================================================================
+       MODALES PERSONALIZADOS
+       ========================================================================== */
+.fc-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(7, 10, 19, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.fc-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.fc-modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    width: 100%;
+    max-width: 460px;
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: scale(0.95);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+}
+
+body.dark-mode .fc-modal-box {
+    background: #111827; /* Fondo completamente sólido en modo oscuro para legibilidad total */
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.5),
+        0 10px 10px -5px rgba(0, 0, 0, 0.3);
+}
+
+.category-header:hover {
+    background: var(--border) !important;
+    border-color: var(--brand-dim) !important;
+}
+
+.fc-overlay.open .fc-modal-box {
+    transform: scale(1);
+}
+
+.fc-modal-header {
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fc-modal-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--t1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.fc-modal-close {
+    background: transparent;
+    border: none;
+    color: var(--t3);
+    font-size: 1.25rem;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.fc-modal-close:hover {
+    background: var(--border-light);
+    color: var(--t1);
+}
+
+.fc-modal-body {
+    padding: 1.5rem;
+}
+
+/* Selector de color */
+.color-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.color-option {
+    position: relative;
+    height: 38px;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    transition: transform 0.15s;
+    border: 2px solid transparent;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option.selected {
+    border-color: var(--t1);
+    box-shadow: 0 0 0 2px var(--bg);
+}
+
+.fc-modal-footer {
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+    padding: 1rem 1.5rem;
+    background: var(--border-light);
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.btn-modal-cancel {
+    background: transparent;
+    color: var(--t2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 0.55rem 1rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-modal-cancel:hover {
+    background: var(--surface);
+    color: var(--t1);
+}
+
+.btn-modal-save {
+    background: var(--brand);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--r-sm);
+    padding: 0.55rem 1.25rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-modal-save:hover {
+    background: var(--brand-hover);
+}
+
+/* Estado vacío */
+.empty-state {
+    grid-column: 1 / -1;
+    background: var(--surface);
+    border: 2px dashed var(--border);
+    border-radius: var(--r-lg);
+    padding: 4rem 2rem;
+    text-align: center;
+    color: var(--t3);
+}
+
+.empty-state-icon {
+    margin: 0 auto 1rem auto;
+    color: var(--brand-dim);
+}
+
+.empty-state-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--t2);
+    margin: 0 0 0.5rem 0;
+}
+
+.empty-state-desc {
+    font-size: 0.9rem;
+    max-width: 320px;
+    margin: 0 auto 1.5rem auto;
+    line-height: 1.4;
+}
+
+/* Animaciones Generales */
+.fade-in {
+    animation: fadeInEffect 0.3s ease-out forwards;
+}
+
+@keyframes fadeInEffect {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+.ai-loader-spinner {
+    box-sizing: border-box;
+}
+
+/* Estilos Premium para Text-To-Speech (TTS) */
+.btn-card-tts {
+    position: absolute;
+    top: 1.15rem;
+    right: 1.25rem;
+    background: transparent;
+    border: none;
+    color: var(--t3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem;
+    border-radius: var(--r-sm);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    z-index: 10;
+}
+
+.btn-card-tts:hover {
+    color: var(--brand);
+    background: var(--border-light);
+    border-color: var(--border);
+    transform: scale(1.08);
+}
+
+.btn-card-tts:active {
+    transform: scale(0.95);
+}
+
+/* Estilos de Carpetas/Contenedores de Mazos */
+.category-group {
+    margin-top: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.category-header {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0 12px 12px 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--sh);
+}
+
+.category-chevron {
+    transition: transform 0.25s ease;
+}
+
+/* Pestaña superior del archivador físico */
+.category-header::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: -1px;
+    width: 140px;
+    height: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: 8px 12px 0 0;
+    z-index: 1;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ocultar borde superior del cuerpo de la carpeta debajo de la pestaña */
+.category-header::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    width: 138px;
+    height: 4px;
+    background: var(--surface);
+    z-index: 2;
+    margin-bottom: -2px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.category-header:hover {
+    background: var(--border-light);
+    border-color: var(--brand-dim);
+    transform: translateY(-2px);
+    box-shadow: var(--sh-md);
+}
+
+.category-header:hover::before {
+    background: var(--border-light);
+    border-color: var(--brand-dim);
+}
+
+.category-header:hover::after {
+    background: var(--border-light);
+}
+
+/* Ajustes para el Modo Carpeta colapsada */
+.category-group.collapsed .category-header {
+    border-radius: 12px;
+}

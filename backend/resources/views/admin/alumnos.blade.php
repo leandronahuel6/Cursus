@@ -3,7 +3,8 @@
 @section('title', 'Admin — Alumnos | Cursus')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin-alumnos.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin/shared.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin/alumnos.css') }}">
 @endpush
 
 @section('mobile-header')
@@ -45,13 +46,13 @@
         <input
           type="text"
           id="aa-legajo"
-          class="aa-input"
+          class="admin-input"
           placeholder="Ej: 12345"
           maxlength="20"
           required
           autocomplete="off"
         >
-        <button type="submit" class="aa-btn-search" id="aa-btn-search">
+        <button type="submit" class="admin-btn-search" id="aa-btn-search">
           Buscar
         </button>
       </div>
@@ -66,7 +67,7 @@
       <h2 class="aa-search-title" style="margin: 0; font-size: 1.1rem;">Directorio de Alumnos</h2>
     </div>
     <div class="aa-materias-table-wrap" style="max-height: 380px; overflow-y: auto;">
-      <table class="aa-table">
+      <table class="admin-table">
         <thead>
           <tr>
             <th>Nombre</th>
@@ -76,7 +77,7 @@
           </tr>
         </thead>
         <tbody id="aa-directory-body">
-          <tr><td colspan="4" class="aa-table-empty">Cargando alumnos registrados...</td></tr>
+          <tr><td colspan="4" class="admin-table-empty">Cargando alumnos registrados...</td></tr>
         </tbody>
       </table>
     </div>
@@ -98,7 +99,7 @@
           </div>
         </div>
         <div style="display: flex; gap: 0.5rem; align-items: center;">
-          <button type="button" class="aa-btn-cancel" onclick="window.aaVolverAlDirectorio()" style="display: flex; align-items: center; gap: 6px; padding: 0.5rem 0.85rem; font-size: 0.82rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--t2); cursor: pointer; transition: all 0.2s;">
+          <button type="button" class="admin-btn-cancel" onclick="window.aaVolverAlDirectorio()" style="display: flex; align-items: center; gap: 6px; padding: 0.5rem 0.85rem; font-size: 0.82rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--t2); cursor: pointer; transition: all 0.2s;">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.8;"><path d="m12 19-7-7 7-7M5 12h14"/></svg>
             Volver al directorio
           </button>
@@ -147,7 +148,7 @@
         </div>
       </div>
       <div class="aa-materias-table-wrap">
-        <table class="aa-table">
+        <table class="admin-table">
           <thead>
             <tr>
               <th>Materia</th>
@@ -167,16 +168,16 @@
 
 
   <!-- Modal confirmación baja -->
-  <div class="aa-confirm-overlay" id="aa-confirm-overlay" hidden>
-    <div class="aa-confirm-box">
-      <div class="aa-confirm-icon">
+  <div class="admin-confirm-overlay" id="aa-confirm-overlay" hidden>
+    <div class="admin-confirm-box">
+      <div class="admin-confirm-icon">
         <svg width="24" height="24" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#trash-2"></use></svg>
       </div>
-      <h3 class="aa-confirm-title">¿Dar de baja al alumno?</h3>
-      <p class="aa-confirm-msg" id="aa-confirm-msg"></p>
-      <div class="aa-confirm-actions">
-        <button class="aa-btn-cancel" onclick="window.aaCancelEliminar()">Cancelar</button>
-        <button class="aa-btn-confirm-delete" id="aa-btn-confirm" onclick="window.aaConfirmarEliminar()">Eliminar</button>
+      <h3 class="admin-confirm-title">¿Dar de baja al alumno?</h3>
+      <p class="admin-confirm-msg" id="aa-confirm-msg"></p>
+      <div class="admin-confirm-actions">
+        <button class="admin-btn-cancel" onclick="window.aaCancelEliminar()">Cancelar</button>
+        <button class="admin-btn-confirm-delete" id="aa-btn-confirm" onclick="window.aaConfirmarEliminar()">Eliminar</button>
       </div>
     </div>
   </div>
@@ -185,5 +186,5 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/admin-alumnos.js') }}"></script>
+<script src="{{ asset('js/views/admin/alumnos.js') }}"></script>
 @endpush

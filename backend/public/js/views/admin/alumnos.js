@@ -53,13 +53,13 @@
 
   function estadoBadge(estado) {
     const map = {
-      aprobada: { cls: 'badge-aprobada', label: 'Aprobada' },
-      cursando: { cls: 'badge-cursando', label: 'Cursando' },
-      regular:  { cls: 'badge-regular',  label: 'Regular'  },
-      libre:    { cls: 'badge-libre',    label: 'Libre'    },
+      aprobada: { cls: 'badge-success', label: 'Aprobada' },
+      cursando: { cls: 'badge-info',    label: 'Cursando' },
+      regular:  { cls: 'badge-warning', label: 'Regular'  },
+      libre:    { cls: 'badge-muted',   label: 'Libre'    },
     };
-    const e = map[estado] ?? { cls: 'badge-libre', label: estado ?? '—' };
-    return `<span class="aa-badge ${e.cls}">${e.label}</span>`;
+    const e = map[estado] ?? { cls: 'badge-muted', label: estado ?? '—' };
+    return `<span class="admin-badge ${e.cls}">${e.label}</span>`;
   }
 
   function showError(msg) {
@@ -172,7 +172,7 @@
       : materias.filter(m => m.estado === filter);
 
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4" class="aa-table-empty">Sin materias en estado "${filter}"</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="4" class="admin-table-empty">Sin materias en estado "${filter}"</td></tr>`;
     } else {
       filtered.forEach(m => {
         const tr = document.createElement('tr');
@@ -257,7 +257,7 @@
     tbody.innerHTML = '';
     
     if (alumnos.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" class="aa-table-empty">No hay alumnos registrados.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="admin-table-empty">No hay alumnos registrados.</td></tr>';
       return;
     }
 
@@ -268,7 +268,7 @@
         <td>${u.legajo || '—'}</td>
         <td style="color: var(--t2); font-size: 0.88rem;">${u.email}</td>
         <td style="text-align: right;">
-          <button type="button" class="aa-btn-search" onclick="window.aaSeleccionarPreview('${u.legajo}')" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: all 0.2s;">
+          <button type="button" class="admin-btn-search" onclick="window.aaSeleccionarPreview('${u.legajo}')" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: all 0.2s;">
             Ver Expediente
           </button>
         </td>

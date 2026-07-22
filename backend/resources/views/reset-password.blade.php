@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cursus - Restablecer contraseña</title>
+    <link rel="stylesheet" href="{{ asset('css/base/fonts.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/base/variables.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/base/reset.css') }}">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
 </head>
 <body>
@@ -56,6 +59,6 @@
             </div>
         </div>
     </main>
-    <script src="{{ asset('js/reset-password.js') }}"></script>
+    <script src="{{ asset('js/views/reset-password.js') }}"></script>
 </body>
 </html>

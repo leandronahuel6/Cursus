@@ -5,40 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" id="color-scheme-meta" content="light">
   <title>@yield('title', 'Cursus - Asistente de Estudiantes')</title>
+  @include('partials._css-modules')
+  <link rel="stylesheet" href="{{ asset('css/base/fonts.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/base/variables.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/base/reset.css') }}">
   <link rel="stylesheet" href="{{ asset('css/main.css') }}?v={{ filemtime(public_path('css/main.css')) }}">
   <link rel="stylesheet" href="{{ asset('css/layout/sidebar.css') }}">
   <link rel="icon" href="{{ asset('assets/icons/cursus-logo.svg') }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ asset('css/components/pomo-float.css') }}">
   <link rel="stylesheet" href="{{ asset('css/components/toast.css') }}">
   @stack('styles')
-  <style>
-    .dashboard-bg {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-image: var(--bg-url);
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        opacity: var(--bg-opacity);
-        filter: grayscale(15%) blur(var(--bg-blur));
-        z-index: -2;
-        pointer-events: none;
-        transition: opacity 0.3s, filter 0.3s, background-image 0.3s;
-    }
-    .contact-range {
-        width: 100%;
-        height: 6px;
-        background: var(--card-border);
-        border-radius: 3px;
-        outline: none;
-        accent-color: var(--brand);
-        margin-top: 8px;
-        cursor: pointer;
-    }
-  </style>
 </head>
 
 <body style="visibility:hidden" class="{{ Request::routeIs('admin.*') ? 'route-admin' : '' }}">
@@ -136,7 +112,6 @@
   </div><!-- /main -->
 
   <!-- ======== BOTTOM NAV (mobile) ======== -->
-  <!-- ======== BOTTOM NAV (mobile) ======== -->
   <!-- Barra Admin (se muestra solo para admins vía CSS en mobile) -->
   <nav class="bnav admin-bnav">
     <div class="bnav-row">
@@ -152,7 +127,7 @@
         <svg class="bn-ic" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#graduation-cap') }}"></use></svg>
         <span class="bn-lbl">Plan Estudios</span>
       </div>
-      <div class="bn {{ !Request::routeIs('admin.*') ? 'on' : '' }}" id="btn-toggle-student-menu" onclick="toggleStudentMenu(event)">
+      <div class="bn {{ !Request::routeIs('admin.*') ? 'on' : '' }}" id="btn-toggle-student-menu">
         <span class="bnav-icon-wrapper" style="position: relative; display: flex; align-items: center; justify-content: center;">
           <svg class="bn-ic" style="transform: rotate(0deg); transition: transform 0.2s;" id="student-menu-caret" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg#chevron-up') }}"></use></svg>
         </span>
@@ -435,41 +410,17 @@
 <div class="toast-container" id="toast-container"></div>
 
 <!-- Scripts -->
-<script src="{{ asset('js/theme.js') }}?v={{ filemtime(public_path('js/theme.js')) }}"></script>
-<script src="{{ asset('js/animations.js') }}"></script>
-<script src="{{ asset('js/celebracion.js') }}"></script>
+<script src="{{ asset('js/shared/theme.js') }}?v={{ filemtime(public_path('js/shared/theme.js')) }}"></script>
+<script src="{{ asset('js/shared/animations.js') }}"></script>
+<script src="{{ asset('js/shared/celebracion.js') }}"></script>
 <script src="{{ asset('js/shared/sidebar.js') }}"></script>
 <script src="{{ asset('js/shared/toast.js') }}"></script>
-<script src="{{ asset('js/profile.js') }}"></script>
-<script type="module" src="{{ asset('js/pomo-float.js') }}?v={{ filemtime(public_path('js/pomo-float.js')) }}"></script>
+<script src="{{ asset('js/shared/profile.js') }}"></script>
+<script type="module" src="{{ asset('js/views/pomo-float.js') }}?v={{ filemtime(public_path('js/views/pomo-float.js')) }}"></script>
 @if(Request::routeIs('dashboard') || Request::routeIs('area-estudio'))
-<script src="{{ asset('js/onboarding.js') }}?v={{ filemtime(public_path('js/onboarding.js')) }}"></script>
+<script src="{{ asset('js/views/onboarding.js') }}?v={{ filemtime(public_path('js/views/onboarding.js')) }}"></script>
 @endif
-<script>
-  function toggleStudentMenu(event) {
-      if (event) event.stopPropagation();
-      const popup = document.getElementById('student-menu-popup');
-      const caret = document.getElementById('student-menu-caret');
-      if (popup && caret) {
-          popup.classList.toggle('open');
-          if (popup.classList.contains('open')) {
-              caret.style.transform = 'rotate(180deg)';
-          } else {
-              caret.style.transform = 'rotate(0deg)';
-          }
-      }
-  }
-
-  document.addEventListener('click', function(event) {
-      const popup = document.getElementById('student-menu-popup');
-      const caret = document.getElementById('student-menu-caret');
-      const trigger = document.getElementById('btn-toggle-student-menu');
-      if (popup && popup.classList.contains('open') && !popup.contains(event.target) && (!trigger || !trigger.contains(event.target))) {
-          popup.classList.remove('open');
-          if (caret) caret.style.transform = 'rotate(0deg)';
-      }
-  });
-</script>
+<script src="{{ asset('js/shared/app-init.js') }}"></script>
 @stack('scripts')
 
 </body>

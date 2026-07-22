@@ -166,5 +166,5 @@
 @endsection
 
 @push('scripts')
-  <script src="{{ asset('js/dashboard.js') }}"></script>
+  <script src="{{ asset('js/views/dashboard.js') }}"></script>
 @endpush
