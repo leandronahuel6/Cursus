@@ -1,0 +1,57 @@
+.modal-field { display: flex; flex-direction: column; gap: 6px; }
+.modal-label { font-size: 11.5px; font-weight: 600; color: var(--t2); text-transform: uppercase; letter-spacing: 0.02em; }
+
+.modal-input {
+  padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--r-sm);
+  font-size: 13px; color: var(--t1); transition: border-color .15s;
+}
+.modal-input:focus { border-color: var(--brand); outline: none; }
+.modal-textarea { resize: vertical; min-height: 80px; }
+
+.modal-inp-readonly {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 8px 12px;
+  font-size: 13px; color: var(--t1);
+}
+
+.modal-select {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 8px 12px;
+  font-size: 13px; color: var(--t1); cursor: pointer;
+}
+
+.contact-input {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 8px 12px;
+  font-size: 13px; color: var(--t1); transition: border-color .15s;
+}
+.contact-input:focus { border-color: var(--brand); outline: none; }
+
+body.dark-mode .modal-input,
+body.dark-mode .modal-inp-readonly,
+body.dark-mode .modal-select,
+body.dark-mode .contact-input {
+  background: #1f2937;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--t1);
+}
+body.dark-mode .modal-input:focus,
+body.dark-mode .contact-input:focus {
+  border-color: var(--brand);
+}
+body.dark-mode select.modal-input,
+body.dark-mode select.modal-input option {
+  background-color: #1f2937;
+  color: var(--t1);
+}
+
+.contact-range {
+  width: 100%;
+  height: 6px;
+  background: var(--card-border);
+  border-radius: 3px;
+  outline: none;
+  accent-color: var(--brand);
+  margin-top: 8px;
+  cursor: pointer;
+}
