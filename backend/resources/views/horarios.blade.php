@@ -282,5 +282,5 @@
 @endsection
 
 @push('scripts')
-  <script src="{{ asset('js/horarios.js') }}"></script>
+  <script type="module" src="{{ asset('js/views/horarios/horarios-main.js') }}"></script>
 @endpush

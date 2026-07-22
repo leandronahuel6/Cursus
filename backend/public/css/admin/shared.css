@@ -1,0 +1,234 @@
+/**
+ * @fileoverview Estilos compartidos entre las vistas del panel de administración.
+ * Extraído de css/admin/alumnos.css para aplicar DRY entre las vistas
+ * alumnos, cuotas y plan-estudios.
+ * Debe cargarse ANTES del CSS específico de cada vista.
+ * 
+ * Convención de nomenclatura: prefijo "admin-" para todas las clases compartidas,
+ * distinguiéndolas de las clases específicas de cada vista (aa-, ac-, pe-).
+ */
+
+/* ---- Inputs & selects ---- */
+
+.admin-input {
+  flex: 1;
+  padding: 9px 13px;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  outline: none;
+  transition: border-color .15s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.admin-input:focus { border-color: var(--brand); }
+
+select.admin-input {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 36px;
+}
+
+.admin-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.admin-select-wrapper select {
+  width: 100%;
+}
+
+.admin-select-chevron {
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+  color: var(--text-muted);
+}
+
+/* ---- Buttons ---- */
+
+.admin-btn-search {
+  padding: 9px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background: var(--brand);
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: opacity .15s;
+  white-space: nowrap;
+}
+.admin-btn-search:hover:not(:disabled) { opacity: .88; }
+.admin-btn-search:disabled { opacity: .55; cursor: not-allowed; }
+
+.admin-btn-cancel {
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background .15s;
+}
+.admin-btn-cancel:hover { background: var(--border); }
+
+/* ---- Tables ---- */
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 9px 12px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-table tr:last-child td { border-bottom: none; }
+
+.admin-table-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 20px !important;
+}
+
+/* ---- Text utilities ---- */
+
+.text-ok   { color: var(--success, #38a169); }
+.text-warn { color: var(--warning, #d97706); }
+
+/* ---- Badges / status pills ---- */
+
+.admin-badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-success { background: rgba(56,161,105,.15);  color: #38a169; } /* Materia aprobada · Cuota pagada */
+.badge-info    { background: rgba(66,153,225,.15);  color: #4299e1; } /* Materia cursando */
+.badge-warning { background: rgba(237,137,54,.15);  color: #ed8936; } /* Materia regular */
+.badge-muted   { background: var(--border);          color: var(--text-muted); } /* Materia libre · Cuota pendiente */
+
+/* ---- Confirm/delete modal ---- */
+
+.admin-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+.admin-confirm-overlay[hidden] { display: none; }
+
+.admin-confirm-box {
+  background: var(--card);
+  border: 1px solid rgba(229,62,62,.35);
+  border-radius: var(--r-lg);
+  padding: 32px 32px 28px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+.admin-confirm-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(229,62,62,.15);
+  border: 1px solid rgba(229,62,62,.25);
+  color: #e53e3e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-confirm-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.admin-confirm-msg {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 300px;
+}
+
+.admin-confirm-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  width: 100%;
+}
+.admin-confirm-actions button {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.admin-btn-confirm-delete {
+  flex: 1;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: #e53e3e;
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.admin-btn-confirm-delete:hover:not(:disabled) { opacity: .88; }
+.admin-btn-confirm-delete:disabled { opacity: .55; cursor: not-allowed; }
+
+
+/* ============================
+   Responsive (shared)
+   ============================ */
+
+@media (max-width: 600px) {
+  .admin-btn-search {
+    width: 100%;
+    justify-content: center;
+    padding: 11px 20px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .admin-btn-search {
+    width: 100%;
+    justify-content: center;
+  }
+}

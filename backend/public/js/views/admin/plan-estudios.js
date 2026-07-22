@@ -73,7 +73,7 @@
       tbody.innerHTML = '';
 
       if (lista.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="aa-table-empty">Sin materias</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="admin-table-empty">Sin materias</td></tr>';
         return;
       }
 

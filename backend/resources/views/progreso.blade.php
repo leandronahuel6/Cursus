@@ -451,5 +451,5 @@
 @endsection
 
 @push('scripts')
-  <script src="{{ asset('js/progreso.js') }}"></script>
+  <script type="module" src="{{ asset('js/views/progreso/progreso-main.js') }}"></script>
 @endpush

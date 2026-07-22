@@ -21,6 +21,12 @@ A continuación se detalla la nueva estructura propuesta, diseñada para respeta
 
 ```text
 public/
+├── assets/
+│   ├── fonts/               # Webfonts (Outfit .woff2)
+│   ├── icons/               # SVG icons, sprite, logo
+│   │   ├── sprite.svg
+│   │   └── cursus-logo.svg
+│   └── img/                 # Imágenes estáticas (fondos, landing, etc.)
 ├── css/
 │   ├── base/               # Estilos fundamentales y reseteos
 │   │   ├── fonts.css       # Declaraciones @font-face
@@ -44,11 +50,17 @@ public/
 │       ├── welcome.css     # Estilos exclusivos de la landing page
 │       ├── dashboard.css   # Panel principal (Inicio)
 │       ├── area-estudio.css# Pomodoro, Kanban
+│       ├── area-estudio-focus.css  # Modo concentración (Zen Mode)
 │       ├── materias.css    # Árbol de correlatividades
 │       ├── alertas.css     # Lista y calendario de alertas
 │       ├── horarios.css    # Grilla del simulador de horarios
 │       ├── progreso.css    # Gráficos (donut, heatmap)
 │       └── auth.css        # Pantallas de login, registro, recuperación de contraseña
+│   └── admin/                     # Estilos del panel de administración
+│       ├── shared.css             # Componentes compartidos: inputs, tablas, botones, modales
+│       ├── alumnos.css            # Exclusivo de la vista Alumnos
+│       ├── cuotas.css             # Exclusivo de la vista Cuotas
+│       └── plan-estudios.css      # Exclusivo de la vista Plan de Estudios
 │
 ├── js/
 │   ├── models/             # Modelos de dominio y máquinas de estado (ES6 Modules)
@@ -64,6 +76,9 @@ public/
 │   │   ├── sidebar.js      # Lógica del menú lateral: colapso, tooltips y navegación activa
 │   │   ├── utils.js        # Funciones auxiliares reutilizables: formato de fechas, cálculo de alertas próximas
 │   │   ├── profile.js      # Menú de perfil de usuario: cambio de carrera, modal de contraseña, cierre de sesión
+│   │   ├── theme.js        # Alternancia modo claro/oscuro
+│   │   ├── celebracion.js  # Efectos de celebración (confeti, animaciones)
+│   │   ├── animations.js   # Animaciones compartidas (landing, transiciones)
 │   │   └── pomo-audio-player.js # Módulo de UI puro: sintetiza alarmas con Web Audio API. Importado por area-estudio.js y pomo-float.js.
 │   └── views/              # Lógica específica por página (orquestadores)
 │       ├── welcome.js      # Animaciones de la landing
@@ -71,6 +86,10 @@ public/
 │       ├── area-estudio.js # Orquestador principal del Área de Estudio
 │       ├── kanban.js       # Lógica separada del Tablero Kanban y Modal de Tareas
 │       ├── lofi-panel.js   # Panel de ruido blanco y música Lo-Fi
+│       ├── pomo-ambient-synth.js  # Sintetizador de ambiente Lo-Fi (Web Audio API)
+│       ├── pomo-focus-canvas.js   # Canvas del modo concentración (partículas, fondo dinámico)
+│       ├── pomo-float.js   # Widget flotante Pomodoro minimizable (importa PomodoroStateService)
+│       ├── onboarding.js   # Flujo de onboarding para nuevos usuarios
 │       ├── materias.js     # Interacciones del árbol de materias
 │       ├── alertas/        # Lógica compleja de la página de alertas dividida
 │       │   ├── alertas-data.js     # Manejo de datos y mocks
@@ -90,15 +109,26 @@ public/
 │       ├── login.js
 │       ├── register.js
 │       ├── forgot-password.js
-│       └── reset-password.js
+│       ├── reset-password.js
+│       └── admin/                  # Lógica del panel de administración
+│           ├── alumnos.js
+│           ├── cuotas.js
+│           └── plan-estudios.js
 ```
 
 ### Estructura de Vistas Blade (`resources/views/`)
 
 ```text
 resources/views/
+├── admin/                       # Panel de administración
+│   ├── alumnos.blade.php
+│   ├── cuotas.blade.php
+│   └── plan-estudios.blade.php
+├── emails/                      # Plantillas de correo electrónico
+│   ├── contact.blade.php
+│   └── welcome.blade.php
 ├── layouts/
-│   └── app.blade.php           # Plantilla base. Ahora solo orquesta la carga de CSS modular y partials.
+│   └── app.blade.php           # Plantilla base. Orquesta la carga de CSS modular y partials.
 ├── partials/                   # Fragmentos reutilizables de UI general
 │   ├── sidebar.blade.php       # Navegación izquierda
 │   ├── mobile-nav.blade.php    # Navegación inferior
@@ -114,10 +144,21 @@ resources/views/
 │   ├── _pricing.blade.php      # Tabla de precios
 │   ├── _testimonials.blade.php # Reseñas
 │   └── _footer.blade.php       # Enlaces al pie
-├── dashboard.blade.php
+├── alertas.blade.php
 ├── area-estudio.blade.php
+├── beneficios.blade.php
+├── contacto.blade.php
+├── dashboard.blade.php
+├── flashcards.blade.php
+├── forgot-password.blade.php
+├── horarios.blade.php
+├── login.blade.php
 ├── materias.blade.php
-└── ... (resto de vistas)
+├── placeholder.blade.php
+├── progreso.blade.php
+├── register.blade.php
+├── reset-password.blade.php
+└── welcome.blade.php
 ```
 
 ---
@@ -144,12 +185,12 @@ window.showToast("Información", "info", 6000); // duración custom en ms
 
 ### Tipos soportados
 
-| `type`    | Ícono Sprite      | ID en Sprite     | Color borde     |
-| --------- | ----------------- | ---------------- | --------------- |
-| `success` | `circle-check.svg`| `#circle-check`  | `var(--green)`  |
-| `error`   | `circle-x.svg`    | `#circle-x`      | `var(--red)`    |
-| `warn`    | `circle-alert.svg`| `#circle-alert`  | `var(--orange)` |
-| `info`    | `info.svg`        | `#info`          | `var(--brand)`  |
+| `type`    | Ícono Sprite       | ID en Sprite    | Color borde     |
+| --------- | ------------------ | --------------- | --------------- |
+| `success` | `circle-check.svg` | `#circle-check` | `var(--green)`  |
+| `error`   | `circle-x.svg`     | `#circle-x`     | `var(--red)`    |
+| `warn`    | `circle-alert.svg` | `#circle-alert` | `var(--orange)` |
+| `info`    | `info.svg`         | `#info`         | `var(--brand)`  |
 
 ### Regla de Oro
 

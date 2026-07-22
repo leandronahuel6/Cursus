@@ -127,13 +127,13 @@
     tbody.innerHTML = '';
 
     if (alumnos.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" class="aa-table-empty">Sin alumnos registrados</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="admin-table-empty">Sin alumnos registrados</td></tr>';
     } else {
       alumnos.forEach(a => {
         const tr = document.createElement('tr');
         const badge = a.pagado
-          ? '<span class="aa-badge badge-aprobada">Pagó</span>'
-          : '<span class="aa-badge badge-libre">Pendiente</span>';
+          ? '<span class="admin-badge badge-success">Pagó</span>'
+          : '<span class="admin-badge badge-muted">Pendiente</span>';
         tr.innerHTML = `
           <td>${a.nombre}</td>
           <td>${a.legajo ?? '—'}</td>
