@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" id="color-scheme-meta" content="light">
   <title>@yield('title', 'Cursus - Asistente de Estudiantes')</title>
+  @include('partials._css-modules')
+  <link rel="stylesheet" href="{{ asset('css/base/fonts.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/base/variables.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/base/reset.css') }}">
   <link rel="stylesheet" href="{{ asset('css/main.css') }}?v={{ filemtime(public_path('css/main.css')) }}">
   <link rel="stylesheet" href="{{ asset('css/layout/sidebar.css') }}">
   <link rel="icon" href="{{ asset('assets/icons/cursus-logo.svg') }}" type="image/svg+xml">

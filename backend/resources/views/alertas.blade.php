@@ -2,6 +2,10 @@
 
 @section('title', 'Cursus - Alertas y Vencimientos')
 
+@push('styles')
+  <link rel="stylesheet" href="{{ asset('css/views/alertas.css') }}">
+@endpush
+
 @section('mobile-header')
   <!-- Mobile Header -->
   <div class="mob-hdr">

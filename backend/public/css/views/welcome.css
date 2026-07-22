@@ -133,9 +133,10 @@ body.dark-mode {
     background-image: var(--bg-gradient-aurora);
 }
 
-html {
+/* Moved to base/reset.css */
+/* html {
     scroll-behavior: smooth;
-}
+} */
 
 body {
     background-color: var(--bg-color);

@@ -1,121 +1,12 @@
 /*==============================
-   LOCAL FONTS (Outfit)
+   LOCAL FONTS (Outfit) — MOVED TO base/fonts.css
 ============================== */
-@font-face {
-  font-family: 'Outfit';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url('../assets/fonts/outfit-v15-latin-300.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Outfit';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('../assets/fonts/outfit-v15-latin-regular.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Outfit';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('../assets/fonts/outfit-v15-latin-500.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Outfit';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../assets/fonts/outfit-v15-latin-600.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Outfit';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../assets/fonts/outfit-v15-latin-700.woff2') format('woff2');
-}
+/* @font-face { ... } — ver css/base/fonts.css */
 
 /*==============================
-   VARIABLES
+   VARIABLES — MOVED TO base/variables.css
 ============================== */
-:root {
-  /* Sin esto, si el SO del usuario está en modo oscuro, el navegador dibuja
-     los controles nativos (el popup de <select>, por ejemplo) con su tema
-     oscuro aunque el sitio esté en modo claro, dejando el texto invisible. */
-  color-scheme: light;
-
-  --brand:        #4f46e5;
-  --brand-hover:  #4338ca;
-  --brand-light:  #eef2ff;
-  --brand-dim:    #c7d2fe;
-
-  --green-light:  #d1fae5;
-
-  --sidebar-bg:   #111827;
-  --sidebar-w:    220px;
-  --sidebar-w-collapsed: 72px;
-
-  --bg:           #f4f5fb;
-  --surface:      #ffffff;
-  --card:         #ffffff;
-  --border:       #e5e7eb;
-  --border-light: #f3f4f6;
-
-  --t1: #111827;
-  --t2: #374151;
-  --t3: #6b7280;
-  --tm: #9ca3af;
-
-  --green:    #059669;
-  --orange:   #ea580c;
-  --yellow:   #d97706;
-  --red:      #dc2626;
-
-  --r:    10px;
-  --r-sm: 6px;
-  --r-lg: 14px;
-  --topbar-h: 60px;
-
-  --sh:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-  --sh-md: 0 4px 14px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.05);
-
-  /* Typography */
-  --font-display: "Outfit", system-ui, sans-serif;
-  --font-body: "Outfit", system-ui, sans-serif;
-}
-
-body.dark-mode {
-  color-scheme: dark;
-  --brand: #6366f1;
-  --brand-hover: #818cf8;
-  --brand-light: rgba(99, 102, 241, 0.12);
-  --brand-dim: rgba(99, 102, 241, 0.25);
-
-  --bg: #0b0f1a;
-  --surface: rgba(30, 41, 59, 0.78);
-  --card: #1f2937;
-  --border: rgba(255, 255, 255, 0.12);
-  --border-light: rgba(255, 255, 255, 0.07);  
-  --t1: #f3f4f6;
-  --t2: #cbd5e1;
-  --t3: #94a3b8;
-  --tm: #64748b;
-
-  --brand-light: rgba(99, 102, 241, 0.18);
-  --brand-dim: rgba(129, 140, 248, 0.45);
-  --green-light: rgba(16, 185, 129, 0.18);
-
-  --sh:    0 1px 3px rgba(0,0,0,.5), 0 1px 2px rgba(0,0,0,.35);
-  --sh-md: 0 4px 14px rgba(0,0,0,.5), 0 2px 4px rgba(0,0,0,.4);
-
-  background-image:
-    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.08) 0px, transparent 50%);
-  background-size: 100% 100%, 100% 100%;
-  background-attachment: fixed;
-}
+/* :root { ... } y body.dark-mode { ... } → ver css/base/variables.css */
 
 body.dark-mode .topbar {
   background: rgba(7, 10, 19, 0.82);
@@ -150,19 +41,8 @@ body.dark-mode .contact-title img {
   filter: invert(1);
 }
 
-/* Skeleton: placeholder visual mientras se carga el dato real desde la API,
-   para no mostrar valores de ejemplo (0%, 0 días, etc.) como si fueran reales. */
-.skel {
-  color: transparent !important;
-  background: linear-gradient(90deg, var(--border-light) 25%, var(--border) 37%, var(--border-light) 63%);
-  background-size: 400% 100%;
-  animation: skel-loading 1.4s ease infinite;
-  border-radius: 4px;
-}
-@keyframes skel-loading {
-  0% { background-position: 100% 50%; }
-  100% { background-position: 0 50%; }
-}
+/* .skel — MOVED TO base/reset.css */
+/* .skel { ... } → ver css/base/reset.css */
 
 body.dark-mode .contact-input {
   background: #1f2937;
@@ -471,24 +351,9 @@ body.dark-mode .btn-modal-action.cancel:hover {
 }
 
 /* ==============================
-   RESET
+   RESET — MOVED TO base/reset.css
 ============================== */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body {
-  max-width: 100%;
-  overflow-x: hidden;
-}
-html { font-size: 15px; }
-body {
-  font-family: var(--font-body);
-  color: var(--t1);
-  background: var(--bg);
-  min-height: 100vh;
-  overflow-y: overlay;
-}
-button, select, input, textarea { font-family: inherit; }
-button { cursor: pointer; border: none; background: none; outline: none; }
-a { text-decoration: none; color: inherit; }
+/* *, html, body, button, a { ... } → ver css/base/reset.css */
 
 .theme-toggle-btn {
   background: #ffffff;
@@ -552,9 +417,8 @@ body.dark-mode .theme-toggle-btn .icon-moon { display: none; }
   font-size: 13px;
 }
 
-h1, h2, h3, h4, h5, h6, .display-text {
-  font-family: var(--font-display);
-}
+/* h1, h2, ... — MOVED TO base/reset.css */
+/* h1, h2, h3, h4, h5, h6, .display-text { font-family: var(--font-display); } */
 
 /* ==============================
    APP LAYOUT
@@ -655,7 +519,8 @@ h1, h2, h3, h4, h5, h6, .display-text {
   background: #f97316; flex-shrink: 0;
   animation: blink 2s ease-in-out infinite;
 }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+/* @keyframes blink moved to base/reset.css */
+/* @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} } */
 .alert-txt { flex: 1; line-height: 1.4; }
 .alert-txt strong { font-weight: 600; }
 .alert-x {
@@ -1274,12 +1139,13 @@ font-size: 13px; font-weight: 600;
 /* ==============================
    PÁGINA DE ALERTAS
 ============================= */
-.alertas-grid {
+/* MOVED TO public/css/views/alertas.css */
+/* .alertas-grid {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
   gap: 20px;
   align-items: start;
-}
+} */
 
 /* Selector de Carrera en Topbar */
 .career-selector-wrap {
@@ -1335,8 +1201,8 @@ font-size: 13px; font-weight: 600;
   box-shadow: var(--sh);
 }
 
-/* Alertas List / Agenda */
-.alert-list-container {
+/* Alertas List / Agenda — MOVED TO public/css/views/alertas.css */
+/* .alert-list-container {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -1457,10 +1323,10 @@ font-size: 13px; font-weight: 600;
   background: #fef2f2;
   color: var(--red);
   border-color: #fca5a5;
-}
+} */
 
-/* Calendario */
-.calendar-card-wrap {
+/* Calendario — MOVED TO public/css/views/alertas.css */
+/* .calendar-card-wrap {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
@@ -1576,9 +1442,6 @@ font-size: 13px; font-weight: 600;
   height: 4px;
   border-radius: 50%;
 }
-
-/* Popover de detalle del día: se abre anclado a la celda tocada, en vez de
-   un cuadro fijo debajo de todo el calendario. */
 .calendar-day-popover {
   position: absolute;
   top: calc(100% + 4px);
@@ -1620,7 +1483,7 @@ font-size: 13px; font-weight: 600;
   white-space: normal;
   word-break: break-word;
   margin-bottom: 3px;
-}
+} */
 
 /* Tarjeta de Pago de Cuota */
 .payment-card-box {
@@ -1728,8 +1591,8 @@ pointer-events: none;
   color: var(--green);
 }
 
-/* Formulario de carga de alertas */
-.alert-form-card {
+/* Formulario de carga de alertas — MOVED TO public/css/views/alertas.css */
+/* .alert-form-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
@@ -1821,7 +1684,7 @@ pointer-events: none;
 }
 .btn-alert-submit:hover {
   background: var(--brand-hover);
-}
+} */
 
 
 /* ==============================
@@ -4365,14 +4228,15 @@ font-size: 11px;
 }
 
 /* Desactiva animaciones y transiciones en toda la app cuando el switch está apagado */
-body.no-animations *,
+/* Moved to base/reset.css */
+/* body.no-animations *,
 body.no-animations *::before,
 body.no-animations *::after {
   animation-duration: 0s !important;
   animation-delay: 0s !important;
   transition-duration: 0s !important;
   transition-delay: 0s !important;
-}
+} */
 
 /* .sb-user-caret y .menu-open → ver css/layout/sidebar.css */
 
@@ -4549,7 +4413,7 @@ body.dark-mode .hm-cell:not(.l1):not(.l2):not(.l3) { background: rgba(255, 255, 
 
 body.dark-mode .sim-subject-badge.b-lib,
 body.dark-mode .edit-name-prompt:focus,
-body.dark-mode .alert-priority-baja,
+/* body.dark-mode .alert-priority-baja, — MOVED to public/css/views/alertas.css */
 body.dark-mode .sub-status-badge.disponible,
 body.dark-mode .legend-color.disponible {
   background: rgba(255, 255, 255, 0.08);

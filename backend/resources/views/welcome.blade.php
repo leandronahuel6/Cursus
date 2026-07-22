@@ -13,6 +13,9 @@
     <meta property="og:image" content="{{ asset('img/landing_hero.png') }}">
     
     <title>Cursus - Tu Asistente Universitario UTN Haedo</title>
+    <link rel="stylesheet" href="{{ asset('css/base/fonts.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/base/variables.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/base/reset.css') }}">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="icon" href="{{ asset('assets/icons/cursus-logo.svg') }}" type="image/svg+xml">
     <script src="https://unpkg.com/lucide@latest"></script>

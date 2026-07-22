@@ -1,0 +1,97 @@
+/* ==============================
+	RESET
+============================== */
+html {
+    scroll-behavior: smooth;
+}
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+html {
+    font-size: 15px;
+}
+body {
+    font-family: var(--font-body);
+    color: var(--t1);
+    background: var(--bg);
+    min-height: 100vh;
+    overflow-y: overlay;
+}
+button,
+select,
+input,
+textarea {
+    font-family: inherit;
+}
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    outline: none;
+}
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.display-text {
+    font-family: var(--font-display);
+}
+
+/* Skeleton: placeholder visual mientras se carga el dato real desde la API */
+.skel {
+    color: transparent !important;
+    background: linear-gradient(
+        90deg,
+        var(--border-light) 25%,
+        var(--border) 37%,
+        var(--border-light) 63%
+    );
+    background-size: 400% 100%;
+    animation: skel-loading 1.4s ease infinite;
+    border-radius: 4px;
+}
+@keyframes skel-loading {
+    0% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0 50%;
+    }
+}
+
+/* Desactiva animaciones y transiciones en toda la app cuando el switch está apagado */
+body.no-animations *,
+body.no-animations *::before,
+body.no-animations *::after {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+}
+
+/* Blink utility — usado en .alert-dot y .study-live-dot */
+@keyframes blink {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.3;
+    }
+}
