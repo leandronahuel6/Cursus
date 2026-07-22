@@ -32,8 +32,9 @@ Si durante una tarea creas un nuevo archivo o directorio que no existía, **DEBE
 
 Estas normativas deben cumplirse obligatoriamente al interactuar con el código:
 
-1. **PROHIBIDO el CSS Monolítico:** No agregues clases indiscriminadamente a `main.css`. Busca la capa correspondiente (`components/`, `layout/` o `views/`).
-2. **Carga Bajo Demanda:** Las hojas de estilo de las vistas (`views/*.css`) y los scripts específicos (`views/*.js`) **SOLO** deben cargarse en el Blade de esa vista usando las directivas `@push('styles')` y `@push('scripts')`. No las coloques globalmente en el layout `app.blade.php`.
-3. **JS Desacoplado:** Si un script supera las 200-300 líneas, probablemente mezcla responsabilidades. Separa la obtención de datos (API/Mocks), la manipulación del DOM (Render) y la inicialización (Main).
-4. **Vistas Ligeras:** Ningún archivo `.blade.php` debe superar las 300 líneas. Si una vista tiene una sección muy larga, extráela a un componente o partial usando `@include('partials.nombre')`.
-5. **Cero Lógica en Plantillas:** Evita incrustar `<style>` o `<script>` directamente dentro de un archivo `.blade.php`. Esto impide el cacheo y fomenta el código espagueti.
+1. **SOLID, SRP y Patrones GoF (Backend):** Extrae la lógica de negocio compleja de los controladores hacia clases de servicio (Service Classes) o acciones de un solo propósito (Action Classes). Aplica patrones de diseño GoF para evitar código espagueti o condicionales anidados.
+2. **PROHIBIDO el CSS Monolítico:** No agregues clases indiscriminadamente a `main.css`. Busca la capa correspondiente (`components/`, `layout/` o `views/`).
+3. **Carga Bajo Demanda:** Las hojas de estilo de las vistas (`views/*.css`) y los scripts específicos (`views/*.js`) **SOLO** deben cargarse en el Blade de esa vista usando las directivas `@push('styles')` y `@push('scripts')`. No las coloques globalmente en el layout `app.blade.php`.
+4. **JS Desacoplado:** Si un script supera las 200-300 líneas, probablemente mezcla responsabilidades. Separa la obtención de datos (API/Mocks), la manipulación del DOM (Render) y la inicialización (Main). Asegúrate de acoplar JavaScript al DOM mediante clases o selectores de datos (`data-js="..."`), NUNCA mediante eventos inline.
+5. **Vistas Ligeras:** Ningún archivo `.blade.php` debe superar las 300 líneas. Si una vista tiene una sección muy larga, extráela a un componente o partial usando `@include('partials.nombre')`.
+6. **Cero Lógica en Plantillas:** Evita incrustar `<style>` o `<script>` directamente dentro de un archivo `.blade.php`. Esto impide el cacheo y fomenta el código espagueti.

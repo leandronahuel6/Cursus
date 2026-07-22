@@ -9,6 +9,14 @@ When working on this project, load the relevant skill(s) BEFORE writing any code
 3. Follow ALL patterns and rules from the loaded skill
 4. Multiple skills can apply simultaneously
 
+## Strict Project Rules (Always Mandatory)
+
+- **Architecture & Design (Backend/General):** Rigorously apply SOLID principles, with extreme emphasis on **SRP (Single Responsibility Principle)**. Keep the code DRY and highly decoupled using dependency injection.
+- **Design Patterns (GoF):** Whenever you identify a common design problem, apply the appropriate GoF pattern (Strategy, Factory, Repository, Adapter, etc.) instead of writing spaghetti code or nested conditionals.
+- **Separation of Concerns (Frontend/Blade):** It is STRICTLY FORBIDDEN to use `<style>` and `<script>` tags inside `.blade.php` files. Views must only contain semantic HTML and Blade directives.
+- **Zero Inline Styles & Events:** Do not use `style="..."` attributes or inline events like `onclick="..."` in HTML. All CSS must live in its respective compiled files and JS behavior must be handled via `addEventListener` in separate modular files.
+- **Modern CSS:** Maximize the use of CSS variables (Custom Properties) for colors, spacing, and typography instead of hardcoded values, facilitating maintainability, consistent theming, and accessibility.
+
 ## Skills
 
 | Skill | Trigger | Path |
