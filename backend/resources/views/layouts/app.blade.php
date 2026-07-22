@@ -435,12 +435,12 @@
 <div class="toast-container" id="toast-container"></div>
 
 <!-- Scripts -->
-<script src="{{ asset('js/theme.js') }}?v={{ filemtime(public_path('js/theme.js')) }}"></script>
-<script src="{{ asset('js/animations.js') }}"></script>
-<script src="{{ asset('js/celebracion.js') }}"></script>
+<script src="{{ asset('js/shared/theme.js') }}?v={{ filemtime(public_path('js/shared/theme.js')) }}"></script>
+<script src="{{ asset('js/shared/animations.js') }}"></script>
+<script src="{{ asset('js/shared/celebracion.js') }}"></script>
 <script src="{{ asset('js/shared/sidebar.js') }}"></script>
 <script src="{{ asset('js/shared/toast.js') }}"></script>
-<script src="{{ asset('js/profile.js') }}"></script>
+<script src="{{ asset('js/shared/profile.js') }}"></script>
 <script type="module" src="{{ asset('js/pomo-float.js') }}?v={{ filemtime(public_path('js/pomo-float.js')) }}"></script>
 @if(Request::routeIs('dashboard') || Request::routeIs('area-estudio'))
 <script src="{{ asset('js/onboarding.js') }}?v={{ filemtime(public_path('js/onboarding.js')) }}"></script>

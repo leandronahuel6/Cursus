@@ -70,8 +70,6 @@ public/
 │   │   ├── PomodoroStateService.js # Observer/SSOT: estado canónico del Pomodoro + motor Time Deltas
 │   │   └── PomodoroSyncQueue.js # Cola Offline: Sincronización en segundo plano de sesiones Pomodoro
 │   ├── shared/             # Scripts transversales a toda la app
-│   │   ├── api.js          # Utilidades para llamadas fetch al backend
-│   │   ├── router.js       # Manejo de navegación/historial
 │   │   ├── toast.js        # ★ Sistema centralizado de notificaciones (window.showToast)
 │   │   ├── sidebar.js      # Lógica del menú lateral: colapso, tooltips y navegación activa
 │   │   ├── utils.js        # Funciones auxiliares reutilizables: formato de fechas, cálculo de alertas próximas
