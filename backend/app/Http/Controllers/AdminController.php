@@ -8,8 +8,10 @@ use App\Models\Carrera;
 use App\Models\Materia;
 use App\Models\PagoCuota;
 use App\Models\SesionPomodoro;
+use App\Services\CuotaMensualService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
@@ -78,7 +80,7 @@ class AdminController extends Controller
             ],
             'cuota_actual' => [
                 'periodo'    => $periodoActual,
-                'pagado'     => $pagoActual !== null,
+                'pagado'     => $pagoActual?->estado === 'pagado',
                 'fecha_pago' => $pagoActual?->fecha_pago,
             ],
             'resumen' => [
@@ -100,6 +102,7 @@ class AdminController extends Controller
             ->get(['id', 'nombre', 'legajo', 'email']);
 
         $pagos = PagoCuota::where('periodo', $periodoActual)
+            ->where('estado', 'pagado')
             ->pluck('fecha_pago', 'usuario_id');
 
         $data = $alumnos->map(fn($u) => [
@@ -171,6 +174,202 @@ class AdminController extends Controller
         );
 
         return response()->json($cuota, 201);
+    }
+
+    // Historial completo de cuotas de un alumno buscado por legajo (mismo
+    // patrón de búsqueda que buscarAlumno). Usado por la secretaría para
+    // cotejar contra el informe de tesorería.
+    public function historialAlumno(Request $request, string $legajo)
+    {
+        $usuario = User::where('legajo', $legajo)->where('role', 'general')->first();
+
+        if (!$usuario) {
+            return response()->json(['message' => 'Alumno no encontrado.'], 404);
+        }
+
+        CuotaMensualService::generarFaltantesParaUsuario($usuario);
+
+        $anio = (int) $request->query('anio', CuotaMensualService::anioCicloActual());
+
+        $pagos = PagoCuota::where('usuario_id', $usuario->id)
+            ->where('periodo', 'like', "{$anio}-%")
+            ->orderBy('periodo')
+            ->get();
+
+        return response()->json([
+            'usuario' => [
+                'id'     => $usuario->id,
+                'nombre' => $usuario->nombre,
+                'legajo' => $usuario->legajo,
+            ],
+            'anio' => $anio,
+            'anios_disponibles' => CuotaMensualService::aniosConCuotas($usuario->id),
+            'cuotas' => $pagos->map(fn (PagoCuota $p) => [
+                'id'                 => $p->id,
+                'periodo'            => $p->periodo,
+                'estado'             => $p->estado,
+                'medio_pago'         => $p->medio_pago,
+                'monto_base'         => $p->monto_base,
+                'monto_exigible'     => $p->monto_exigible,
+                'monto_declarado'    => $p->monto_declarado,
+                'fecha_pago'         => $p->fecha_pago?->toDateString(),
+                'tiene_comprobante'  => $p->comprobante_path !== null,
+                'datos_extraidos_ia' => $p->datos_extraidos_ia,
+                'confirmado_en'      => $p->confirmado_en?->toDateTimeString(),
+            ]),
+        ]);
+    }
+
+    // Sirve el archivo del comprobante desde el disco privado. Protegido por
+    // el middleware 'admin' ya aplicado a todo este grupo de rutas.
+    public function comprobante(int $id)
+    {
+        $pago = PagoCuota::find($id);
+
+        if (!$pago || !$pago->comprobante_path || !Storage::disk('local')->exists($pago->comprobante_path)) {
+            return response()->json(['message' => 'Comprobante no encontrado.'], 404);
+        }
+
+        return Storage::disk('local')->response($pago->comprobante_path);
+    }
+
+    // Elimina (soft delete) el registro de pago de un período puntual cuando
+    // el informe de tesorería contradice lo que el alumno autodeclaró en el
+    // sistema. Vuelve el período a 'pendiente' y deja auditoría de quién y
+    // por qué; el contacto con el alumno se hace por fuera del sistema.
+    public function eliminarPago(Request $request, int $id)
+    {
+        $request->validate(['motivo' => 'nullable|string|max:255']);
+
+        $pago = PagoCuota::find($id);
+
+        if (!$pago) {
+            return response()->json(['message' => 'Registro no encontrado.'], 404);
+        }
+
+        // No se hace soft delete de la fila: el rastro de auditoría queda en
+        // eliminado_por/motivo_eliminacion sobre la misma fila. Si se borrara
+        // (aunque fuera soft delete), el período volvería a intentar
+        // regenerarse y chocaría con el índice único (usuario_id, periodo).
+        $pago->update([
+            'estado'             => 'pendiente',
+            'eliminado_por'      => $request->user()->id,
+            'motivo_eliminacion' => $request->input('motivo'),
+        ]);
+
+        return response()->json(['message' => 'Registro de pago eliminado correctamente.']);
+    }
+
+    // Confirma manualmente un pago declarado en efectivo, una vez que la
+    // secretaría cotejó al alumno contra el informe de tesorería (única
+    // fuente real de verdad para efectivo, ya que el recibo lo emite la
+    // propia universidad). Si el informe muestra otra fecha de pago, se
+    // puede corregir acá y se recalcula el recargo correspondiente.
+    public function confirmarEfectivo(Request $request, int $id)
+    {
+        $request->validate(['fecha_pago' => 'nullable|date']);
+
+        $pago = PagoCuota::find($id);
+
+        if (!$pago) {
+            return response()->json(['message' => 'Registro no encontrado.'], 404);
+        }
+
+        if ($pago->estado !== 'pendiente_efectivo') {
+            return response()->json(['message' => 'Este registro no está pendiente de confirmación en efectivo.'], 422);
+        }
+
+        $fechaPago = $request->filled('fecha_pago')
+            ? \Carbon\Carbon::parse($request->fecha_pago)
+            : $pago->fecha_pago;
+
+        $montoExigible = $pago->monto_base !== null
+            ? CuotaMensualService::calcularMontoExigible((float) $pago->monto_base, $fechaPago)
+            : $pago->monto_exigible;
+
+        $pago->update([
+            'estado'         => 'pagado',
+            'fecha_pago'     => $fechaPago->toDateString(),
+            'monto_exigible' => $montoExigible,
+            'confirmado_por' => $request->user()->id,
+            'confirmado_en'  => now(),
+        ]);
+
+        return response()->json(['message' => 'Pago en efectivo confirmado.', 'cuota' => $pago]);
+    }
+
+    // Alumnos con al menos un período esperando confirmación de pago en
+    // efectivo, para que la secretaría los recorra tras recibir el informe.
+    public function pendientesEfectivo()
+    {
+        $usuarioIds = PagoCuota::where('estado', 'pendiente_efectivo')->distinct()->pluck('usuario_id');
+
+        $alumnos = User::where('role', 'general')
+            ->whereIn('id', $usuarioIds)
+            ->orderBy('nombre')
+            ->get(['id', 'nombre', 'legajo', 'email']);
+
+        $data = $alumnos->map(function ($u) {
+            $pendientes = PagoCuota::where('usuario_id', $u->id)
+                ->where('estado', 'pendiente_efectivo')
+                ->orderBy('periodo')
+                ->get(['id', 'periodo', 'fecha_pago', 'monto_exigible']);
+
+            return [
+                'id'          => $u->id,
+                'nombre'      => $u->nombre,
+                'legajo'      => $u->legajo,
+                'email'       => $u->email,
+                'periodos'    => $pendientes->map(fn (PagoCuota $p) => [
+                    'id'             => $p->id,
+                    'periodo'        => $p->periodo,
+                    'fecha_pago'     => $p->fecha_pago?->toDateString(),
+                    'monto_exigible' => $p->monto_exigible,
+                ])->values(),
+            ];
+        });
+
+        return response()->json($data->values());
+    }
+
+    // Alumnos con al menos un período pendiente dentro del ciclo actual
+    // (marzo-diciembre), filtrable por carrera.
+    public function deudores(Request $request)
+    {
+        $request->validate(['carrera_id' => 'nullable|exists:carreras,id']);
+
+        $usuarioIds = PagoCuota::where('estado', 'pendiente')->distinct()->pluck('usuario_id');
+
+        $query = User::where('role', 'general')
+            ->whereIn('id', $usuarioIds)
+            ->orderBy('nombre');
+
+        if ($request->filled('carrera_id')) {
+            $carreraId = $request->carrera_id;
+            $query->whereIn('id', function ($q) use ($carreraId) {
+                $q->select('usuario_id')->from('carrera_usuario')->where('carrera_id', $carreraId);
+            });
+        }
+
+        $alumnos = $query->get(['id', 'nombre', 'legajo', 'email']);
+
+        $data = $alumnos->map(function ($u) {
+            $periodosPendientes = PagoCuota::where('usuario_id', $u->id)
+                ->where('estado', 'pendiente')
+                ->orderBy('periodo')
+                ->pluck('periodo');
+
+            return [
+                'id'                  => $u->id,
+                'nombre'              => $u->nombre,
+                'legajo'              => $u->legajo,
+                'email'               => $u->email,
+                'periodos_pendientes' => $periodosPendientes->values(),
+                'meses_adeudados'     => $periodosPendientes->count(),
+            ];
+        });
+
+        return response()->json($data->values());
     }
 
     public function getPlanEstudios()

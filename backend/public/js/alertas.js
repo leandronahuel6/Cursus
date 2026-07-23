@@ -44,15 +44,28 @@ let state = {
     year: new Date().getFullYear(),
     month: new Date().getMonth(),
     selectedDate: todayDateStr()
-  }
+  },
+  cuotaMontoVigente: null,
+  historialCuotas: [],
+  pagoPeriodo: null,
+  pagoMedio: 'transferencia'
 };
+
+const MESES_CUOTA = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+  'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function formatPeriodoCuota(periodo) {
+  const [y, m] = periodo.split('-');
+  return `${MESES_CUOTA[parseInt(m, 10) - 1]} ${y}`;
+}
 
 // Inicialización de la página
 document.addEventListener('DOMContentLoaded', async () => {
   await loadAlertas();
   updateUI();
-  loadRecordatorioCuota();
+  await loadRecordatorioCuota();
   loadEstadoPagoCuota();
+  loadHistorialCuotas();
 
   const dateInput = document.getElementById('alert-date');
   if (dateInput) dateInput.value = todayDateStr();
@@ -117,7 +130,8 @@ async function loadRecordatorioCuota() {
     if (!response.ok) return;
     const data = await response.json();
     if (data.valor_mensual != null) {
-      input.value = parseFloat(data.valor_mensual).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+      state.cuotaMontoVigente = parseFloat(data.valor_mensual);
+      input.value = state.cuotaMontoVigente.toLocaleString('es-AR', { minimumFractionDigits: 2 });
     }
 
     const proximaEl = document.getElementById('cuota-proxima-notice');
@@ -145,6 +159,7 @@ async function loadEstadoPagoCuota() {
     const response = await fetch(`${API_BASE}/pagos-cuota/estado`, { headers: getAuthHeaders() });
     if (!response.ok) throw new Error('No se pudo cargar el estado de la cuota');
     const estado = await response.json();
+    state.pagoPeriodo = estado.periodo;
     renderEstadoPagoCuota(estado);
   } catch (e) {
     console.error(e);
@@ -181,19 +196,154 @@ function renderEstadoPagoCuota(estado) {
   const dot = document.getElementById('cuota-pago-alert-dot');
   if (dot) dot.style.background = urgente ? 'var(--red)' : '#f97316';
 
-  if (dias < 0) {
-    bannerText.textContent = `Ya pasó el día 15: la cuota de este mes está vencida y puede tener recargos. Todavía no registraste el pago.`;
-  } else if (dias === 0) {
-    bannerText.textContent = `Hoy es el último día para pagar la cuota sin recargos.`;
-  } else if (urgente) {
-    bannerText.textContent = `Quedan ${dias} día${dias !== 1 ? 's' : ''} para pagar la cuota sin recargos (vence el 15).`;
+  // Mensaje fijo (no varía según los días restantes): recuerda siempre el
+  // recargo del 10% con el monto ya calculado, para que quede claro cuánto
+  // hay que pagar si se abona después del día 15.
+  if (state.cuotaMontoVigente != null) {
+    const montoConRecargo = (state.cuotaMontoVigente * 1.10).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+    bannerText.textContent = `Recordá que si el pago es luego del día 15 se debe pagar un 10% de recargo: $${montoConRecargo}.`;
   } else {
-    bannerText.textContent = `Todavía no pagaste la cuota de este mes. Vence el día 15.`;
+    bannerText.textContent = `Recordá que si el pago es luego del día 15 se debe pagar un 10% de recargo.`;
   }
 }
 
-window.openPagoModal = function() {
-  document.getElementById('pago-fecha').value = todayDateStr();
+// Carga el historial de UN ciclo (año) por vez — por default el actual, para
+// no mostrarle de entrada 30 meses acumulados a alumnos con varios años de
+// cursada. `anio` opcional para cambiar de ciclo desde el selector.
+async function loadHistorialCuotas(anio) {
+  try {
+    const qs = anio ? `?anio=${encodeURIComponent(anio)}` : '';
+    const response = await fetch(`${API_BASE}/pagos-cuota/historial${qs}`, { headers: getAuthHeaders() });
+    if (!response.ok) throw new Error('No se pudo cargar el historial de cuotas');
+    const data = await response.json();
+    state.historialCuotas = data.cuotas;
+    renderSelectorAnioHistorial(data.anio, data.anios_disponibles);
+    renderHistorialCuotas();
+  } catch (e) {
+    console.error(e);
+    const list = document.getElementById('cuota-historial-list');
+    if (list) list.innerHTML = '<div class="chr-empty">No se pudo cargar el historial.</div>';
+  }
+}
+
+function renderSelectorAnioHistorial(anioActual, aniosDisponibles) {
+  const select = document.getElementById('cuota-historial-anio');
+  if (!select) return;
+
+  select.innerHTML = '';
+  (aniosDisponibles || [anioActual]).forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a;
+    opt.textContent = `Ciclo ${a}`;
+    select.appendChild(opt);
+  });
+  select.value = anioActual;
+}
+
+window.cambiarAnioHistorial = function(anio) {
+  loadHistorialCuotas(anio);
+};
+
+function cuotaBadge(pago) {
+  if (pago.estado === 'pagado') {
+    const medio = pago.medio_pago === 'efectivo' ? ' (efectivo)' : '';
+    return `<span class="aa-badge badge-aprobada">Pagó${medio}</span>`;
+  }
+  if (pago.estado === 'pendiente_efectivo') {
+    return '<span class="aa-badge badge-regular">Efectivo, a confirmar</span>';
+  }
+  return '<span class="aa-badge badge-libre">Pendiente</span>';
+}
+
+function renderHistorialCuotas() {
+  const list = document.getElementById('cuota-historial-list');
+  if (!list) return;
+
+  if (state.historialCuotas.length === 0) {
+    list.innerHTML = '<div class="chr-empty">Todavía no hay cuotas generadas para este ciclo.</div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  state.historialCuotas.forEach(pago => {
+    const row = document.createElement('div');
+    row.className = 'chr-row';
+
+    const monto = pago.monto_exigible != null
+      ? '$' + parseFloat(pago.monto_exigible).toLocaleString('es-AR', { minimumFractionDigits: 2 })
+      : (pago.monto_base != null ? '$' + parseFloat(pago.monto_base).toLocaleString('es-AR', { minimumFractionDigits: 2 }) : '—');
+
+    let acciones = '';
+    if (pago.estado === 'pendiente') {
+      acciones += `<button class="chr-btn-pagar" onclick="window.openPagoModal('${pago.periodo}')">Pagar</button>`;
+    } else {
+      // Ya declaró el pago (transferencia o efectivo) — permitir corregirlo
+      // por si se equivocó de archivo, de fecha o de medio de pago.
+      acciones += `<button onclick="window.openPagoModal('${pago.periodo}')">Editar</button>`;
+    }
+    if (pago.tiene_comprobante) {
+      acciones += `<button onclick="window.verMiComprobante(${pago.id})">Ver comprobante</button>`;
+    }
+
+    row.innerHTML = `
+      <div class="chr-periodo">${formatPeriodoCuota(pago.periodo)}</div>
+      ${cuotaBadge(pago)}
+      <div class="chr-monto">${monto}</div>
+      <div class="chr-actions">${acciones}</div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+window.verMiComprobante = async function(id) {
+  try {
+    const response = await fetch(`${API_BASE}/pagos-cuota/${id}/comprobante`, { headers: getAuthHeaders() });
+    if (!response.ok) throw new Error('No se pudo abrir el comprobante');
+    const blob = await response.blob();
+    window.open(URL.createObjectURL(blob), '_blank');
+  } catch (e) {
+    console.error(e);
+    showToast('No se pudo abrir el comprobante.', 'error');
+  }
+};
+
+window.pagoSeleccionarMedio = function(medio) {
+  state.pagoMedio = medio;
+  document.querySelectorAll('.pago-medio-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.medio === medio);
+  });
+  document.getElementById('pago-transferencia-fields').hidden = medio !== 'transferencia';
+  document.getElementById('pago-efectivo-fields').hidden = medio !== 'efectivo';
+};
+
+// Mensaje fijo (no depende de la fecha elegida): mismo recordatorio del
+// recargo que se muestra en el banner, para que quede claro al pagar o editar.
+window.pagoActualizarPreview = function() {
+  const preview = document.getElementById('pago-monto-preview');
+  if (!preview) return;
+
+  if (state.cuotaMontoVigente == null) {
+    preview.textContent = 'Recordá que si el pago es posterior al día 15 debés pagar un 10% más.';
+    return;
+  }
+
+  const montoFmt = (state.cuotaMontoVigente * 1.10).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+  preview.classList.remove('con-recargo');
+  preview.textContent = `Recordá que si el pago es posterior al día 15 debés pagar un 10% más que sería: $${montoFmt}.`;
+};
+
+window.openPagoModal = function(periodo) {
+  state.pagoPeriodo = periodo || state.pagoPeriodo;
+
+  // Si ya había un pago declarado para este período (se está editando), se
+  // precarga la fecha y el medio que había usado antes.
+  const existente = state.historialCuotas.find(p => p.periodo === state.pagoPeriodo);
+  const label = state.pagoPeriodo ? formatPeriodoCuota(state.pagoPeriodo) : '';
+  document.getElementById('pago-periodo-label').textContent = existente ? `Editar — ${label}` : label;
+  document.getElementById('pago-comprobante').value = '';
+  document.getElementById('pago-recibo').value = '';
+  window.pagoSeleccionarMedio(existente?.medio_pago === 'efectivo' ? 'efectivo' : 'transferencia');
+  window.pagoActualizarPreview();
   document.getElementById('pago-cuota-modal').classList.add('open');
 };
 
@@ -202,27 +352,61 @@ window.closePagoModal = function() {
 };
 
 window.confirmarPago = async function() {
-  const fecha = document.getElementById('pago-fecha').value;
-  if (!fecha) {
-    showToast('Elegí una fecha de pago.', 'warn');
+  if (!state.pagoPeriodo) {
+    showToast('No se encontró el período a pagar.', 'error');
     return;
   }
 
-  try {
-    const response = await fetch(`${API_BASE}/pagos-cuota`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ fecha_pago: fecha })
-    });
-    if (!response.ok) throw new Error('No se pudo registrar el pago');
+  const btn = document.getElementById('pago-btn-confirmar');
+  btn.disabled = true;
+  btn.textContent = 'Guardando…';
 
-    const estado = await response.json();
-    renderEstadoPagoCuota(estado);
+  try {
+    const formData = new FormData();
+
+    let url;
+    if (state.pagoMedio === 'efectivo') {
+      const recibo = document.getElementById('pago-recibo').files[0];
+      if (!recibo) {
+        showToast('Adjuntá la foto del recibo de tesorería.', 'warn');
+        return;
+      }
+      formData.append('recibo', recibo);
+      url = `${API_BASE}/pagos-cuota/${state.pagoPeriodo}/efectivo`;
+    } else {
+      const comprobante = document.getElementById('pago-comprobante').files[0];
+      if (!comprobante) {
+        showToast('Adjuntá el comprobante de la transferencia.', 'warn');
+        return;
+      }
+      formData.append('comprobante', comprobante);
+      url = `${API_BASE}/pagos-cuota/${state.pagoPeriodo}/comprobante`;
+    }
+
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token },
+      body: formData
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'No se pudo registrar el pago');
+
     window.closePagoModal();
-    showToast('Pago registrado con éxito.', 'success');
+    await Promise.all([loadEstadoPagoCuota(), loadHistorialCuotas()]);
+
+    showToast(
+      state.pagoMedio === 'efectivo'
+        ? 'Pago en efectivo declarado. Quedará confirmado cuando la secretaría lo revise.'
+        : 'Comprobante subido con éxito.',
+      'success'
+    );
   } catch (e) {
     console.error(e);
-    showToast('No se pudo registrar el pago. Intentá de nuevo.', 'error');
+    showToast(e.message || 'No se pudo registrar el pago. Intentá de nuevo.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Confirmar';
   }
 };
 

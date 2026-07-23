@@ -108,6 +108,9 @@
       select.appendChild(opt);
     });
 
+    carrerasCache = data.carreras || [];
+    poblarSelectCarreras();
+
     // Resumen
     document.getElementById('ac-periodo-label').textContent   = formatPeriodo(data.periodo);
     document.getElementById('ac-stat-total').textContent      = data.resumen.total;
@@ -227,10 +230,325 @@
     }
   }
 
+  // ---- Historial de cuotas por legajo ----
+  let carrerasCache = [];
+  let historialLegajoActual = null;
+  let eliminarPagoIdActual = null;
+
+  const MESES_CUOTA = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  function formatPeriodoLargo(periodo) {
+    const [y, m] = periodo.split('-');
+    return `${MESES_CUOTA[parseInt(m, 10) - 1]} ${y}`;
+  }
+
+  function badgeCuota(pago) {
+    if (pago.estado === 'pagado') {
+      const medio = pago.medio_pago === 'efectivo' ? ' (efectivo)' : '';
+      return `<span class="aa-badge badge-aprobada">Pagó${medio}</span>`;
+    }
+    if (pago.estado === 'pendiente_efectivo') {
+      return '<span class="aa-badge badge-regular">Efectivo, a confirmar</span>';
+    }
+    return '<span class="aa-badge badge-libre">Pendiente</span>';
+  }
+
+  async function achBuscar(e, anioOverride) {
+    e.preventDefault();
+    const legajo = document.getElementById('ach-legajo').value.trim();
+    if (!legajo) return;
+
+    const err = document.getElementById('ach-error');
+    err.hidden = true;
+    document.getElementById('ach-result').hidden = true;
+
+    const btn = document.getElementById('ach-btn-search');
+    btn.disabled = true;
+    btn.textContent = 'Buscando…';
+
+    try {
+      const qs = anioOverride ? `?anio=${encodeURIComponent(anioOverride)}` : '';
+      const res = await fetch(`/api/admin/alumnos/${encodeURIComponent(legajo)}/cuotas${qs}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        err.textContent = data.message ?? 'Error al buscar el alumno.';
+        err.hidden = false;
+        return;
+      }
+      historialLegajoActual = legajo;
+      renderHistorialAlumno(data);
+    } catch {
+      err.textContent = 'Error de conexión.';
+      err.hidden = false;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Buscar';
+    }
+  }
+
+  function iaIndicador(p) {
+    const ia = p.datos_extraidos_ia;
+    if (!ia) return '<span class="aa-badge badge-libre">—</span>';
+
+    const declarado = p.monto_declarado != null ? formatMonto(p.monto_declarado) : '—';
+    if (ia.coincide_monto === true) {
+      return `<span class="aa-badge badge-aprobada" title="El monto leído coincide con el exigible">✓ ${declarado}</span>`;
+    }
+    if (ia.coincide_monto === false) {
+      const obs = (ia.observaciones || 'el monto leído no coincide con el exigible').replace(/"/g, '&quot;');
+      return `<span class="aa-badge badge-regular" title="${obs}">✗ ${declarado}</span>`;
+    }
+    return `<span class="aa-badge badge-libre" title="No se pudo comparar el monto">${declarado}</span>`;
+  }
+
+  function achCambiarAnio(anio) {
+    achBuscar({ preventDefault: () => {} }, anio);
+  }
+
+  function renderSelectorAnioAch(anioActual, aniosDisponibles) {
+    const select = document.getElementById('ach-anio');
+    if (!select) return;
+
+    select.innerHTML = '';
+    (aniosDisponibles && aniosDisponibles.length ? aniosDisponibles : [anioActual]).forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a;
+      opt.textContent = `Ciclo ${a}`;
+      select.appendChild(opt);
+    });
+    select.value = anioActual;
+  }
+
+  function renderHistorialAlumno(data) {
+    document.getElementById('ach-nombre').textContent = `${data.usuario.nombre} — Legajo ${data.usuario.legajo}`;
+    renderSelectorAnioAch(data.anio, data.anios_disponibles);
+    const tbody = document.getElementById('ach-tbody');
+    tbody.innerHTML = '';
+
+    if (data.cuotas.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="aa-table-empty">Sin cuotas generadas.</td></tr>';
+    } else {
+      data.cuotas.forEach(p => {
+        const tr = document.createElement('tr');
+        const acciones = [];
+        if (p.tiene_comprobante) {
+          acciones.push(`<button type="button" class="aa-btn-search" style="padding:4px 10px; font-size:0.78rem;" onclick="window.acVerComprobante(${p.id})">Ver comprobante</button>`);
+        }
+        if (p.estado === 'pendiente_efectivo') {
+          acciones.push(`<button type="button" class="aa-btn-search" style="padding:4px 10px; font-size:0.78rem;" onclick="window.acConfirmarEfectivo(${p.id})">Confirmar</button>`);
+        }
+        acciones.push(`<button type="button" class="aa-btn-cancel" style="padding:4px 10px; font-size:0.78rem;" onclick="window.acAbrirEliminar(${p.id})">Eliminar</button>`);
+
+        tr.innerHTML = `
+          <td>${formatPeriodoLargo(p.periodo)}</td>
+          <td>${badgeCuota(p)}</td>
+          <td>${p.medio_pago ?? '—'}</td>
+          <td>${formatMonto(p.monto_exigible)}</td>
+          <td>${iaIndicador(p)}</td>
+          <td>${formatFecha(p.fecha_pago)}</td>
+          <td style="display:flex; gap:6px; flex-wrap:wrap;">${acciones.join('')}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('ach-result').hidden = false;
+  }
+
+  async function acVerComprobante(id) {
+    try {
+      const res = await fetch(`/api/admin/cuotas/${id}/comprobante`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (!res.ok) throw new Error();
+      const blob = await res.blob();
+      window.open(URL.createObjectURL(blob), '_blank');
+    } catch {
+      showToast('No se pudo abrir el comprobante.', 'error');
+    }
+  }
+
+  async function acConfirmarEfectivo(id) {
+    try {
+      const res = await fetch(`/api/admin/cuotas/${id}/confirmar-efectivo`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message ?? 'Error al confirmar el pago.');
+      showToast('Pago en efectivo confirmado.', 'success');
+      await refrescarVistasCuotas();
+    } catch (e) {
+      showToast(e.message ?? 'Error al confirmar el pago.', 'error');
+    }
+  }
+
+  function acAbrirEliminar(id) {
+    eliminarPagoIdActual = id;
+    document.getElementById('ac-eliminar-motivo').value = '';
+    document.getElementById('ac-eliminar-overlay').hidden = false;
+  }
+
+  function acCancelarEliminar() {
+    eliminarPagoIdActual = null;
+    document.getElementById('ac-eliminar-overlay').hidden = true;
+  }
+
+  async function acConfirmarEliminar() {
+    if (!eliminarPagoIdActual) return;
+    const btn = document.getElementById('ac-btn-confirmar-eliminar');
+    btn.disabled = true;
+    btn.textContent = 'Eliminando…';
+
+    try {
+      const motivo = document.getElementById('ac-eliminar-motivo').value.trim();
+      const res = await fetch(`/api/admin/cuotas/${eliminarPagoIdActual}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify({ motivo: motivo || null }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message ?? 'Error al eliminar el registro.');
+
+      document.getElementById('ac-eliminar-overlay').hidden = true;
+      showToast('Registro de pago eliminado.', 'success');
+      await refrescarVistasCuotas();
+    } catch (e) {
+      showToast(e.message ?? 'Error al eliminar el registro.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Eliminar';
+      eliminarPagoIdActual = null;
+    }
+  }
+
+  // ---- Pendientes de confirmar (efectivo) ----
+  async function cargarPendientesEfectivo() {
+    const cont = document.getElementById('ac-efectivo-list');
+    try {
+      const res = await fetch('/api/admin/cuotas/pendientes-efectivo', {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (!res.ok) throw new Error();
+      const alumnos = await res.json();
+
+      if (alumnos.length === 0) {
+        cont.innerHTML = '<p class="ac-loading">No hay pagos en efectivo esperando confirmación.</p>';
+        return;
+      }
+
+      cont.innerHTML = '';
+      alumnos.forEach(a => {
+        const box = document.createElement('div');
+        box.style.cssText = 'border:1px solid var(--border); border-radius:var(--r-sm); padding:10px 14px; margin-bottom:8px;';
+        const periodosHtml = a.periodos.map(p => `
+          <div style="display:flex; align-items:center; gap:8px; justify-content:space-between; padding:4px 0;">
+            <span>${formatPeriodoLargo(p.periodo)} — ${formatMonto(p.monto_exigible)}</span>
+            <button type="button" class="aa-btn-search" style="padding:3px 10px; font-size:0.78rem;" onclick="window.acConfirmarEfectivo(${p.id})">Confirmar</button>
+          </div>
+        `).join('');
+        box.innerHTML = `
+          <div style="font-weight:600; color:var(--text);">${a.nombre} — Legajo ${a.legajo}</div>
+          ${periodosHtml}
+        `;
+        cont.appendChild(box);
+      });
+    } catch {
+      cont.innerHTML = '<p class="ac-loading">Error al cargar.</p>';
+    }
+  }
+
+  // ---- Deudores del ciclo ----
+  function poblarSelectCarreras() {
+    const select = document.getElementById('ac-deudores-carrera');
+    if (!select || carrerasCache.length === 0) return;
+    const actual = select.value;
+    select.innerHTML = '<option value="">Todas las carreras</option>';
+    carrerasCache.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.nombre;
+      select.appendChild(opt);
+    });
+    select.value = actual;
+  }
+
+  async function cargarDeudores() {
+    const tbody = document.getElementById('ac-deudores-tbody');
+    tbody.innerHTML = '<tr><td colspan="5" class="aa-table-empty">Cargando…</td></tr>';
+
+    const carreraId = document.getElementById('ac-deudores-carrera').value;
+    const qs = carreraId ? `?carrera_id=${encodeURIComponent(carreraId)}` : '';
+
+    try {
+      const res = await fetch(`/api/admin/cuotas/deudores${qs}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (!res.ok) throw new Error();
+      const alumnos = await res.json();
+
+      if (alumnos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="aa-table-empty">No hay deudores.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      alumnos.forEach(a => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${a.nombre}</td>
+          <td>${a.legajo ?? '—'}</td>
+          <td>${a.meses_adeudados}</td>
+          <td>${a.periodos_pendientes.map(formatPeriodoLargo).join(', ')}</td>
+          <td><button type="button" class="aa-btn-search" style="padding:4px 10px; font-size:0.78rem;" onclick="window.acVerHistorialDesdeLegajo('${a.legajo}')">Ver historial</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } catch {
+      tbody.innerHTML = '<tr><td colspan="5" class="aa-table-empty">Error al cargar.</td></tr>';
+    }
+  }
+
+  function acVerHistorialDesdeLegajo(legajo) {
+    document.getElementById('ach-legajo').value = legajo;
+    achBuscar({ preventDefault: () => {} });
+  }
+
+  // Refresca todas las vistas de cuotas tras una acción (eliminar/confirmar).
+  // Preserva el ciclo (año) que se estaba mirando, no vuelve siempre al actual.
+  async function refrescarVistasCuotas() {
+    const anioSelect = document.getElementById('ach-anio');
+    const anioActual = anioSelect && anioSelect.value ? anioSelect.value : undefined;
+
+    await Promise.all([
+      cargarDatos(),
+      cargarPendientesEfectivo(),
+      cargarDeudores(),
+      historialLegajoActual ? achBuscar({ preventDefault: () => {} }, anioActual) : Promise.resolve(),
+    ]);
+  }
+
   // Exportar
-  window.acToggleForm    = acToggleForm;
-  window.acGuardarCuota  = acGuardarCuota;
-  window.acFiltrar       = acFiltrar;
+  window.acToggleForm         = acToggleForm;
+  window.acGuardarCuota       = acGuardarCuota;
+  window.acFiltrar            = acFiltrar;
+  window.achBuscar            = achBuscar;
+  window.achCambiarAnio       = achCambiarAnio;
+  window.acVerComprobante     = acVerComprobante;
+  window.acConfirmarEfectivo  = acConfirmarEfectivo;
+  window.acAbrirEliminar      = acAbrirEliminar;
+  window.acCancelarEliminar   = acCancelarEliminar;
+  window.acConfirmarEliminar  = acConfirmarEliminar;
+  window.cargarDeudores       = cargarDeudores;
+  window.acVerHistorialDesdeLegajo = acVerHistorialDesdeLegajo;
 
   cargarDatos();
+  cargarPendientesEfectivo();
+  cargarDeudores();
 })();
