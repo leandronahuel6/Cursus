@@ -3,7 +3,8 @@
 @section('title', 'Cursus - Alertas y Vencimientos')
 
 @push('styles')
-  <link rel="stylesheet" href="{{ asset('css/views/alertas.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin-alumnos.css') }}">
+<link rel="stylesheet" href="{{ asset('css/views/alertas.css') }}">
 @endpush
 
 @section('mobile-header')
@@ -169,22 +170,45 @@
 
   </div>
 
+  <!-- HISTORIAL DE CUOTAS: un registro por mes del ciclo marzo-diciembre -->
+  <div class="cuota-historial-section">
+    <div class="cuota-historial-card">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+        <h3 style="margin-bottom:0;"><span>📋</span> Historial de cuotas</h3>
+        <select id="cuota-historial-anio" class="alert-form-input" style="width:auto; height:32px;" onchange="window.cambiarAnioHistorial(this.value)"></select>
+      </div>
+      <div id="cuota-historial-list" class="cuota-historial-list" style="margin-top:12px;">
+        <div class="chr-empty">Cargando historial…</div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: REGISTRAR PAGO DE LA CUOTA -->
   <div class="grade-modal-overlay" id="pago-cuota-modal">
     <div class="grade-modal-box">
-      <div class="grade-modal-header">Registrar pago de la cuota</div>
+      <div class="grade-modal-header">Registrar pago — <span id="pago-periodo-label"></span></div>
       <div class="grade-modal-body">
-        <p style="font-size: 12px; color: var(--t3); line-height: 1.4;">
-          ¿En qué fecha abonaste la cuota de este mes?
-        </p>
-        <div class="grade-select-wrapper">
-          <label for="pago-fecha" style="font-size: 11px; font-weight: 600; color: var(--t2);">Fecha de pago:</label>
-          <input type="date" id="pago-fecha" class="grade-input-select" style="margin-top: 5px;">
+        <div class="pago-medio-tabs">
+          <button type="button" class="pago-medio-tab active" data-medio="transferencia" onclick="window.pagoSeleccionarMedio('transferencia')">Transferencia</button>
+          <button type="button" class="pago-medio-tab" data-medio="efectivo" onclick="window.pagoSeleccionarMedio('efectivo')">Efectivo en tesorería</button>
+        </div>
+
+        <div id="pago-monto-preview" class="pago-monto-preview"></div>
+
+        <div id="pago-transferencia-fields" class="pago-field">
+          <label for="pago-comprobante">Comprobante de transferencia (imagen o PDF)</label>
+          <input type="file" id="pago-comprobante" accept=".pdf,.jpg,.jpeg,.png">
+        </div>
+
+        <div id="pago-efectivo-fields" class="pago-field" hidden>
+          <label for="pago-recibo">Foto del recibo de tesorería</label>
+          <input type="file" id="pago-recibo" accept=".pdf,.jpg,.jpeg,.png">
+          <p class="pago-efectivo-note">El pago en efectivo queda pendiente de confirmación por la secretaría contra el informe de tesorería.</p>
         </div>
       </div>
       <div class="grade-modal-footer">
         <button class="btn-modal-action cancel" onclick="window.closePagoModal()">Cancelar</button>
-        <button class="btn-modal-action save" onclick="window.confirmarPago()">Confirmar Pago</button>
+        <button class="btn-modal-action save" id="pago-btn-confirmar" onclick="window.confirmarPago()">Confirmar</button>
       </div>
     </div>
   </div>

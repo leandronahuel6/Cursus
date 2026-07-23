@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Mail\ContactMail;
 use App\Mail\WelcomeMail;
+use App\Models\Carrera;
 use App\Models\User;
 use App\Models\ContactMessage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
@@ -63,6 +65,19 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'role' => 'general',
         ]);
+
+        // Por ahora la única carrera ofrecida es la TUP, así que se asigna
+        // automáticamente al registrarse (sin esto, cosas como el monto de
+        // la cuota del alumno no tienen de dónde salir).
+        $tup = Carrera::where('nombre', 'Tecnicatura Universitaria en Programación')->first();
+        if ($tup) {
+            DB::table('carrera_usuario')->insertOrIgnore([
+                'usuario_id' => $user->id,
+                'carrera_id' => $tup->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
