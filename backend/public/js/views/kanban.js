@@ -375,7 +375,16 @@ export const KanbanManager = {
 
     toggleSubtaskStatus(index) {
         this.subtasksTempList[index].completed = !this.subtasksTempList[index].completed;
-        this.renderModalSubtasks();
+        const list = document.getElementById('task-modal-subtasks-list');
+        if (list) {
+            const items = list.children;
+            if (items[index]) {
+                const chk = items[index].querySelector('.subtask-chk');
+                const txt = items[index].querySelector('.subtask-txt');
+                if (chk) chk.checked = this.subtasksTempList[index].completed;
+                if (txt) txt.classList.toggle('done', this.subtasksTempList[index].completed);
+            }
+        }
         this.saveTaskSubtasksStateOnly(index, 'update');
     },
 

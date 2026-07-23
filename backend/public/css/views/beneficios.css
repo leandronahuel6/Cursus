@@ -67,11 +67,12 @@
     body.dark-mode .contact-title {
         color: #ffffff;
     }
-    body.dark-mode .contact-input {
+    /* .contact-input dark-mode → components/forms.css (contextual @media override) */
+    /* body.dark-mode .contact-input {
         background: #1f2937;
         border-color: rgba(255, 255, 255, 0.1);
         color: #ffffff;
-    }
+    } */
 
     /* ==========================================================================
        ESTILOS DEL BOTÓN THEME TOGGLE

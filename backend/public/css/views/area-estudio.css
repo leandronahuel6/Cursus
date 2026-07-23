@@ -504,87 +504,6 @@ transition: border-color .15s;
       text-align: center; line-height: 1.4;
     }
 
-    /* ==========================================================================
-       MODALS Y OVERLAYS (DISEÑO PREMIUM GLASSMORPHISM)
-       ========================================================================== */
-    .modal-overlay {
-      display: none;
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(17, 24, 39, 0.4);
-      backdrop-filter: blur(4px);
-      align-items: center; justify-content: center;
-      z-index: 20100;
-      padding: 16px;
-    }
-    .modal-overlay.show { display: flex; }
-    
-    .modal-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r-lg);
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-      width: 100%;
-      max-width: 500px;
-      max-height: 90vh;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      animation: modalSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @keyframes modalSlide {
-      from { transform: translateY(12px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    .modal-hdr {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 18px; border-bottom: 1px solid var(--border-light);
-    }
-    .modal-title { font-size: 14px; font-weight: 700; color: var(--t1); display: flex; align-items: center; gap: 6px; }
-    .modal-close {
-      width: 24px; height: 24px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--t3); transition: background .15s;
-    }
-    .modal-close:hover { background: var(--border-light); color: var(--t1); }
-    
-    .modal-body { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
-    .modal-foot {
-      padding: 12px 18px; border-top: 1px solid var(--border-light);
-      display: flex; align-items: center; justify-content: flex-end; gap: 10px;
-      background: var(--bg);
-    }
-
-    .modal-field { display: flex; flex-direction: column; gap: 6px; }
-    .modal-label { font-size: 11.5px; font-weight: 600; color: var(--t2); text-transform: uppercase; letter-spacing: 0.02em; }
-    
-    .modal-input {
-      padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--r-sm);
-      font-size: 13px; color: var(--t1);transition: border-color .15s;
-    }
-    .modal-input:focus { border-color: var(--brand); outline: none; }
-    
-    .modal-textarea { resize: vertical; min-height: 80px; }
-
-    /* Estilo de botones en Modales */
-    .btn-cancel {
-      padding: 7px 14px; border-radius: var(--r-sm); border: 1px solid var(--border);
-      font-size: 12.5px; font-weight: 500; color: var(--t2); transition: all .15s;
-    }
-    .btn-cancel:hover { background: var(--border-light); color: var(--t1); }
-    
-    .btn-save {
-      padding: 7px 14px; border-radius: var(--r-sm); background: var(--brand);
-      font-size: 12.5px; font-weight: 600; color: #fff; transition: background .15s;
-    }
-    .btn-save:hover { background: var(--brand-hover); }
-
-    .btn-danger {
-      padding: 7px 14px; border-radius: var(--r-sm); background: #fee2e2; border: 1px solid #fca5a5;
-      font-size: 12.5px; font-weight: 600; color: var(--red); transition: all .15s;
-    }
-    .btn-danger:hover { background: #fecaca; }
-
     /* Checklist de subtareas en modal */
     .subtasks-wrap { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
     .subtasks-list { display: flex; flex-direction: column; gap: 6px; }
@@ -603,15 +522,24 @@ transition: border-color .15s;
       border: 1px solid transparent; border-radius: 3px; padding: 2px 4px;
     }
     .subtask-txt[contenteditable="true"]:focus {
-      background: #fff; border-color: var(--brand-dim);
+      background: var(--surface); border-color: var(--brand-dim);
     }
     .subtask-txt.done { text-decoration: line-through; color: var(--t3); }
+
+    body.dark-mode .subtask-item {
+      background: rgba(255,255,255,0.03);
+      border-color: rgba(255,255,255,0.08);
+    }
+    body.dark-mode .subtask-txt[contenteditable="true"]:focus {
+      background: #1f2937;
+    }
 
     .subtask-del {
       width: 20px; height: 20px; border-radius: 4px;
       display: flex; align-items: center; justify-content: center;
       color: var(--tm); cursor: pointer; transition: all .15s;
     }
+    body.dark-mode .subtask-del:hover { background: rgba(239,68,68,0.15); color: var(--red); }
     .subtask-del:hover { background: #fee2e2; color: var(--red); }
     .subtask-del svg { width: 12px; height: 12px; }
 
@@ -711,53 +639,15 @@ transition: border-color .15s;
 /* Added missing CSS */
 .tb-right { display: flex; align-items: center; gap: 12px; }
 
-/* ==========================================================================
-   MODO OSCURO (DARK MODE)
-   ========================================================================== */
-body.dark-mode .modal-box {
-  background: #111827;
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
-}
-
-body.dark-mode .modal-input {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: var(--t1);
-}
-
-body.dark-mode .modal-input:focus {
-  border-color: var(--brand);
-}
-
-body.dark-mode .modal-foot {
-  background: #0b0f19;
-  border-top-color: rgba(255, 255, 255, 0.06);
-}
-
-body.dark-mode .btn-cancel {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: var(--t2);
-}
-
-body.dark-mode .btn-cancel:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--t1);
-}
-
+/* dark-mode .modal-box / .modal-foot / .btn-cancel → components/modals.css */
+/* dark-mode .modal-input / .modal-input:focus / select.modal-input → components/forms.css */
 /* Formulario inline para agregar tarea (modo oscuro) */
 body.dark-mode .kb-add-inp {
   background: transparent;
   color: var(--t1);
 }
 
-/* Evitar fondo blanco en menú desplegable nativo en modo oscuro */
-body.dark-mode select.modal-input,
-body.dark-mode select.modal-input option {
-  background-color: #1f2937;
-  color: var(--t1);
-}
+/* select.modal-input dark mode → components/forms.css */
 
 /* -----------------------------------------------------------------------------
  * Tooltip / Popover (Estudio Independiente)

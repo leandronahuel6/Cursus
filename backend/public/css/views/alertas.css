@@ -1,6 +1,33 @@
 /* ==============================
    PÁGINA DE ALERTAS
 ============================== */
+
+/* Switcher de Vista (Lista / Calendario) */
+.view-switcher {
+  display: flex;
+  background: var(--border-light);
+  padding: 4px;
+  border-radius: var(--r-sm);
+  margin-bottom: 15px;
+  width: fit-content;
+}
+.view-btn {
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 500;
+  border-radius: var(--r-sm);
+  color: var(--t3);
+  transition: all .2s;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.view-btn.active {
+  background: var(--surface);
+  color: var(--brand);
+  box-shadow: var(--sh);
+}
+
 .alertas-grid {
   display: grid;
   grid-template-columns: 1.6fr 1fr;

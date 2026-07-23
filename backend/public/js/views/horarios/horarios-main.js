@@ -350,7 +350,7 @@ window.openAddModal = function(itemId, tipo) {
     const act = schedState.personalActivities.find(a => a.id === itemId);
     nombre = act ? act.nombre : '';
     document.getElementById('modal-item-name').readOnly = false;
-    document.getElementById('modal-item-name').className = 'modal-select';
+    document.getElementById('modal-item-name').className = 'modal-input';
     document.getElementById('modal-commission-select').style.display = 'none';
     document.getElementById('modal-comm-lbl').style.display = 'none';
   }
@@ -387,7 +387,7 @@ window.openEditModal = function(blockId) {
     document.getElementById('modal-commission-select').value = block.comision;
   } else {
     document.getElementById('modal-item-name').readOnly = false;
-    document.getElementById('modal-item-name').className = 'modal-select';
+    document.getElementById('modal-item-name').className = 'modal-input';
     document.getElementById('modal-commission-select').style.display = 'none';
     document.getElementById('modal-comm-lbl').style.display = 'none';
   }
