@@ -4,6 +4,7 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/admin-alumnos.css') }}">
+<link rel="stylesheet" href="{{ asset('css/views/alertas.css') }}">
 @endpush
 
 @section('mobile-header')
@@ -214,5 +215,5 @@
 @endsection
 
 @push('scripts')
-  <script src="{{ asset('js/alertas.js') }}"></script>
+  <script type="module" src="{{ asset('js/views/alertas/alertas-main.js') }}"></script>
 @endpush

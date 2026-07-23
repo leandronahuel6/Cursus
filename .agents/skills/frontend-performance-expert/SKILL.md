@@ -13,10 +13,10 @@ Actúa como un Desarrollador Frontend Senior experto en Vanilla JS y optimizaci�
   - **Diseño Responsivo Pragmático:** Dado el tiempo acotado, enfócate en que el sistema funcione perfecto en Desktop (su uso principal) y se adapte de forma aceptable a móviles, sin forzar un flujo Mobile-First estricto si esto retrasa la entrega.
   - Nomenclatura **BEM estricta** (`bloque__elemento--modificador`).
   - **PROHIBIDO** el uso de librerías CSS externas a menos que se solicite explícitamente.
-  - **PROHIBIDO** hardcodear colores, tipografías o espaciados en las clases CSS. Si un token (variable) no existe, defínelo en el archivo de diseño base (CSS vars) antes de utilizarlo.
+  - **PROHIBIDO** hardcodear colores, tipografías o espaciados en las clases CSS. Si un token (variable) no existe, defínelo en el archivo de diseño base (CSS vars) antes de utilizarlo. Asegura que la arquitectura CSS esté basada en un diccionario de tokens con variables CSS (`:root { --primary: ... }`).
 - **JavaScript:**
   - Uso exclusivo de Vanilla JS moderno en el frontend.
-  - Uso obligatorio de **Módulos ES6** (`<script type="module">`).
+  - Uso obligatorio de **Módulos ES6** (`<script type="module">`). Todo el JavaScript debe acoplarse al DOM únicamente mediante clases o selectores de datos (`data-js="..."`), NUNCA mediante eventos inline (`onclick="..."`).
   - Usa `const` por defecto, seguido de `let`.
   - **PROHIBIDO ABSOLUTAMENTE** el uso de `var`.
 - **Documentación:**

@@ -14,14 +14,14 @@ Eres un experto en Experiencia de Usuario (UX) y Accesibilidad Web (A11y). Cada 
 
 ## 2. Navegación y Lectores de Pantalla (WCAG Básico)
 
-- **Teclado:** Todo elemento interactivo (botones, enlaces, modales, formularios) debe ser accesible y navegable utilizando exclusivamente el teclado (tecla `Tab`). Define un estado `:focus-visible` global en CSS.
+- **Teclado:** Todo elemento interactivo (botones, enlaces, modales, formularios) debe ser accesible y navegable utilizando exclusivamente el teclado (tecla `Tab`). Asegúrate de que los componentes interactivos (creados sin eventos inline, según las reglas globales) sean plenamente manejables por teclado. Define un estado `:focus-visible` global en CSS.
 - **Flujo del DOM:** NO rompas el flujo del DOM con CSS (ej. usar `order` o `flex-direction: row-reverse`) si el contenedor tiene elementos interactivos, ya que afecta severamente la lógica tabular de lectura.
 - **Atributos ARIA:** Usa `aria-expanded` para componentes desplegables (ej. menú lateral de módulos, dropdown del perfil del alumno), `aria-hidden="true"` en SVGs puramente decorativos, y `aria-label` en botones sin texto visible (ej. ícono de campana de notificaciones, menú hamburguesa).
 - Toda imagen (`<img>`) debe incluir un atributo `alt` descriptivo. Si es decorativa y no aporta contexto, usa `alt=""`.
 
 ## 3. Contraste Visual y Diseño
 
-- Garantiza que haya un contraste de color adecuado y legible entre el texto y su fondo, según los estándares WCAG AA.
+- Garantiza que haya un contraste de color adecuado y legible entre el texto y su fondo, según los estándares WCAG AA. Utiliza variables CSS (Custom Properties) para definir esquemas de colores de alto contraste que faciliten el cumplimiento de esta norma.
 - **Diseño Responsivo:** El diseño debe adaptarse a todas las pantallas (Móvil, Tablet, Desktop) mediante media queries o utilidades CSS. Los componentes deben fluir correctamente sin desbordarse.
 
 ## 4. Animaciones y Reducción de Movimiento

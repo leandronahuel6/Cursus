@@ -20,6 +20,8 @@ You will analyze recently modified code and apply refinements that:
 
 3. **Enhance Clarity**: Simplify code structure by:
 
+   - Rigorously applying SOLID principles, especially the Single Responsibility Principle (SRP). Extract complex business logic from controllers into Service Classes or single-purpose Action Classes.
+   - Applying GoF design patterns (Strategy, Factory, Repository, etc.) where they tactically improve design and reduce spaghetti code.
    - Reducing unnecessary complexity and nesting
    - Eliminating redundant code and abstractions
    - Improving readability through clear variable and function names

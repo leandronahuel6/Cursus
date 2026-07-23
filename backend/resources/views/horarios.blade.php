@@ -231,13 +231,13 @@
         <input type="hidden" id="modal-item-type">
         
         <div class="modal-field">
-          <label class="modal-lbl">Asignatura / Actividad:</label>
+          <label class="modal-label">Asignatura / Actividad:</label>
           <input type="text" class="modal-inp-readonly" id="modal-item-name" readonly>
         </div>
 
         <div class="modal-field-row">
           <div class="modal-field">
-            <label class="modal-lbl">Día:</label>
+            <label class="modal-label">Día:</label>
             <select class="modal-select" id="modal-day-select">
               <option value="1">Lunes</option>
               <option value="2">Martes</option>
@@ -248,7 +248,7 @@
             </select>
           </div>
           <div class="modal-field">
-            <label class="modal-lbl" id="modal-comm-lbl">Comisión:</label>
+            <label class="modal-label" id="modal-comm-lbl">Comisión:</label>
             <select class="modal-select" id="modal-commission-select">
               <option value="Comisión 1 (Noche)">Comisión 1 (Noche)</option>
               <option value="Comisión 2 (Tarde)">Comisión 2 (Tarde)</option>
@@ -259,13 +259,13 @@
 
         <div class="modal-field-row">
           <div class="modal-field">
-            <label class="modal-lbl">Hora Inicio:</label>
+            <label class="modal-label">Hora Inicio:</label>
             <select class="modal-select" id="modal-start-time-select">
               <!-- Se poblará con JS -->
             </select>
           </div>
           <div class="modal-field">
-            <label class="modal-lbl">Hora Fin:</label>
+            <label class="modal-label">Hora Fin:</label>
             <select class="modal-select" id="modal-end-time-select">
               <!-- Se poblará con JS -->
             </select>
@@ -282,5 +282,5 @@
 @endsection
 
 @push('scripts')
-  <script src="{{ asset('js/horarios.js') }}"></script>
+  <script type="module" src="{{ asset('js/views/horarios/horarios-main.js') }}"></script>
 @endpush

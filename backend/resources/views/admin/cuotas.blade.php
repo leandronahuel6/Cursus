@@ -3,8 +3,8 @@
 @section('title', 'Admin — Cuotas | Cursus')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin-alumnos.css') }}">
-<link rel="stylesheet" href="{{ asset('css/admin-cuotas.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin/shared.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin/cuotas.css') }}">
 @endpush
 
 @section('mobile-header')
@@ -60,23 +60,23 @@
       <div class="ac-form-row">
         <div class="ac-field">
           <label for="ac-carrera">Carrera</label>
-          <div class="aa-select-wrapper">
-            <select id="ac-carrera" class="aa-input" required></select>
-            <svg class="aa-select-chevron" width="16" height="16" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#chevron-down"></use></svg>
+          <div class="admin-select-wrapper">
+            <select id="ac-carrera" class="admin-input" required></select>
+            <svg class="admin-select-chevron" width="16" height="16" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#chevron-down"></use></svg>
           </div>
         </div>
         <div class="ac-field">
           <label for="ac-valor">Nuevo valor ($)</label>
-          <input type="number" id="ac-valor" class="aa-input" min="0" step="0.01" placeholder="Ej: 5000" required>
+          <input type="number" id="ac-valor" class="admin-input" min="0" step="0.01" placeholder="Ej: 5000" required>
         </div>
         <div class="ac-field">
           <label for="ac-desde">Vigente desde</label>
-          <input type="date" id="ac-desde" class="aa-input" required>
+          <input type="date" id="ac-desde" class="admin-input" required>
         </div>
       </div>
       <div class="ac-form-actions">
-        <button type="button" class="aa-btn-cancel" onclick="window.acToggleForm()">Cancelar</button>
-        <button type="submit" class="aa-btn-search" id="ac-btn-guardar">Guardar</button>
+        <button type="button" class="admin-btn-cancel" onclick="window.acToggleForm()">Cancelar</button>
+        <button type="submit" class="admin-btn-search" id="ac-btn-guardar">Guardar</button>
       </div>
       </div>
     </form>
@@ -114,7 +114,7 @@
     <!-- Tabla alumnos -->
     <div class="ac-table-wrap" id="ac-table-wrap">
       <p class="ac-loading" id="ac-loading">Cargando…</p>
-      <table class="aa-table" id="ac-table" hidden>
+      <table class="admin-table" id="ac-table" hidden>
         <thead>
           <tr>
             <th>Alumno</th>
@@ -228,5 +228,5 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/admin-cuotas.js') }}"></script>
+<script src="{{ asset('js/views/admin/cuotas.js') }}"></script>
 @endpush
