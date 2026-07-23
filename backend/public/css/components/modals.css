@@ -1,0 +1,188 @@
+/* ==============================
+   MODALS Y OVERLAYS
+============================== */
+.modal-overlay {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(17, 24, 39, 0.4);
+  backdrop-filter: blur(4px);
+  align-items: center; justify-content: center;
+  z-index: 20100;
+  padding: 16px;
+}
+.modal-overlay.show { display: flex; }
+
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  animation: modalSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalSlide {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; border-bottom: 1px solid var(--border-light);
+}
+.modal-title { font-size: 14px; font-weight: 700; color: var(--t1); display: flex; align-items: center; gap: 6px; }
+.modal-close {
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--t3); transition: background .15s;
+}
+.modal-close:hover { background: var(--border-light); color: var(--t1); }
+
+.modal-body { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.modal-foot {
+  padding: 12px 18px; border-top: 1px solid var(--border-light);
+  display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+  background: var(--bg);
+}
+
+.btn-cancel {
+  padding: 7px 14px; border-radius: var(--r-sm); border: 1px solid var(--border);
+  font-size: 12.5px; font-weight: 500; color: var(--t2); transition: all .15s;
+}
+.btn-cancel:hover { background: var(--border-light); color: var(--t1); }
+
+.btn-save {
+  padding: 7px 14px; border-radius: var(--r-sm); background: var(--brand);
+  font-size: 12.5px; font-weight: 600; color: #fff; transition: background .15s;
+}
+.btn-save:hover { background: var(--brand-hover); }
+
+.btn-danger {
+  padding: 7px 14px; border-radius: var(--r-sm); background: #fee2e2; border: 1px solid #fca5a5;
+  font-size: 12.5px; font-weight: 600; color: var(--red); transition: all .15s;
+}
+.btn-danger:hover { background: #fecaca; }
+
+/* Dark mode */
+body.dark-mode .modal-box {
+  background: #111827;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .modal-foot {
+  background: #0b0f19;
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode .btn-cancel {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--t2);
+}
+
+body.dark-mode .btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--t1);
+}
+
+/* ==============================
+   GRADE MODAL SYSTEM (shared between materias & alertas)
+   Moved from views/materias.css — see main.css too
+   ============================== */
+.grade-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+.grade-modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.grade-modal-box {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  width: 90%;
+  max-width: 320px;
+  padding: 20px;
+  box-shadow: var(--sh-md);
+  transform: translateY(-20px);
+  transition: transform .25s;
+}
+.grade-modal-overlay.open .grade-modal-box {
+  transform: translateY(0);
+}
+.grade-modal-header {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--t1);
+  margin-bottom: 12px;
+}
+.grade-modal-body {
+  margin-bottom: 18px;
+}
+.grade-select-wrapper {
+  margin-top: 10px;
+}
+.grade-input-select {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  outline: none;
+  background: var(--surface);
+  color: var(--t1);
+}
+.grade-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.btn-modal-action {
+  padding: 7px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  border: none;
+}
+.btn-modal-action.cancel {
+  background: #f3f4f6;
+  color: var(--t2);
+}
+.btn-modal-action.save {
+  background: var(--green);
+  color: #ffffff;
+}
+
+body.dark-mode .grade-modal-box {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+}
+body.dark-mode .grade-input-select {
+  background: #1f2937;
+  color: var(--t1);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .btn-modal-action.cancel {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--t2);
+}
+body.dark-mode .btn-modal-action.cancel:hover {
+  background: rgba(255, 255, 255, 0.08);
+}

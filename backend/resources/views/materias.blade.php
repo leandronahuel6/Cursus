@@ -2,6 +2,10 @@
 
 @section('title', 'Cursus - Mis Materias y Plan de Estudios')
 
+@push('styles')
+  <link rel="stylesheet" href="{{ asset('css/views/materias.css') }}">
+@endpush
+
 @section('mobile-header')
   <!-- Mobile Header -->
   <div class="mob-hdr">
