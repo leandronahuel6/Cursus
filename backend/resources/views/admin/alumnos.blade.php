@@ -56,7 +56,7 @@
           Buscar
         </button>
       </div>
-      <p id="aa-error" class="aa-error" hidden></p>
+      <p id="aa-error" class="admin-error" hidden></p>
     </form>
   </div>
 

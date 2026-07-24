@@ -136,18 +136,18 @@
     </div>
 
     <form id="ach-form" onsubmit="window.achBuscar(event)" style="display:flex; gap:10px; flex-wrap:wrap;">
-      <input type="text" id="ach-legajo" class="aa-input" placeholder="Legajo del alumno" maxlength="20" required autocomplete="off" style="flex:1; min-width:160px;">
-      <button type="submit" class="aa-btn-search" id="ach-btn-search">Buscar</button>
+      <input type="text" id="ach-legajo" class="admin-input" placeholder="Legajo del alumno" maxlength="20" required autocomplete="off" style="flex:1; min-width:160px;">
+      <button type="submit" class="admin-btn-search" id="ach-btn-search">Buscar</button>
     </form>
-    <p id="ach-error" class="aa-error" hidden></p>
+    <p id="ach-error" class="admin-error" hidden></p>
 
     <div id="ach-result" hidden>
       <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:10px;">
         <h3 class="ac-card-title" style="margin:0;" id="ach-nombre"></h3>
-        <select id="ach-anio" class="aa-input" style="width:auto;" onchange="window.achCambiarAnio(this.value)"></select>
+        <select id="ach-anio" class="admin-input" style="width:auto;" onchange="window.achCambiarAnio(this.value)"></select>
       </div>
       <div class="ac-table-wrap">
-        <table class="aa-table">
+        <table class="admin-table">
           <thead>
             <tr>
               <th>Período</th>
@@ -183,14 +183,14 @@
       <svg width="18" height="18" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#users"></use></svg>
       <h2 class="ac-card-title">Deudores del ciclo</h2>
     </div>
-    <div class="aa-select-wrapper" style="max-width:260px;">
-      <select id="ac-deudores-carrera" class="aa-input" onchange="window.cargarDeudores()">
+    <div class="admin-select-wrapper" style="max-width:260px;">
+      <select id="ac-deudores-carrera" class="admin-input" onchange="window.cargarDeudores()">
         <option value="">Todas las carreras</option>
       </select>
-      <svg class="aa-select-chevron" width="16" height="16" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#chevron-down"></use></svg>
+      <svg class="admin-select-chevron" width="16" height="16" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#chevron-down"></use></svg>
     </div>
     <div class="ac-table-wrap">
-      <table class="aa-table">
+      <table class="admin-table">
         <thead>
           <tr>
             <th>Alumno</th>
@@ -200,7 +200,7 @@
             <th></th>
           </tr>
         </thead>
-        <tbody id="ac-deudores-tbody"><tr><td colspan="5" class="aa-table-empty">Cargando…</td></tr></tbody>
+        <tbody id="ac-deudores-tbody"><tr><td colspan="5" class="admin-table-empty">Cargando…</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -208,20 +208,20 @@
 </div>
 
 <!-- Modal confirmación de eliminar registro de pago -->
-<div class="aa-confirm-overlay" id="ac-eliminar-overlay" hidden>
-  <div class="aa-confirm-box">
-    <div class="aa-confirm-icon">
+<div class="admin-confirm-overlay" id="ac-eliminar-overlay" hidden>
+  <div class="admin-confirm-box">
+    <div class="admin-confirm-icon">
       <svg width="24" height="24" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#trash-2"></use></svg>
     </div>
-    <h3 class="aa-confirm-title">¿Eliminar este registro de pago?</h3>
-    <p class="aa-confirm-msg">Vuelve a quedar pendiente. Usalo solo si el informe de tesorería contradice lo que muestra el sistema.</p>
+    <h3 class="admin-confirm-title">¿Eliminar este registro de pago?</h3>
+    <p class="admin-confirm-msg">Vuelve a quedar pendiente. Usalo solo si el informe de tesorería contradice lo que muestra el sistema.</p>
     <div class="ac-field" style="text-align:left; margin-top:10px;">
       <label for="ac-eliminar-motivo">Motivo (opcional)</label>
-      <input type="text" id="ac-eliminar-motivo" class="aa-input" placeholder="Ej: no figura en el informe de tesorería de julio">
+      <input type="text" id="ac-eliminar-motivo" class="admin-input" placeholder="Ej: no figura en el informe de tesorería de julio">
     </div>
-    <div class="aa-confirm-actions">
-      <button class="aa-btn-cancel" onclick="window.acCancelarEliminar()">Cancelar</button>
-      <button class="aa-btn-confirm-delete" id="ac-btn-confirmar-eliminar" onclick="window.acConfirmarEliminar()">Eliminar</button>
+    <div class="admin-confirm-actions">
+      <button class="admin-btn-cancel" onclick="window.acCancelarEliminar()">Cancelar</button>
+      <button class="admin-btn-confirm-delete" id="ac-btn-confirmar-eliminar" onclick="window.acConfirmarEliminar()">Eliminar</button>
     </div>
   </div>
 </div>

@@ -219,9 +219,9 @@
         // Mensaje rápido de éxito
         const err = document.getElementById('aa-error');
         err.textContent = '✓ Alumno eliminado correctamente.';
-        err.className = 'aa-error aa-success';
+        err.className = 'admin-error admin-success';
         err.hidden = false;
-        setTimeout(() => { err.hidden = true; err.className = 'aa-error'; }, 3000);
+        setTimeout(() => { err.hidden = true; err.className = 'admin-error'; }, 3000);
         // Volver al directorio
         aaVolverAlDirectorio();
       } else {

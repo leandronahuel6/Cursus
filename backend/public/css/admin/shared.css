@@ -116,6 +116,18 @@ select.admin-input {
 .text-ok   { color: var(--success, #38a169); }
 .text-warn { color: var(--warning, #d97706); }
 
+/* ---- Feedback messages ---- */
+/* Mensajes de éxito/error en línea dentro de formularios.
+   admin-error es el elemento base; admin-success lo sobreescribe
+   temporalmente vía className para indicar resultado positivo. */
+
+.admin-error {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--danger, #e53e3e);
+}
+.admin-success { color: var(--success, #38a169); }
+
 /* ---- Badges / status pills ---- */
 
 .admin-badge {
@@ -125,9 +137,11 @@ select.admin-input {
   font-size: 11px;
   font-weight: 600;
 }
+
+/* Modificadores semánticos de materias (admin/alumnos) */
 .badge-success { background: rgba(56,161,105,.15);  color: #38a169; } /* Materia aprobada · Cuota pagada */
 .badge-info    { background: rgba(66,153,225,.15);  color: #4299e1; } /* Materia cursando */
-.badge-warning { background: rgba(237,137,54,.15);  color: #ed8936; } /* Materia regular */
+.badge-warning { background: rgba(237,137,54,.15);  color: #ed8936; } /* Materia regular · Efectivo a confirmar */
 .badge-muted   { background: var(--border);          color: var(--text-muted); } /* Materia libre · Cuota pendiente */
 
 /* ---- Confirm/delete modal ---- */

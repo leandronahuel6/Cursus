@@ -246,12 +246,12 @@
   function badgeCuota(pago) {
     if (pago.estado === 'pagado') {
       const medio = pago.medio_pago === 'efectivo' ? ' (efectivo)' : '';
-      return `<span class="aa-badge badge-aprobada">Pagó${medio}</span>`;
+      return `<span class="admin-badge badge-success">Pagó${medio}</span>`;
     }
     if (pago.estado === 'pendiente_efectivo') {
-      return '<span class="aa-badge badge-regular">Efectivo, a confirmar</span>';
+      return '<span class="admin-badge badge-warning">Efectivo, a confirmar</span>';
     }
-    return '<span class="aa-badge badge-libre">Pendiente</span>';
+    return '<span class="admin-badge badge-muted">Pendiente</span>';
   }
 
   async function achBuscar(e, anioOverride) {
@@ -291,17 +291,17 @@
 
   function iaIndicador(p) {
     const ia = p.datos_extraidos_ia;
-    if (!ia) return '<span class="aa-badge badge-libre">—</span>';
+    if (!ia) return '<span class="admin-badge badge-muted">—</span>';
 
     const declarado = p.monto_declarado != null ? formatMonto(p.monto_declarado) : '—';
     if (ia.coincide_monto === true) {
-      return `<span class="aa-badge badge-aprobada" title="El monto leído coincide con el exigible">✓ ${declarado}</span>`;
+      return `<span class="admin-badge badge-success" title="El monto leído coincide con el exigible">✓ ${declarado}</span>`;
     }
     if (ia.coincide_monto === false) {
       const obs = (ia.observaciones || 'el monto leído no coincide con el exigible').replace(/"/g, '&quot;');
-      return `<span class="aa-badge badge-regular" title="${obs}">✗ ${declarado}</span>`;
+      return `<span class="admin-badge badge-warning" title="${obs}">✗ ${declarado}</span>`;
     }
-    return `<span class="aa-badge badge-libre" title="No se pudo comparar el monto">${declarado}</span>`;
+    return `<span class="admin-badge badge-muted" title="No se pudo comparar el monto">${declarado}</span>`;
   }
 
   function achCambiarAnio(anio) {
@@ -329,18 +329,18 @@
     tbody.innerHTML = '';
 
     if (data.cuotas.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" class="aa-table-empty">Sin cuotas generadas.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="admin-table-empty">Sin cuotas generadas.</td></tr>';
     } else {
       data.cuotas.forEach(p => {
         const tr = document.createElement('tr');
         const acciones = [];
         if (p.tiene_comprobante) {
-          acciones.push(`<button type="button" class="aa-btn-search" style="padding:4px 10px; font-size:0.78rem;" onclick="window.acVerComprobante(${p.id})">Ver comprobante</button>`);
+          acciones.push(`<button type="button" class="admin-btn-search" style="padding:4px 10px; font-size:0.78rem;" onclick="window.acVerComprobante(${p.id})">Ver comprobante</button>`);
         }
         if (p.estado === 'pendiente_efectivo') {
-          acciones.push(`<button type="button" class="aa-btn-search" style="padding:4px 10px; font-size:0.78rem;" onclick="window.acConfirmarEfectivo(${p.id})">Confirmar</button>`);
+          acciones.push(`<button type="button" class="admin-btn-search" style="padding:4px 10px; font-size:0.78rem;" onclick="window.acConfirmarEfectivo(${p.id})">Confirmar</button>`);
         }
-        acciones.push(`<button type="button" class="aa-btn-cancel" style="padding:4px 10px; font-size:0.78rem;" onclick="window.acAbrirEliminar(${p.id})">Eliminar</button>`);
+        acciones.push(`<button type="button" class="admin-btn-cancel" style="padding:4px 10px; font-size:0.78rem;" onclick="window.acAbrirEliminar(${p.id})">Eliminar</button>`);
 
         tr.innerHTML = `
           <td>${formatPeriodoLargo(p.periodo)}</td>
@@ -450,7 +450,7 @@
         const periodosHtml = a.periodos.map(p => `
           <div style="display:flex; align-items:center; gap:8px; justify-content:space-between; padding:4px 0;">
             <span>${formatPeriodoLargo(p.periodo)} — ${formatMonto(p.monto_exigible)}</span>
-            <button type="button" class="aa-btn-search" style="padding:3px 10px; font-size:0.78rem;" onclick="window.acConfirmarEfectivo(${p.id})">Confirmar</button>
+            <button type="button" class="admin-btn-search" style="padding:3px 10px; font-size:0.78rem;" onclick="window.acConfirmarEfectivo(${p.id})">Confirmar</button>
           </div>
         `).join('');
         box.innerHTML = `
@@ -481,7 +481,7 @@
 
   async function cargarDeudores() {
     const tbody = document.getElementById('ac-deudores-tbody');
-    tbody.innerHTML = '<tr><td colspan="5" class="aa-table-empty">Cargando…</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="admin-table-empty">Cargando…</td></tr>';
 
     const carreraId = document.getElementById('ac-deudores-carrera').value;
     const qs = carreraId ? `?carrera_id=${encodeURIComponent(carreraId)}` : '';
@@ -494,7 +494,7 @@
       const alumnos = await res.json();
 
       if (alumnos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="aa-table-empty">No hay deudores.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="admin-table-empty">No hay deudores.</td></tr>';
         return;
       }
 
@@ -506,12 +506,12 @@
           <td>${a.legajo ?? '—'}</td>
           <td>${a.meses_adeudados}</td>
           <td>${a.periodos_pendientes.map(formatPeriodoLargo).join(', ')}</td>
-          <td><button type="button" class="aa-btn-search" style="padding:4px 10px; font-size:0.78rem;" onclick="window.acVerHistorialDesdeLegajo('${a.legajo}')">Ver historial</button></td>
+          <td><button type="button" class="admin-btn-search" style="padding:4px 10px; font-size:0.78rem;" onclick="window.acVerHistorialDesdeLegajo('${a.legajo}')">Ver historial</button></td>
         `;
         tbody.appendChild(tr);
       });
     } catch {
-      tbody.innerHTML = '<tr><td colspan="5" class="aa-table-empty">Error al cargar.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="admin-table-empty">Error al cargar.</td></tr>';
     }
   }
 
