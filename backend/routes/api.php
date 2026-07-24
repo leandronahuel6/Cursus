@@ -11,7 +11,6 @@ use App\Http\Controllers\SesionPomodoroController;
 use App\Http\Controllers\TareaController;
 use App\Http\Controllers\MarcadorController;
 use App\Http\Controllers\AlertaController;
-use App\Http\Controllers\RecordatorioCuotaController;
 use App\Http\Controllers\PagoCuotaController;
 use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\AdminController;
@@ -80,9 +79,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/alertas', [AlertaController::class, 'store']);
     Route::put('/alertas/{alerta}', [AlertaController::class, 'update']);
     Route::delete('/alertas/{alerta}', [AlertaController::class, 'destroy']);
-
-    Route::get('/recordatorio-cuota', [RecordatorioCuotaController::class, 'show']);
-    Route::put('/recordatorio-cuota', [RecordatorioCuotaController::class, 'update']);
 
     Route::get('/pagos-cuota/estado', [PagoCuotaController::class, 'estado']);
     Route::post('/pagos-cuota', [PagoCuotaController::class, 'store']);
