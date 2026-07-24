@@ -81,7 +81,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/alertas/{alerta}', [AlertaController::class, 'destroy']);
 
     Route::get('/pagos-cuota/estado', [PagoCuotaController::class, 'estado']);
-    Route::post('/pagos-cuota', [PagoCuotaController::class, 'store']);
+    Route::get('/pagos-cuota/historial', [PagoCuotaController::class, 'historial']);
+    Route::post('/pagos-cuota/{periodo}/comprobante', [PagoCuotaController::class, 'subirComprobante']);
+    Route::post('/pagos-cuota/{periodo}/efectivo', [PagoCuotaController::class, 'declararEfectivo']);
+    Route::get('/pagos-cuota/{id}/comprobante', [PagoCuotaController::class, 'comprobante']);
 
     // Rutas de Flashcards
     Route::get('/flashcards/decks', [FlashcardController::class, 'indexDecks']);
@@ -103,7 +106,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/alumnos/buscar', [AdminController::class, 'buscarAlumno']);
         Route::delete('/alumnos/{id}', [AdminController::class, 'eliminarAlumno']);
         Route::get('/cuotas/estado', [AdminController::class, 'cuotasEstado']);
+        Route::get('/cuotas/deudores', [AdminController::class, 'deudores']);
+        Route::get('/cuotas/pendientes-efectivo', [AdminController::class, 'pendientesEfectivo']);
+        Route::get('/cuotas/{id}/comprobante', [AdminController::class, 'comprobante']);
+        Route::post('/cuotas/{id}/confirmar-efectivo', [AdminController::class, 'confirmarEfectivo']);
+        Route::delete('/cuotas/{id}', [AdminController::class, 'eliminarPago']);
         Route::post('/cuotas', [AdminController::class, 'setCuota']);
+        Route::get('/alumnos/{legajo}/cuotas', [AdminController::class, 'historialAlumno']);
         Route::get('/plan-estudios', [AdminController::class, 'getPlanEstudios']);
         Route::post('/plan-estudios', [AdminController::class, 'storeMateria']);
         Route::put('/plan-estudios/{id}', [AdminController::class, 'updateMateria']);
