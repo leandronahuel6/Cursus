@@ -3,7 +3,6 @@
 @section('title', 'Cursus - Alertas y Vencimientos')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin-alumnos.css') }}">
 <link rel="stylesheet" href="{{ asset('css/views/alertas.css') }}">
 @endpush
 
