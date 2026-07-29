@@ -8,25 +8,11 @@
 ============================== */
 /* :root { ... } y body.dark-mode { ... } → ver css/base/variables.css */
 
-body.dark-mode .topbar {
-  background: rgba(7, 10, 19, 0.82);
-  border-bottom-color: rgba(255, 255, 255, 0.08);
-}
+/* body.dark-mode .topbar -> MOVED TO css/layout/topbar.css */
 
 /* Sidebar dark-mode overrides → ver css/layout/sidebar.css */
 
-body.dark-mode .bnav {
-  background: rgba(11, 15, 25, 0.96);
-  border-top-color: rgba(255, 255, 255, 0.08);
-}
-
-body.dark-mode .bn {
-  color: #94a3b8;
-}
-
-body.dark-mode .bn.on {
-  color: #a5b4fc;
-}
+/* body.dark-mode .bnav and variants -> MOVED TO css/layout/mobile-nav.css */
 
 body.dark-mode .contact-box {
   background: #111827;
@@ -172,7 +158,8 @@ body.dark-mode .modal-select {
   border-color: rgba(255, 255, 255, 0.08);
   color: var(--t1);
 } */
-body.dark-mode .btn-secondary {
+/* .btn-secondary dark mode -> components/buttons.css */
+/* body.dark-mode .btn-secondary {
   background: rgba(255, 255, 255, 0.05);
   color: var(--t1);
   border-color: rgba(255, 255, 255, 0.1);
@@ -180,32 +167,14 @@ body.dark-mode .btn-secondary {
 body.dark-mode .btn-secondary:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.2);
-}
+} */
 
-/* Progreso Dark Mode Overrides */
-body.dark-mode .grade-stepper {
-  background: #1f2937;
-  border-color: rgba(255, 255, 255, 0.08);
-}
-body.dark-mode .g-btn {
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--t2);
-}
-body.dark-mode .g-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.08);
-}
-body.dark-mode .g-val {
-  color: var(--t3);
-}
+/* body.dark-mode .grade-stepper, body.dark-mode .g-btn, body.dark-mode .g-btn:hover, body.dark-mode .g-val → ver css/views/progreso.css */
 body.dark-mode .formula-container {
   background: rgba(255, 255, 255, 0.02);
   border-color: rgba(255, 255, 255, 0.06);
 }
-body.dark-mode .pace-btn {
-  background: #1f2937;
-  color: var(--t2);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.5);
-}
+/* body.dark-mode .pace-btn → ver css/views/progreso.css */
 body.dark-mode .metrics-box {
   background: rgba(255, 255, 255, 0.02);
   border-color: rgba(255, 255, 255, 0.06);
@@ -246,14 +215,8 @@ body.dark-mode .heatmap-day {
   background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Adaptación de las tarjetas de racha (.stat-badge-card) al modo oscuro en Productividad y Estudio */
-body.dark-mode .stat-badge-card {
-  background: rgba(99, 102, 241, 0.12);
-  border-color: rgba(99, 102, 241, 0.25);
-}
-body.dark-mode .stat-badge-val {
-  color: #818cf8;
-}
+/* Adaptación de las tarjetas de racha (.stat-badge-card) — MOVED TO css/components/stats.css */
+/* body.dark-mode .stat-badge-card, body.dark-mode .stat-badge-val → ver css/components/stats.css */
 
 /* Heatmap de Progreso (Productividad y Estudio) modo oscuro */
 body.dark-mode .heatmap-day.lvl-1 {
@@ -269,43 +232,17 @@ body.dark-mode .heatmap-day.lvl-4 {
   background-color: #c7d2fe; 
 }
 
-/* Heatmap de Dashboard (Inicio) modo oscuro */
-body.dark-mode .hm-cell,
-body.dark-mode .hm-sq.l0 {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-body.dark-mode .hm-cell.l1,
-body.dark-mode .hm-sq.l1 {
-  background: #312e81;
-}
-body.dark-mode .hm-cell.l2,
-body.dark-mode .hm-sq.l2 {
-  background: #6366f1; 
-}
-body.dark-mode .hm-cell.l3,
-body.dark-mode .hm-sq.l3 {
-  background: #c7d2fe;
-}
+/* Heatmap de Dashboard (Inicio) — MOVED TO css/views/dashboard.css */
+/* body.dark-mode .hm-cell, body.dark-mode .hm-sq → ver css/views/dashboard.css */
 
-/* Botón cancelar del popup de contacto y perfil en modo oscuro */
-body.dark-mode .contact-btn-cancel {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--t2);
-}
-body.dark-mode .contact-btn-cancel:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
+/* Botón cancelar del popup de contacto y perfil en modo oscuro -> components/modals.css */
 
 /* Filas (.sim-row.disabled) en Mi Progreso en modo oscuro */
 body.dark-mode .sim-row.disabled {
   background: rgba(255, 255, 255, 0.02) !important;
   opacity: 0.4;
 }
-body.dark-mode .grade-stepper.stepper-disabled {
-  background: rgba(255, 255, 255, 0.02);
-  opacity: 0.5;
-}
+/* body.dark-mode .grade-stepper.stepper-disabled → ver css/views/progreso.css */
 
 /* Gestión de Cursada y Modal de calificación en modo oscuro — MOVED TO public/css/views/materias.css and public/css/components/modals.css */
 
@@ -314,7 +251,8 @@ body.dark-mode .grade-stepper.stepper-disabled {
 ============================== */
 /* *, html, body, button, a { ... } → ver css/base/reset.css */
 
-.theme-toggle-btn {
+/* theme-toggle-btn -> components/buttons.css */
+/* .theme-toggle-btn {
   background: #ffffff;
   border: 1px solid rgba(226, 232, 240, 0.85);
   border-radius: 50%;
@@ -359,462 +297,80 @@ body.dark-mode .theme-toggle-btn .icon-moon { display: none; }
 
 .theme-toggle-btn.theme-toggle-mobile {
   display: none;
-}
-.mob-header-actions {
-  display: none;
-  position: fixed;
-  right: 16px;
-  top: 37px;
-  transform: translateY(-50%);
-  z-index: 120;
-  align-items: center;
-  gap: 12px;
-}
-.mob-header-actions .sb-av {
-  width: 34px;
-  height: 34px;
-  font-size: 13px;
-}
+} */
+
 
 /* h1, h2, ... — MOVED TO base/reset.css */
 /* h1, h2, h3, h4, h5, h6, .display-text { font-family: var(--font-display); } */
 
 /* ==============================
-   APP LAYOUT
-============================== */
-.app { display: flex; min-height: 100vh; }
-
-/* ==============================
-   MAIN
+   APP LAYOUT / MAIN -> MOVED TO css/layout/app.css
 ============================== */
 /* Estilos sidebar → ver css/layout/sidebar.css */
 
-.main {
-  flex: 1;
-  margin-left: var(--sidebar-w);
-  display: flex; flex-direction: column;
-  min-height: 100vh;
-  min-width: 0;
-  max-width: calc(100% - var(--sidebar-w));
-  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 /* ==============================
-   TOPBAR
+   TOPBAR -> MOVED TO css/layout/topbar.css
 ============================== */
-.topbar {
-  height: var(--topbar-h);
-  background: rgba(244,245,251,.88);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; z-index: 50;
-  display: flex; align-items: center;
-  padding: 0 24px; gap: 12px;
-}
-.topbar-title {
-  flex: 1; font-size: 15.5px; font-weight: 600; color: var(--t1);
-}
-.topbar-title span { font-weight: 300; color: var(--t3); }
-.topbar-title .greeting-name,
-.mob-greet .greeting-name,
-.topbar-title #greet-text-topbar,
-.mob-greet #greet-text-mob { font-weight: 700; color: inherit; }
-.streak-chip {
-  display: flex; align-items: center; gap: 5px;
-  background: #fff7ed; border: 1px solid #fed7aa;
-  color: #c2410c; font-size: 12px; font-weight: 600;
-  padding: 4px 11px; border-radius: 20px;
-}
-.btn-primary {
-  background: var(--brand); color: #fff;
-  font-size: 13px; font-weight: 500;
-  padding: 7px 16px; border-radius: 8px;
-  transition: background .15s, transform .15s, box-shadow .15s;
-}
-.btn-primary:hover {
-  background: var(--brand-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(79,70,229,.3);
-}
-.btn-secondary {
-  background: #fff;
-  color: var(--t2);
-  border: 1px solid var(--border);
-  font-size: 13px;
-  font-weight: 500;
-  padding: 7px 16px;
-  border-radius: 8px;
-  transition: all .15s ease;
-}
-.btn-secondary:hover {
-  background: #f3f4f6;
-  color: var(--t1);
-  border-color: #d1d5db;
-  transform: translateY(-1px);
-}
-.tb-actions {
-  margin-left: auto;
-  display: flex;
-  gap: 12px;
-}
+
+/* .btn-primary, .btn-secondary -> components/buttons.css */
 
 /* ==============================
-   PAGE CONTENT
+   PAGE CONTENT -> MOVED TO css/layout/app.css
 ============================== */
-.page { flex: 1; padding: 20px 24px 36px; display: flex; flex-direction: column; gap: 16px; }
 
 /* ==============================
-   ALERT BANNER
+   ALERT BANNER — MOVED TO css/components/alerts.css
 ============================== */
-.alert {
-  display: flex; align-items: center; gap: 10px;
-  background: #fff7ed;
-  border: 1px solid #fcd9a0; border-left: 3px solid #f97316;
-  border-radius: var(--r);
-  padding: 10px 14px; font-size: 13px; color: #9a3412;
-}
-.alert-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: #f97316; flex-shrink: 0;
-  animation: blink 2s ease-in-out infinite;
-}
-/* @keyframes blink moved to base/reset.css */
-/* @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} } */
-.alert-txt { flex: 1; line-height: 1.4; }
-.alert-txt strong { font-weight: 600; }
-.alert-x {
-  font-size: 15px; color: #fdba74;
-  cursor: pointer; padding: 0 2px;
-  transition: color .15s;
-}
-.alert-x:hover { color: #9a3412; }
+/* .alert, .alert-dot, .alert-txt, .alert-x { ... } → ver css/components/alerts.css */
+/* @keyframes blink moved to css/base/animations.css */
 
 /* ==============================
-   STATS GRID
+   STATS GRID — MOVED TO css/components/stats.css
 ============================== */
-.stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
-
-.stat {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--r-lg); padding: 14px 15px;
-  box-shadow: var(--sh); position: relative; overflow: hidden;
-  transition: box-shadow .2s, transform .2s;
-}
-.stat:hover { box-shadow: var(--sh-md); transform: translateY(-1px); }
-.stat::before {
-  content: ''; position: absolute;
-  top: 0; left: 0; right: 0; height: 3px;
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
-}
-.stat:nth-child(1)::before { background: var(--brand); }
-.stat:nth-child(2)::before { background: #f97316; }
-.stat:nth-child(3)::before { background: var(--green); }
-.stat:nth-child(4)::before { background: var(--yellow); }
-
-.stat-ic { font-size: 18px; display: block; margin-bottom: 8px; }
-.stat-val {
-  font-size: 21px; font-weight: 700;
-  letter-spacing: -.03em; line-height: 1;
-  margin-bottom: 4px; color: var(--t1);
-}
-.stat-lbl { font-size: 11.5px; color: var(--t3); }
+/* .stats, .stat, .stat--*, .stat-ic, .stat-val, .stat-lbl { ... } → ver css/components/stats.css */
 
 /* ==============================
-   DASHBOARD GRID
+   DASHBOARD GRID — MOVED TO css/layout/grid.css
 ============================== */
-.dash { display: grid; grid-template-columns: 1fr 256px; gap: 16px; align-items: start; }
-.col { display: flex; flex-direction: column; gap: 16px; }
+/* .dash, .col { ... } → ver css/layout/grid.css */
 
 /* ==============================
-   CARD BASE
+   CARD BASE — MOVED TO css/components/cards.css
 ============================== */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh); overflow: hidden;
-}
-.card-hd {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 13px 15px 0;
-}
-.card-title {
-  font-size: 12.5px; font-weight: 600; color: var(--t1);
-  display: flex; align-items: center; gap: 6px;
-}
-.card-title svg { flex-shrink: 0; }
-.card-link {
-  font-size: 11.5px; font-weight: 500; color: var(--brand);
-  cursor: pointer; transition: opacity .15s;
-}
-.card-link:hover { opacity: .7; }
-.card-body { padding: 11px 15px 15px; }
+/* .card, .card-hd, .card-title, .card-link, .card-body { ... } → ver css/components/cards.css */
 
 /* ==============================
-   MATERIALS
+   MATERIALS (dashboard) — MOVED TO css/views/dashboard.css
 ============================== */
-.mats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-
-.mat {
-  background: var(--bg); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 10px 11px;
-  cursor: pointer; transition: border-color .15s, background .15s;
-}
-.mat:hover { border-color: var(--brand-dim); background: var(--brand-light); }
-.mat.dim { opacity: .45; cursor: default; }
-
-.mat-top {
-  display: flex; align-items: flex-start;
-  justify-content: space-between; gap: 6px; margin-bottom: 7px;
-}
-.mat-name { font-size: 12px; font-weight: 600; color: var(--t1); line-height: 1.3; }
-
-.badge {
-  font-size: 9px; font-weight: 700;
-  padding: 2px 6px; border-radius: 4px;
-  white-space: nowrap; flex-shrink: 0;
-  text-transform: uppercase; letter-spacing: .02em;
-}
-.b-reg  { background: #dbeafe; color: #1d4ed8; }
-.b-apr  { background: #d1fae5; color: #065f46; }
-.b-cur  { background: #fef3c7; color: #92400e; }
-
-.mat-bar { height: 3px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 7px; }
-.mat-fill {
-  height: 100%; border-radius: 3px;
-  transition: width .9s cubic-bezier(.34,1.56,.64,1);
-}
-.mat:nth-child(1) .mat-fill { background: linear-gradient(90deg,#4f46e5,#818cf8); }
-.mat:nth-child(2) .mat-fill { background: linear-gradient(90deg,#059669,#34d399); }
-.mat:nth-child(3) .mat-fill { background: linear-gradient(90deg,#f97316,#fb923c); }
-.mat:nth-child(4) .mat-fill { background: linear-gradient(90deg,#4f46e5,#818cf8); }
-
-.mat-ft { display: flex; align-items: center; justify-content: space-between; }
-.mat-h  { font-size: 10.5px; color: var(--t3); }
-.mat-ar { font-size: 11px; color: var(--tm); }
+/* .mats-grid, .mat, .mat-top, .mat-name, .mat-bar, .mat-fill, .mat-ft, .mat-h, .mat-ar { ... } → ver css/views/dashboard.css */
 
 /* ==============================
-   TASKS
+   BADGE — MOVED TO css/components/badges.css
 ============================== */
-.task {
-  display: flex; align-items: center; gap: 9px;
-  padding: 8.5px 0; border-bottom: 1px solid var(--border-light);
-  cursor: pointer; transition: opacity .15s;
-}
-.task:last-child { border-bottom: none; padding-bottom: 0; }
-.task:hover { opacity: .72; }
+/* .badge, .badge--info, .badge--success, .badge--warning, .badge--danger, .badge--neutral { ... } → ver css/components/badges.css */
 
-.task-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%; flex-shrink: 0;
-}
-.d-red   { background: #ef4444; }
-.d-org   { background: #f97316; }
-.d-ylw   { background: #f59e0b; }
-.d-grn   { background: #10b981; }
+/* .mat-bar, .mat-fill, .mat-ft, .mat-h, .mat-ar → ver css/views/dashboard.css */
 
-.task-inf { flex: 1; min-width: 0; }
-.task-name { font-size: 12.5px; font-weight: 500; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.task-sub  { font-size: 11px; color: var(--t3); margin-top: 1px; }
-.task-due  { font-size: 11px; font-weight: 500; color: var(--t3); white-space: nowrap; }
-.task-due.urg { color: var(--red); }
-.task-due.mid { color: var(--orange); }
+/* .task, .task-dot, .d-red, .d-org, .d-ylw, .d-grn, .task-inf, .task-name, .task-sub, .task-due → ver css/views/dashboard.css */
 
 /* ==============================
-   ACCESO RÁPIDO — Área de Estudio
+   ACCESO RÁPIDO / STUDY CARD — MOVED TO css/views/dashboard.css
 ============================== */
-.study-card { overflow: hidden; }
-
-.study-hero {
-  padding: 14px 15px 12px;
-  display: flex; align-items: center; gap: 11px;
-  border-bottom: 1px solid var(--border-light);
-}
-.study-hero-icon {
-  width: 40px; height: 40px; border-radius: 10px;
-  background: var(--brand-light);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; flex-shrink: 0;
-}
-.study-subject { font-size: 13px; font-weight: 600; color: var(--t1); margin-bottom: 2px; }
-.study-sub     { font-size: 11px; color: var(--t3); }
-
-.study-cta-wrap {
-  padding: 12px 15px;
-  border-bottom: 1px solid var(--border-light);
-}
-.study-cta {
-  width: 100%; padding: 9px;
-  background: var(--brand); color: #fff;
-font-size: 13px; font-weight: 600;
-  border-radius: var(--r); cursor: pointer;
-  transition: background .15s, transform .15s, box-shadow .15s;
-  margin-bottom: 7px;
-}
-.study-cta:hover {
-  background: var(--brand-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(79,70,229,.3);
-}
-.study-cta-meta {
-  font-size: 11px; color: var(--t3);
-  text-align: center;
-  display: flex; align-items: center; justify-content: center; gap: 5px;
-}
-.study-live-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: #10b981; flex-shrink: 0;
-  animation: blink 2s infinite;
-}
-
-.study-sessions { padding: 10px 15px 0; }
-.ss-hdr {
-  font-size: 10.5px; font-weight: 600; color: var(--tm);
-  text-transform: uppercase; letter-spacing: .06em;
-  margin-bottom: 8px;
-}
-.ss-item {
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 0;
-  border-bottom: 1px solid var(--border-light);
-}
-.ss-item:last-child { border-bottom: none; }
-.ss-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--brand); flex-shrink: 0;
-}
-.ss-info { flex: 1; min-width: 0; }
-.ss-mat  { font-size: 12px; font-weight: 500; color: var(--t1); }
-.ss-time { font-size: 10.5px; color: var(--t3); }
-.ss-dur  { font-size: 11.5px; font-weight: 600; color: var(--t3); white-space: nowrap; }
-.ss-total {
-  padding: 7px 0 10px;
-  font-size: 11.5px; font-weight: 500; color: var(--t2);
-  text-align: right;
-}
-
-.study-others { border-top: 1px solid var(--border-light); padding: 9px 15px 12px; }
-.so-hdr {
-  font-size: 10.5px; font-weight: 600; color: var(--tm);
-  text-transform: uppercase; letter-spacing: .06em;
-  margin-bottom: 6px;
-}
-.so-item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 6px 8px; border-radius: var(--r-sm);
-  font-size: 12px; color: var(--t2);
-  cursor: pointer; transition: background .15s, color .15s;
-  margin-bottom: 2px;
-}
-.so-item:last-child { margin-bottom: 0; }
-.so-item:hover { background: var(--brand-light); color: var(--brand); }
+/* .study-card, .study-hero, .study-cta, .study-sessions, .study-others { ... } → ver css/views/dashboard.css */
 
 /* ==============================
-   HEATMAP
+   HEATMAP — MOVED TO css/views/dashboard.css
 ============================== */
-.hm-wrap { padding: 10px 15px 13px; }
-.hm-top {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 8px;
-}
-.hm-title { font-size: 12.5px; font-weight: 600; color: var(--t1); display: flex; align-items: center; gap: 6px; }
-.hm-streak { font-size: 12.5px; font-weight: 700; color: #ea580c; }
-
-.hm-grid {
-  display: grid; grid-template-columns: repeat(13,1fr);
-  gap: 2.5px; margin-bottom: 6px;
-}
-.hm-cell {
-  aspect-ratio: 1; border-radius: 2px;
-  background: #f3f4f6;
-  transition: transform .15s;
-  cursor: default;
-}
-.hm-cell:hover { transform: scale(1.4); }
-.hm-cell.l1 { background: #c7d2fe; }
-.hm-cell.l2 { background: #818cf8; }
-.hm-cell.l3 { background: #4f46e5; }
-
-.hm-leg {
-  display: flex; align-items: center;
-  justify-content: flex-end; gap: 3px;
-}
-.hm-lt { font-size: 10px; color: var(--tm); }
-.hm-sq { width: 9px; height: 9px; border-radius: 2px; }
-.hm-sq.l0 { background: #f3f4f6; border: 1px solid #e5e7eb; }
-.hm-sq.l1 { background: #c7d2fe; }
-.hm-sq.l2 { background: #818cf8; }
-.hm-sq.l3 { background: #4f46e5; }
+/* .hm-wrap, .hm-top, .hm-title, .hm-streak, .hm-grid, .hm-cell, .hm-leg, .hm-lt, .hm-sq { ... } → ver css/views/dashboard.css */
 
 /* ==============================
-   MOBILE HEADER
+   MOBILE HEADER & BNAV -> MOVED TO css/layout/mobile-nav.css
 ============================== */
-.mob-hdr { display: none; }
-.pmenu { position: fixed; bottom: 16px; right: 16px; z-index: 101; }
 
 /* ==============================
-   BARRA DE NAVEGACIÓN INFERIOR (MÓVIL)
-   ============================== */
-.bnav {
-  display: none;
-  position: fixed; bottom: -1px; left: 0; right: 0; /* Solapa 1px abajo del viewport */
-  height: calc(51px + env(safe-area-inset-bottom, 0px)); /* Soporte para área segura móvil */
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  box-sizing: border-box;
-  background: rgba(11, 15, 25, 0.96); /* Fondo oscuro permanente */
-  backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(255, 255, 255, 0.08); /* Borde superior claro permanente */
-  z-index: 100;
-}
-.bnav-row {
-  display: flex;
-  height: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-  gap: 12px;
-  padding: 0 16px;
-}
-.bn {
-  flex: 1;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 3px;
-  font-size: 10px; font-weight: 500; color: #94a3b8; /* Texto gris de modo oscuro */
-  cursor: pointer; transition: color .15s; position: relative;
-}
-.bn.on { color: #a5b4fc; } /* Color de elemento activo (indigo claro) */
-.bn.on .bn-ic { opacity: 1; }
-.bn:hover:not(.on) { color: #e2e8f0; } /* Hover gris claro */
-.bn:hover:not(.on) .bn-ic { opacity: 0.8; }
-.bn-ic {
-  width: 16px;
-  height: 16px;
-  display: block;
-  opacity: 0.45;
-  transition: opacity 0.15s;
-}
-.bn-badge {
-  position: absolute; top: 5px; right: calc(50% - 15px);
-  background: #ef4444; color: #fff;
-  font-size: 8px; font-weight: 700;
-  padding: 0 4px; border-radius: 10px;
-  line-height: 1.6;
-}/* ==============================
    ÁREA DE ESTUDIO (POMODORO / KANBAN / MARCADORES)
 ============================== */
-.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--t3); }
-.breadcrumb .sep { color: var(--border); }
-.breadcrumb a { cursor: pointer; transition: color .15s; }
-.breadcrumb a:hover { color: var(--brand); }
-.breadcrumb .cur { color: var(--t1); font-weight: 600; }
-.tb-right { margin-left: auto; }
-.focus-btn {
-  display: flex; align-items: center; gap: 5px;
-  background: var(--bg); border: 1px solid var(--border);
-  border-radius: 20px; padding: 5px 13px;
-  font-size: 12px; font-weight: 500; color: var(--t2);
-  cursor: pointer; transition: all .15s;
-}
-.focus-btn:hover { border-color: var(--brand-dim); color: var(--brand); background: var(--brand-light); }
+/* Breadcrumb y Area de Estudio header -> MOVED TO css/layout/topbar.css (No son en sí estilos propios del área de estudio) */
 
 /* MATERIA HEADER */
 .mat-hdr {
@@ -1106,33 +662,7 @@ font-size: 13px; font-weight: 600;
   align-items: start;
 } */
 
-/* Selector de Carrera en Topbar */
-.career-selector-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 6px 12px;
-  border-radius: var(--r-sm);
-  font-size: 13px;
-  color: var(--t2);
-  box-shadow: var(--sh);
-}
-
-[hidden] {
-  display: none !important;
-}
-.career-select {
-  border: none;
-  background: transparent;
-  color: var(--t1);
-  font-weight: 600;
-  outline: none;
-  font-size: 13px;
-  cursor: pointer;
-  max-width: 250px;
-}
+/* Selector de Carrera en Topbar -> MOVED TO css/layout/topbar.css */
 
 /* Switcher de Vista (Lista / Calendario) — MOVED TO public/css/views/alertas.css */
 /* .view-switcher {
@@ -1236,53 +766,9 @@ font-size: 13px; font-weight: 600;
   border: 1px solid rgba(0, 0, 0, 0.18);
   flex-shrink: 0;
 }
-.alert-priority-badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 12px;
-  text-transform: uppercase;
-}
-.alert-priority-alta { background: #fee2e2; color: var(--red); }
-.alert-priority-media { background: #ffedd5; color: var(--orange); }
-.alert-priority-baja { background: #f3f4f6; color: var(--t2); }
+/* .alert-priority-badge, .alert-priority-alta, .alert-priority-media, .alert-priority-baja → ver css/views/alertas.css */
 
-.alert-date-badge {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--t2);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.alert-item-actions {
-  display: flex;
-  gap: 8px;
-}
-.btn-alert-action {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border);
-  color: var(--t3);
-  font-size: 12px;
-  background: var(--surface);
-  transition: all .15s;
-  cursor: pointer;
-}
-.btn-alert-action.btn-complete:hover {
-  background: #ecfdf5;
-  color: var(--green);
-  border-color: #a7f3d0;
-}
-.btn-alert-action.btn-delete:hover {
-  background: #fef2f2;
-  color: var(--red);
-  border-color: #fca5a5;
-} */
+
 
 /* Calendario — MOVED TO public/css/views/alertas.css */
 /* .calendar-card-wrap {
@@ -1377,72 +863,8 @@ font-size: 13px; font-weight: 600;
   color: #ffffff !important;
   font-weight: 600;
 }
-.calendar-day-cell.has-alerts {
-  color: var(--t1);
-  font-weight: 700;
-}
-.calendar-day-cell.has-alerts.selected {
-  outline: 2px solid var(--brand);
-  outline-offset: -2px;
-  background: transparent !important;
-  color: var(--t1) !important;
-}
-.calendar-day-cell.selected .calendar-dots-row .dot {
-  background: #ffffff !important;
-}
-.calendar-dots-row {
-  display: flex;
-  gap: 3px;
-  position: absolute;
-  bottom: 3px;
-}
-.calendar-dots-row .dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-}
-.calendar-day-popover {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 220px;
-  max-height: 220px;
-  overflow-y: auto;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  box-shadow: var(--sh-md);
-  padding: 8px;
-  z-index: 80;
-  cursor: default;
-  text-align: left;
-  white-space: normal;
-}
-.calendar-day-popover-title {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--t1);
-  margin-bottom: 6px;
-  padding: 0 2px;
-}
-.calendar-day-popover-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 4px;
-  border-radius: var(--r-sm);
-}
-.calendar-day-popover-item:hover { background: var(--border-light); }
-.calendar-day-popover-info { flex: 1; min-width: 0; }
-.calendar-day-popover-titulo {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--t1);
-  white-space: normal;
-  word-break: break-word;
-  margin-bottom: 3px;
-} */
+/* .calendar-day-cell.has-alerts, .calendar-day-cell.has-alerts.selected, .calendar-day-cell.selected .calendar-dots-row .dot → ver css/views/alertas.css */
+
 
 /* Tarjeta de Pago de Cuota — DEAD CODE (no se usa en ninguna vista ni JS) */
 /* .payment-card-box {
@@ -1650,219 +1072,8 @@ pointer-events: none;
    PÁGINA DE MIS MATERIAS — MOVED TO public/css/views/materias.css
    grade-modal / subject-info classes → public/css/components/modals.css
 ============================== */
-/* ==============================
-   PÁGINA DE MÉTRICAS
-============================== */
-.metricas-grid {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 20px;
-  align-items: start;
-}
-.metricas-stats-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 15px;
-  margin-bottom: 20px;
-}
-.metricas-stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 15px;
-  box-shadow: var(--sh);
-  text-align: center;
-}
-.metricas-stat-val {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--brand);
-  margin-bottom: 2px;
-}
-.metricas-stat-lbl {
-  font-size: 11px;
-  color: var(--t3);
-  font-weight: 500;
-}
 
-/* Gráficos y visuales */
-.chart-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 20px;
-  box-shadow: var(--sh);
-  margin-bottom: 20px;
-}
-.chart-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-.chart-card-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--t1);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.chart-card-subtitle {
-  font-size: 11px;
-  color: var(--tm);
-}
-.svg-chart-container {
-  position: relative;
-  width: 100%;
-  height: 200px;
-  overflow: visible;
-}
-.svg-chart {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-/* Clases SVG para gráficos */
-.chart-line {
-  stroke: var(--brand);
-  stroke-width: 3;
-  fill: none;
-  stroke-linecap: round;
-  transition: d 0.5s ease-in-out;
-}
-.chart-area-fill {
-  fill: url(#chart-gradient);
-  transition: d 0.5s ease-in-out;
-}
-.chart-dot-point {
-  fill: var(--surface);
-  stroke: var(--brand);
-  stroke-width: 3;
-  r: 5;
-  cursor: pointer;
-  transition: transform 0.2s, r 0.2s;
-}
-.chart-dot-point:hover {
-  r: 7;
-}
-.chart-grid-line {
-  stroke: var(--border-light);
-  stroke-width: 1;
-}
-.chart-grid-line.bold {
-  stroke: var(--border);
-}
-.chart-axis-line {
-  stroke: var(--border);
-  stroke-width: 1.5;
-}
-.chart-text-lbl {
-  fill: var(--t3);
-  font-size: 10px;
-  font-weight: 500;
-  text-anchor: middle;
-}
-.chart-text-lbl.y-axis {
-  text-anchor: end;
-}
-
-/* Gráfico de barras SVG */
-.chart-bar-rect {
-  fill: var(--brand-dim);
-  transition: fill 0.2s, height 0.3s, y 0.3s;
-  cursor: pointer;
-}
-.chart-bar-rect:hover {
-  fill: var(--brand);
-}
-.chart-bar-rect.active {
-  fill: var(--brand);
-}
-
-/* Gráfico Donut */
-.chart-donut-segment {
-  fill: none;
-  stroke-width: 24;
-  transition: stroke-dasharray 0.5s ease;
-  cursor: pointer;
-}
-.chart-donut-text-title {
-  fill: var(--t1);
-  font-size: 22px;
-  font-weight: 700;
-  text-anchor: middle;
-  dominant-baseline: middle;
-}
-.chart-donut-text-sub {
-  fill: var(--t3);
-  font-size: 10px;
-  font-weight: 500;
-  text-anchor: middle;
-  dominant-baseline: middle;
-}
-
-/* Leyendas de Gráficos */
-.chart-legends-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 15px;
-  justify-content: center;
-}
-.chart-legend-bullet {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--t2);
-  font-weight: 500;
-}
-.bullet-color {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-/* Caja de Proyecciones */
-.projection-card-box {
-  background: linear-gradient(135deg, var(--brand-hover) 0%, #1e1b4b 100%);
-  color: #ffffff;
-  padding: 20px;
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh);
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-.projection-card-box::before {
-  content: '🎯';
-  position: absolute;
-  right: -10px;
-  bottom: -15px;
-  font-size: 110px;
-  opacity: .08;
-  pointer-events: none;
-}
-.proj-title {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  color: #a5b4fc;
-  margin-bottom: 14px;
-}
-.proj-date-big {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-.proj-text-sub {
-  font-size: 12px;
-  opacity: .85;
-  line-height: 1.4;
-}
+/* Horarios - Botones de acción en versión móvil */
 
 .btn-rect-mobile {
   display: inline-flex;
@@ -1920,13 +1131,7 @@ body.dark-mode .btn-rect-mobile-purple:hover {
 }
 
 @media (max-width: 1310px) {
-  /* Ocultar botones en la barra superior (topbar) de desktop */
-  .topbar-title .version-tabs {
-    display: none;
-  }
-  .tb-actions {
-    display: none;
-  }
+  /* topbar desktop buttons hidden -> MOVED TO css/layout/topbar.css */
 
   /* Mostrar la barra de acciones debajo del topbar y hacerla responsive */
   .horarios-mobile-actions-bar {
@@ -1966,53 +1171,15 @@ body.dark-mode .btn-rect-mobile-purple:hover {
 @media (max-width: 1100px) {
   /* --sidebar-w: 200px → ver css/layout/sidebar.css */
   .stats { grid-template-columns: repeat(2,1fr); }
-  .dash  { grid-template-columns: 1fr 240px; }
+  /* .dash { grid-template-columns: 1fr 240px; → ver css/layout/grid.css } */
 }
 
 @media (max-width: 768px) {
   /* .sidebar display:none → ver css/layout/sidebar.css */
-  .topbar  { display: none; }
+  /* .topbar display:none → MOVED TO css/layout/topbar.css */
   .main    { margin-left: 0; max-width: 100%; position: relative; }
 
-  .theme-toggle-desktop { display: none; }
-  .theme-toggle-btn.theme-toggle-mobile { display: inline-flex; width: 34px; height: 34px; }
-  .mob-header-actions { display: flex; position: absolute; }
-  .bnav-row { gap: 6px !important; padding: 0 8px !important; }
-  .btn-circle-mobile {
-    background: rgba(255, 255, 255, 0.65);
-    border: 1px solid rgba(226, 232, 240, 0.85);
-    border-radius: 50% !important;
-    width: 34px;
-    height: 34px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 !important;
-    color: var(--t2);
-    cursor: pointer;
-    transition: all .2s ease;
-    box-shadow: var(--sh);
-  }
-  .btn-circle-mobile:hover {
-    background: #ffffff;
-    transform: scale(1.04);
-    border-color: var(--brand);
-    color: var(--brand);
-  }
-  body.dark-mode .btn-circle-mobile {
-    background: rgba(17, 24, 39, 0.62);
-    border-color: rgba(255, 255, 255, 0.12);
-    color: #cbd5e1;
-  }
-  body.dark-mode .btn-circle-mobile:hover {
-    background: rgba(30, 41, 59, 0.9);
-    border-color: #818cf8;
-    color: #c7d2fe;
-  }
-  .btn-circle-mobile-sm {
-    width: 28px !important;
-    height: 28px !important;
-  }
+
 
 
 
@@ -2054,24 +1221,7 @@ body.dark-mode .btn-rect-mobile-purple:hover {
       height: 20px;
     }
 
-    /* Achicar proporcionalmente todo el contenedor de acciones en pantallas <= 390px */
-    .mob-header-actions {
-      gap: 6px;
-    }
-    .theme-toggle-btn.theme-toggle-mobile {
-      width: 28px;
-      height: 28px;
-    }
-    .theme-toggle-btn.theme-toggle-mobile svg {
-      width: 12px;
-      height: 12px;
-    }
-    .mob-header-actions .sb-av {
-      width: 28px;
-      height: 28px;
-      font-size: 11px;
-      line-height: 26px;
-    }
+
     .btn-focus-mode-trigger.btn-focus-mobile-hdr {
       padding: 0.25rem 0.5rem;
       font-size: 0.68rem;
@@ -2093,59 +1243,16 @@ body.dark-mode .btn-rect-mobile-purple:hover {
     }
   }
 
-  .mob-hdr {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background: var(--sidebar-bg);
-    height: 74px;
-    padding: 0 16px;
-    box-sizing: border-box;
-  }
-  .mob-greet { font-size: 16px; font-weight: 600; color: #f9fafb; margin-bottom: 4px; }
-  .mob-sub   { font-size: 12px; color: #6b7280; display: flex; align-items: center; gap: 8px; }
-  .mob-stk   {
-    background: #431407; border: 1px solid #7c2d12;
-    color: #fb923c; font-size: 11px; font-weight: 600;
-    padding: 2px 9px; border-radius: 20px;
-  }
+
 
   .page  { padding: 13px 12px 76px; gap: 13px; }
   .stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .dash  { grid-template-columns: 1fr; gap: 13px; }
-  .col.right { order: -1; }
+  /* .dash, .col.right → ver css/layout/grid.css */
   .mats-grid { grid-template-columns: 1fr; }
 
-  .bnav { display: block; }
-  .bn { font-size: 11px; }
-  .bn-ic { width: 19px !important; height: 19px !important; }
 
-  body .toast-container {
-    bottom: calc(51px + env(safe-area-inset-bottom, 0px));
-    right: 12px;
-    left: auto;
-    align-items: flex-end;
-  }
-  body .toast {
-    min-width: auto;
-    font-size: 11.5px;
-    padding: 8px 14px;
-    border-radius: var(--r-md);
-  }
-  .bn-lbl {
-    display: block;
-    font-size: 10px;
-    width: 100%;
-    text-align: center;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
 
-  /* Área de Concentración Mobile Overrides */
-  .mob-lbl  { font-size: 12px; color: #6b7280; margin-bottom: 2px; }
-  .mob-name { font-size: 18px; font-weight: 700; color: #f9fafb; }
-  .mob-row  { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+
 
 
 
@@ -2552,48 +1659,7 @@ font-size: 14px;
   background: #f3f4f6;
 }
 
-/* Stepper Nota */
-.grade-stepper {
-  display: flex;
-  align-items: center;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  overflow: hidden;
-}
-.grade-stepper.stepper-disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.g-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--t2);
-  background: #f9fafb;
-  cursor: pointer;
-  transition: background .15s;
-}
-.g-btn:hover:not(:disabled) {
-  background: #f3f4f6;
-}
-.g-btn:disabled {
-  cursor: not-allowed;
-}
-.g-val {
-  min-width: 36px;
-  text-align: center;
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--tm);
-}
-.g-val.active-grade {
-  color: var(--brand);
-}
+/* .grade-stepper, .grade-stepper.stepper-disabled, .g-btn, .g-btn:hover, .g-btn:disabled, .g-val, .g-val.active-grade → ver css/views/progreso.css */
 
 /* Tooltip */
 .sim-row.disabled:hover .sim-tooltip {
@@ -2742,34 +1808,7 @@ font-size: 14px;
   font-weight: 600;
   color: var(--t2);
 }
-.pace-stepper {
-  display: flex;
-  align-items: center;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 2px;
-}
-.pace-btn {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--t2);
-  cursor: pointer;
-  box-shadow: var(--sh);
-}
-.pace-val {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--t1);
-  padding: 0 10px;
-}
+/* .pace-stepper, .pace-btn, .pace-val → ver css/views/progreso.css */
 .metrics-box {
   background: #f9fafb;
   border: 1px solid var(--border);
@@ -3608,53 +2647,8 @@ font-size: 11px;
 }
 
 /* ==============================
-   PERFIL — POPUP MENU
+   PERFIL — POPUP MENU -> MOVED TO css/layout/topbar.css
 ============================== */
-.profile-menu {
-  position: fixed;
-  bottom: 55px;
-  left: 8px;
-  width: calc(var(--sidebar-w) - 16px);
-  background: #111827;
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: var(--r);
-  padding: 6px;
-  transform: translateY(6px);
-  opacity: 0;
-  pointer-events: none;
-  transition: transform .2s cubic-bezier(.34,1.2,.64,1), opacity .15s;
-  z-index: 200;
-  box-shadow: 0 -4px 20px rgba(0,0,0,.35);
-}
-.profile-menu.open {
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
-}
-.profile-menu-header {
-  display: none;
-}
-.profile-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: var(--r-sm);
-  font-size: 13px;
-  font-weight: 500;
-  color: #d1d5db;
-  text-align: left;
-  transition: background .15s, color .15s;
-  cursor: pointer;
-}
-.profile-menu-item:hover { background: rgba(255,255,255,.07); color: #f9fafb; }
-
-.pmenu-ic { width: 15px; height: 15px; flex-shrink: 0; opacity: .75; }
-.profile-menu-item:hover .pmenu-ic { opacity: 1; }
-.profile-menu-divider { height: 1px; background: rgba(255,255,255,.07); margin: 4px 4px; }
-.profile-menu-switch-row { justify-content: space-between; cursor: default; }
-.profile-menu-switch-row:hover { background: none; color: #d1d5db; }
 
 /* Festejo al completar el 100% del plan de estudios */
 .celebracion-banner {
@@ -3697,144 +2691,8 @@ body.no-animations *::after {
 /* .sb-user-caret y .menu-open → ver css/layout/sidebar.css */
 
 /* ==============================
-   CONTACTO — MODAL
+   CONTACTO — MODAL -> MOVED TO components/modals.css
 ============================== */
-.contact-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  opacity: 0;
-  pointer-events: none;
-  will-change: opacity;
-  transition: opacity .22s ease;
-}
-.contact-overlay.open { opacity: 1; pointer-events: auto; }
-.contact-box {
-  background: var(--surface);
-  border-radius: var(--r-lg);
-  width: 90%;
-  max-width: 460px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.2);
-  opacity: 0;
-  transform: translateY(-10px) scale(.95);
-  will-change: transform, opacity;
-  transition: transform .28s cubic-bezier(0.22, 1, 0.36, 1), opacity .22s ease;
-  overflow: hidden;
-}
-.contact-overlay.open .contact-box {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-.contact-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px 12px;
-  border-bottom: 1px solid var(--border);
-}
-.contact-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--t1);
-}
-.contact-close {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; color: var(--t3);
-  transition: background .15s, color .15s;
-  cursor: pointer;
-}
-.contact-close:hover { background: var(--border-light); color: var(--t1); }
-.contact-body { padding: 16px 20px 20px; }
-.contact-subtitle { font-size: 13px; color: var(--t3); margin-bottom: 16px; line-height: 1.4; }
-.contact-field { margin-bottom: 13px; }
-
-.profile-avatar-edit {
-  position: relative;
-  width: 76px; height: 76px;
-  margin: 0 auto 10px;
-}
-.profile-avatar-preview {
-  width: 76px; height: 76px; border-radius: 50%;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  background-size: cover;
-  background-position: center;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px; font-weight: 700; color: #fff;
-}
-.profile-avatar-pencil {
-  position: absolute;
-  bottom: -2px; right: -2px;
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  background: var(--brand);
-  color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  border: 2px solid var(--surface);
-  cursor: pointer;
-  transition: transform .15s;
-}
-.profile-avatar-pencil:hover { transform: scale(1.08); }
-.profile-avatar-trash {
-  position: absolute;
-  bottom: -2px; left: -2px;
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  background: #ef4444;
-  color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  border: 2px solid var(--surface);
-  cursor: pointer;
-  transition: transform .15s;
-}
-.profile-avatar-trash:hover { transform: scale(1.08); }
-.contact-field label { display: block; font-size: 12px; font-weight: 600; color: var(--t2); margin-bottom: 5px; }
-/* .contact-input / .contact-input:focus / .contact-textarea → components/forms.css */
-.contact-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
-.contact-footer:has(.btn-change-pwd) { justify-content: space-between; }
-.contact-footer-actions { display: flex; gap: 10px; }
-.contact-btn-cancel {
-  padding: 8px 16px;
-  font-size: 13px; font-weight: 500;
-  border-radius: var(--r-sm);
-  background: #f3f4f6; color: var(--t2);
-  border: none; cursor: pointer;transition: background .15s;
-}
-.contact-btn-cancel:hover { background: var(--border); }
-.contact-btn-send {
-  padding: 8px 20px;
-  font-size: 13px; font-weight: 600;
-  border-radius: var(--r-sm);
-  background: var(--brand); color: #fff;
-  border: none; cursor: pointer;transition: background .15s, transform .15s;
-}
-.contact-btn-send:hover:not(:disabled) { background: var(--brand-hover); transform: translateY(-1px); }
-.contact-btn-send:disabled { cursor: default; }
-
-.btn-change-pwd {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--brand);
-  background: var(--brand-light);
-  border: 1px solid var(--brand-dim);
-  border-radius: var(--r-sm);
-  cursor: pointer;
-transition: background .15s, border-color .15s;
-}
-.btn-change-pwd:hover { background: var(--brand-dim); border-color: var(--brand); }
 
 /* Small Mobile Screens (<= 600px) */
 @media (max-width: 600px) {
@@ -3867,74 +2725,7 @@ body.dark-mode .streak-chip {
   color: #fdba74;
 }
 
-/* Posicionamiento móvil del menú de perfil (al final para ganancia de cascada) */
-@media (max-width: 768px) {
-  .profile-menu {
-    top: 62px;
-    right: 16px;
-    bottom: auto;
-    left: auto;
-    width: 220px;
-    padding: 0;
-    transform: none;
-    transition: opacity 0.15s ease;
-  }
-  .profile-menu.open {
-    transform: none;
-  }
-  .profile-menu-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 16px;
-    border-bottom: 1px solid rgba(255,255,255,.07);
-    margin-bottom: 8px;
-  }
-  .pm-user-info {
-    display: flex;
-    gap: 12px;
-  }
-  .pm-user-info .sb-av {
-    width: 38px;
-    height: 38px;
-    font-size: 14px;
-  }
-  .pm-user-details {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .pm-uname {
-    font-size: 14px;
-    font-weight: 700;
-    color: #f9fafb;
-    line-height: 1.2;
-    margin-bottom: 2px;
-  }
-  .pm-uleg {
-    font-size: 12px;
-    color: #9ca3af;
-  }
-  .pm-close-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    color: #9ca3af;
-    transition: background 0.15s, color 0.15s;
-  }
-  .pm-close-btn:hover {
-    background: rgba(255,255,255,.1);
-    color: #f9fafb;
-  }
-  .profile-menu-item {
-    padding: 12px 16px;
-    font-size: 14px;
-  }
-}
+/* Posicionamiento móvil del menú de perfil -> MOVED TO css/layout/topbar.css */
 
 
 /* ==========================================================================
@@ -4479,114 +3270,6 @@ body.dark-mode .sched-compare-box {
   background: #b91c1c !important;
 }
 
-/* Control de visibilidad de menús inferiores según rol y ruta */
-.admin-bnav {
-  display: none;
-}
-@media (max-width: 768px) {
-  body.route-admin .student-bnav {
-    display: none;
-  }
-  body.route-admin .admin-bnav {
-    display: block;
-  }
-  body.is-admin .student-bnav {
-    display: none;
-  }
-  body.is-admin .admin-bnav {
-    display: block;
-  }
-}
-
 /* ==========================================
-   MENÚ FLOTANTE VISTA ALUMNO (MOBILE ADMIN)
-   ========================================== */
-.student-menu-popup {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 12px;
-  right: 12px;
-  background: rgba(11, 15, 25, 0.96);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--r-lg);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
-  z-index: 1000;
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
-  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  box-sizing: border-box;
-}
-
-.student-menu-popup.open {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.student-menu-popup-title {
-  font-size: 11px;
-  font-weight: 700;
-  color: #9ca3af;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 12px 16px 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.student-menu-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  padding: 14px;
-}
-
-.sm-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  padding: 8px 4px;
-  border-radius: var(--r-sm);
-  cursor: pointer;
-  color: #94a3b8;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.sm-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #e2e8f0;
-}
-
-.sm-ic {
-  width: 22px;
-  height: 22px;
-  fill: none;
-  stroke: currentColor;
-  color: currentColor;
-  opacity: 0.45;
-  transition: transform 0.2s ease, opacity 0.15s ease;
-}
-
-.sm-item:hover .sm-ic {
-  transform: scale(1.1);
-  opacity: 0.8;
-}
-
-.sm-lbl {
-  font-size: 10.5px;
-  font-weight: 600;
-  color: currentColor;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.sm-item.on {
-  color: #a5b4fc;
-}
-
-.sm-item.on .sm-ic {
-  opacity: 1;
-}
+   Admin bnav y student-menu-popup -> MOVED TO css/layout/mobile-nav.css
+========================================== */

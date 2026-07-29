@@ -2,6 +2,10 @@
 
 @section('title', 'Cursus - Inicio')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/views/dashboard.css') }}">
+@endpush
+
 @php
   $dashboardNow = now()->locale('es');
   $userName = $viewerFirstName ?? 'Estudiante';
@@ -41,22 +45,22 @@
 
   <!-- Stats Grid -->
   <div class="stats">
-    <div class="stat">
+    <div class="stat stat--primary">
       <span class="stat-ic">⏱️</span>
       <div class="stat-val skel" id="stat-horas-semana">0h</div>
       <div class="stat-lbl">Horas esta semana</div>
     </div>
-    <div class="stat">
+    <div class="stat stat--warning">
       <span class="stat-ic">🔥</span>
       <div class="stat-val skel" id="stat-racha">0 días</div>
       <div class="stat-lbl">Racha actual</div>
     </div>
-    <div class="stat">
+    <div class="stat stat--success">
       <span class="stat-ic">📚</span>
       <div class="stat-val skel" id="stat-materias-activas">0</div>
       <div class="stat-lbl">Materias activas</div>
     </div>
-    <div class="stat">
+    <div class="stat stat--secondary">
       <span class="stat-ic">⚠️</span>
       <div class="stat-val skel" id="stat-tareas-pendientes">0</div>
       <div class="stat-lbl">Tareas pendientes</div>
@@ -121,13 +125,13 @@
 
         <!-- CTA principal -->
         <div class="study-cta-wrap">
-          <button class="study-cta" type="button">
+          <button class="study-cta" id="study-cta-btn" type="button">
             ▶ Continuar estudiando →
           </button>
         </div>
 
         <!-- Sesiones de hoy -->
-        <div class="study-sessions" id="study-sessions">
+        <div class="study-sessions">
           <div class="ss-hdr">Sesiones de hoy</div>
           <div id="study-sessions-list">
             <div class="ss-empty" style="padding:10px 0;color:var(--t3);font-size:13px">Todavía no estudiaste hoy.</div>

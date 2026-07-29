@@ -105,7 +105,7 @@ function createAlertCardHTML(alerta, diffDays) {
       <div class="alert-item-desc">${alerta.descripcion || ''}</div>
       <div class="alert-item-meta">
         <span class="alert-color-chip" style="background: ${resolvedColor};" title="Color de la alerta"></span>
-        <span class="alert-priority-badge alert-priority-${alerta.prioridad}">${alerta.prioridad}</span>
+        <span class="badge ${alerta.prioridad === 'alta' ? 'badge--danger' : (alerta.prioridad === 'media' ? 'badge--warning' : 'badge--neutral')}">${alerta.prioridad}</span>
         <span class="alert-date-badge" ${dateInfo.cls}>
           ⏱️ ${dateInfo.text}
         </span>
@@ -202,12 +202,12 @@ export function renderCuotaRecordatorio(data) {
 export function cuotaBadge(pago) {
   if (pago.estado === 'pagado') {
     const medio = pago.medio_pago === 'efectivo' ? ' (efectivo)' : '';
-    return `<span class="cuota-badge badge-success">Pagó${medio}</span>`;
+    return `<span class="badge badge--success">Pagó${medio}</span>`;
   }
   if (pago.estado === 'pendiente_efectivo') {
-    return '<span class="cuota-badge badge-warning">Efectivo, a confirmar</span>';
+    return '<span class="badge badge--warning">Efectivo, a confirmar</span>';
   }
-  return '<span class="cuota-badge badge-muted">Pendiente</span>';
+  return '<span class="badge badge--neutral">Pendiente</span>';
 }
 
 /**

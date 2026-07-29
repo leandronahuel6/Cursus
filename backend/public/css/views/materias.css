@@ -182,20 +182,6 @@ body.dark-mode .btn-status-toggle.aprobar-bloqueada {
   font-weight: 600;
   color: var(--tm);
 }
-.sub-status-badge {
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: 1px 6px;
-  border-radius: 10px;
-  letter-spacing: .02em;
-}
-.sub-status-badge.disponible { background: #f3f4f6; color: var(--t3); }
-.sub-status-badge.cursando { background: var(--brand-light); color: var(--brand); }
-.sub-status-badge.regular { background: #ffedd5; color: var(--orange); }
-.sub-status-badge.aprobada { background: var(--green-light); color: var(--green); }
-.sub-status-badge.locked { background: #fee2e2; color: var(--red); }
-
 .sub-title {
   font-size: 13.5px;
   font-weight: 600;

@@ -23,8 +23,8 @@
 
 @section('content')
   <!-- Stat Cards de Resumen -->
-  <div class="stats avg-stats">
-    <div class="stat card-real-avg">
+  <div class="stats stats--3">
+    <div class="stat card-real-avg stat--primary">
       <span class="stat-ic">🎓</span>
       <div>
         <div class="stat-title">Promedio Real</div>
@@ -32,7 +32,7 @@
         <div class="stat-lbl" id="real-avg-lbl">0 materias aprobadas</div>
       </div>
     </div>
-    <div class="stat card-proj-avg">
+    <div class="stat card-proj-avg stat--warning">
       <span class="stat-ic">📊</span>
       <div>
         <div class="stat-title">Promedio Proyectado</div>
@@ -40,7 +40,7 @@
         <div class="stat-lbl" id="proj-avg-lbl">Simulando 0 finales</div>
       </div>
     </div>
-    <div class="stat card-proj-grad">
+    <div class="stat card-proj-grad stat--success">
       <span class="stat-ic">📅</span>
       <div>
         <div class="stat-title">Egreso Proyectado</div>

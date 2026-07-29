@@ -8,13 +8,26 @@
   <link rel="stylesheet" href="{{ asset('css/base/fonts.css') }}">
   <link rel="stylesheet" href="{{ asset('css/base/variables.css') }}">
   <link rel="stylesheet" href="{{ asset('css/base/reset.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/base/animations.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/layout/grid.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/components/alerts.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/components/badges.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/components/cards.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/components/stats.css') }}">
   <link rel="stylesheet" href="{{ asset('css/main.css') }}?v={{ filemtime(public_path('css/main.css')) }}">
+  <link rel="stylesheet" href="{{ asset('css/layout/app.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/layout/topbar.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/layout/mobile-nav.css') }}">
   <link rel="stylesheet" href="{{ asset('css/layout/sidebar.css') }}">
   <link rel="icon" href="{{ asset('assets/icons/cursus-logo.svg') }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ asset('css/components/pomo-float.css') }}">
   <link rel="stylesheet" href="{{ asset('css/components/toast.css') }}">
   <link rel="stylesheet" href="{{ asset('css/components/modals.css') }}">
   <link rel="stylesheet" href="{{ asset('css/components/forms.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/components/buttons.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/components/tabs.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/components/filters.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/base/utils.css') }}">
   @stack('styles')
 </head>
 

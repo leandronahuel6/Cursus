@@ -1,0 +1,43 @@
+.stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.stats--3    { grid-template-columns: repeat(3,1fr); }
+.stats--auto { grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); }
+
+.stat {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 14px 15px;
+  box-shadow: var(--sh); position: relative; overflow: hidden;
+  transition: box-shadow .2s, transform .2s;
+}
+.stat:hover { box-shadow: var(--sh-md); transform: translateY(-1px); }
+.stat::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+}
+
+.stat--primary::before   { background: var(--brand); }
+.stat--warning::before   { background: #f97316; }
+.stat--success::before   { background: var(--green); }
+.stat--secondary::before { background: var(--yellow); }
+
+.stat-ic { font-size: 18px; display: block; margin-bottom: 8px; }
+.stat-val {
+  font-size: 21px; font-weight: 700;
+  letter-spacing: -.03em; line-height: 1;
+  margin-bottom: 4px; color: var(--t1);
+}
+.stat-lbl { font-size: 11.5px; color: var(--t3); }
+.stat-title   { font-size: 10.5px; font-weight: 600; color: var(--t3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+.stat-val--sm { font-size: 16px; }
+
+body.dark-mode .stat { background: var(--surface); border-color: var(--border); }
+body.dark-mode .stat-val { color: var(--t1); }
+body.dark-mode .stat-lbl { color: var(--t3); }
+body.dark-mode .stat-title { color: var(--tm); }
+
+.stat-badge-card { background: rgba(99,102,241,.12); border: 1px solid rgba(99,102,241,.25); border-radius: var(--r-lg); padding: 12px; text-align: center; }
+.stat-badge-val { font-size: 24px; font-weight: 700; color: #6366f1; }
+.stat-badge-lbl { font-size: 11px; color: var(--t3); text-transform: uppercase; letter-spacing: .05em; }
+
+body.dark-mode .stat-badge-card { background: rgba(99,102,241,.12); border-color: rgba(99,102,241,.25); }
+body.dark-mode .stat-badge-val { color: #818cf8; }

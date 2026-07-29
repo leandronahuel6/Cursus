@@ -15,7 +15,7 @@
       <div class="mob-sub">
         <span>Gestión de tiempo y tareas</span>
         <span id="mob-materia-name" style="display: none;">—</span>
-        <span class="badge b-reg" id="mob-materia-badge" style="display: none;">Regular</span>
+        <span class="badge badge--info" id="mob-materia-badge" style="display: none;">Regular</span>
         <span id="mob-materia-meta" style="display: none;">Cargando...</span>
       </div>
     </div>
@@ -50,7 +50,7 @@
             <span class="mat-dropdown-caret">▾</span>
           </div>
           <div class="mat-meta" style="display: flex; align-items: center; gap: 6px; position: relative;">
-            <span class="badge b-cur" id="mat-selector-badge">Cursando</span>
+            <span class="badge badge--warning" id="mat-selector-badge">Cursando</span>
             <button id="btn-independiente-help" style="display: none; background: none; border: none; padding: 0; cursor: pointer; color: var(--t2); align-items: center; width: 22px; height: 22px; justify-content: center;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="/assets/icons/sprite.svg#circle-question-mark"></use></svg>
             </button>

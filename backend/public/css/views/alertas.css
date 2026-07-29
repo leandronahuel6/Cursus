@@ -111,16 +111,7 @@
   border: 1px solid rgba(0, 0, 0, 0.18);
   flex-shrink: 0;
 }
-.alert-priority-badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 12px;
-  text-transform: uppercase;
-}
-.alert-priority-alta { background: #fee2e2; color: var(--red); }
-.alert-priority-media { background: #ffedd5; color: var(--orange); }
-.alert-priority-baja { background: #f3f4f6; color: var(--t2); }
+
 
 .alert-date-badge {
   font-size: 11px;
@@ -415,10 +406,6 @@
   background: var(--brand-hover);
 }
 
-body.dark-mode .alert-priority-baja {
-  background: rgba(255, 255, 255, 0.08);
-}
-
 /* ==============================
    HISTORIAL DE CUOTAS (alumno)
    Migrado desde main.css — exclusivo de alertas.blade.php
@@ -591,18 +578,19 @@ body.dark-mode .alert-priority-baja {
 }
 
 /* ==============================
+   BADGES DE PRIORIDAD (Alertas)
+============================== */
+.alert-priority-badge {
+  font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 12px; text-transform: uppercase;
+}
+.alert-priority-alta  { background: #fee2e2; color: var(--red); }
+.alert-priority-media { background: #ffedd5; color: var(--orange); }
+.alert-priority-baja  { background: #f3f4f6; color: var(--t2); }
+body.dark-mode .alert-priority-baja { background: rgba(255,255,255,.08); }
+
+/* ==============================
    BADGES DE ESTADO DE CUOTA (alumno)
    Estilos específicos para los estados de pago de cuota
    ============================== */
 
-.cuota-badge {
-  display: inline-block;
-  padding: 2px 9px;
-  border-radius: 99px;
-  font-size: 11px;
-  font-weight: 600;
-}
 
-.badge-success { background: rgba(56, 161, 105, .15); color: #38a169; }
-.badge-warning { background: rgba(237, 137, 54, .15);  color: #ed8936; }
-.badge-muted   { background: var(--border-light);      color: var(--tm); }
