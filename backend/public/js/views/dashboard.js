@@ -1,9 +1,9 @@
 // Cursus - Inicio: materias del cuatrimestre traídas desde la base de datos
 
 const ESTADO_BADGE = {
-  cursando: { label: 'Cursando', clase: 'b-cur' },
-  regular: { label: 'Regular', clase: 'b-reg' },
-  aprobada: { label: 'Aprobada', clase: 'b-apr' }
+  cursando: { label: 'Cursando', clase: 'badge--info' },
+  regular: { label: 'Regular', clase: 'badge--warning' },
+  aprobada: { label: 'Aprobada', clase: 'badge--success' }
 };
 
 function getStoredToken() {
@@ -73,7 +73,7 @@ function renderStudyPanel(materiasCursando) {
     heroSubject.textContent = heroMateria ? heroMateria.nombre : 'Estudio Independiente';
   }
 
-  const studyCta = document.querySelector('.study-cta');
+  const studyCta = document.getElementById('study-cta-btn');
   if (studyCta) {
     studyCta.onclick = () => goToAreaEstudio(heroMateria ? heroMateria.id : null);
   }
@@ -406,7 +406,7 @@ function setGreetingLocal() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const studyCta = document.querySelector('.study-cta');
+  const studyCta = document.getElementById('study-cta-btn');
   if (studyCta) studyCta.onclick = () => goToAreaEstudio(null);
 
   setGreetingLocal();

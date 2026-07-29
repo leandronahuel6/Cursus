@@ -238,7 +238,7 @@ function renderSimulationList() {
 
         <div class="sim-subject-info">
           <div class="sim-subject-name ${!isRegularOrCursando ? 'text-dim' : ''}">${sub.name}</div>
-          <div class="sim-subject-badge ${subReal.status === 'regular' ? 'b-reg' : (subReal.status === 'cursando' ? 'b-cur' : 'b-lib')}">
+          <div class="sim-subject-badge ${subReal.status === 'regular' ? 'badge badge--warning' : (subReal.status === 'cursando' ? 'badge badge--info' : 'badge badge--neutral')}">
             ${sub.code} · ${subReal.status.toUpperCase()}
           </div>
         </div>

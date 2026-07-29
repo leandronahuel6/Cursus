@@ -76,6 +76,11 @@ let state = {
 let activeModalSubjectId = null;
 
 
+function statusBadgeClass(status) {
+  const map = { disponible: 'badge--neutral', cursando: 'badge--info', regular: 'badge--warning', aprobada: 'badge--success', locked: 'badge--danger' };
+  return map[status] || 'badge--neutral';
+}
+
 function getStatusLabel(status, isLocked) {
   if (isLocked) return 'Bloqueada';
   const labels = {
@@ -134,7 +139,7 @@ window.openSubjectInfoModal = function(sub, subState) {
   bodyEl.innerHTML = `
     <div class="subject-info-meta">
       <span class="subject-info-code">TUP${sub.id}</span>
-      <span class="sub-status-badge ${statusClass}">${getStatusLabel(subState.status, isLocked)}</span>
+      <span class="badge ${statusBadgeClass(statusClass)}">${getStatusLabel(subState.status, isLocked)}</span>
       ${gradeHTML}
     </div>
     <div class="subject-info-prereqs-title">Correlatividades</div>
@@ -470,10 +475,10 @@ function renderListView() {
         }
         
         // Badge de estado actual
-        let statusBadgeClass = subState.status;
+        let badgeClass = subState.status;
         let statusText = subState.status;
         if (isLocked) {
-          statusBadgeClass = 'locked';
+          badgeClass = 'locked';
           statusText = 'Bloqueada';
         } else if (subState.status === 'disponible') {
           statusText = 'Disponible';
@@ -488,7 +493,7 @@ function renderListView() {
           <div class="sub-card-top">
             <div class="sub-code-row">
               <span class="sub-code">CÓDIGO: TUP${sub.id}</span>
-              <span class="sub-status-badge ${statusBadgeClass}">${statusText}</span>
+              <span class="badge ${statusBadgeClass(badgeClass)}">${statusText}</span>
             </div>
             <div class="sub-title">${sub.name}</div>
             ${gradeHTML}
