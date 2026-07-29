@@ -7,7 +7,7 @@
   padding: 8px 16px; border-radius: var(--r);
   min-width: 280px;
   box-sizing: border-box;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh);
 }
 .mat-dropdown-caret { font-size: 11px; color: var(--t3); transition: transform .15s; }
 .mat-dropdown-trigger.open .mat-dropdown-caret { transform: rotate(180deg); }
@@ -97,11 +97,6 @@
     .mat-info { flex: 1; }
     .mat-name { font-size: 15px; font-weight: 600; color: var(--t1); letter-spacing: -.02em; }
     .mat-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-top: 4px; }
-    .badge {
-      font-size: 10px; font-weight: 700; text-transform: uppercase;
-      padding: 2.5px 8px; border-radius: 12px; letter-spacing: .02em;
-    }
-    .badge.b-reg { background: #e0f2fe; color: #0369a1; }
     .mat-yr { color: var(--t3); }
 
     .mat-chips { display: flex; gap: 10px; }
