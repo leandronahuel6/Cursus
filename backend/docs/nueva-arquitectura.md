@@ -53,7 +53,11 @@ public/
 │       ├── area-estudio-focus.css  # Modo concentración (Zen Mode)
 │       ├── materias.css    # Árbol de correlatividades
 │       ├── alertas.css     # Lista y calendario de alertas
-│       ├── horarios.css    # Grilla del simulador de horarios
+│       ├── horarios/               # Simulador de Horarios (sub-modularizado)
+│       │   ├── horarios-grid.css   # Canvas, grilla semanal, time-blocks, colores de tema, DM overrides
+│       │   ├── horarios-drag.css   # Panel lateral, drag cards, responsividad tablets/móviles
+│       │   ├── horarios-ui.css     # Editor, modales, pestañas A/B, comparador, botones móviles
+│       │   └── horarios-print.css  # @media print: impresión/PDF (cargado con media="print")
 │       ├── progreso.css    # Gráficos (donut, heatmap)
 │       └── auth.css        # Pantallas de login, registro, recuperación de contraseña
 │   └── admin/                     # Estilos del panel de administración
