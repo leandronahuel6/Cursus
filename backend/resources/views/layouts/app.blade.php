@@ -410,7 +410,7 @@
           <input type="password" id="cp-confirm" class="contact-input" placeholder="••••••••" autocomplete="new-password">
           <span id="cp-confirm-error" class="error-message"></span>
         </div>
-        <p id="cp-success" class="login-success-message" hidden></p>
+        <p id="cp-success" class="form-success-message" hidden></p>
         <div class="contact-footer">
           <button type="button" class="contact-btn-cancel" onclick="window.closeChangePasswordModal()">Cancelar</button>
           <button type="submit" class="contact-btn-send" id="cp-submit">Guardar cambios</button>
