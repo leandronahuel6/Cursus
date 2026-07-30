@@ -24,3 +24,10 @@
 .flex-column { flex-direction: column; }
 .align-items-center { align-items: center; }
 .justify-content-between { justify-content: space-between; }
+
+/* Indicators / Legends */
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}

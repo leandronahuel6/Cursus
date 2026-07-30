@@ -23,12 +23,7 @@ body.dark-mode .topbar {
 .mob-greet .greeting-name,
 .topbar-title #greet-text-topbar,
 .mob-greet #greet-text-mob { font-weight: 700; color: inherit; }
-.streak-chip {
-  display: flex; align-items: center; gap: 5px;
-  background: #fff7ed; border: 1px solid #fed7aa;
-  color: #c2410c; font-size: 12px; font-weight: 600;
-  padding: 4px 11px; border-radius: 20px;
-}
+
 .tb-actions {
   margin-left: auto;
   display: flex;

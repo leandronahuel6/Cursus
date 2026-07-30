@@ -1,0 +1,251 @@
+/**
+ * @fileoverview horarios-drag.css
+ *
+ * Responsabilidad: Panel lateral de elementos del Simulador y sistema de
+ * arrastre (Drag & Drop). Contiene el sidebar con las secciones de materias
+ * y actividades (.sched-sidebar-panel, .sched-panel-section), la lista de
+ * tarjetas arrastrables (.sched-draggable-list, .sched-drag-card) con sus
+ * variantes, indicadores decorativos, y las Media Queries de compactacion
+ * del panel en tablets (<= 1200px) y de redimensionado de tarjetas en
+ * moviles (<= 600px).
+ *
+ * Paralelo JS: horarios-drag.js
+ */
+
+/* ==========================================
+   SIMULADOR — Panel Lateral de Elementos
+========================================== */
+.sched-sidebar-panel {
+  width: 290px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 18px;
+  flex-shrink: 0;
+}
+.sched-panel-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sched-section-hd {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--t2);
+}
+.sched-badge-count {
+  background: var(--brand);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+.btn-add-act {
+  background: var(--brand-light);
+  color: var(--brand);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-add-act:hover {
+  background: var(--brand-dim);
+}
+
+/* Lista de tarjetas arrastrables con scroll interno */
+.sched-draggable-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 50px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.sched-draggable-list::-webkit-scrollbar {
+  width: 5px;
+}
+.sched-draggable-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sched-draggable-list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+.sched-draggable-list::-webkit-scrollbar-thumb:hover {
+  background: var(--t2);
+}
+
+/* Nota de lista vacia */
+.sched-empty-note {
+  border: 1px dashed var(--border);
+  border-radius: var(--r-sm);
+  background: #f9fafb;
+  color: var(--t2);
+  font-size: 11px;
+  line-height: 1.35;
+  padding: 10px 12px;
+}
+
+/* Tarjeta arrastrable */
+.sched-drag-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9fafb;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  cursor: grab;
+  user-select: none;
+  transition: border-color .15s;
+}
+.sched-drag-card:active {
+  cursor: grabbing;
+}
+
+/* Barra decorativa de color en el borde izquierdo */
+.card-decor-bar {
+  width: 4px;
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: var(--brand);
+  border-top-left-radius: var(--r-sm);
+  border-bottom-left-radius: var(--r-sm);
+}
+.card-decor-bar.act {
+  background: #3b82f6;
+}
+
+/* Info interna de la tarjeta */
+.card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  padding-left: 6px;
+  overflow: hidden;
+}
+.card-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--t1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-meta {
+  font-size: 9px;
+  color: var(--tm);
+}
+
+/* Boton de agregar al canvas desde la tarjeta */
+.card-btn-add {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: var(--brand-light);
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--brand-dim);
+  cursor: pointer;
+}
+.sched-drag-card.activity .card-btn-add {
+  background: #eff6ff;
+  color: #3b82f6;
+  border-color: #bfdbfe;
+}
+
+/* Alerta de conflicto de solapamiento */
+.sched-alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: var(--r-sm);
+  padding: 8px 16px;
+  margin-top: 10px;
+}
+.alert-icon { font-size: 14px; }
+.alert-text { font-size: 12px; font-weight: 600; color: var(--red); }
+
+/* ==========================================
+   RESPONSIVIDAD — Tablets (<= 1200px): Panel como fila de tarjetas
+========================================== */
+@media (max-width: 1200px) {
+  .sched-sidebar-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .sched-panel-section {
+    margin-bottom: 12px !important;
+  }
+
+  /* Show available items in a wrapping grid layout (stacked in rows) */
+  .sched-draggable-list {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+    padding: 4px 0 !important;
+    gap: 8px !important;
+  }
+  .sched-drag-card {
+    width: calc(33.33% - 6px) !important; /* 3 columns on tablet */
+    min-width: 140px !important;
+    flex-shrink: 0 !important;
+    flex-grow: 1 !important;
+    padding: 8px 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Manual editor bar responsiveness */
+  .sched-editor-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 12px 14px !important;
+  }
+  .editor-left {
+    max-width: 100% !important;
+    align-items: center !important;
+  }
+  .editor-center {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .editor-right {
+    max-width: 100% !important;
+    text-align: center !important;
+  }
+
+  .sched-modal-card {
+    max-width: 90% !important;
+    padding: 16px !important;
+  }
+}
+
+/* ==========================================
+   RESPONSIVIDAD — Small Mobile (<= 600px): 2 columnas de tarjetas
+========================================== */
+@media (max-width: 600px) {
+  .sched-drag-card {
+    width: calc(50% - 4px) !important; /* 2 columns on mobile */
+  }
+}

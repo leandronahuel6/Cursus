@@ -35,38 +35,6 @@
 
     /* Overrides del sidebar en dark mode → ver css/layout/sidebar.css */
 
-    body.dark-mode .topbar {
-        background: rgba(7, 10, 19, 0.8) !important;
-        backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    body.dark-mode .topbar-title {
-        color: #ffffff;
-    }
-    body.dark-mode .streak-chip {
-        background: rgba(255, 255, 255, 0.05);
-        border-color: rgba(255, 255, 255, 0.1);
-        color: #f3f4f6;
-    }
-
-    body.dark-mode .bnav {
-        background: rgba(11, 15, 25, 0.95);
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    body.dark-mode .bn {
-        color: #9ca3af;
-    }
-    body.dark-mode .bn.on {
-        color: #a5b4fc;
-    }
-
-    body.dark-mode .contact-box {
-        background: #111827;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    body.dark-mode .contact-title {
-        color: #ffffff;
-    }
     /* .contact-input dark-mode → components/forms.css (contextual @media override) */
     /* body.dark-mode .contact-input {
         background: #1f2937;

@@ -1,0 +1,524 @@
+/**
+ * @fileoverview horarios-grid.css
+ *
+ * Responsabilidad: Renderizado visual del canvas del Simulador de Horarios.
+ * Incluye la estructura de la grilla semanal (grid-header, grid-body, ejes de
+ * tiempo), los bloques de tiempo arrastrables (.sched-time-block) con todos
+ * sus estados (seleccionado, conflicto, colores de tema), los override de
+ * Dark Mode para el canvas, y las Media Queries de responsividad estructural
+ * (tablets <= 1200px) que afectan al canvas y a la grilla.
+ *
+ * Paralelo JS: horarios-grid.js
+ */
+
+/* ==========================================
+   HORARIOS DARK MODE OVERRIDES — Canvas y Grilla
+========================================== */
+body.dark-mode .time-col-hdr::before,
+body.dark-mode .grid-time-axis::before {
+  /* Color sólido equivalente a var(--surface) [rgba(30,41,59,0.78)] sobre var(--bg) [#0b0f1a] 
+     para evitar doble transparencia sobre el padding de la tarjeta */
+  background: #1a2334;
+}
+body.dark-mode .sched-canvas-card {
+  background: var(--surface);
+}
+body.dark-mode .sched-drag-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .sched-empty-note {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+body.dark-mode .sched-drag-card.activity .card-btn-add {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+body.dark-mode .grid-header-row {
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .time-col-hdr {
+  background: #121621;
+  border-right-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .grid-body-row {
+  background: transparent;
+}
+body.dark-mode .grid-time-axis {
+  background: #121621;
+  border-right-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .grid-bg-line-hour {
+  background: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .grid-bg-line-half {
+  border-top-color: rgba(255, 255, 255, 0.04);
+}
+body.dark-mode .grid-day-col {
+  border-right-color: rgba(255, 255, 255, 0.04);
+}
+body.dark-mode .sched-time-block {
+  background: rgba(79, 70, 229, 0.22);
+  border-color: var(--brand);
+}
+body.dark-mode .sched-time-block .block-code-row {
+  color: #a5b4fc;
+}
+body.dark-mode .sched-time-block.act {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+}
+body.dark-mode .sched-time-block.act .block-code-row {
+  color: #60a5fa;
+}
+
+/* Colores personalizados de bloques en modo oscuro (curso oficial y editor
+   manual): sin esto, los 6 colores caian en el mismo tinte indigo generico
+   de arriba, porque las reglas de modo claro usan !important. */
+body.dark-mode .sched-time-block.theme-color-indigo {
+  border-left: 4px solid #818cf8 !important;
+  background: rgba(79, 70, 229, 0.28) !important;
+}
+body.dark-mode .sched-time-block.theme-color-indigo .block-code-row {
+  color: #a5b4fc;
+}
+body.dark-mode .sched-time-block.theme-color-purple {
+  border-left: 4px solid #a78bfa !important;
+  background: rgba(147, 51, 234, 0.28) !important;
+}
+body.dark-mode .sched-time-block.theme-color-purple .block-code-row {
+  color: #c4b5fd;
+}
+body.dark-mode .sched-time-block.theme-color-emerald {
+  border-left: 4px solid #34d399 !important;
+  background: rgba(16, 185, 129, 0.26) !important;
+}
+body.dark-mode .sched-time-block.theme-color-emerald .block-code-row {
+  color: #6ee7b7;
+}
+body.dark-mode .sched-time-block.theme-color-rose {
+  border-left: 4px solid #fb7185 !important;
+  background: rgba(244, 63, 94, 0.26) !important;
+}
+body.dark-mode .sched-time-block.theme-color-rose .block-code-row {
+  color: #fda4af;
+}
+body.dark-mode .sched-time-block.theme-color-amber {
+  border-left: 4px solid #fbbf24 !important;
+  background: rgba(245, 158, 11, 0.26) !important;
+}
+body.dark-mode .sched-time-block.theme-color-amber .block-code-row {
+  color: #fcd34d;
+}
+body.dark-mode .sched-time-block.theme-color-sky {
+  border-left: 4px solid #38bdf8 !important;
+  background: rgba(14, 165, 233, 0.26) !important;
+}
+body.dark-mode .sched-time-block.theme-color-sky .block-code-row {
+  color: #7dd3fc;
+}
+body.dark-mode .sched-modal-card {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+}
+body.dark-mode .custom-confirm-card {
+  background: #111827;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================
+   SIMULADOR DE HORARIOS — Layout Principal
+========================================== */
+.sched-main-split {
+  display: flex;
+  gap: 20px;
+  align-items: start;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Timeline Canvas Grid */
+.sched-timeline-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.sched-canvas-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 20px;
+  box-shadow: var(--sh);
+  overflow-x: auto;
+  transform: scaleY(-1);
+}
+/* Estilos para que el scrollbar quede visible e interactivo arriba */
+.sched-canvas-card::-webkit-scrollbar {
+  height: 6px;
+}
+.sched-canvas-card::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
+}
+.sched-canvas-card::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+}
+.sched-canvas-card::-webkit-scrollbar-thumb:hover {
+  background: var(--brand);
+}
+.sched-weekly-grid {
+  display: flex;
+  flex-direction: column;
+  min-width: 680px;
+  transform: scaleY(-1);
+}
+
+/* Grid Headers */
+.grid-header-row {
+  display: flex;
+  background: #f9fafb;
+  border-top-left-radius: var(--r-sm);
+  border-top-right-radius: var(--r-sm);
+}
+.grid-hdr-cell {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--t2);
+}
+.time-col-hdr {
+  width: 60px;
+  flex: 0 0 60px;
+  text-align: center;
+  padding-right: 0;
+  color: var(--tm);
+  position: -webkit-sticky;
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: #f9fafb;
+  border-right: 1px solid var(--border);
+}
+/* Cubre el gap del padding izquierdo de .sched-canvas-card al scrollear */
+.time-col-hdr::before,
+.grid-time-axis::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -20px;
+  width: 20px;
+  background: var(--surface);
+  z-index: 10;
+}
+
+/* Grid Body */
+.grid-body-row {
+  display: flex;
+  position: relative;
+  background: #fff;
+}
+.grid-time-axis {
+  width: 60px;
+  flex: 0 0 60px;
+  background: #f9fafb;
+  position: -webkit-sticky;
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  border-right: 1px solid var(--border);
+}
+.grid-time-lbl-cell {
+  text-align: center;
+  padding-right: 0;
+  color: var(--t2);
+  font-size: 9.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.grid-time-lbl-cell span {
+  transform: translateY(-50%); /* Alinear con las lineas horizontales */
+}
+.grid-time-lbl-cell:first-child span {
+  transform: translateY(1px); /* Evitar solapamiento en el borde superior para las 08:00 */
+}
+.grid-time-lbl-cell.half-hour span {
+  font-size: 8px;
+  color: #9ca3af;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.grid-day-cols-wrap {
+  flex: 1;
+  position: relative;
+  height: 720px; /* 15 horas * 48px/hora */
+}
+
+/* Background lines */
+.grid-bg-lines-container {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.grid-bg-line-hour {
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  background: #e5e7eb;
+}
+.grid-bg-line-half {
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  border-top: 1px dashed #f3f4f6;
+}
+
+/* Interactive Column zones */
+.grid-cols-interactive {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  z-index: 1;
+}
+.grid-day-col {
+  flex: 1;
+  height: 100%;
+  position: relative;
+  border-right: 1px solid #f3f4f6;
+}
+.grid-day-col:last-child {
+  border-right: none;
+}
+
+/* Time Blocks rendering */
+.sched-time-block {
+  position: absolute;
+  left: 3px; right: 3px;
+  background: rgba(238, 242, 255, 0.9);
+  border: 1px solid var(--brand);
+  border-left-width: 4px;
+  border-radius: var(--r-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8px 10px;
+  cursor: move;
+  box-shadow: var(--sh);
+  z-index: 5;
+  transition: box-shadow .15s, border-color .15s;
+}
+.sched-time-block.act {
+  background: rgba(239, 246, 255, 0.9);
+  border-color: #3b82f6;
+}
+.sched-time-block.selected {
+  outline: 2px solid var(--brand-dim);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
+  z-index: 10 !important;
+}
+.block-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  height: 100%;
+  justify-content: center;
+}
+.block-code-row {
+  font-size: 8.5px;
+  font-weight: 800;
+  color: var(--brand);
+  opacity: 0.8;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sched-time-block.act .block-code-row {
+  color: #2563eb;
+}
+.block-title-row {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--t1);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.block-meta-row {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--t3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.block-overlap-indicator {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--red);
+  margin-top: 1px;
+}
+
+.block-btn-delete-x {
+  position: absolute;
+  top: 4px; right: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--tm);
+  cursor: pointer;
+  opacity: 0.6;
+  border: none;
+  background: none;
+  padding: 0;
+  line-height: 1;
+}
+.block-btn-delete-x:hover {
+  color: var(--red);
+  opacity: 1;
+}
+
+/* Resize Handles (Verticales) */
+.resize-handle {
+  position: absolute;
+  left: 0; right: 0;
+  height: 6px;
+  cursor: ns-resize;
+  z-index: 3;
+}
+.resize-handle.top-handle { top: 0; }
+.resize-handle.bottom-handle { bottom: 0; }
+
+/* Conflict overlap highlight */
+.sched-time-block.overlap-conflict {
+  background: rgba(254, 226, 226, 0.92) !important;
+  border-color: var(--red) !important;
+}
+.sched-time-block.overlap-conflict .block-code-row { color: #991b1b; }
+.sched-time-block.overlap-conflict .block-title-row { color: #991b1b; }
+
+/* Bloques de horario del companiero (Comparacion) */
+.sched-time-block.comparison {
+  box-shadow: none !important;
+  cursor: default !important;
+  pointer-events: none !important;
+  opacity: 0.85;
+  z-index: 5;
+  border-width: 1.5px !important;
+  border-style: dashed !important;
+}
+
+/* Ocultar elementos de resize e interactividad en bloques de comparacion */
+.sched-time-block.comparison .resize-handle,
+.sched-time-block.comparison .block-btn-delete-x {
+  display: none !important;
+}
+
+/* ==========================================
+   ESTILOS DE PERSONALIZACION — Colores de tema de bloques
+========================================== */
+
+/* Indicador de color activo en el selector manual */
+.color-dot {
+  transition: all 0.2s ease-in-out;
+}
+.color-dot.active {
+  border-color: #ffffff !important;
+  transform: scale(1.25);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+/* Clases de colores personalizados para los bloques */
+.sched-time-block.theme-color-indigo {
+  border-left: 4px solid #4f46e5 !important;
+  background: rgba(79, 70, 229, 0.12) !important;
+}
+.sched-time-block.theme-color-purple {
+  border-left: 4px solid #9333ea !important;
+  background: rgba(147, 51, 234, 0.12) !important;
+}
+.sched-time-block.theme-color-emerald {
+  border-left: 4px solid #10b981 !important;
+  background: rgba(16, 185, 129, 0.12) !important;
+}
+.sched-time-block.theme-color-rose {
+  border-left: 4px solid #f43f5e !important;
+  background: rgba(244, 63, 94, 0.12) !important;
+}
+.sched-time-block.theme-color-amber {
+  border-left: 4px solid #f59e0b !important;
+  background: rgba(245, 158, 11, 0.12) !important;
+}
+.sched-time-block.theme-color-sky {
+  border-left: 4px solid #0ea5e9 !important;
+  background: rgba(14, 165, 233, 0.12) !important;
+}
+
+/* ==========================================
+   RESPONSIVIDAD — Tablets & Medium Screens (<= 1200px)
+========================================== */
+@media (max-width: 1200px) {
+  .sched-main-split {
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Constraint layout to prevent entire page scroll while letting grid scroll internally */
+  .sched-timeline-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .sched-canvas-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 12px 0 !important;
+    box-sizing: border-box !important;
+  }
+  .sched-weekly-grid {
+    min-width: 800px !important;
+  }
+
+  /* Overlap conflict banner styling on mobile/tablet */
+  .sched-alert-banner {
+    display: flex;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    padding: 10px 14px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+  }
+  .alert-text {
+    font-size: 11.5px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    line-height: 1.4 !important;
+    flex: 1 !important;
+  }
+
+  /* .modal-field-row responsive override — keeps layout */
+  .modal-field-row {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+}

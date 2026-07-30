@@ -32,6 +32,20 @@ input,
 textarea {
     font-family: inherit;
 }
+/* Asegurar legibilidad global de opciones de select en modo claro y oscuro */
+select option,
+select optgroup {
+    background-color: var(--surface, #ffffff);
+    color: var(--t1, #1f2937);
+}
+select optgroup {
+    font-weight: 700;
+}
+body.dark-mode select option,
+body.dark-mode select optgroup {
+    background-color: #111827;
+    color: #f3f4f6;
+}
 button {
     cursor: pointer;
     border: none;

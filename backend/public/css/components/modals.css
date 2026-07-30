@@ -327,6 +327,15 @@ body.dark-mode .btn-modal-action.cancel:hover {
 }
 .btn-change-pwd:hover { background: var(--brand-dim); border-color: var(--brand); }
 
+/* Dark mode contact modal */
+body.dark-mode .contact-box {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .contact-title img {
+  filter: invert(1);
+}
+
 /* Dark mode contact buttons */
 body.dark-mode .contact-btn-cancel {
   background: rgba(255, 255, 255, 0.05);
