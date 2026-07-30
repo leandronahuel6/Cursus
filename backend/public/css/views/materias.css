@@ -323,16 +323,17 @@ body.dark-mode .btn-status-toggle.aprobar-bloqueada {
   align-items: center;
   gap: 6px;
 }
-.legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-}
+
 .legend-color.disponible { background: #f3f4f6; border: 1px solid #d1d5db; }
 .legend-color.cursando { background: var(--brand); }
 .legend-color.regular { background: var(--orange); }
 .legend-color.aprobada { background: var(--green); }
 .legend-color.bloqueada { background: #fee2e2; border: 1px solid #fca5a5; }
+
+body.dark-mode .legend-color.disponible { 
+  background: rgba(255, 255, 255, 0.08); 
+  border-color: rgba(255, 255, 255, 0.22); 
+}
 
 .tree-flow-row {
   display: flex;

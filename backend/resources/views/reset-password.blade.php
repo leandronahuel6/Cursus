@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="{{ asset('css/base/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/base/reset.css') }}">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/components/forms.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/views/auth.css') }}">
 </head>
 <body>
     <main class="login-page">
@@ -43,7 +45,7 @@
                         <button type="submit" class="login-submit">Cambiar contraseña</button>
                     </form>
 
-                    <p id="success-message" class="login-success-message" hidden></p>
+                    <p id="success-message" class="form-success-message" hidden></p>
 
                     <div class="login-divider"></div>
 
@@ -54,9 +56,7 @@
                 </div>
             </div>
 
-            <div class="login-visual-side">
-                <div class="login-visual-placeholder" aria-hidden="true"></div>
-            </div>
+            <div class="login-visual-side"></div>
         </div>
     </main>
     <script src="{{ asset('js/views/reset-password.js') }}"></script>

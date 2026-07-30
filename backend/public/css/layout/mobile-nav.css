@@ -73,20 +73,16 @@ body.dark-mode .bnav {
   transition: color 0.15s;
   position: relative;
 }
-body.dark-mode .bn {
-  color: #94a3b8;
-}
+
 .bn.on {
   color: #a5b4fc;
 }
 .bn.on .bn-ic {
   opacity: 1;
 }
-body.dark-mode .bn.on {
-  color: #a5b4fc;
-}
+
 body.dark-mode .bn.on .bn-ic {
-  opacity: 1;
+  opacity: 1; /* No filter needed for SVG sprite */
 }
 .bn:hover:not(.on) {
   color: #e2e8f0;

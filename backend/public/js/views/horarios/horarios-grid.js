@@ -179,6 +179,7 @@ function createUpdateCallback() {
 function createDragEndCallback() {
   return (updatedBlock, isClick) => {
     renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
+    checkOverlaps(schedState.blocks);
     if (isClick) {
       window.openEditModal(updatedBlock.id);
     } else if (schedState.selectedBlockId === updatedBlock.id) {
@@ -190,6 +191,7 @@ function createDragEndCallback() {
 function createResizeEndCallback() {
   return (updatedBlock) => {
     renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
+    checkOverlaps(schedState.blocks);
     if (schedState.selectedBlockId === updatedBlock.id) {
       checkAlternativeCommissions(updatedBlock);
     }

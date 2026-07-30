@@ -1,0 +1,553 @@
+/**
+ * @fileoverview horarios-ui.css
+ *
+ * Responsabilidad: Capa de interfaz de usuario del Simulador de Horarios.
+ * Engloba todos los elementos interactivos que no pertenecen al canvas de la
+ * grilla ni al sistema de arrastre: barra de edicion contextual manual
+ * (.sched-editor-bar), modales de edicion y confirmacion (.sched-modal-card,
+ * .custom-confirm-backdrop), pestanias de versiones A/B (.version-tabs,
+ * .btn-version), panel comparador (.sched-compare-box), botones de accion
+ * movil (.btn-rect-mobile, .horarios-mobile-actions-bar), y todas sus
+ * respectivas Media Queries responsivas (1310px, 768px y 390px).
+ *
+ * Paralelo JS: horarios-main.js (coordinador), horarios-data.js (datos)
+ */
+
+/* ==========================================
+/* Ocultar cabecera de impresion en pantalla — revelada por horarios-print.css via @media print */
+.print-only-header {
+  display: none !important;
+}
+
+/* ==========================================
+   BARRA DE EDICION CONTEXTUAL MANUAL
+========================================== */
+.sched-editor-bar {
+  background: #1e293b;
+  border-radius: var(--r-sm);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: var(--sh-md);
+  color: #fff;
+  z-index: 20;
+}
+.editor-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 250px;
+  overflow: hidden;
+}
+.editor-block-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #f9fafb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.editor-block-type-badge {
+  display: inline-block;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--brand);
+  color: #fff;
+  width: fit-content;
+}
+.editor-block-type-badge.act { background: #3b82f6; }
+.editor-block-type-badge.error { background: var(--red); }
+
+.editor-center {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.editor-time-lbl {
+  font-size: 11px;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.editor-time-input {
+  background: #334155;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  color: #fff;
+  padding: 4px 6px;
+  font-size: 11px;
+  outline: none;
+}
+.editor-btn-delete {
+  background: rgba(220,38,38,0.2);
+  color: #fca5a5;
+  border: 1px solid rgba(220,38,38,0.4);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.editor-btn-delete:hover {
+  background: var(--red);
+  color: #fff;
+}
+.editor-right {
+  font-size: 11px;
+  font-weight: 600;
+  max-width: 350px;
+  color: #fca5a5;
+  word-wrap: break-word;
+}
+
+/* ==========================================
+   MODAL DE EDICION DE BLOQUE
+========================================== */
+.sched-modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.sched-modal-card {
+  background: #ffffff;
+  border-radius: var(--r);
+  padding: 24px;
+  width: 400px;
+  box-shadow: var(--sh-md);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.sched-modal-hd {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+.sched-modal-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--t1);
+}
+.sched-modal-close {
+  font-size: 16px;
+  color: var(--tm);
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s ease;
+}
+.sched-modal-close:hover {
+  background: var(--border-light);
+  color: var(--t1);
+}
+.sched-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+/* .modal-field / .modal-field-row / .modal-field-row .modal-field -> components/forms.css */
+/* .modal-lbl -> renamed to .modal-label in components/forms.css */
+/* .modal-inp-readonly / .modal-select -> components/forms.css */
+.sched-modal-ft {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+.sched-modal-ft button {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+
+/* ==========================================
+   MODAL DE CONFIRMACION PERSONALIZADO
+========================================== */
+.custom-confirm-backdrop {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+.custom-confirm-backdrop.show {
+  opacity: 1;
+}
+.custom-confirm-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  transform: scale(0.9);
+  transition: transform 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--t1);
+}
+.custom-confirm-backdrop.show .custom-confirm-card {
+  transform: scale(1);
+}
+.custom-confirm-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--t1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.custom-confirm-body {
+  font-size: 13.5px;
+  color: var(--t2);
+  line-height: 1.5;
+}
+.custom-confirm-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+.btn-confirm-delete {
+  background: #dc2626 !important;
+  color: #fff !important;
+  border: 1px solid #dc2626 !important;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.btn-confirm-delete:hover {
+  background: #b91c1c !important;
+}
+
+/* ==========================================
+   PESTANIAS DE VERSIONES (A / B) Y COMPARADOR
+========================================== */
+
+/* Pestanias de versiones */
+.version-tabs {
+  display: inline-flex;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  align-items: center;
+  box-sizing: border-box;
+  height: 34px;
+}
+
+body.dark-mode .version-tabs {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.btn-version {
+  background: transparent;
+  color: var(--t2);
+  border: none;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease-in-out;
+  box-sizing: border-box;
+}
+
+.btn-version.active {
+  background: var(--brand) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+}
+
+.btn-version:hover:not(.active) {
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--t1);
+}
+
+body.dark-mode .btn-version:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Panel de Comparacion en Sidebar */
+.sched-compare-box {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.015);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.sched-compare-box select {
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-hover, rgba(0, 0, 0, 0.03));
+  color: var(--t1);
+  font-size: 12.5px;
+  font-weight: 550;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.sched-compare-box select:focus {
+  border-color: var(--brand);
+}
+
+/* El fondo del popup nativo siempre es oscuro (a proposito, como el
+   sidebar), asi que el texto tiene que ser siempre claro: no puede usar
+   var(--t1), que en modo claro es oscuro y quedaba ilegible (texto negro
+   sobre fondo negro). Los <optgroup> no tenian ningun estilo propio y
+   quedaban con el renderizado nativo del navegador. */
+.sched-compare-box select option,
+.sched-compare-box select optgroup {
+  background-color: var(--surface);
+  color: var(--t1);
+}
+.sched-compare-box select optgroup {
+  font-weight: 700;
+}
+body.dark-mode .sched-compare-box select option,
+body.dark-mode .sched-compare-box select optgroup {
+  background-color: #111827;
+  color: #f3f4f6;
+}
+
+body.dark-mode .sched-compare-box {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.compare-input-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.compare-input-group input {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-hover, rgba(0, 0, 0, 0.03));
+  color: var(--t1);
+  font-size: 12.5px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.compare-input-group button {
+  background: var(--brand);
+  color: #fff;
+  border: 1px solid var(--brand);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 7px 12px;
+  font-size: 12.5px;
+  font-weight: 550;
+  transition: all 0.15s ease;
+}
+
+.compare-input-group button:hover {
+  background: var(--brand-hover);
+}
+
+/* ==========================================
+   BOTONES DE ACCION MOVIL — Barra de acciones del simulador en pantallas
+   pequeñas (Migrado desde main.css, paso anterior)
+========================================== */
+.btn-rect-mobile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--t2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--sh-sm);
+}
+.btn-rect-mobile:hover {
+  background: var(--border-light);
+  color: var(--t1);
+  transform: translateY(-0.5px);
+}
+body.dark-mode .btn-rect-mobile {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--t2);
+}
+body.dark-mode .btn-rect-mobile:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--t1);
+}
+.btn-rect-mobile-purple {
+  background: var(--brand);
+  border: 1px solid var(--brand);
+  color: #ffffff;
+}
+.btn-rect-mobile-purple:hover {
+  background: var(--brand-hover);
+  border-color: var(--brand-hover);
+  color: #ffffff;
+}
+body.dark-mode .btn-rect-mobile-purple {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #ffffff;
+}
+body.dark-mode .btn-rect-mobile-purple:hover {
+  background: var(--brand-hover);
+  border-color: var(--brand-hover);
+  color: #ffffff;
+}
+
+.horarios-mobile-actions-bar {
+  display: none;
+}
+
+/* ==========================================
+   RESPONSIVIDAD — Mostrar barra de acciones en pantallas <= 1310px
+========================================== */
+@media (max-width: 1310px) {
+  .horarios-mobile-actions-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .horarios-mobile-actions-bar .btn-rect-mobile {
+    flex: 1;
+    justify-content: center;
+    padding: 7px 4px;
+    font-size: 11.5px;
+    white-space: nowrap;
+  }
+  .horarios-mobile-actions-bar .version-tabs {
+    flex: 1.2;
+    display: flex;
+    justify-content: center;
+    height: 32px;
+    margin-right: 0;
+  }
+  .horarios-mobile-actions-bar .version-tabs .btn-version {
+    flex: 1;
+    height: 24px;
+    padding: 0;
+    font-size: 11.5px;
+  }
+}
+
+/* ==========================================
+   RESPONSIVIDAD — Ajustes de tamano responsivo para pestanias en moviles
+========================================== */
+@media (max-width: 768px) {
+  .version-tabs {
+    height: 28px;
+    padding: 2px;
+    margin-right: 8px;
+  }
+  .btn-version {
+    height: 22px;
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+
+  /* Mobile header button actions styling */
+  .mob-hdr .mob-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+    width: 100%;
+  }
+  .mob-hdr .mob-tb-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .mob-hdr .btn-mob-action {
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    line-height: 1.5;
+    transition: all .15s ease;
+  }
+  .mob-hdr .btn-mob-action.btn-primary {
+    background: var(--brand);
+    color: #fff;
+    border: 1px solid var(--brand);
+  }
+  .mob-hdr .btn-mob-action.btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f3f4f6;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .mob-hdr .btn-mob-action:active {
+    opacity: 0.8;
+  }
+}
+
+@media (max-width: 390px) {
+  .horarios-mobile-actions-bar {
+    gap: 4px;
+  }
+  .horarios-mobile-actions-bar .btn-rect-mobile {
+    font-size: 10px;
+    padding: 5px 2px;
+  }
+  .horarios-mobile-actions-bar .version-tabs {
+    height: 28px;
+  }
+  .horarios-mobile-actions-bar .version-tabs .btn-version {
+    font-size: 10px;
+    height: 20px;
+  }
+}

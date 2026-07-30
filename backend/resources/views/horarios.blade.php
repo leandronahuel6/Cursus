@@ -2,6 +2,14 @@
 
 @section('title', 'Cursus - Simulador de Horarios')
 
+@push('styles')
+  <link rel="stylesheet" href="{{ asset('css/views/horarios/horarios-grid.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/views/horarios/horarios-drag.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/views/horarios/horarios-ui.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/views/horarios/horarios-print.css') }}" media="print">
+@endpush
+
+
 @section('mobile-header')
 <div class="mob-hdr">
   <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
@@ -126,7 +134,7 @@
           <div class="print-badge" id="print-active-version-badge">Versión A</div>
         </div>
         <div class="print-info-row">
-          <span><strong>Alumno:</strong> {{ Auth::user()->name ?? 'Estudiante UTN' }} ({{ Auth::user()->email ?? '' }})</span>
+          <span><strong>Alumno:</strong> {{ Auth::user()->nombre ?? Auth::user()->name ?? 'Estudiante UTN' }} (Legajo: {{ Auth::user()->legajo ?? Auth::id() ?? 'N/A' }})</span>
           <span><strong>Generado el:</strong> <span id="print-generated-date">30/06/2026</span></span>
         </div>
       </div>

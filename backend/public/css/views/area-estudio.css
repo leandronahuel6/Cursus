@@ -619,7 +619,7 @@ transition: border-color .15s;
       .sidebar { transform: translateX(-100%); }
       .sidebar.open { transform: translateX(0); }
       .main { margin-left: 0; max-width: 100%; }
-      .topbar { display: none; }
+
       .mob-hdr { display: flex; flex-direction: column; justify-content: center; }
       .page { padding: 12px; }
       .mat-hdr { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px; }
@@ -627,7 +627,7 @@ transition: border-color .15s;
       .mat-meta .badge { font-size: 8px; padding: 1.5px 6px; }
       .mat-meta .mat-yr { font-size: 10px; }
       .kanban { grid-template-columns: 1fr; }
-      .bnav { display: block; }
+
       body { padding-bottom: 50px; }
     }
 

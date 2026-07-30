@@ -1,0 +1,308 @@
+/**
+ * @fileoverview horarios-print.css
+ *
+ * Responsabilidad: Estilos exclusivos para la impresion y exportacion PDF
+ * del Simulador de Horarios. Este archivo se carga con el atributo
+ * media="print", por lo que el navegador NO lo procesa durante el
+ * renderizado normal de la pagina, optimizando el tiempo de carga (Core
+ * Web Vitals). Contiene: la cabecera exclusiva de impresion (.print-only-header),
+ * las reglas para ocultar la interfaz web (sidebar, topbar, editor), el
+ * reseteo de colores para el formato imprimible, el mapeo de colores
+ * personalizados de los bloques (.theme-color-*) para impresion exacta, y
+ * la configuracion de pagina en formato apaisado (Landscape A4).
+ *
+ * Nota: No tiene paralelo JS directo. El JS que dispara window.print()
+ * reside en horarios-main.js.
+ */
+
+/* ==========================================
+   ESTILOS DE COMPARACION Y VISTA IMPRIMIBLE (PDF)
+========================================== */
+
+
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Mostrar la cabecera de impresion */
+  .print-only-header {
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #000000;
+    padding-bottom: 12px;
+    color: #000000 !important;
+  }
+
+  .print-brand-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #4f46e5 !important;
+  }
+
+  .print-logo {
+    font-size: 16px;
+  }
+
+  .print-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .print-title-row h1 {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0;
+    color: #000000 !important;
+  }
+
+  .print-badge {
+    background: #e0e7ff !important;
+    color: #4f46e5 !important;
+    border: 1px solid #4f46e5 !important;
+    padding: 3px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 700;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .print-info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #374151 !important;
+  }
+
+  /* Ocultar barra lateral, botones y elementos UI fantasma */
+  #sidebar,
+  .topbar,
+  .topbar-title,
+  .mob-hdr,
+  .mob-header-actions,
+  .sched-sidebar-panel,
+  .sched-editor-bar,
+  .tb-actions,
+  .sched-alert-banner,
+  .toast-container,
+  .horarios-mobile-hdr-actions,
+  .horarios-mobile-actions-bar,
+  .bnav,
+  .student-menu-popup,
+  .version-tabs,
+  .btn-version,
+  #theme-switcher,
+  .custom-confirm-backdrop {
+    display: none !important;
+  }
+
+  /* Resetear overflow global y ocultar scrollbar */
+  ::-webkit-scrollbar {
+    display: none !important;
+  }
+  html, body, .app, .app-main, .page {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Ajustar contenedor de grilla para impresion */
+  .sched-main-split {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .sched-timeline-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .sched-canvas-card {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .sched-weekly-grid {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 2px solid #000000 !important;
+    background: #ffffff !important;
+    border-radius: 0 !important;
+    zoom: 0.75; /* Ajuste fuerte para encajar holgadamente en A4 sin cortes */
+  }
+
+  /* Forzar fondos e impresion exacta */
+  .sched-time-block {
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    border-radius: 6px !important;
+    padding: 6px !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    color: #000000 !important;
+    text-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .sched-time-block .block-code-row {
+    font-size: 9.5px !important;
+    font-weight: bold !important;
+    color: #1e1b4b !important;
+    margin-bottom: 2px !important;
+  }
+
+  .sched-time-block .block-title-row {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #000000 !important;
+    line-height: 1.25 !important;
+    margin-bottom: 2px !important;
+  }
+
+  .sched-time-block .block-meta-row {
+    font-size: 9px !important;
+    font-weight: 500 !important;
+    color: #4b5563 !important;
+  }
+
+  .sched-time-block.act {
+    background-color: #f3e8ff !important;
+    border-color: #a855f7 !important;
+  }
+
+  .sched-time-block.comparison {
+    display: none !important;
+  }
+
+  .sched-time-block:not(.act):not(.comparison) {
+    background-color: #e0e7ff !important;
+    border-color: #6366f1 !important;
+  }
+
+  /* Asegurar legibilidad de cabeceras en impresion */
+  .grid-header-row {
+    background: #f3f4f6 !important;
+    border-bottom: 2px solid #000000 !important;
+    display: flex !important;
+    border-radius: 0 !important;
+  }
+
+  .grid-hdr-cell {
+    color: #000000 !important;
+    font-weight: 700 !important;
+    border-right: 2px solid #d1d5db !important;
+    border-bottom: 2px solid #000000 !important;
+    padding: 8px 4px !important;
+    text-align: center !important;
+    background: #f3f4f6 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .grid-hdr-cell:last-child {
+    border-right: none !important;
+  }
+
+  .time-col-hdr {
+    background: #e5e7eb !important;
+    position: relative !important; /* Fix Bug Tabloid: quitar sticky */
+  }
+
+  /* Ejes y etiquetas de hora en impresion */
+  .grid-time-axis {
+    position: relative !important; /* Fix Bug Tabloid: quitar sticky */
+  }
+
+  .grid-day-cols-wrap {
+    height: 720px !important;
+    position: relative !important;
+  }
+  
+  .grid-day-col {
+    height: 100% !important;
+    position: relative !important;
+    border-right: 2px solid #e5e7eb !important;
+    background: transparent !important;
+  }
+
+  .grid-day-col:last-child {
+    border-right: none !important;
+  }
+  .grid-time-lbl-cell {
+    color: #374151 !important;
+  }
+  .grid-time-lbl-cell.half-hour span {
+    color: #4b5563 !important;
+    opacity: 1 !important;
+  }
+
+  .grid-bg-line-hour {
+    background: #e5e7eb !important;
+  }
+
+  .grid-bg-line-half {
+    border-top: 1px dashed #f3f4f6 !important;
+  }
+
+  /* ==========================================
+     MAPEO DE COLORES PERSONALIZADOS EN IMPRESION
+     (Impresion exacta de los 6 temas de bloques)
+  ========================================== */
+  .sched-time-block.theme-color-indigo {
+    background-color: #e0e7ff !important;
+    border-color: #4f46e5 !important;
+    border-left: 5px solid #4f46e5 !important;
+  }
+  .sched-time-block.theme-color-purple {
+    background-color: #f3e8ff !important;
+    border-color: #9333ea !important;
+    border-left: 5px solid #9333ea !important;
+  }
+  .sched-time-block.theme-color-emerald {
+    background-color: #d1fae5 !important;
+    border-color: #10b981 !important;
+    border-left: 5px solid #10b981 !important;
+  }
+  .sched-time-block.theme-color-rose {
+    background-color: #ffe4e6 !important;
+    border-color: #f43f5e !important;
+    border-left: 5px solid #f43f5e !important;
+  }
+  .sched-time-block.theme-color-amber {
+    background-color: #fef3c7 !important;
+    border-color: #f59e0b !important;
+    border-left: 5px solid #f59e0b !important;
+  }
+  .sched-time-block.theme-color-sky {
+    background-color: #e0f2fe !important;
+    border-color: #0ea5e9 !important;
+    border-left: 5px solid #0ea5e9 !important;
+  }
+
+  /* Configuracion de tamano de pagina en formato apaisado (Landscape) */
+  @page {
+    size: landscape;
+    margin: 0.5cm;
+  }
+}
