@@ -1,59 +1,34 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cursus - Olvidé mi contraseña</title>
-    <link rel="stylesheet" href="{{ asset('css/base/fonts.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/base/variables.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/base/reset.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/base/animations.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/components/forms.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/views/auth.css') }}">
-</head>
-<body>
-    <main class="login-page">
-        <div class="login-layout">
-            <div class="login-form-side">
-                <div class="login-logo">
-                    <div class="login-logo-icon"><img src="{{ asset('assets/icons/cursus-logo.svg') }}" alt="Cursus"></div>
-                    <div class="login-logo-text">
-                        Cursus
-                        <small>Tec. en Programación</small>
-                    </div>
-                </div>
+@extends('layouts.auth')
 
-                <div class="login-form-wrap">
-                    <div class="login-form-header">
-                        <h1>Olvidé mi contraseña</h1>
-                        <p>Ingresá tu email y te mandamos un link para restablecer tu contraseña.</p>
-                    </div>
+@section('title', 'Olvidé mi Contraseña | Cursus')
 
-                    <form id="ForgotForm" class="login-form">
-                        <div class="login-field">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" placeholder="nombre@ejemplo.com" autocomplete="email" required>
-                            <span id="email-error" class="error-message"></span>
-                        </div>
+@section('content')
+    <div class="login-form-header">
+        <h1>Olvidé mi contraseña</h1>
+        <p>Ingresá tu email y te mandamos un link para restablecer tu contraseña.</p>
+    </div>
 
-                        <button type="submit" class="login-submit">Enviar link</button>
-                    </form>
-
-                    <p id="success-message" class="form-success-message" hidden></p>
-
-                    <div class="login-divider"></div>
-
-                    <p class="login-signup">
-                        ¿Recordaste tu contraseña?
-                        <a href="{{ route('login') }}">Volver al inicio de sesión</a>
-                    </p>
-                </div>
-            </div>
-
-            <div class="login-visual-side"></div>
+    <form id="ForgotForm" class="login-form" novalidate>
+        @csrf
+        <div class="login-field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="nombre@ejemplo.com" autocomplete="email" required>
+            <span id="email-error" class="error-message"></span>
         </div>
-    </main>
+
+        <button type="submit" class="login-submit">Enviar link</button>
+    </form>
+
+    <p id="success-message" class="form-success-message" hidden></p>
+
+    <div class="login-divider"></div>
+
+    <p class="login-signup">
+        ¿Recordaste tu contraseña?
+        <a href="{{ route('login') }}">Volver al inicio de sesión</a>
+    </p>
+@endsection
+
+@push('scripts')
     <script src="{{ asset('js/views/forgot-password.js') }}"></script>
-</body>
-</html>
+@endpush

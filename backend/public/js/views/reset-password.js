@@ -1,23 +1,31 @@
-const form = document.querySelector('#ResetForm');
-const passwordInput = document.querySelector('#password');
-const passwordConfirmInput = document.querySelector('#password_confirmation');
-const passwordError = document.querySelector('#password-error');
-const passwordConfirmError = document.querySelector('#password-confirmation-error');
-const successMessage = document.querySelector('#success-message');
+/**
+ * reset-password.js
+ *
+ * Lógica exclusiva de la vista "Restablecer contraseña".
+ * La validación de contraseña se delega a AuthCommon.
+ */
 
-const token = form.dataset.token;
+const form                 = document.querySelector('#ResetForm');
+const passwordInput        = document.querySelector('#password');
+const passwordConfirmInput = document.querySelector('#password_confirmation');
+const passwordError        = document.querySelector('#password-error');
+const passwordConfirmError = document.querySelector('#password-confirmation-error');
+const successMessage       = document.querySelector('#success-message');
+
+const token    = form.dataset.token;
 const loginUrl = form.dataset.loginUrl;
-const email = new URLSearchParams(window.location.search).get('email');
+const email    = new URLSearchParams(window.location.search).get('email');
 
 const handleSubmit = async (e) => {
     e.preventDefault();
-    passwordError.textContent = '';
+    passwordError.textContent        = '';
     passwordConfirmError.textContent = '';
-    successMessage.textContent = '';
-    successMessage.hidden = true;
+    successMessage.textContent       = '';
+    successMessage.hidden            = true;
 
-    if (passwordInput.value.length < 8) {
-        passwordError.textContent = 'La contraseña debe tener al menos 8 caracteres';
+    const passwordValidationError = AuthCommon.validatePassword(passwordInput.value);
+    if (passwordValidationError) {
+        passwordError.textContent = passwordValidationError;
         passwordInput.focus();
         return;
     }
@@ -33,12 +41,13 @@ const handleSubmit = async (e) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
             },
             body: JSON.stringify({
                 token,
                 email,
-                password: passwordInput.value,
+                password:              passwordInput.value,
                 password_confirmation: passwordConfirmInput.value
             })
         });
@@ -51,8 +60,8 @@ const handleSubmit = async (e) => {
         }
 
         successMessage.textContent = data.message + ' Te llevamos al login...';
-        successMessage.hidden = false;
-        form.style.display = 'none';
+        successMessage.hidden      = false;
+        form.style.display         = 'none';
 
         setTimeout(() => {
             window.location.href = loginUrl;
