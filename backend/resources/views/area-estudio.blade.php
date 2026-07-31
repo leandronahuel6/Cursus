@@ -45,7 +45,7 @@
       <div class="mat-hdr">
         <div class="mat-ic">💻</div>
         <div class="mat-info mat-dropdown-wrap" id="mat-dropdown-wrap">
-          <div class="mat-name mat-dropdown-trigger" id="mat-dropdown-trigger" onclick="toggleMateriaDropdown(event)">
+          <div class="mat-hdr-name mat-dropdown-trigger" id="mat-dropdown-trigger" onclick="toggleMateriaDropdown(event)">
             <span id="mat-selector-name">—</span>
             <span class="mat-dropdown-caret">▾</span>
           </div>
@@ -89,7 +89,7 @@
       </div>
 
       <!-- Split layout (Left content & Right content) -->
-      <div class="split-v2">
+      <div class="split">
         
         <!-- COLUMNA PRINCIPAL IZQUIERDA (Kanban + Marcadores Apilados) -->
         <div class="left-content">
@@ -266,7 +266,7 @@
 
         </div><!-- /right-sidebar -->
 
-      </div><!-- /split-v2 -->
+      </div><!-- /split -->
 
 <!-- 1. MODAL DETALLE DE TAREA --><div class="modal-overlay" id="task-modal">
   <div class="modal-box">

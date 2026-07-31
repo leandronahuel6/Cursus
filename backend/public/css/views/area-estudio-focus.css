@@ -61,16 +61,6 @@
     }
 }
 
-@keyframes focus-banner-entrance {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
 @keyframes focus-canvas-fade-in {
     from {
@@ -91,7 +81,7 @@
 }
 
 #focus-mode-overlay.show .focus-goal-banner {
-    animation: focus-banner-entrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+    animation: slide-in-down-fade 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
 }
 
 #focus-mode-overlay.show #focus-canvas {
@@ -112,7 +102,7 @@
 }
 
 #focus-mode-overlay.show.leaving .focus-goal-banner {
-    animation: focus-banner-exit 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slide-out-up-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes focus-fade-out {
@@ -150,16 +140,6 @@
     }
 }
 
-@keyframes focus-banner-exit {
-    from {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-}
 
 /* Contenedor del fondo visual */
 #focus-bg-container {
@@ -259,31 +239,6 @@
     text-align: center;
 }
 
-/* Fase actual de estudio */
-.focus-phase-badge {
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    padding: 0.4rem 1rem;
-    border-radius: 999px;
-    margin-bottom: 1.5rem;
-    transition: all 0.3s ease;
-}
-
-.focus-phase-badge.enfoque {
-    background: rgba(99, 102, 241, 0.15);
-    color: #a5b4fc;
-    border: 1px solid rgba(99, 102, 241, 0.3);
-    box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
-}
-
-.focus-phase-badge.recreo {
-    background: rgba(16, 185, 129, 0.15);
-    color: #6ee7b7;
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
-}
 
 /* Anillo de Progreso y Reloj */
 .focus-timer-ring-wrapper {
@@ -537,31 +492,6 @@
     background: rgba(255, 255, 255, 0.3);
 }
 
-/* Botón de Salida */
-.focus-exit-btn {
-    position: fixed;
-    top: 24px;
-    right: 24px;
-    z-index: 20;
-    background: rgba(239, 68, 68, 0.12);
-    border: 1px solid rgba(239, 68, 68, 0.25);
-    color: #f87171;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    outline: none;
-}
-
-.focus-exit-btn:hover {
-    background: rgba(239, 68, 68, 0.25);
-    color: #ffffff;
-    transform: scale(1.05);
-}
 
 /* ==========================================================================
    ESTILOS GENERALES Y BOTÓN DE INGRESO
@@ -670,12 +600,7 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
         margin-top: 0.05rem;
     }
 
-    .focus-exit-btn {
-        top: 14px;
-        right: 14px;
-        width: 32px;
-        height: 32px;
-    }
+
 }
 
 /* Banner de Meta / Tarea Activa */
@@ -1171,23 +1096,14 @@ cursor: pointer;
     z-index: 11;
     display: none;
     flex-direction: column;
-    animation: focus-subtasks-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slide-in-up-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .focus-subtasks-drawer.show {
     display: flex;
 }
 
-@keyframes focus-subtasks-slide-up {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+
 
 .focus-subtasks-header {
     font-size: 0.8rem;
