@@ -183,10 +183,7 @@
 .sidebar.collapsed {
   width: var(--sidebar-w-collapsed);
 }
-body.sidebar-collapsed .main {
-  margin-left: var(--sidebar-w-collapsed);
-  max-width: calc(100% - var(--sidebar-w-collapsed));
-}
+
 .sidebar.collapsed .sb-logo-text,
 .sidebar.collapsed .nav-text,
 .sidebar.collapsed .nav-group,
@@ -280,10 +277,6 @@ body.dark-mode .nav-item.active {
 
 @media (max-width: 768px) {
   .sidebar { display: none; }
-  body.sidebar-collapsed .main {
-    margin-left: 0;
-    max-width: 100%;
-  }
 }
 
 /* ==============================

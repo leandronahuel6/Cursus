@@ -80,14 +80,6 @@ h6,
     animation: skel-loading 1.4s ease infinite;
     border-radius: 4px;
 }
-@keyframes skel-loading {
-    0% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0 50%;
-    }
-}
 
 /* Desactiva animaciones y transiciones en toda la app cuando el switch está apagado */
 body.no-animations *,
@@ -99,13 +91,4 @@ body.no-animations *::after {
     transition-delay: 0s !important;
 }
 
-/* Blink utility — usado en .alert-dot y .study-live-dot */
-@keyframes blink {
-    0%,
-    100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.3;
-    }
-}
+/* Blink utility se movió a animations.css */

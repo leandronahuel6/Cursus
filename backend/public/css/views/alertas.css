@@ -594,3 +594,4 @@ body.dark-mode .alert-priority-baja { background: rgba(255,255,255,.08); }
    ============================== */
 
 
+@media (max-width: 768px) { .alertas-grid { grid-template-columns: 1fr; gap: 15px; } }

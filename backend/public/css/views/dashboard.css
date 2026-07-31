@@ -12,7 +12,7 @@
   display: flex; align-items: flex-start;
   justify-content: space-between; gap: 6px; margin-bottom: 7px;
 }
-.mat-name { font-size: 12px; font-weight: 600; color: var(--t1); line-height: 1.3; }
+.mat-card-name { font-size: 12px; font-weight: 600; color: var(--t1); line-height: 1.3; }
 
 .mat-bar { height: 3px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 7px; }
 .mat-fill {
@@ -191,4 +191,8 @@ body.dark-mode .hm-sq.l2 {
 body.dark-mode .hm-cell.l3,
 body.dark-mode .hm-sq.l3 {
   background: #c7d2fe;
+}
+
+@media (max-width: 768px) {
+  .mats-grid { grid-template-columns: 1fr; }
 }

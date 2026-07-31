@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="{{ asset('css/components/forms.css') }}">
   <link rel="stylesheet" href="{{ asset('css/components/buttons.css') }}">
   <link rel="stylesheet" href="{{ asset('css/components/tabs.css') }}">
-  <link rel="stylesheet" href="{{ asset('css/components/filters.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/components/celebracion.css') }}">
   <link rel="stylesheet" href="{{ asset('css/base/utils.css') }}">
   @stack('styles')
 </head>
