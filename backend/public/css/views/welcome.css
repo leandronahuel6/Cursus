@@ -200,14 +200,7 @@ body {
     left: 5%;
     animation-delay: -3s;
 }
-@keyframes float {
-    0% {
-        transform: translate(0, 0) scale(1);
-    }
-    100% {
-        transform: translate(50px, 40px) scale(1.15);
-    }
-}
+
 
 /* Header Sticky */
 .landing-header {

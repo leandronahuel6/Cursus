@@ -1,5 +1,61 @@
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+/* ==========================================================================
+   GLOBAL KEYFRAMES
+   ========================================================================== */
+
+/* Utility: Parpadeo de opacidad */
+@keyframes blink { 
+  0%,100% { opacity: 1; } 
+  50% { opacity: 0.3; } 
+}
+
+/* Utility: Pulso de estado en vivo */
 @keyframes livepulse {
   0%,100% { box-shadow: 0 0 0 3px rgba(16,185,129,.15); }
   50%     { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
 }
+
+/* Utility: Skeleton Loading */
+@keyframes skel-loading {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* Vibración Horizontal (Errores o acciones denegadas) */
+@keyframes horizontal-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+/* Entradas y Salidas con Fade (Modales, Popups, Listas) */
+@keyframes slide-in-up-fade {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-down-fade {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-out-up-fade {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-20px); }
+}
+
+/* Decorativos y Comunes */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(50px, 40px) scale(1.15); }
+}
+
+@keyframes pulse-bounce {
+  0% { transform: scale(1) translateY(0); }
+  100% { transform: scale(1.1) translateY(-6px); }
+}
+
+
