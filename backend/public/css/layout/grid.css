@@ -1,5 +1,6 @@
 .dash { display: grid; grid-template-columns: 1fr 256px; gap: 16px; align-items: start; }
-.col  { display: flex; flex-direction: column; gap: 16px; }
+.col  { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.col-left, .col-right { min-width: 0; }
 
 @media (max-width: 1100px) {
   .dash { grid-template-columns: 1fr 240px; }

@@ -41,3 +41,11 @@ body.dark-mode .stat-title { color: var(--tm); }
 
 body.dark-mode .stat-badge-card { background: rgba(99,102,241,.12); border-color: rgba(99,102,241,.25); }
 body.dark-mode .stat-badge-val { color: #818cf8; }
+
+@media (max-width: 1100px) {
+  .stats { grid-template-columns: repeat(2,1fr); }
+}
+
+@media (max-width: 768px) {
+  .stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+}

@@ -498,41 +498,7 @@ body.dark-mode .btn-rect-mobile-purple:hover {
     font-size: 11px;
   }
 
-  /* Mobile header button actions styling */
-  .mob-hdr .mob-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 4px;
-    width: 100%;
-  }
-  .mob-hdr .mob-tb-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-  .mob-hdr .btn-mob-action {
-    padding: 4px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    border-radius: var(--r-sm);
-    cursor: pointer;
-    line-height: 1.5;
-    transition: all .15s ease;
-  }
-  .mob-hdr .btn-mob-action.btn-primary {
-    background: var(--brand);
-    color: #fff;
-    border: 1px solid var(--brand);
-  }
-  .mob-hdr .btn-mob-action.btn-secondary {
-    background: rgba(255, 255, 255, 0.08);
-    color: #f3f4f6;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-  }
-  .mob-hdr .btn-mob-action:active {
-    opacity: 0.8;
-  }
+
 }
 
 @media (max-width: 390px) {

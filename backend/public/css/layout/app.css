@@ -32,6 +32,17 @@ body.sidebar-collapsed .main {
 }
 
 @media (max-width: 768px) {
-  .main { margin-left: 0; max-width: 100%; }
-  .page { padding: 12px; }
+  .main,
+  body.sidebar-collapsed .main {
+    margin-left: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    position: relative;
+  }
+  .page {
+    width: 100%;
+    max-width: 100%;
+    padding: 16px 12px calc(24px + 51px + env(safe-area-inset-bottom, 0px));
+    box-sizing: border-box;
+  }
 }

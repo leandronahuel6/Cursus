@@ -23,11 +23,7 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  animation: modalSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes modalSlide {
-  from { transform: translateY(12px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  animation: slide-in-up-fade 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-hdr {

@@ -43,7 +43,7 @@ function renderMatsGrid(materias) {
     mat.onclick = () => goToAreaEstudio(m.id);
     mat.innerHTML = `
       <div class="mat-top">
-        <div class="mat-name">${m.nombre}</div>
+        <div class="mat-card-name">${m.nombre}</div>
         <span class="badge ${badge.clase}">${badge.label}</span>
       </div>
       <div class="mat-bar"><div class="mat-fill" style="width:${fillWidth}"></div></div>

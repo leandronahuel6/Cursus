@@ -1,66 +1,10 @@
 /* ==========================================================================
-       VARIABLES Y TEMA OSCURO LOCAL (FLASHCARDS)
-       ========================================================================== */
-body.dark-mode {
-    --bg: #070a13;
-    --border: rgba(255, 255, 255, 0.08);
-    --border-light: rgba(255, 255, 255, 0.04);
-    --surface: rgba(17, 24, 39, 0.6);
-    --t1: #f3f4f6;
-    --t2: #cbd5e1;
-    --t3: #94a3b8;
-}
-
-body {
-    background-image: none;
-    background-color: var(--bg);
-}
-
-/* Fondo Aurora Mesh Gradient Animado en Modo Oscuro */
-body.dark-mode {
-    background-image:
-        radial-gradient(
-            at 0% 0%,
-            rgba(99, 102, 241, 0.12) 0px,
-            transparent 50%
-        ),
-        radial-gradient(
-            at 100% 0%,
-            rgba(6, 182, 212, 0.08) 0px,
-            transparent 50%
-        );
-    background-size:
-        100% 100%,
-        100% 100%;
-    background-attachment: fixed;
-    animation: aurora-bg 20s infinite alternate ease-in-out;
-}
-
-@keyframes aurora-bg {
-    0% {
-        background-position:
-            0% 0%,
-            100% 100%;
-    }
-    50% {
-        background-position:
-            50% 50%,
-            50% 50%;
-    }
-    100% {
-        background-position:
-            100% 100%,
-            0% 0%;
-    }
-}
-
-/* ==========================================================================
        DISEÑO DE LA INTERFAZ DE FLASHCARDS
        ========================================================================== */
 .fc-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 1.5rem 0.5rem;
+    padding: 1.5rem 0;
 }
 
 .fc-header {
@@ -748,14 +692,7 @@ body.dark-mode .key-hint {
     animation: pulse-bounce 1.5s infinite alternate ease-in-out;
 }
 
-@keyframes pulse-bounce {
-    0% {
-        transform: scale(1) translateY(0);
-    }
-    100% {
-        transform: scale(1.1) translateY(-6px);
-    }
-}
+
 
 .summary-card h2 {
     font-size: 1.5rem;
@@ -973,7 +910,7 @@ body.dark-mode .key-hint {
 
 @media (max-width: 576px) {
     .fc-container {
-        padding: 1rem 0.75rem;
+        padding: 1rem 0;
     }
 
     /* Ajustes de estudio activo */
@@ -1503,24 +1440,10 @@ body.dark-mode .fc-modal-box {
 
 /* Animaciones Generales */
 .fade-in {
-    animation: fadeInEffect 0.3s ease-out forwards;
+    animation: slide-in-up-fade 0.3s ease-out forwards;
 }
 
-@keyframes fadeInEffect {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
+
 .ai-loader-spinner {
     box-sizing: border-box;
 }

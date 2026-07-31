@@ -122,6 +122,8 @@ body.dark-mode .topbar {
 /* Posicionamiento móvil del menú de perfil (al final para ganancia de cascada) */
 @media (max-width: 768px) {
   .topbar { display: none; }
+  .career-selector-wrap { width: 100%; margin-top: 10px; justify-content: space-between; }
+  .career-select { max-width: 100%; }
   .profile-menu {
     top: 62px;
     right: 16px;
