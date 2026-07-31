@@ -43,7 +43,6 @@ public/
 │   │   ├── modals.css      # Estilos compartidos para modales/overlays
 │   │   ├── tabs.css        # Sistema de pestañas
 │   │   ├── toast.css       # Notificaciones flotantes (sistema centralizado)
-│   │   ├── filters.css     # Chips de filtrado y selectores
 │   │   ├── forms.css       # Switches, inputs, textareas
 │   │   └── pomo-float.css  # Widget flotante Pomodoro minimizable
 │   └── views/              # Estilos ESPECÍFICOS para cada página
