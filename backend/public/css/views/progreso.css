@@ -1,3 +1,9 @@
+/* ==========================================
+   MI PROGRESO — Estilos específicos de la vista
+   Movido progresivamente desde main.css
+   Última actualización: refactorización modular
+   ========================================== */
+
 /* Grade Stepper (Nota) — movido desde main.css */
 .grade-stepper {
   display: flex;
@@ -41,32 +47,41 @@
   color: var(--brand);
 }
 
-body.dark-mode .grade-stepper {
-  background: #1f2937;
-  border-color: rgba(255, 255, 255, 0.08);
+/* Formulario y Contenedor de Formula */
+.formula-container {
+  background: #f9fafb;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 20px;
+  margin-top: 16px;
 }
-body.dark-mode .grade-stepper.stepper-disabled {
-  background: rgba(255, 255, 255, 0.02);
-  opacity: 0.5;
+.formula-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
-body.dark-mode .g-btn {
-  background: rgba(255, 255, 255, 0.03);
+.formula-title {
+  font-size: 11.5px;
+  font-weight: 700;
   color: var(--t2);
 }
-body.dark-mode .g-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.08);
+.formula-math {
+  font-family: monospace;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--brand);
 }
-body.dark-mode .g-val {
-  color: var(--t3);
+.formula-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--t2);
+  margin-bottom: 10px;
 }
 
-.formula-container {
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid var(--border-light);
-  border-radius: var(--r);
-  padding: 12px;
-  margin-top: 8px;
-}
+/* Pace Stepper */
 .pace-stepper {
   display: flex; align-items: center;
   background: var(--bg); border: 1px solid var(--border);
@@ -82,38 +97,51 @@ body.dark-mode .g-val {
   font-size: 13px; font-weight: 700; color: var(--t1);
   padding: 0 10px;
 }
-body.dark-mode .pace-stepper { background: #1f2937; border-color: rgba(255,255,255,.08); }
-body.dark-mode .pace-btn { background: rgba(255,255,255,.03); color: var(--t2); }
+
+/* Metrics Box */
 .metrics-box {
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid var(--border-light);
-  border-radius: var(--r);
-  padding: 12px;
+  background: #f9fafb;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-
+/* Tarjeta de tip/sugerencia de productividad */
 .tip-box {
-  background-color: rgba(168, 85, 247, 0.05);
-  border: 1px solid rgba(168, 85, 247, 0.15);
-  border-radius: var(--r);
+  background-color: #faf5ff;
+  border: 1px solid #e9d5ff;
+  border-radius: var(--r-sm);
   padding: 12px;
 }
-.tip-title {
+.tip-box .tip-title {
   font-size: 12px;
   font-weight: 700;
-  color: #7c3aed;
-  margin-bottom: 4px;
+  color: #7e22ce;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-.tip-body {
-  font-size: 12px;
-  color: var(--t2);
-  line-height: 1.5;
+.tip-box .tip-body {
+  font-size: 11.5px;
+  color: #6b21a8;
+  margin-top: 4px;
+  line-height: 1.4;
 }
 
+/* Heatmap de Actividad */
 .heatmap-day {
-  background-color: var(--border-light);
-  border-radius: 2px;
   aspect-ratio: 1;
+  background-color: #f3f4f6;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.heatmap-day:hover {
+  transform: scale(1.2);
+  z-index: 2;
 }
 .heatmap-day.lvl-1 {
   background-color: #c7d2fe;
@@ -122,68 +150,35 @@ body.dark-mode .pace-btn { background: rgba(255,255,255,.03); color: var(--t2); 
   background-color: #818cf8;
 }
 .heatmap-day.lvl-3 {
-  background-color: #6366f1;
-}
-.heatmap-day.lvl-4 {
   background-color: #4f46e5;
 }
+.heatmap-day.lvl-4 {
+  background-color: #312e81;
+}
 
+/* Tarjetas de estadisticas */
 .stat-badge-card {
-  background: rgba(99, 102, 241, 0.06);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-  border-radius: var(--r);
-  padding: 12px;
+  background: var(--brand-light);
+  border: 1px solid var(--brand-dim);
+  border-radius: var(--r-sm);
+  padding: 14px;
   text-align: center;
 }
 .stat-badge-val {
   font-size: 24px;
   font-weight: 700;
   color: var(--brand);
+  margin-bottom: 4px;
 }
-
-body.dark-mode .grade-stepper {
-  background: #1f2937;
-  border-color: rgba(255, 255, 255, 0.08);
-}
-body.dark-mode .g-btn {
-  background: rgba(255, 255, 255, 0.03);
+.stat-badge-lbl {
+  font-size: 11px;
+  font-weight: 600;
   color: var(--t2);
-}
-body.dark-mode .chart-card {
-  background: var(--surface);
-}
-body.dark-mode .tip-box {
-  background-color: rgba(168, 85, 247, 0.1);
-  border-color: rgba(168, 85, 247, 0.25);
-}
-body.dark-mode .tip-title {
-  color: #c084fc;
-}
-body.dark-mode .heatmap-day {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-body.dark-mode .heatmap-day.lvl-1 {
-  background-color: #312e81;
-}
-body.dark-mode .heatmap-day.lvl-2 {
-  background-color: #4338ca;
-}
-body.dark-mode .heatmap-day.lvl-3 {
-  background-color: #6366f1;
-}
-body.dark-mode .heatmap-day.lvl-4 {
-  background-color: #c7d2fe;
-}
-body.dark-mode .stat-badge-card {
-  background: rgba(99, 102, 241, 0.12);
-  border-color: rgba(99, 102, 241, 0.25);
-}
-body.dark-mode .stat-badge-val {
-  color: #818cf8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* Extraído de progreso.blade.php (inline) */
-/* Estilos específicos para la página de Progreso y Gráficos SVG */
+/* Estilos especificos para la pagina de Progreso y Graficos SVG */
 .chart-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -231,13 +226,6 @@ body.dark-mode .stat-badge-val {
   margin-top: 12px;
   flex-wrap: wrap;
 }
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--t2);
-}
 
 /* Layout de Productividad */
 .prod-grid {
@@ -246,39 +234,15 @@ body.dark-mode .stat-badge-val {
   gap: 20px;
   margin-top: 20px;
 }
-@media (max-width: 992px) {
-  .prod-grid {
-    grid-template-columns: 1fr;
-  }
-}
+
 .stat-badge-group {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-bottom: 16px;
 }
-.stat-badge-card {
-  background: var(--brand-light);
-  border: 1px solid var(--brand-dim);
-  border-radius: var(--r-sm);
-  padding: 14px;
-  text-align: center;
-}
-.stat-badge-val {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--brand);
-  margin-bottom: 4px;
-}
-.stat-badge-lbl {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--t2);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
 
-/* Heatmap de Actividad */
+/* Heatmap de Actividad (wrap) */
 .heatmap-wrap {
   margin-top: 16px;
 }
@@ -293,30 +257,8 @@ body.dark-mode .stat-badge-val {
   grid-template-columns: repeat(15, 1fr);
   gap: 4px;
 }
-.heatmap-day {
-  aspect-ratio: 1;
-  background-color: #f3f4f6;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: transform 0.1s;
-}
-.heatmap-day:hover {
-  transform: scale(1.2);
-  z-index: 2;
-}
-.heatmap-day.lvl-1 {
-  background-color: #c7d2fe;
-}
-.heatmap-day.lvl-2 {
-  background-color: #818cf8;
-}
-.heatmap-day.lvl-3 {
-  background-color: #4f46e5;
-}
-.heatmap-day.lvl-4 {
-  background-color: #312e81;
-}
 
+/* Leyenda del donut */
 .donut-legend-list {
   display: flex;
   flex-direction: column;
@@ -343,24 +285,420 @@ body.dark-mode .stat-badge-val {
   color: var(--t2);
 }
 
-/* Estilos para la tarjeta de tip/sugerencia de productividad */
-.tip-box {
-  background-color: #faf5ff;
-  border: 1px solid #e9d5ff;
-  border-radius: var(--r-sm);
-  padding: 12px;
+/* ==========================================
+   CALCULADORA DE PROMEDIO -- MOVED FROM main.css
+   ========================================== */
+.avg-stats {
+  margin-bottom: 20px;
 }
-.tip-box .tip-title {
-  font-size: 12px;
+.avg-dash {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  align-items: start;
+}
+.avg-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.dark-header {
+  background: #1e293b !important;
+  padding-bottom: 13px;
+}
+.dark-header .card-title {
+  color: #f9fafb !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sim-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.sim-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  transition: all .2s ease;
+}
+.sim-row.disabled {
+  opacity: 0.6;
+  background: #f9fafb;
+}
+.sim-left-decor {
+  width: 4px;
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  border-top-left-radius: var(--r-sm);
+  border-bottom-left-radius: var(--r-sm);
+}
+.sim-subject-info {
+  flex: 1;
+  overflow: hidden;
+}
+.sim-subject-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--t1);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sim-subject-name.text-dim {
+  color: var(--t3);
+}
+
+/* Tooltip de filas deshabilitadas */
+.sim-row.disabled:hover .sim-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+.sim-tooltip {
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(17,24,39,0.9);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 10;
+  box-shadow: var(--sh-md);
+}
+.sim-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(17,24,39,0.9) transparent transparent transparent;
+}
+
+/* Insignias de mejora */
+.improvement-badge {
+  font-size: 11px;
   font-weight: 700;
-  color: #7e22ce;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+.improvement-badge.plus {
+  color: var(--green);
+  background: #d1fae5;
+}
+.improvement-badge.minus {
+  color: var(--red);
+  background: #fee2e2;
+}
+
+/* Barra de comparacion real vs proyectado */
+.comparison-bar-wrap {
+  position: relative;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+.bar-base {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+.bar-real {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: var(--green);
+  z-index: 2;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+.bar-proj {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: #3b82f6;
+  z-index: 1;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+.bar-legend {
+  display: flex;
+  gap: 16px;
+}
+.leg-item {
   display: flex;
   align-items: center;
   gap: 6px;
+  font-size: 10.5px;
+  color: var(--t3);
 }
-.tip-box .tip-body {
-  font-size: 11.5px;
-  color: #6b21a8;
-  margin-top: 4px;
-  line-height: 1.4;
+.leg-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.leg-dot.real { background: var(--green); }
+.leg-dot.proj { background: #3b82f6; }
+
+/* Columna derecha: Proyeccion */
+.projection-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.pace-selector-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.pace-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--t2);
+}
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+.m-lbl { color: var(--t3); }
+.m-val { font-weight: 700; color: var(--t1); font-family: monospace; }
+.metric-divider {
+  border: none;
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+.metric-row.highlight {
+  font-size: 14px;
+}
+.brand-color-text {
+  color: var(--brand) !important;
+}
+.font-bold {
+  font-weight: 700;
+}
+
+/* Trayecto sugerido */
+.sug-path-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sug-path-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t2);
+}
+.sug-path-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sug-year-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sug-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sug-chip {
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+}
+.sug-chip-num {
+  padding: 3px 6px;
+  color: #fff;
+}
+.sug-chip-lbl {
+  padding: 3px 6px;
+  background: #fff;
+  color: var(--t2);
+}
+.sug-chip.passed .sug-chip-num { background: var(--brand); }
+.sug-chip.passed { border-color: var(--brand); }
+.sug-chip.active .sug-chip-num { background: var(--brand-dim); color: var(--brand-hover); }
+.sug-chip.active { border-color: var(--brand-dim); }
+.sug-year-lbl {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--tm);
+}
+
+/* Boton guardar promedio */
+.btn-save-avg {
+  width: 100%;
+  padding: 11px;
+  font-weight: 700;
+  border-radius: var(--r-sm);
+}
+
+/* ==============================================
+   DARK MODE OVERRIDES -- al final para respetar cascada
+   ============================================== */
+
+body.dark-mode .grade-stepper {
+  background: #1f2937;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .grade-stepper.stepper-disabled {
+  background: rgba(255, 255, 255, 0.02);
+  opacity: 0.5;
+}
+body.dark-mode .g-btn {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--t2);
+}
+body.dark-mode .g-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .g-val {
+  color: var(--t3);
+}
+
+/* Adaptacion de la tarjeta de sugerencia (tip-box) y del heatmap de actividad al modo oscuro */
+body.dark-mode .tip-box {
+  background-color: rgba(168, 85, 247, 0.1);
+  border-color: rgba(168, 85, 247, 0.25);
+}
+body.dark-mode .tip-box .tip-title {
+  color: #c084fc;
+}
+body.dark-mode .tip-box .tip-body {
+  color: #e9d5ff;
+}
+
+body.dark-mode .formula-container {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+body.dark-mode .pace-stepper { background: #1f2937; border-color: rgba(255,255,255,.08); }
+body.dark-mode .pace-btn { background: rgba(255,255,255,.03); color: var(--t2); }
+body.dark-mode .metrics-box {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+body.dark-mode .sug-chip-lbl {
+  background: #1f2937;
+  color: var(--t2);
+}
+body.dark-mode .chart-card {
+  background: var(--surface);
+}
+/* SVG overrides para graficos en modo oscuro */
+body.dark-mode .chart-card svg line {
+  stroke: var(--border) !important;
+}
+body.dark-mode .chart-card svg text {
+  fill: var(--t2) !important;
+}
+body.dark-mode .chart-card svg text[fill="#1e293b"],
+body.dark-mode .chart-card svg text[fill="#111827"] {
+  fill: var(--t1) !important;
+}
+body.dark-mode .chart-card svg circle[fill="#ffffff"] {
+  display: none !important;
+}
+
+body.dark-mode .heatmap-day {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+body.dark-mode .heatmap-day.lvl-1 {
+  background-color: #312e81;
+}
+body.dark-mode .heatmap-day.lvl-2 {
+  background-color: #4338ca;
+}
+body.dark-mode .heatmap-day.lvl-3 {
+  background-color: #6366f1;
+}
+body.dark-mode .heatmap-day.lvl-4 {
+  background-color: #c7d2fe;
+}
+
+body.dark-mode .stat-badge-card {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+body.dark-mode .stat-badge-val {
+  color: #818cf8;
+}
+
+/* Filas deshabilitadas en modo oscuro */
+body.dark-mode .sim-row.disabled {
+  background: rgba(255, 255, 255, 0.02) !important;
+  opacity: 0.4;
+}
+
+/* ==============================================
+   MEDIA QUERIES -- al final para respetar cascada
+   ============================================== */
+
+@media (max-width: 1200px) {
+  .avg-dash {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .prod-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mi Progreso Mobile overrides */
+@media (max-width: 768px) {
+  .svg-chart {
+    width: 100% !important;
+    height: auto !important;
+  }
+  .formula-hd {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .bar-legend {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+  .sim-row {
+    padding: 12px 14px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .sim-subject-name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    font-size: 13px;
+    line-height: 1.3;
+  }
+  .chart-container {
+    height: auto !important;
+  }
 }

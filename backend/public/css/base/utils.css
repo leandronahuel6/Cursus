@@ -31,3 +31,11 @@
   height: 12px;
   border-radius: 3px;
 }
+/* Usado en materias.blade.php y progreso (charts legend) */
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--t2);
+}
