@@ -1,24 +1,24 @@
-const form = document.querySelector('#ForgotForm');
-const emailInput = document.querySelector('#email');
-const emailError = document.querySelector('#email-error');
-const successMessage = document.querySelector('#success-message');
+/**
+ * forgot-password.js
+ *
+ * Lógica exclusiva de la vista "Olvidé mi contraseña".
+ * La validación de email se delega a AuthCommon.
+ */
 
-const emailRegex = /^[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
+const form           = document.querySelector('#ForgotForm');
+const emailInput     = document.querySelector('#email');
+const emailError     = document.querySelector('#email-error');
+const successMessage = document.querySelector('#success-message');
 
 const handleSubmit = async (e) => {
     e.preventDefault();
-    emailError.textContent = '';
+    emailError.textContent    = '';
     successMessage.textContent = '';
-    successMessage.hidden = true;
+    successMessage.hidden      = true;
 
-    if (!emailInput.value) {
-        emailError.textContent = 'Ingresá tu correo electrónico';
-        emailInput.focus();
-        return;
-    }
-
-    if (!emailRegex.test(emailInput.value)) {
-        emailError.textContent = 'Ingresá un correo electrónico válido';
+    const validationError = AuthCommon.validateEmail(emailInput.value);
+    if (validationError) {
+        emailError.textContent = validationError;
         emailInput.focus();
         return;
     }
@@ -28,7 +28,8 @@ const handleSubmit = async (e) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
             },
             body: JSON.stringify({ email: emailInput.value })
         });
@@ -41,8 +42,8 @@ const handleSubmit = async (e) => {
         }
 
         successMessage.textContent = data.message;
-        successMessage.hidden = false;
-        emailInput.value = '';
+        successMessage.hidden      = false;
+        emailInput.value           = '';
 
     } catch (error) {
         console.error('Error:', error);

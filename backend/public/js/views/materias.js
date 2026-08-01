@@ -46,7 +46,9 @@ async function loadPlan() {
   data.forEach(m => {
     state.subjects[m.id] = {
       status: estadoDbToUi(m.estado),
-      grade: m.nota ?? null
+      grade: m.nota ?? null,
+      puede_cursar: m.puede_cursar,
+      puede_aprobar: m.puede_aprobar
     };
   });
 }
@@ -54,13 +56,39 @@ async function loadPlan() {
 // Persiste en la BD el estado de cursada de una materia para el usuario actual
 async function persistSubjectStatus(id, statusUi, grade) {
   try {
-    await fetch(`${API_BASE}/materias/${id}/estado`, {
+    const res = await fetch(`${API_BASE}/materias/${id}/estado`, {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify({ estado: estadoUiToDb(statusUi), nota: grade ?? null })
     });
+    const data = await res.json();
+    
+    if (!res.ok) {
+      if (data.conflictos && data.conflictos.length > 0) {
+        if (window.openDependencyErrorModal) {
+          window.openDependencyErrorModal(data.conflictos);
+        }
+      } else {
+        if (window.showToast) window.showToast(data.message || 'La operación fue rechazada por el servidor.', 'error');
+      }
+      return false;
+    }
+    
+    // Confiamos ciegamente en la Única Fuente de Verdad (Backend)
+    // El servidor ya recalculó todas las correlatividades.
+    data.forEach(sub => {
+      state.subjects[sub.id] = { 
+        status: sub.estado, 
+        grade: sub.nota,
+        puede_cursar: sub.puede_cursar,
+        puede_aprobar: sub.puede_aprobar
+      };
+    });
+    updateUI();
+    return true;
   } catch (e) {
     console.error('No se pudo guardar el estado de la materia', e);
+    return false;
   }
 }
 
@@ -77,12 +105,12 @@ let activeModalSubjectId = null;
 
 
 function statusBadgeClass(status) {
-  const map = { disponible: 'badge--neutral', cursando: 'badge--info', regular: 'badge--warning', aprobada: 'badge--success', locked: 'badge--danger' };
+  const map = { disponible: 'badge--neutral', cursando: 'badge--info', regular: 'badge--warning', aprobada: 'badge--success', bloqueada: 'badge--danger' };
   return map[status] || 'badge--neutral';
 }
 
-function getStatusLabel(status, isLocked) {
-  if (isLocked) return 'Bloqueada';
+function getStatusLabel(status) {
+  if (status === 'bloqueada') return 'Bloqueada';
   const labels = {
     disponible: 'Disponible',
     cursando: 'Cursando',
@@ -129,17 +157,17 @@ window.openSubjectInfoModal = function(sub, subState) {
   const bodyEl = document.getElementById('subject-info-modal-body');
   if (!modal || !titleEl || !bodyEl) return;
 
-  const isLocked = isSubjectLocked(sub);
+  const isLocked = !subState.puede_cursar;
   const statusClass = isLocked ? 'locked' : subState.status;
   const gradeHTML = (subState.status === 'aprobada' && subState.grade)
-    ? `<div class="sub-grade-badge">Calificación: ${subState.grade}</div>`
+    ? `<span class="badge badge--success">Calificación: ${subState.grade}</span>`
     : '';
 
   titleEl.textContent = sub.name;
   bodyEl.innerHTML = `
     <div class="subject-info-meta">
       <span class="subject-info-code">TUP${sub.id}</span>
-      <span class="badge ${statusBadgeClass(statusClass)}">${getStatusLabel(subState.status, isLocked)}</span>
+      <span class="badge ${statusBadgeClass(statusClass)}">${getStatusLabel(subState.status)}</span>
       ${gradeHTML}
     </div>
     <div class="subject-info-prereqs-title">Correlatividades</div>
@@ -152,6 +180,32 @@ window.openSubjectInfoModal = function(sub, subState) {
 window.closeSubjectInfoModal = function() {
   const modal = document.getElementById('subject-info-modal');
   if (modal) modal.classList.remove('open');
+};
+
+// ===================== MODAL DE ERROR DE DEPENDENCIAS =====================
+window.openDependencyErrorModal = function(conflictos) {
+  const modal = document.getElementById('dependency-error-modal');
+  const listEl = document.getElementById('dependency-error-list');
+  
+  if (!modal || !listEl) return;
+  
+  // Limpiar lista
+  listEl.innerHTML = '';
+  
+  // Inyectar materias conflictivas
+  conflictos.forEach(materia => {
+    const li = document.createElement('li');
+    li.textContent = materia;
+    listEl.appendChild(li);
+  });
+  
+  // Mostrar modal usando la clase .show (estándar en components/modals.css)
+  modal.classList.add('show');
+};
+
+window.closeDependencyErrorModal = function() {
+  const modal = document.getElementById('dependency-error-modal');
+  if (modal) modal.classList.remove('show');
 };
 
 // Inicialización de la vista
@@ -177,36 +231,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// Comprobar si una materia está bloqueada por correlativas.
-// `newStatus` es el estado al que se quiere pasar la materia (opcional).
-function isSubjectLocked(sub, newStatus) {
-  // 1. Validar cursadas obligatorias (deben estar al menos como "regular" o "aprobada")
-  for (const reqId of sub.prereq.cursadas) {
-    const reqState = state.subjects[reqId];
-    if (!reqState || (reqState.status !== 'regular' && reqState.status !== 'aprobada')) {
-      return true;
-    }
-  }
-
-  // 2. Validar aprobadas obligatorias (deben estar como "aprobada").
-  // Caso especial: el Trabajo Final Integrador se REGULARIZA con las materias 8 a
-  // 12 cursadas (chequeo de arriba), pero solo se ACREDITA (estado 'aprobada')
-  // teniendo aprobadas las 17 materias del plan. Para cualquier otro destino
-  // (cursando/regular/disponible) esa lista de aprobadas no debe bloquearlo.
-  const esTFI = sub.name === 'Trabajo Final Integrador';
-  if (esTFI && newStatus !== 'aprobada') {
-    return false;
-  }
-
-  for (const reqId of sub.prereq.aprobadas) {
-    const reqState = state.subjects[reqId];
-    if (!reqState || reqState.status !== 'aprobada') {
-      return true;
-    }
-  }
-
-  return false;
-}
+// La función isSubjectLocked ha sido eliminada por completo. El frontend
+// ahora confía 100% en las banderas booleanas calculadas por el servidor.
 
 // Obtener el nombre de una materia por su ID
 function getSubjectNameById(id) {
@@ -217,29 +243,41 @@ function getSubjectNameById(id) {
 // Cambiar estado de una materia
 window.changeSubjectStatus = function(id, newStatus) {
   const sub = TUP_PLAN.find(s => s.id === id);
-  if (!sub) return;
-  
-  // Si está bloqueada, no permitir cambiar
-  if (isSubjectLocked(sub, newStatus) && newStatus !== 'disponible') {
-    showToast('Esta materia está bloqueada. Cumplí sus correlativas primero.', 'warn');
-    return;
-  }
+  const subState = state.subjects[id];
+  if (!sub || !subState) return;
   
   if (newStatus === 'aprobada') {
     // Abrir modal de notas
     activeModalSubjectId = id;
     document.getElementById('grade-modal-subject-title').innerText = `Registrar nota: ${sub.name}`;
-    document.getElementById('grade-select').value = '8';
+    document.getElementById('grade-select').value = subState.grade || '8';
     document.getElementById('grade-modal').classList.add('open');
   } else {
-    // Cambiar estado directamente
-    state.subjects[id].status = newStatus;
-    state.subjects[id].grade = null;
-    persistSubjectStatus(id, newStatus, null);
+    // Evitar múltiples clicks simultáneos en la misma materia
+    if (subState.isFetching) return;
+    subState.isFetching = true;
 
-    // Ejecutar verificación en cascada para bloquear materias que dependían de esta
-    cascadeVerifications();
+    // ACTUALIZACIÓN OPTIMISTA: 
+    // Cambiamos el estado localmente de inmediato para dar feedback instantáneo al usuario sin latencia
+    const originalStatus = subState.status;
+    subState.status = newStatus;
     updateUI();
+
+    // El servidor procesará y devolverá el árbol completo, destrabando las demás materias
+    persistSubjectStatus(id, newStatus, null).then(success => {
+      if (!success) {
+        // Rollback en caso de fallo de red o validación (ej. HTTP 422)
+        subState.status = originalStatus;
+        updateUI();
+        
+        // Efecto visual: el botón falla y tiembla para darle feedback físico al usuario
+        const btn = document.getElementById(`btn-${id}-${newStatus}`);
+        if (btn && window.shakeApproveButton) {
+          window.shakeApproveButton(btn);
+        }
+      }
+      subState.isFetching = false;
+    });
   }
 };
 
@@ -257,35 +295,35 @@ window.closeGradeModal = function(shouldSave) {
 
   if (shouldSave && activeModalSubjectId !== null) {
     const gradeVal = parseInt(document.getElementById('grade-select').value);
-
-    state.subjects[activeModalSubjectId].status = 'aprobada';
-    state.subjects[activeModalSubjectId].grade = gradeVal;
-    persistSubjectStatus(activeModalSubjectId, 'aprobada', gradeVal);
-
-    cascadeVerifications();
-    updateUI();
+    const subState = state.subjects[activeModalSubjectId];
+    
+    if (subState && !subState.isFetching) {
+      subState.isFetching = true;
+      
+      const originalStatus = subState.status;
+      const originalGrade = subState.grade;
+      
+      // Actualización optimista
+      subState.status = 'aprobada';
+      subState.grade = gradeVal;
+      updateUI();
+      
+      persistSubjectStatus(activeModalSubjectId, 'aprobada', gradeVal).then(success => {
+        if (!success) {
+          // Rollback
+          subState.status = originalStatus;
+          subState.grade = originalGrade;
+          updateUI();
+        }
+        subState.isFetching = false;
+      });
+    }
   }
   activeModalSubjectId = null;
 };
 
-// Validación en cascada: si demoto una materia (ej: Programación I pasa de aprobada a disponible),
-// debemos bajar de nivel automáticamente cualquier materia que requiera de ella.
-function cascadeVerifications() {
-  let changed = true;
-  while (changed) {
-    changed = false;
-    TUP_PLAN.forEach(sub => {
-      const subState = state.subjects[sub.id];
-      if (subState.status !== 'disponible' && isSubjectLocked(sub, subState.status)) {
-        // La materia ya no cumple sus correlativas, bajar a disponible
-        subState.status = 'disponible';
-        subState.grade = null;
-        persistSubjectStatus(sub.id, 'disponible', null);
-        changed = true;
-      }
-    });
-  }
-}
+// La validación en cascada local (cascadeVerifications) ha sido eliminada.
+// Ahora el Frontend confía 100% en la Única Fuente de Verdad (Backend).
 
 // Filtrado de pestañas superiores (Gestión vs Plan de Estudios)
 window.switchToTab = function(tabName) {
@@ -409,7 +447,7 @@ function renderListView() {
     const filtered = levelSubjects.filter(sub => {
       const subState = state.subjects[sub.id];
       if (state.currentFilter === 'all') return true;
-      if (state.currentFilter === 'bloqueada') return isSubjectLocked(sub);
+      if (state.currentFilter === 'bloqueada') return subState.status === 'bloqueada';
       return subState.status === state.currentFilter;
     });
     
@@ -437,7 +475,7 @@ function renderListView() {
       
       filtered.forEach(sub => {
         const subState = state.subjects[sub.id];
-        const isLocked = isSubjectLocked(sub);
+        const isLocked = subState.status === 'bloqueada';
         
         // El TFI (y cualquier materia con muchas correlativas) necesita más alto que el resto
         const totalPrereqs = sub.prereq.cursadas.length + sub.prereq.aprobadas.length;
@@ -486,7 +524,7 @@ function renderListView() {
         
         // Nota si está aprobada
         const gradeHTML = (subState.status === 'aprobada' && subState.grade) 
-          ? `<div class="sub-grade-badge">Calificación: ${subState.grade}</div>` 
+          ? `<span class="badge badge--success">Calificación: ${subState.grade}</span>` 
           : '';
           
         card.innerHTML = `
@@ -546,21 +584,17 @@ function renderTreeView() {
       
       levelSubjects.forEach(sub => {
         const subState = state.subjects[sub.id];
-        const isLocked = isSubjectLocked(sub);
+        const isLocked = !subState.puede_cursar;
         const lockedDisponible = false; // siempre se puede volver a "Disponible"
-        const lockedCursando = isSubjectLocked(sub, 'cursando');
-        const lockedRegular = isSubjectLocked(sub, 'regular');
-        const lockedAprobada = isSubjectLocked(sub, 'aprobada');
+        const lockedCursando = !subState.puede_cursar;
+        const lockedRegular = !subState.puede_cursar;
+        const lockedAprobada = !subState.puede_aprobar;
 
-        // Caso particular: se puede regularizar la materia pero todavía no aprobarla
-        // (ej. el TFI regularizado, sin tener aprobadas las 17 materias). En ese
-        // caso el botón "Aprobar" queda habilitado para el click, pero en rojo
-        // suave y con un shake en vez de cambiar el estado.
-        const aprobarBloqueadaParcial = subState.status !== 'aprobada' && !lockedRegular && lockedAprobada;
+        // Feedback visual si puede cursar pero aún no puede aprobar (efecto shake)
+        const aprobarBloqueadaParcial = subState.puede_cursar && !subState.puede_aprobar;
 
         const node = document.createElement('div');
         let nodeClass = subState.status;
-        if (isLocked) nodeClass = 'bloqueada';
         
         node.className = `tree-node-card ${nodeClass}`;
         
@@ -582,13 +616,13 @@ function renderTreeView() {
             <span class="tree-node-meta">${metaText}</span>
           </div>
           <div class="status-buttons-row">
-            <button class="btn-status-toggle ${!lockedDisponible && subState.status === 'disponible' ? 'active disponible' : ''}"
+            <button id="btn-${sub.id}-disponible" class="btn-status-toggle ${!lockedDisponible && subState.status === 'disponible' ? 'active disponible' : ''}"
                     ${lockedDisponible ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'disponible')">Disponible</button>
-            <button class="btn-status-toggle ${!lockedCursando && subState.status === 'cursando' ? 'active cursando' : ''}"
+            <button id="btn-${sub.id}-cursando" class="btn-status-toggle ${!lockedCursando && subState.status === 'cursando' ? 'active cursando' : ''}"
                     ${lockedCursando ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'cursando')">Cursar</button>
-            <button class="btn-status-toggle ${!lockedRegular && subState.status === 'regular' ? 'active regular' : ''}"
+            <button id="btn-${sub.id}-regular" class="btn-status-toggle ${!lockedRegular && subState.status === 'regular' ? 'active regular' : ''}"
                     ${lockedRegular ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'regular')">Regular</button>
-            <button class="btn-status-toggle ${!lockedAprobada && subState.status === 'aprobada' ? 'active aprobada' : ''} ${aprobarBloqueadaParcial ? 'aprobar-bloqueada' : ''}"
+            <button id="btn-${sub.id}-aprobada" class="btn-status-toggle ${!lockedAprobada && subState.status === 'aprobada' ? 'active aprobada' : ''} ${aprobarBloqueadaParcial ? 'aprobar-bloqueada' : ''}"
                     ${lockedAprobada && !aprobarBloqueadaParcial ? 'disabled' : ''}
                     title="${aprobarBloqueadaParcial ? 'Podés regularizarla, pero todavía no podés aprobarla: faltan correlativas.' : ''}"
                     onclick="event.stopPropagation(); ${aprobarBloqueadaParcial ? `window.shakeApproveButton(this)` : `window.changeSubjectStatus(${sub.id}, 'aprobada')`}">Aprobar</button>

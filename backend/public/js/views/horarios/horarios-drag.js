@@ -16,8 +16,6 @@ import {
   timeToMin
 } from './horarios-grid.js';
 
-import { getCommissionByTime } from './horarios-data.js';
-
 // ── HTML5 Drag State ───────────────────────────────────────────────────────
 
 export let dragData = null;
@@ -73,7 +71,7 @@ export function setupDropZones(onBlockDrop) {
         fin: finStr,
         color: null,
         version: null,
-        comision: dragData.tipo === 'materia' ? getCommissionByTime(inicioStr) : 'Actividad Personal'
+        comision: dragData.tipo === 'materia' ? null : 'Actividad Personal'
       };
 
       onBlockDrop(newBlock);
@@ -98,6 +96,8 @@ export function initBlockVerticalDrag(block, startEvent, onDragUpdate, onDragEnd
   const startOffsetMin = initialStartMin - START_HOUR * 60;
   const dayColElements = Array.from(document.querySelectorAll('.grid-day-col'));
 
+  blockDiv.classList.add('is-dragging');
+
   function handleMouseMove(e) {
     const deltaY = e.clientY - startY;
     const deltaMin = Math.round(deltaY / PX_PER_MINUTE);
@@ -114,13 +114,9 @@ export function initBlockVerticalDrag(block, startEvent, onDragUpdate, onDragEnd
     block.inicio = minToTime(newStartMin);
     block.fin = minToTime(newEndMin);
 
-    if (block.tipo === 'materia') {
-      block.comision = getCommissionByTime(block.inicio);
-    }
-
     blockDiv.style.top = `${newOffset * PX_PER_MINUTE}px`;
     const metaRow = blockDiv.querySelector('.block-meta-row');
-    if (metaRow) metaRow.textContent = block.comision;
+    if (metaRow) metaRow.textContent = block.comision || (block.tipo === 'materia' ? 'Sin asignar' : '');
 
     let hoverDayId = block.dia;
     dayColElements.forEach(col => {
@@ -142,6 +138,7 @@ export function initBlockVerticalDrag(block, startEvent, onDragUpdate, onDragEnd
   function handleMouseUp(e) {
     window.removeEventListener('mousemove', handleMouseMove);
     window.removeEventListener('mouseup', handleMouseUp);
+    blockDiv.classList.remove('is-dragging');
 
     const distY = Math.abs(e.clientY - startY);
     const distX = Math.abs(e.clientX - startX);
@@ -162,6 +159,8 @@ export function initBlockVerticalResize(block, handle, startEvent, onResizeUpdat
   const startMin = timeToMin(block.inicio);
   const endMin = timeToMin(block.fin);
 
+  blockDiv.classList.add('is-dragging');
+
   function handleMouseMove(e) {
     const deltaY = e.clientY - startY;
     const deltaMin = Math.round(deltaY / PX_PER_MINUTE);
@@ -174,16 +173,12 @@ export function initBlockVerticalResize(block, handle, startEvent, onResizeUpdat
 
       block.inicio = minToTime(newStart);
 
-      if (block.tipo === 'materia') {
-        block.comision = getCommissionByTime(block.inicio);
-      }
-
       const topPx = (newStart - START_HOUR * 60) * PX_PER_MINUTE;
       const heightPx = (endMin - newStart) * PX_PER_MINUTE;
       blockDiv.style.top = `${topPx}px`;
       blockDiv.style.height = `${heightPx}px`;
       const metaRow = blockDiv.querySelector('.block-meta-row');
-      if (metaRow) metaRow.textContent = block.comision;
+      if (metaRow) metaRow.textContent = block.comision || (block.tipo === 'materia' ? 'Sin asignar' : '');
     } else {
       let newEnd = endMin + deltaMin;
       newEnd = Math.round(newEnd / 30) * 30;
@@ -196,12 +191,17 @@ export function initBlockVerticalResize(block, handle, startEvent, onResizeUpdat
       blockDiv.style.height = `${heightPx}px`;
     }
 
+    const currentDurationMin = timeToMin(block.fin) - timeToMin(block.inicio);
+    blockDiv.classList.toggle('is-tiny', currentDurationMin <= 30);
+    blockDiv.classList.toggle('is-small', currentDurationMin > 30 && currentDurationMin <= 60);
+
     onResizeUpdate(block);
   }
 
   function handleMouseUp() {
     window.removeEventListener('mousemove', handleMouseMove);
     window.removeEventListener('mouseup', handleMouseUp);
+    blockDiv.classList.remove('is-dragging');
     onResizeEnd(block);
   }
 

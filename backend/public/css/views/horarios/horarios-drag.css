@@ -39,6 +39,13 @@
   font-weight: 700;
   color: var(--t2);
 }
+.sched-group-label {
+  width: 100%;
+  margin-top: 10px;
+}
+.sched-group-label:first-child {
+  margin-top: 0;
+}
 .sched-badge-count {
   background: var(--brand);
   color: #fff;

@@ -125,6 +125,35 @@
       </div>
     </div>
   </div>
+
+  <!-- ===================== MODAL DE ERROR DE DEPENDENCIAS ===================== -->
+  <div class="modal-overlay" id="dependency-error-modal" role="dialog" aria-modal="true" aria-labelledby="dependency-error-title" aria-describedby="dependency-error-desc" tabindex="-1">
+    <div class="modal-box">
+      <div class="modal-hdr">
+        <div class="modal-title" id="dependency-error-title" style="color: #ef4444; display: flex; align-items: center; gap: 8px;">
+          <svg aria-hidden="true" width="18" height="18"><use href="{{ asset('assets/icons/sprite.svg#circle-alert') }}"></use></svg>
+          Acción Bloqueada
+        </div>
+        <button class="modal-close" onclick="window.closeDependencyErrorModal()">
+          <svg aria-hidden="true" width="16" height="16"><use href="{{ asset('assets/icons/sprite.svg#x') }}"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.9em">
+          No puedes retroceder el estado de esta materia porque invalidaría tu progreso actual en las siguientes materias dependientes:
+        </p>
+        <ul id="dependency-error-list" style="margin: 15px 0 15px 25px; list-style-type: disc;">
+          <!-- Items inyectados desde JS -->
+        </ul>
+        <p style="font-size: 0.9em; opacity: 0.8;">
+          Debes dar de baja estas materias avanzadas antes de poder deshacer esta.
+        </p>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-cancel" onclick="window.closeDependencyErrorModal()">Entendido</button>
+      </div>
+    </div>
+  </div>
 @endsection
 
 @push('scripts')

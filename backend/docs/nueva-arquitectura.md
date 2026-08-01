@@ -117,7 +117,27 @@ public/
 │           └── plan-estudios.js
 ```
 
-### Estructura de Vistas Blade (`resources/views/`)
+### Estructura del Backend PHP (`app/`)
+
+```text
+app/
+├── Http/
+│   └── Controllers/
+│       ├── HorarioController.php   # CRUD del simulador; delega elegibilidad al AcademicStatusService
+│       ├── MateriaController.php   # Catálogo y actualización de estados; consume AcademicStatusService
+│       └── ...                     # Otros controladores de la aplicación
+├── Models/
+│   ├── HorarioUsuario.php          # Bloque guardado en la grilla (columna 'comision' agregada)
+│   ├── Materia.php                 # Entidad de materia académica
+│   ├── MateriaUsuario.php          # Pivot de estado académico del alumno
+│   └── ...
+└── Services/
+    ├── AcademicStatusService.php   # ★ Única Fuente de Verdad para estados y correlatividades
+    ├── ComprobanteAnalyzer.php     # Análisis de comprobantes de pago (OCR)
+    └── CuotaMensualService.php     # Lógica de gestión de cuotas mensuales
+```
+
+
 
 ```text
 resources/views/

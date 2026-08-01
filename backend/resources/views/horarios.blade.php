@@ -99,7 +99,7 @@
 
       <div class="sched-panel-section">
         <div class="sched-section-hd">
-          <span>Materias Disponibles (A cursar)</span>
+          <span>Catálogo de Materias</span>
           <span class="sched-badge-count" id="count-available-subjects">0</span>
         </div>
         <div class="sched-draggable-list" id="list-available-subjects">
@@ -206,14 +206,15 @@
             <input type="time" class="editor-time-input" id="editor-end-time">
           </label>
 
-          <!-- Paleta de colores -->
+          <!-- Paleta de colores: data-color usa strings semánticos (ej. 'emerald')
+               para evitar conversiones hex→nombre en JS y backend. -->
           <div class="editor-color-picker" style="display: flex; align-items: center; gap: 6px; margin: 0 10px; padding-left: 10px; border-left: 1px solid rgba(255,255,255,0.15);">
-            <button class="color-dot" data-color="#4f46e5" onclick="changeBlockColor('#4f46e5')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: #4f46e5; cursor: pointer;"></button>
-            <button class="color-dot" data-color="#9333ea" onclick="changeBlockColor('#9333ea')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: #9333ea; cursor: pointer;"></button>
-            <button class="color-dot" data-color="#10b981" onclick="changeBlockColor('#10b981')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: #10b981; cursor: pointer;"></button>
-            <button class="color-dot" data-color="#f43f5e" onclick="changeBlockColor('#f43f5e')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: #f43f5e; cursor: pointer;"></button>
-            <button class="color-dot" data-color="#f59e0b" onclick="changeBlockColor('#f59e0b')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: #f59e0b; cursor: pointer;"></button>
-            <button class="color-dot" data-color="#0ea5e9" onclick="changeBlockColor('#0ea5e9')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: #0ea5e9; cursor: pointer;"></button>
+            <button class="color-dot" data-color="indigo" onclick="changeBlockColor('indigo')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: var(--theme-indigo, #4f46e5); cursor: pointer;"></button>
+            <button class="color-dot" data-color="purple" onclick="changeBlockColor('purple')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: var(--theme-purple, #9333ea); cursor: pointer;"></button>
+            <button class="color-dot" data-color="emerald" onclick="changeBlockColor('emerald')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: var(--theme-emerald, #10b981); cursor: pointer;"></button>
+            <button class="color-dot" data-color="rose" onclick="changeBlockColor('rose')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: var(--theme-rose, #f43f5e); cursor: pointer;"></button>
+            <button class="color-dot" data-color="amber" onclick="changeBlockColor('amber')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: var(--theme-amber, #f59e0b); cursor: pointer;"></button>
+            <button class="color-dot" data-color="sky" onclick="changeBlockColor('sky')" style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid transparent; background-color: var(--theme-sky, #0ea5e9); cursor: pointer;"></button>
           </div>
 
           <button class="editor-btn-delete" id="editor-btn-delete-block" title="Eliminar bloque">🗑️ Eliminar</button>
@@ -258,9 +259,18 @@
           <div class="modal-field">
             <label class="modal-label" id="modal-comm-lbl">Comisión:</label>
             <select class="modal-select" id="modal-commission-select">
-              <option value="Comisión 1 (Noche)">Comisión 1 (Noche)</option>
-              <option value="Comisión 2 (Tarde)">Comisión 2 (Tarde)</option>
-              <option value="Comisión 3 (Mañana)">Comisión 3 (Mañana)</option>
+              <option value="">Sin comisión / No seleccionar</option>
+              <optgroup label="Madrugada">
+                <option value="M1A">M1A &mdash; 1° Año Mañana A</option>
+                <option value="M1B">M1B &mdash; 1° Año Mañana B</option>
+                <option value="M2">M2 &mdash; 2° Año Mañana</option>
+                <option value="M3">M3 &mdash; 3° Año Mañana</option>
+                <option value="M4">M4 &mdash; 4° Año Mañana</option>
+              </optgroup>
+              <optgroup label="Noche">
+                <option value="N1">N1 &mdash; 1° Año Noche</option>
+                <option value="N3">N3 &mdash; 3° Año Noche</option>
+              </optgroup>
             </select>
           </div>
         </div>
