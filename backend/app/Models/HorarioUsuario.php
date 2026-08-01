@@ -18,6 +18,7 @@ class HorarioUsuario extends Model
         'hora_fin',
         'color',
         'version',
+        'comision',
     ];
 
     public function usuario()
