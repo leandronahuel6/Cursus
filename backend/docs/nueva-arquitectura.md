@@ -125,7 +125,6 @@ app/
 │   └── Controllers/
 │       ├── HorarioController.php   # CRUD del simulador; delega elegibilidad al AcademicStatusService
 │       ├── MateriaController.php   # Catálogo y actualización de estados; consume AcademicStatusService
-│       ├── MateriaController.php   # Catálogo y actualización de estados; consume AcademicStatusService
 │       └── ...                     # Otros controladores de la aplicación
 ├── Models/
 │   ├── HorarioUsuario.php          # Bloque guardado en la grilla (columna 'comision' agregada)
