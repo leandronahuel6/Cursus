@@ -318,8 +318,84 @@ body.dark-mode .custom-confirm-card {
   cursor: move;
   box-shadow: var(--sh);
   z-index: 5;
-  transition: box-shadow .15s, border-color .15s;
+  transition: box-shadow 0.15s, border-color 0.15s, opacity 0.2s;
 }
+
+.sched-time-block:hover {
+  z-index: 50 !important; /* Elevar sobre los demas bloques para evitar recortes del tooltip */
+}
+
+/* Tooltip implementado con ::after y attr(data-tooltip) */
+.sched-time-block[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px); /* Mostrar por encima del bloque */
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background: rgba(17, 24, 39, 0.95); /* Gris muy oscuro, casi negro */
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: normal;
+  max-width: 220px;
+  width: max-content;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 51;
+  /* Control de desbordamiento de palabra si es muy largo sin espacios */
+  word-wrap: break-word;
+}
+
+/* Flecha del tooltip */
+.sched-time-block[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 1px);
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(17, 24, 39, 0.95) transparent transparent transparent;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  z-index: 51;
+  pointer-events: none;
+}
+
+/* Mostrar tooltip al hacer hover solo si NO se está haciendo drag activo (arrastrando) */
+.sched-time-block[data-tooltip]:not(.is-dragging):hover::after,
+.sched-time-block[data-tooltip]:not(.is-dragging):hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Controlar desbordamiento horizontal en la última columna (Sábado) */
+.grid-day-col:last-child .sched-time-block[data-tooltip]::after {
+  left: auto;
+  right: 0;
+  transform: translateX(0) translateY(5px);
+}
+.grid-day-col:last-child .sched-time-block[data-tooltip]::before {
+  /* La flechita puede seguir centrada o moverse a la derecha. La movemos a la derecha un poco */
+  left: auto;
+  right: 15px;
+  transform: translateX(0) translateY(5px);
+}
+
+/* Mostrar tooltip modificado para la ultima columna */
+.grid-day-col:last-child .sched-time-block[data-tooltip]:not(.is-dragging):hover::after,
+.grid-day-col:last-child .sched-time-block[data-tooltip]:not(.is-dragging):hover::before {
+  transform: translateX(0) translateY(0);
+}
+
 .sched-time-block.act {
   background: rgba(239, 246, 255, 0.9);
   border-color: #3b82f6;
@@ -374,6 +450,55 @@ body.dark-mode .custom-confirm-card {
   margin-top: 1px;
 }
 
+/* Container-based Design: Responsive Schedule Blocks */
+.sched-time-block.is-small {
+  padding: 4px 8px;
+}
+.sched-time-block.is-small .block-code-row {
+  display: none;
+}
+.sched-time-block.is-small .block-title-row {
+  font-size: 10px;
+  line-height: 1.1;
+}
+.sched-time-block.is-small .block-meta-row {
+  font-size: 8.5px;
+}
+
+.sched-time-block.is-tiny {
+  padding: 0 6px;
+}
+.sched-time-block.is-tiny .block-content {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+.sched-time-block.is-tiny .block-code-row,
+.sched-time-block.is-tiny .block-meta-row,
+.sched-time-block.is-tiny .block-overlap-indicator {
+  display: none !important;
+}
+.sched-time-block.is-tiny .block-title-row {
+  font-size: 10px;
+  margin: 0;
+  width: calc(100% - 12px);
+}
+.sched-time-block.is-tiny .resize-handle {
+  height: 3px;
+}
+.sched-time-block.is-tiny .block-btn-delete-x {
+  top: 50%;
+  transform: translateY(-50%);
+  right: 4px;
+  opacity: 0;
+}
+.sched-time-block.is-tiny:hover .block-btn-delete-x {
+  opacity: 0.6;
+}
+.sched-time-block.is-tiny:hover .block-btn-delete-x:hover {
+  opacity: 1;
+}
+
 .block-btn-delete-x {
   position: absolute;
   top: 4px; right: 6px;
@@ -399,6 +524,7 @@ body.dark-mode .custom-confirm-card {
   height: 6px;
   cursor: ns-resize;
   z-index: 3;
+  transition: height 0.15s ease;
 }
 .resize-handle.top-handle { top: 0; }
 .resize-handle.bottom-handle { bottom: 0; }

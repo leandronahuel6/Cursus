@@ -93,13 +93,6 @@ export function buildCodigo(nombre) {
     .slice(0, 8);
 }
 
-export function getCommissionByTime(startVal) {
-  const [h] = startVal.split(':').map(Number);
-  if (h >= 8 && h < 12) return 'Comisión 3 (Mañana)';
-  if (h >= 12 && h < 18) return 'Comisión 2 (Tarde)';
-  return 'Comisión 1 (Noche)';
-}
-
 // ── Legacy Global Export ────────────────────────────────────────────────────
 
 window.HorariosData = {
@@ -111,6 +104,5 @@ window.HorariosData = {
   loadPersonalActivities,
   savePersonalActivities,
   buildCodigo,
-  getCommissionByTime,
   getAuthHeaders
 };

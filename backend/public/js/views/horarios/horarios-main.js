@@ -16,7 +16,6 @@ import {
   loadPersonalActivities,
   savePersonalActivities,
   buildCodigo,
-  getCommissionByTime,
   getAuthHeaders
 } from './horarios-data.js';
 
@@ -83,9 +82,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadInitialData() {
   try {
     const data = await fetchAvailableSubjects();
+    // Incluimos tanto las materias que el alumno está cursando como las disponibles,
+    // permitiendo planificar escenarios futuros en el simulador.
     AVAILABLE_SUBJECTS = data
-      .filter(m => m.estado === 'cursando')
-      .map(m => ({ id: m.id, nombre: m.nombre, codigo: buildCodigo(m.nombre), nivel: `${m.nivel}° Año` }));
+      .filter(m => m.estado === 'cursando' || m.estado === 'disponible')
+      .map(m => ({
+        id: m.id,
+        nombre: m.nombre,
+        codigo: buildCodigo(m.nombre),
+        nivel: `${m.nivel}° Año`,
+        estado: m.estado,
+      }));
   } catch (e) {
     console.error(e);
     AVAILABLE_SUBJECTS = [];
@@ -104,7 +111,8 @@ async function loadInitialData() {
       fin: b.fin,
       color: b.color || null,
       version: b.version || 'A',
-      comision: b.tipo === 'materia' ? getCommissionByTime(b.inicio) : 'Actividad Personal'
+      // Hidramos la comisión guardada desde la BD para el manejo de estado bidireccional.
+      comision: b.comision || null,
     }));
   } catch (e) {
     console.error(e);
@@ -117,7 +125,7 @@ function renderAll() {
   renderGridLines();
   renderAvailablePanels(AVAILABLE_SUBJECTS, schedState.personalActivities, handleDragStart);
   renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
-  checkOverlaps(schedState.blocks);
+  checkOverlaps(schedState.blocks, schedState.currentVersion);
 }
 
 function setupEventListeners() {
@@ -157,11 +165,6 @@ function setupEventListeners() {
     const endSelect = document.getElementById('modal-end-time-select');
     const targetEndMin = startMin + 120;
     endSelect.value = targetEndMin <= 23 * 60 ? minToTime(targetEndMin) : '23:00';
-
-    const tipo = document.getElementById('modal-item-type').value;
-    if (tipo === 'materia') {
-      document.getElementById('modal-commission-select').value = getCommissionByTime(e.target.value);
-    }
   });
 }
 
@@ -171,7 +174,7 @@ function onBlockDrop(newBlock) {
   newBlock.version = schedState.currentVersion;
   schedState.blocks.push(newBlock);
   renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
-  checkOverlaps(schedState.blocks);
+  checkOverlaps(schedState.blocks, schedState.currentVersion);
   selectBlock(newBlock.id);
 }
 
@@ -186,14 +189,14 @@ export function selectBlock(id) {
     const editor = document.getElementById('sched-manual-editor');
     editor.style.display = 'flex';
 
-    document.getElementById('editor-selected-title').textContent = `${block.nombre} (${block.comision})`;
+    document.getElementById('editor-selected-title').textContent = `${block.nombre} (${block.comision ?? 'Sin comisión'})`;
     document.getElementById('editor-selected-type').textContent = block.tipo.toUpperCase();
     document.getElementById('editor-selected-type').className = `editor-block-type-badge ${block.tipo === 'actividad' ? 'act' : ''}`;
 
     document.getElementById('editor-start-time').value = block.inicio;
     document.getElementById('editor-end-time').value = block.fin;
 
-    const activeColor = block.color || (block.tipo === 'materia' ? '#4f46e5' : '#9333ea');
+    const activeColor = block.color || (block.tipo === 'materia' ? 'indigo' : 'purple');
     document.querySelectorAll('.editor-color-picker .color-dot').forEach(dot => {
       if (dot.dataset.color === activeColor) {
         dot.classList.add('active');
@@ -203,6 +206,8 @@ export function selectBlock(id) {
         dot.style.borderColor = 'transparent';
       }
     });
+
+    checkAlternativeCommissions(block);
   }
 }
 
@@ -217,7 +222,7 @@ function deleteBlock(id) {
   schedState.blocks = schedState.blocks.filter(b => b.id !== id);
   if (schedState.selectedBlockId === id) deselectBlock();
   renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
-  checkOverlaps(schedState.blocks);
+  checkOverlaps(schedState.blocks, schedState.currentVersion);
 }
 
 function handleManualTimeChange() {
@@ -242,7 +247,7 @@ function handleManualTimeChange() {
   block.fin = endVal;
 
   renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
-  checkOverlaps(schedState.blocks);
+  checkOverlaps(schedState.blocks, schedState.currentVersion);
   if (block.tipo === 'materia') {
     checkAlternativeCommissions(block);
   }
@@ -251,9 +256,12 @@ function handleManualTimeChange() {
 // ── Save handler ────────────────────────────────────────────────────────────
 
 async function handleSaveSchedule() {
+  const ver = schedState.currentVersion || 'A';
+  const activeBlocks = schedState.blocks.filter(b => (b.version || 'A') === ver);
+
   let conflicts = [];
   for (let d = 1; d <= 6; d++) {
-    const dayBlocks = schedState.blocks.filter(b => b.dia === d);
+    const dayBlocks = activeBlocks.filter(b => b.dia === d);
     const dayName = DAYS.find(x => x.id === d).name;
 
     for (let i = 0; i < dayBlocks.length; i++) {
@@ -294,7 +302,6 @@ async function handleSaveSchedule() {
     return;
   }
 
-  const ver = schedState.currentVersion || 'A';
   window.showCustomConfirm(
     'Guardar Horario',
     `¿Deseas guardar los cambios en tu grilla horaria (Versión ${ver})?`,
@@ -309,7 +316,9 @@ async function handleSaveSchedule() {
             dia_semana: b.dia,
             hora_inicio: b.inicio,
             hora_fin: b.fin,
-            color: b.color || null
+            color: b.color || null,
+            // Enviamos la comisión guardada en el estado. null si el bloque no tiene una asignada.
+            comision: b.comision || null,
           }))
         );
 
@@ -346,6 +355,9 @@ window.openAddModal = function(itemId, tipo) {
     document.getElementById('modal-item-name').className = 'modal-inp-readonly';
     document.getElementById('modal-commission-select').style.display = 'block';
     document.getElementById('modal-comm-lbl').style.display = 'block';
+    // Por defecto, un bloque nuevo arrastrado manualmente no tiene comisión asignada.
+    // El usuario debe seleccionarla explícitamente. Cero adivinanzas.
+    document.getElementById('modal-commission-select').value = '';
   } else {
     const act = schedState.personalActivities.find(a => a.id === itemId);
     nombre = act ? act.nombre : '';
@@ -357,10 +369,6 @@ window.openAddModal = function(itemId, tipo) {
 
   document.getElementById('modal-item-name').value = nombre;
   populateTimeSelects();
-
-  if (tipo === 'materia') {
-    document.getElementById('modal-commission-select').value = getCommissionByTime('18:30');
-  }
 };
 
 window.openEditModal = function(blockId) {
@@ -384,7 +392,9 @@ window.openEditModal = function(blockId) {
     document.getElementById('modal-item-name').className = 'modal-inp-readonly';
     document.getElementById('modal-commission-select').style.display = 'block';
     document.getElementById('modal-comm-lbl').style.display = 'block';
-    document.getElementById('modal-commission-select').value = block.comision;
+    // Hidratamos el select con la comisión guardada en el estado del bloque.
+    // Si es null (sin asignar), dejamos la opción vacía seleccionada. Cero adivinanzas.
+    document.getElementById('modal-commission-select').value = block.comision ?? '';
   } else {
     document.getElementById('modal-item-name').readOnly = false;
     document.getElementById('modal-item-name').className = 'modal-input';
@@ -413,19 +423,23 @@ function submitAddModal() {
   const endMin = timeToMin(endVal);
 
   if (endMin <= startMin) {
-    alert('La hora de fin debe ser posterior a la de inicio.');
+    window.showToast('La hora de fin debe ser posterior a la de inicio.', 'warn');
     return;
   }
 
   let codigo = null;
   let materiaId = null;
-  let comision = 'Actividad Personal';
+  // El valor por defecto es null (Sin asignar). Sin adivinanzas de comisión por horario.
+  let comision = null;
 
   if (tipo === 'materia') {
     const sub = AVAILABLE_SUBJECTS.find(s => String(s.id) === String(itemId));
     codigo = sub ? sub.codigo : null;
     materiaId = sub ? sub.id : null;
-    comision = document.getElementById('modal-commission-select').value;
+    // Leemos estrictamente el valor seleccionado por el usuario en el select.
+    // El valor vacío ('') se traduce a null para persistir como 'Sin asignar'.
+    const comisionSeleccionada = document.getElementById('modal-commission-select').value;
+    comision = comisionSeleccionada || null;
   } else {
     const act = schedState.personalActivities.find(a => a.id === itemId);
     if (act) act.nombre = nombre;
@@ -449,7 +463,7 @@ function submitAddModal() {
   savePersonalActivities(schedState.personalActivities);
   renderAvailablePanels(AVAILABLE_SUBJECTS, schedState.personalActivities, handleDragStart);
   renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
-  checkOverlaps(schedState.blocks);
+  checkOverlaps(schedState.blocks, schedState.currentVersion);
   selectBlock(newBlock.id);
   window.closeAddModal();
 }
@@ -469,7 +483,7 @@ function submitEditModal(blockId) {
   const endMin = timeToMin(endVal);
 
   if (endMin <= startMin) {
-    alert('La hora de fin debe ser posterior a la de inicio.');
+    window.showToast('La hora de fin debe ser posterior a la de inicio.', 'warn');
     return;
   }
 
@@ -479,11 +493,13 @@ function submitEditModal(blockId) {
   block.fin = endVal;
 
   if (block.tipo === 'materia') {
-    block.comision = document.getElementById('modal-commission-select').value;
+    // Leemos el valor del select y lo convertimos a null si el usuario no seleccionó comisión.
+    const comisionSeleccionada = document.getElementById('modal-commission-select').value;
+    block.comision = comisionSeleccionada || null;
   }
 
   renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
-  checkOverlaps(schedState.blocks);
+  checkOverlaps(schedState.blocks, schedState.currentVersion);
   selectBlock(block.id);
   window.closeAddModal();
 }
@@ -533,7 +549,7 @@ window.switchVersion = function(version) {
   if (printBadge) printBadge.textContent = `Versión ${version}`;
 
   renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
-  checkOverlaps(schedState.blocks);
+  checkOverlaps(schedState.blocks, schedState.currentVersion);
   window.showToast(`Cargada la Versión ${version}`, 'success');
 };
 
@@ -544,6 +560,7 @@ window.changeBlockColor = function(colorHex) {
 
   const block = schedState.blocks.find(b => b.id === schedState.selectedBlockId);
   if (block) {
+    // El color es ahora un string semántico (ej. 'emerald'). No se almacenan hexadecimales.
     block.color = colorHex;
 
     renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
@@ -570,12 +587,12 @@ window.searchCompareUser = async function() {
   const listArea = document.getElementById('compare-status-list');
 
   if (!searchVal) {
-    alert('Ingresa un email o legajo para buscar.');
+    window.showToast('Ingresa un email o legajo para buscar.', 'warn');
     return;
   }
 
   if (schedState.comparisonUsers.length >= 3) {
-    alert('Límite alcanzado: solo puedes comparar con hasta 3 compañeros a la vez.');
+    window.showToast('Límite alcanzado: solo puedes comparar con hasta 3 compañeros a la vez.', 'warn');
     return;
   }
 
@@ -586,7 +603,7 @@ window.searchCompareUser = async function() {
 
     if (data.length === 0) {
       renderComparisonSidebar(schedState.comparisonUsers);
-      alert('Compañero no encontrado.');
+      window.showToast('Compañero no encontrado.', 'warn');
       return;
     }
 
@@ -594,7 +611,7 @@ window.searchCompareUser = async function() {
 
     if (schedState.comparisonUsers.some(u => String(u.id) === String(user.id))) {
       renderComparisonSidebar(schedState.comparisonUsers);
-      alert('Este compañero ya está agregado a la comparación.');
+      window.showToast('Este compañero ya está agregado a la comparación.', 'info');
       return;
     }
 
@@ -619,7 +636,7 @@ window.searchCompareUser = async function() {
       inicio: b.inicio,
       fin: b.fin,
       version: b.version || 'A',
-      comision: b.tipo === 'materia' ? getCommissionByTime(b.inicio) : 'Actividad Personal'
+      comision: b.comision || null
     }));
 
     schedState.comparisonBlocks.push(...newCompBlocks);
@@ -631,7 +648,7 @@ window.searchCompareUser = async function() {
   } catch (e) {
     console.error(e);
     renderComparisonSidebar(schedState.comparisonUsers);
-    alert('Error al buscar o cargar el horario del compañero.');
+    window.showToast('Error al buscar o cargar el horario del compañero.', 'error');
   }
 };
 
@@ -770,14 +787,7 @@ const UTN_SCHEDULE_PRESETS = {
   ]
 };
 
-const THEME_NAME_TO_HEX = {
-  indigo: '#4f46e5',
-  purple: '#9333ea',
-  emerald: '#10b981',
-  rose: '#f43f5e',
-  amber: '#f59e0b',
-  sky: '#0ea5e9'
-};
+const THEME_NAME_TO_HEX = null; // Eliminado: los colores son strings semánticos directamente.
 
 window.loadUTNPresetSchedule = function() {
   const select = document.getElementById('utn-presets-select');
@@ -799,30 +809,44 @@ window.loadUTNPresetSchedule = function() {
         b => (b.version || 'A') !== schedState.currentVersion
       );
 
+      let omittedCount = 0;
+
       presetBlocks.forEach((preset, idx) => {
         const matchedSub = AVAILABLE_SUBJECTS.find(
           s => s.nombre.toLowerCase().trim() === preset.nombre.toLowerCase().trim()
         );
 
+        if (!matchedSub) {
+          omittedCount++;
+          return;
+        }
+
         schedState.blocks.push({
           id: `preset-${presetKey}-${idx}-${Date.now()}`,
-          materia_id: matchedSub ? matchedSub.id : null,
+          materia_id: matchedSub.id,
           nombre: preset.nombre,
           tipo: 'materia',
-          codigo: matchedSub ? matchedSub.codigo : buildCodigo(preset.nombre),
+          codigo: matchedSub.codigo,
           comision: preset.comision,
           dia: preset.dia,
           inicio: preset.inicio,
           fin: preset.fin,
-          color: THEME_NAME_TO_HEX[preset.color] || preset.color,
+          // El color del preset ya es un string semántico (ej. 'emerald').
+          // No necesitamos conversión hex, va directo al estado y al backend.
+          color: preset.color,
           version: schedState.currentVersion
         });
       });
 
       deselectBlock();
       renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
-      checkOverlaps(schedState.blocks);
-      window.showToast(`Horario ${selectOptionText} cargado con éxito`, 'success');
+      checkOverlaps(schedState.blocks, schedState.currentVersion);
+
+      if (omittedCount > 0) {
+        window.showToast(`Horario ${selectOptionText} cargado. ${omittedCount} materia(s) omitida(s) por no estar en tu plan activo.`, 'warn');
+      } else {
+        window.showToast(`Horario ${selectOptionText} cargado con éxito`, 'success');
+      }
 
       select.value = '';
     },
@@ -839,33 +863,41 @@ window.applyCommissionAlternative = function(subjectName, presetKey) {
   const presetBlocks = UTN_SCHEDULE_PRESETS[presetKey];
   if (!presetBlocks) return;
 
+  const alternativeBlocks = presetBlocks.filter(
+    b => b.nombre.toLowerCase().trim() === subjectName.toLowerCase().trim()
+  );
+
+  if (alternativeBlocks.length === 0) return;
+
   schedState.blocks = schedState.blocks.filter(
     b => !(b.tipo === 'materia' && b.nombre.toLowerCase().trim() === subjectName.toLowerCase().trim() && (b.version || 'A') === schedState.currentVersion)
   );
 
-  presetBlocks.forEach((preset, idx) => {
+  alternativeBlocks.forEach((preset, idx) => {
     const matchedSub = AVAILABLE_SUBJECTS.find(
       s => s.nombre.toLowerCase().trim() === preset.nombre.toLowerCase().trim()
     );
 
-    schedState.blocks.push({
-      id: `preset-${presetKey}-${idx}-${Date.now()}`,
-      materia_id: matchedSub ? matchedSub.id : null,
-      nombre: preset.nombre,
-      tipo: 'materia',
-      codigo: matchedSub ? matchedSub.codigo : buildCodigo(preset.nombre),
-      comision: preset.comision,
-      dia: preset.dia,
-      inicio: preset.inicio,
-      fin: preset.fin,
-      color: preset.color,
-      version: schedState.currentVersion
-    });
+    if (matchedSub) {
+      schedState.blocks.push({
+        id: `preset-${presetKey}-${idx}-${Date.now()}`,
+        materia_id: matchedSub.id,
+        nombre: preset.nombre,
+        tipo: 'materia',
+        codigo: matchedSub.codigo,
+        comision: preset.comision,
+        dia: preset.dia,
+        inicio: preset.inicio,
+        fin: preset.fin,
+        color: preset.color,
+        version: schedState.currentVersion
+      });
+    }
   });
 
   deselectBlock();
   renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
-  checkOverlaps(schedState.blocks);
+  checkOverlaps(schedState.blocks, schedState.currentVersion);
   window.showToast(`Comisión cambiada a ${presetKey.split('_')[0]} para resolver conflicto`, 'info');
 };
 

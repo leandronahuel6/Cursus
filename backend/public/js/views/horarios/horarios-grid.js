@@ -8,7 +8,7 @@
 
 'use strict';
 
-import { getCommissionByTime, buildCodigo } from './horarios-data.js';
+import { buildCodigo } from './horarios-data.js';
 import { selectBlock, checkAlternativeCommissions, schedState } from './horarios-main.js';
 import { initBlockVerticalDrag, initBlockVerticalResize } from './horarios-drag.js';
 
@@ -81,6 +81,9 @@ export function renderAvailablePanels(availableSubjects, personalActivities, onD
   const subjectsList = document.getElementById('list-available-subjects');
   subjectsList.innerHTML = '';
 
+  const cursando = availableSubjects.filter(s => s.estado === 'cursando');
+  const disponibles = availableSubjects.filter(s => s.estado === 'disponible');
+
   const countBadge = document.getElementById('count-available-subjects');
   if (countBadge) {
     countBadge.textContent = String(availableSubjects.length);
@@ -89,31 +92,29 @@ export function renderAvailablePanels(availableSubjects, personalActivities, onD
   if (availableSubjects.length === 0) {
     const empty = document.createElement('div');
     empty.className = 'sched-empty-note';
-    empty.textContent = 'No tenes materias en estado cursando. Cambialas desde Mis Materias para poder agregarlas al horario.';
+    empty.textContent = 'No tenés materias cursando ni disponibles. Actualiza tu plan de estudios desde Mis Materias.';
     subjectsList.appendChild(empty);
   }
 
-  availableSubjects.forEach(sub => {
-    const card = document.createElement('div');
-    card.className = 'sched-drag-card';
-    card.draggable = true;
-    card.dataset.type = 'materia';
-    card.dataset.itemId = sub.id;
-    card.dataset.name = sub.nombre;
-    card.dataset.code = sub.codigo;
+  // Renderizamos el grupo de materias que el alumno está cursando actualmente.
+  if (cursando.length > 0) {
+    const lbl = document.createElement('span');
+    lbl.className = 'sched-section-hd sched-group-label cursando';
+    lbl.textContent = 'Cursando Actualmente';
+    subjectsList.appendChild(lbl);
+    
+    cursando.forEach(sub => subjectsList.appendChild(buildSubjectCard(sub, onDragStart)));
+  }
 
-    card.innerHTML = `
-      <div class="card-decor-bar"></div>
-      <div class="card-info">
-        <span class="card-name">${sub.nombre}</span>
-        <span class="card-meta">${sub.codigo} | ${sub.nivel}</span>
-      </div>
-      <button class="card-btn-add" onclick="openAddModal('${sub.id}', 'materia')">+</button>
-    `;
+  // Renderizamos el grupo de materias que el alumno tiene disponibles (correlativas OK).
+  if (disponibles.length > 0) {
+    const lbl = document.createElement('span');
+    lbl.className = 'sched-section-hd sched-group-label disponible';
+    lbl.textContent = 'Disponibles para Cursar';
+    subjectsList.appendChild(lbl);
 
-    card.addEventListener('dragstart', onDragStart);
-    subjectsList.appendChild(card);
-  });
+    disponibles.forEach(sub => subjectsList.appendChild(buildSubjectCard(sub, onDragStart)));
+  }
 
   const actList = document.getElementById('list-available-activities');
   actList.innerHTML = '';
@@ -143,26 +144,47 @@ export function renderAvailablePanels(availableSubjects, personalActivities, onD
   });
 }
 
+/**
+ * Construye el elemento DOM de una tarjeta de materia para el panel lateral.
+ *
+ * @param  {Object}   sub         Objeto de materia con id, nombre, codigo, nivel.
+ * @param  {Function} onDragStart Callback de arrastre.
+ * @returns {HTMLElement}
+ */
+function buildSubjectCard(sub, onDragStart) {
+  const card = document.createElement('div');
+  card.className = 'sched-drag-card';
+  card.draggable = true;
+  card.dataset.type = 'materia';
+  card.dataset.itemId = sub.id;
+  card.dataset.name = sub.nombre;
+  card.dataset.code = sub.codigo;
+
+  card.innerHTML = `
+    <div class="card-decor-bar"></div>
+    <div class="card-info">
+      <span class="card-name">${sub.nombre}</span>
+      <span class="card-meta">${sub.codigo} | ${sub.nivel}</span>
+    </div>
+    <button class="card-btn-add" onclick="openAddModal('${sub.id}', 'materia')">+</button>
+  `;
+
+  card.addEventListener('dragstart', onDragStart);
+  return card;
+}
+
+
 // ── Block rendering on tracks ───────────────────────────────────────────────
 
-const COLOR_MAP = {
-  '#4f46e5': 'indigo',
-  '#9333ea': 'purple',
-  '#10b981': 'emerald',
-  '#f43f5e': 'rose',
-  '#f59e0b': 'amber',
-  '#0ea5e9': 'sky'
-};
-
-const COLOR_NAMES = Object.values(COLOR_MAP);
-
+// La clase CSS del bloque se resuelve directamente desde el string semántico del color
+// (ej. 'emerald', 'indigo'). El diccionario de conversión hex→nombre fue eliminado
+// para evitar la doble conversión y mantener el sistema de colores simple y predecible.
 function resolveColorClass(block) {
-  const rawColor = block.color || (block.tipo === 'materia' ? '#4f46e5' : '#9333ea');
-  const colorName = COLOR_NAMES.includes(rawColor)
-    ? rawColor
-    : (COLOR_MAP[rawColor] || (block.tipo === 'materia' ? 'indigo' : 'purple'));
-  return `theme-color-${colorName}`;
+  const defaultColor = block.tipo === 'materia' ? 'indigo' : 'purple';
+  const color = block.color || defaultColor;
+  return `theme-color-${color}`;
 }
+
 
 // ── Callback factories (DRY) ─────────────────────────────────────────────────
 
@@ -172,14 +194,14 @@ function createUpdateCallback() {
       document.getElementById('editor-start-time').value = updatedBlock.inicio;
       document.getElementById('editor-end-time').value = updatedBlock.fin;
     }
-    checkOverlaps(schedState.blocks);
+    checkOverlaps(schedState.blocks, schedState.currentVersion);
   };
 }
 
 function createDragEndCallback() {
   return (updatedBlock, isClick) => {
     renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
-    checkOverlaps(schedState.blocks);
+    checkOverlaps(schedState.blocks, schedState.currentVersion);
     if (isClick) {
       window.openEditModal(updatedBlock.id);
     } else if (schedState.selectedBlockId === updatedBlock.id) {
@@ -191,7 +213,7 @@ function createDragEndCallback() {
 function createResizeEndCallback() {
   return (updatedBlock) => {
     renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
-    checkOverlaps(schedState.blocks);
+    checkOverlaps(schedState.blocks, schedState.currentVersion);
     if (schedState.selectedBlockId === updatedBlock.id) {
       checkAlternativeCommissions(updatedBlock);
     }
@@ -216,7 +238,7 @@ function buildNormalBlockHTML(b) {
     <div class="block-content">
       <span class="block-code-row">${b.codigo || 'PERS'}</span>
       <span class="block-title-row">${b.codigo ? b.nombre.replace('Computación ', '') : b.nombre}</span>
-      <span class="block-meta-row">${b.comision}</span>
+      <span class="block-meta-row">${b.comision || (b.tipo === 'materia' ? 'Sin asignar' : '')}</span>
       <span class="block-overlap-indicator" style="display: none;">[SOLAPADO]</span>
     </div>
     <div class="resize-handle bottom-handle"></div>
@@ -227,13 +249,20 @@ function buildNormalBlockHTML(b) {
 function createBlockElement(b, selectedBlockId) {
   const startMin = timeToMin(b.inicio);
   const endMin = timeToMin(b.fin);
+  const durationMin = endMin - startMin;
   const topPx = (startMin - START_HOUR * 60) * PX_PER_MINUTE;
-  const heightPx = (endMin - startMin) * PX_PER_MINUTE;
+  const heightPx = durationMin * PX_PER_MINUTE;
 
   const blockDiv = document.createElement('div');
   const colorClass = resolveColorClass(b);
 
   let classes = `sched-time-block ${colorClass}`;
+  if (durationMin <= 30) {
+    classes += ' is-tiny';
+  } else if (durationMin <= 60) {
+    classes += ' is-small';
+  }
+  
   if (b.tipo === 'actividad') classes += ' act';
   if (b.isComparison) classes += ' comparison';
   if (!b.isComparison && selectedBlockId === b.id) classes += ' selected';
@@ -242,6 +271,11 @@ function createBlockElement(b, selectedBlockId) {
   blockDiv.style.top = `${topPx}px`;
   blockDiv.style.height = `${heightPx}px`;
   blockDiv.dataset.blockId = b.id;
+
+  const tooltipText = b.tipo === 'materia' 
+    ? `${b.codigo || 'PERS'} - ${b.nombre} - ${b.comision || 'Sin asignar'} (${b.inicio} a ${b.fin})`
+    : `${b.nombre} (${b.inicio} a ${b.fin})`;
+  blockDiv.dataset.tooltip = tooltipText;
 
   if (b.isComparison) {
     blockDiv.style.borderColor = b.userColor;
@@ -362,7 +396,11 @@ export function timeToMin(timeStr) {
 
 // ── Overlap detection ───────────────────────────────────────────────────────
 
-export function checkOverlaps(blocks) {
+export function checkOverlaps(blocks, currentVersion) {
+  if (!currentVersion) {
+    throw new Error("checkOverlaps requiere el parámetro currentVersion para filtrar correctamente.");
+  }
+
   document.querySelectorAll('.sched-time-block').forEach(div => {
     div.classList.remove('overlap-conflict');
     const indicator = div.querySelector('.block-overlap-indicator');
@@ -370,10 +408,11 @@ export function checkOverlaps(blocks) {
     div.removeAttribute('title');
   });
 
+  const activeBlocks = blocks.filter(b => (b.version || 'A') === currentVersion);
   let hasOverlap = false;
 
   for (let d = 1; d <= 6; d++) {
-    const dayBlocks = blocks.filter(b => b.dia === d);
+    const dayBlocks = activeBlocks.filter(b => b.dia === d);
 
     for (let i = 0; i < dayBlocks.length; i++) {
       for (let j = i + 1; j < dayBlocks.length; j++) {
@@ -442,7 +481,7 @@ export function renderComparisonSidebar(comparisonUsers) {
 
 export function exportToICS(blocks) {
   if (blocks.length === 0) {
-    alert('No hay bloques en la grilla para exportar.');
+    window.showToast('No hay bloques en la grilla para exportar.', 'warn');
     return;
   }
 
