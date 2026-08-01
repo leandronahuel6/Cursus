@@ -246,12 +246,6 @@ window.changeSubjectStatus = function(id, newStatus) {
   const subState = state.subjects[id];
   if (!sub || !subState) return;
   
-  // Si está bloqueada, no permitir cambiar
-  if (!subState.puede_cursar && newStatus !== 'disponible') {
-    showToast('Esta materia está bloqueada. Cumplí sus correlativas primero.', 'warn');
-    return;
-  }
-  
   if (newStatus === 'aprobada') {
     // Abrir modal de notas
     activeModalSubjectId = id;
