@@ -12,7 +12,7 @@
         @csrf
         <div class="login-field">
             <label for="nombre">Nombre</label>
-            <input type="text" id="nombre" name="nombre" placeholder="Jhon Doe" autocomplete="username" required>
+            <input type="text" id="nombre" name="nombre" placeholder="John Doe" autocomplete="username" required>
             <span id="nombre-error" class="error-message"></span>
         </div>
         <div class="login-field">
