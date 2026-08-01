@@ -14,7 +14,6 @@
   <link rel="stylesheet" href="{{ asset('css/components/badges.css') }}">
   <link rel="stylesheet" href="{{ asset('css/components/cards.css') }}">
   <link rel="stylesheet" href="{{ asset('css/components/stats.css') }}">
-  <link rel="stylesheet" href="{{ asset('css/main.css') }}?v={{ filemtime(public_path('css/main.css')) }}">
   <link rel="stylesheet" href="{{ asset('css/layout/app.css') }}">
   <link rel="stylesheet" href="{{ asset('css/layout/topbar.css') }}">
   <link rel="stylesheet" href="{{ asset('css/layout/mobile-nav.css') }}">

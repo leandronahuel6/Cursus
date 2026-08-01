@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="{{ asset('css/base/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/base/reset.css') }}">
     <link rel="stylesheet" href="{{ asset('css/base/animations.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="stylesheet" href="{{ asset('css/components/forms.css') }}">
     <link rel="stylesheet" href="{{ asset('css/views/auth.css') }}">
     <link rel="icon" href="{{ asset('assets/icons/cursus-logo.svg') }}" type="image/svg+xml">
