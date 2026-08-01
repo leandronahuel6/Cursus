@@ -127,10 +127,10 @@
   </div>
 
   <!-- ===================== MODAL DE ERROR DE DEPENDENCIAS ===================== -->
-  <div class="modal-overlay" id="dependency-error-modal">
+  <div class="modal-overlay" id="dependency-error-modal" role="dialog" aria-modal="true" aria-labelledby="dependency-error-title" aria-describedby="dependency-error-desc" tabindex="-1">
     <div class="modal-box">
       <div class="modal-hdr">
-        <div class="modal-title" style="color: #ef4444; display: flex; align-items: center; gap: 8px;">
+        <div class="modal-title" id="dependency-error-title" style="color: #ef4444; display: flex; align-items: center; gap: 8px;">
           <svg aria-hidden="true" width="18" height="18"><use href="{{ asset('assets/icons/sprite.svg#circle-alert') }}"></use></svg>
           Acción Bloqueada
         </div>
