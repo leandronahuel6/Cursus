@@ -173,6 +173,11 @@ class AdminController extends Controller
             ]
         );
 
+        // Las filas de cuota 'pendiente' ya generadas para esta carrera quedaron
+        // con el precio viejo snapshoteado — resincronizarlas contra el precio
+        // vigente actual para que el historial del alumno no las siga mostrando.
+        CuotaMensualService::resincronizarPendientesParaCarrera($request->carrera_id);
+
         return response()->json($cuota, 201);
     }
 
@@ -251,8 +256,17 @@ class AdminController extends Controller
         // eliminado_por/motivo_eliminacion sobre la misma fila. Si se borrara
         // (aunque fuera soft delete), el período volvería a intentar
         // regenerarse y chocaría con el índice único (usuario_id, periodo).
+        //
+        // monto_base/monto_exigible/monto_declarado se limpian: eran del pago
+        // que se está anulando. monto_base se recalcula con el precio vigente
+        // AL ARRANCAR el período de esta fila (no el de hoy), para que no
+        // salte al precio de un mes posterior solo por haberse reabierto.
+        $carreraId = CuotaMensualService::carreraIdDeUsuario($pago->usuario_id);
         $pago->update([
             'estado'             => 'pendiente',
+            'monto_base'         => $carreraId ? CuotaMensualService::montoBaseParaPeriodo($carreraId, $pago->periodo) : null,
+            'monto_exigible'     => null,
+            'monto_declarado'    => null,
             'eliminado_por'      => $request->user()->id,
             'motivo_eliminacion' => $request->input('motivo'),
         ]);
