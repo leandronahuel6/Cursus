@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use App\Models\Carrera;
 use App\Models\Materia;
 use App\Models\Correlatividad;
@@ -22,6 +23,18 @@ class MateriasSeeder extends Seeder
             ->orWhereIn('requisito_id', $materiaIdsExistentes)
             ->delete();
         Materia::where('carrera_id', $carrera->id)->delete();
+
+        // Si no quedaron materias de otras carreras, reiniciar el autoincremental
+        // para que los ids vuelvan a arrancar en 1 (evita que se desalineen con
+        // los ids hardcodeados en DemoDataSeeder tras correr el seeder varias veces).
+        if (Materia::count() === 0) {
+            $driver = DB::getDriverName();
+            if ($driver === 'sqlite') {
+                DB::statement("DELETE FROM sqlite_sequence WHERE name = 'materias'");
+            } else {
+                DB::statement('ALTER TABLE materias AUTO_INCREMENT = 1');
+            }
+        }
 
         // Numeración según Ordenanza N° 2019 - Anexo I (Plan 2024)
         $materias = [

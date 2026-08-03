@@ -330,20 +330,23 @@ window.confirmarPago = async function() {
   btn.textContent = 'Guardando…';
 
   try {
+    const periodoSolicitado = state.pagoPeriodo;
+    let resultado;
+
     if (state.pagoMedio === 'efectivo') {
       const recibo = document.getElementById('pago-recibo').files[0];
       if (!recibo) {
         window.showToast('Adjuntá la foto del recibo de tesorería.', 'warn');
         return;
       }
-      await pagarEfectivo(state.pagoPeriodo, recibo);
+      resultado = await pagarEfectivo(periodoSolicitado, recibo);
     } else {
       const comprobante = document.getElementById('pago-comprobante').files[0];
       if (!comprobante) {
         window.showToast('Adjuntá el comprobante de la transferencia.', 'warn');
         return;
       }
-      await subirComprobante(state.pagoPeriodo, comprobante);
+      resultado = await subirComprobante(periodoSolicitado, comprobante);
     }
 
     window.closePagoModal();
@@ -351,12 +354,23 @@ window.confirmarPago = async function() {
     // Refresca tanto el banner de estado como el historial completo
     await Promise.all([loadCuotaInfo(), loadHistorialCuotasView()]);
 
-    window.showToast(
-      state.pagoMedio === 'efectivo'
-        ? 'Pago en efectivo declarado. Quedará confirmado cuando la secretaría lo revise.'
-        : 'Comprobante subido con éxito.',
-      'success'
-    );
+    // Si la fecha leída en el comprobante era de otro mes, el backend
+    // redirige el pago a la fila de ese mes real en vez de la que se abrió.
+    const fueRedirigido = resultado?.periodo && resultado.periodo !== periodoSolicitado;
+
+    if (fueRedirigido) {
+      window.showToast(
+        `El comprobante corresponde a ${formatPeriodoCuota(resultado.periodo)}: se registró el pago en ese período.`,
+        'success'
+      );
+    } else {
+      window.showToast(
+        state.pagoMedio === 'efectivo'
+          ? 'Pago en efectivo declarado. Quedará confirmado cuando la secretaría lo revise.'
+          : 'Comprobante subido con éxito.',
+        'success'
+      );
+    }
   } catch (e) {
     console.error(e);
     window.showToast(e.message || 'No se pudo registrar el pago. Intentá de nuevo.', 'error');

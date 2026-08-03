@@ -61,6 +61,7 @@ class PagoCuotaController extends Controller
                 'monto_base' => $p->monto_base,
                 'monto_exigible' => $p->monto_exigible,
                 'monto_declarado' => $p->monto_declarado,
+                'coincide_monto' => $p->datos_extraidos_ia['coincide_monto'] ?? null,
                 'fecha_pago' => $p->fecha_pago?->toDateString(),
                 'tiene_comprobante' => $p->comprobante_path !== null,
             ]),
@@ -113,13 +114,15 @@ class PagoCuotaController extends Controller
             return response()->json(['message' => 'No pudimos leer la fecha del comprobante. Enviá una foto o PDF con mejor calidad, donde se vea clara la fecha.'], 422);
         }
 
-        if (!$this->fechaCorrespondeAlPeriodo($datosIA, $periodo)) {
-            return response()->json(['message' => 'La fecha del comprobante no corresponde al período que estás pagando.'], 422);
+        [$pago, $errorPeriodo] = $this->resolverPagoCorrecto($pago, $datosIA);
+        if ($errorPeriodo) {
+            return response()->json(['message' => $errorPeriodo], 422);
         }
 
         $fechaPago = $this->resolverFechaPago($datosIA, null);
 
-        $montoBase = $pago->monto_base ?? CuotaMensualService::montoBaseParaUsuario($usuario);
+        $carreraId = CuotaMensualService::carreraIdDeUsuario($usuario->id);
+        $montoBase = $pago->monto_base ?? ($carreraId ? CuotaMensualService::montoBaseParaPeriodo($carreraId, $pago->periodo) : null);
         $montoExigible = $montoBase !== null
             ? CuotaMensualService::calcularMontoExigible((float) $montoBase, $fechaPago)
             : null;
@@ -170,25 +173,47 @@ class PagoCuotaController extends Controller
         return $fechaDeclarada ? \Carbon\Carbon::parse($fechaDeclarada) : now();
     }
 
-    // Verifica que la fecha que la IA leyó en el comprobante sea plausible
-    // para el período que se está pagando (con un mes de tolerancia para
-    // pagos hechos unos días antes o después del mes exacto). Si no hay
-    // fecha extraída, no hay nada que comparar y se deja pasar.
-    private function fechaCorrespondeAlPeriodo(array $datosIA, string $periodo): bool
+    // Determina a qué fila de PagoCuota corresponde REALMENTE el comprobante,
+    // según el mes que la IA leyó en él (no según la fila que el alumno tenía
+    // abierta en el modal). Si el mes leído no coincide con el período
+    // solicitado, busca la fila de ese mes real:
+    // - si existe y sigue 'pendiente', redirige el pago ahí (evita que un
+    //   comprobante de julio quede cargado como pago de agosto).
+    // - si existe pero ya está pagada/declarada, se rechaza: no se pisa un
+    //   pago ya registrado.
+    // - si no existe ninguna fila para ese mes (fuera del ciclo), se rechaza
+    //   con el mensaje genérico de período no correspondiente.
+    // Devuelve [PagoCuota|null $pago, string|null $mensajeError].
+    private function resolverPagoCorrecto(PagoCuota $pagoSolicitado, array $datosIA): array
     {
         $fechaExtraida = $datosIA['fecha'] ?? null;
         if (!$fechaExtraida) {
-            return true;
+            return [$pagoSolicitado, null];
         }
 
         try {
-            $fecha = \Carbon\Carbon::parse($fechaExtraida);
-            $inicioPeriodo = \Carbon\Carbon::createFromFormat('Y-m', $periodo)->startOfMonth();
+            $mesExtraido = \Carbon\Carbon::parse($fechaExtraida)->format('Y-m');
         } catch (\Exception $e) {
-            return true;
+            return [$pagoSolicitado, null];
         }
 
-        return $fecha->diffInMonths($inicioPeriodo) <= 1;
+        if ($mesExtraido === $pagoSolicitado->periodo) {
+            return [$pagoSolicitado, null];
+        }
+
+        $pagoReal = PagoCuota::where('usuario_id', $pagoSolicitado->usuario_id)
+            ->where('periodo', $mesExtraido)
+            ->first();
+
+        if (!$pagoReal) {
+            return [null, 'La fecha del comprobante no corresponde al período que estás pagando.'];
+        }
+
+        if ($pagoReal->estado !== 'pendiente') {
+            return [null, "Este comprobante corresponde al período {$mesExtraido}, que ya figura registrado. Si es un error, comunicate con la secretaría."];
+        }
+
+        return [$pagoReal, null];
     }
 
     // Declara un pago en efectivo hecho en tesorería. A diferencia de una
@@ -233,8 +258,9 @@ class PagoCuotaController extends Controller
             return response()->json(['message' => 'No pudimos leer la fecha del recibo. Enviá una foto o PDF con mejor calidad, donde se vea clara la fecha.'], 422);
         }
 
-        if (!$this->fechaCorrespondeAlPeriodo($datosIA, $periodo)) {
-            return response()->json(['message' => 'La fecha del recibo no corresponde al período que estás pagando.'], 422);
+        [$pago, $errorPeriodo] = $this->resolverPagoCorrecto($pago, $datosIA);
+        if ($errorPeriodo) {
+            return response()->json(['message' => $errorPeriodo], 422);
         }
 
         if ($pago->comprobante_path) {
@@ -246,7 +272,8 @@ class PagoCuotaController extends Controller
 
         $fechaPago = $this->resolverFechaPago($datosIA, null);
 
-        $montoBase = $pago->monto_base ?? CuotaMensualService::montoBaseParaUsuario($usuario);
+        $carreraId = CuotaMensualService::carreraIdDeUsuario($usuario->id);
+        $montoBase = $pago->monto_base ?? ($carreraId ? CuotaMensualService::montoBaseParaPeriodo($carreraId, $pago->periodo) : null);
         $montoExigible = $montoBase !== null
             ? CuotaMensualService::calcularMontoExigible((float) $montoBase, $fechaPago)
             : null;

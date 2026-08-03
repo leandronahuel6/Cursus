@@ -247,11 +247,25 @@ export function renderHistorialCuotas(historialCuotas) {
     const row = document.createElement('div');
     row.className = 'chr-row';
 
-    const monto = pago.monto_exigible != null
-      ? '$' + parseFloat(pago.monto_exigible).toLocaleString('es-AR', { minimumFractionDigits: 2 })
-      : (pago.monto_base != null
-        ? '$' + parseFloat(pago.monto_base).toLocaleString('es-AR', { minimumFractionDigits: 2 })
-        : '—');
+    const montoExigible = pago.monto_exigible != null ? pago.monto_exigible : pago.monto_base;
+    const fmtMonto = (v) => '$' + parseFloat(v).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+
+    // Si ya declaró un pago (comprobante leído por IA), mostrar lo que
+    // efectivamente declaró haber pagado, con indicador de si coincide con
+    // lo exigido — no lo exigido, que puede diferir de lo realmente pagado.
+    let monto;
+    if (pago.monto_declarado != null && pago.estado !== 'pendiente') {
+      const declarado = fmtMonto(pago.monto_declarado);
+      if (pago.coincide_monto === false) {
+        monto = `<span class="chr-monto-discrepancia" title="Lo exigido era ${montoExigible != null ? fmtMonto(montoExigible) : '—'}">${declarado} ✗</span>`;
+      } else if (pago.coincide_monto === true) {
+        monto = `${declarado} ✓`;
+      } else {
+        monto = declarado;
+      }
+    } else {
+      monto = montoExigible != null ? fmtMonto(montoExigible) : '—';
+    }
 
     let acciones = '';
     if (pago.estado === 'pendiente') {
