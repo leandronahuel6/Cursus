@@ -47,9 +47,9 @@
   </div>
 
   <!-- Selector de Subpestañas (Gestión vs Árbol) -->
-  <div class="stabs" style="margin-bottom: 20px;">
-    <div class="stab on" id="tab-manage" onclick="window.switchToTab('manage')">🎛️ Gestión de Cursada</div>
-    <div class="stab" id="tab-plan" onclick="window.switchToTab('plan')">🗺️ Plan de Estudios</div>
+  <div class="stabs">
+    <div class="stab on" id="tab-manage" data-action="switch-tab" data-tab="manage">🎛️ Gestión de Cursada</div>
+    <div class="stab" id="tab-plan" data-action="switch-tab" data-tab="plan">🗺️ Plan de Estudios</div>
   </div>
 
   <!-- ================= PESTAÑA: GESTIÓN DE CURSADA (árbol editable) ================= -->
@@ -70,15 +70,15 @@
   </div>
 
   <!-- ================= PESTAÑA: PLAN DE ESTUDIOS (solo lectura) ================= -->
-  <div id="panel-plan-view" style="display: none;">
+  <div id="panel-plan-view" class="hidden">
 
     <!-- Filtros Rápidos -->
     <div class="filters-bar">
-      <button class="filter-chip active" id="filter-all" onclick="window.setFilter('all')">Todas</button>
-      <button class="filter-chip" id="filter-cursando" onclick="window.setFilter('cursando')">Cursando actualmente</button>
-      <button class="filter-chip" id="filter-regular" onclick="window.setFilter('regular')">Regulares (Final Pendiente)</button>
-      <button class="filter-chip" id="filter-aprobada" onclick="window.setFilter('aprobada')">Aprobadas</button>
-      <button class="filter-chip" id="filter-bloqueada" onclick="window.setFilter('bloqueada')">Faltantes (Bloqueadas)</button>
+      <button class="filter-chip active" id="filter-all" data-action="set-filter" data-filter="all">Todas</button>
+      <button class="filter-chip" id="filter-cursando" data-action="set-filter" data-filter="cursando">Cursando actualmente</button>
+      <button class="filter-chip" id="filter-regular" data-action="set-filter" data-filter="regular">Regulares (Final Pendiente)</button>
+      <button class="filter-chip" id="filter-aprobada" data-action="set-filter" data-filter="aprobada">Aprobadas</button>
+      <button class="filter-chip" id="filter-bloqueada" data-action="set-filter" data-filter="bloqueada">Faltantes (Bloqueadas)</button>
     </div>
 
     <!-- Listado Agrupado por Niveles -->
@@ -95,7 +95,7 @@
       <div class="grade-modal-header" id="subject-info-modal-title">Detalle de materia</div>
       <div class="grade-modal-body" id="subject-info-modal-body"></div>
       <div class="grade-modal-footer">
-        <button class="btn-modal-action cancel" type="button" onclick="window.closeSubjectInfoModal()">Cerrar</button>
+        <button class="btn-modal-action cancel" type="button" data-action="close-subject-info">Cerrar</button>
       </div>
     </div>
   </div>
@@ -105,12 +105,12 @@
     <div class="grade-modal-box">
       <div class="grade-modal-header" id="grade-modal-subject-title">Registrar Calificación</div>
       <div class="grade-modal-body">
-        <p style="font-size: 12px; color: var(--t3); line-height: 1.4;">
+        <p class="grade-modal-desc">
           Ingresa la nota definitiva obtenida en el examen final o promoción directa:
         </p>
         <div class="grade-select-wrapper">
-          <label for="grade-select" style="font-size: 11px; font-weight: 600; color: var(--t2);">Calificación Final:</label>
-          <select id="grade-select" class="grade-input-select" style="margin-top: 5px;">
+          <label for="grade-select" class="grade-modal-label">Calificación Final:</label>
+          <select id="grade-select" class="grade-input-select mt-5">
             <option value="6">6 (Seis)</option>
             <option value="7">7 (Siete)</option>
             <option value="8" selected>8 (Ocho)</option>
@@ -120,8 +120,8 @@
         </div>
       </div>
       <div class="grade-modal-footer">
-        <button class="btn-modal-action cancel" onclick="window.closeGradeModal(false)">Cancelar</button>
-        <button class="btn-modal-action save" onclick="window.closeGradeModal(true)">Guardar Nota</button>
+        <button class="btn-modal-action cancel" data-action="close-grade-modal" data-save="false">Cancelar</button>
+        <button class="btn-modal-action save" data-action="close-grade-modal" data-save="true">Guardar Nota</button>
       </div>
     </div>
   </div>
@@ -130,27 +130,27 @@
   <div class="modal-overlay" id="dependency-error-modal" role="dialog" aria-modal="true" aria-labelledby="dependency-error-title" aria-describedby="dependency-error-desc" tabindex="-1">
     <div class="modal-box">
       <div class="modal-hdr">
-        <div class="modal-title" id="dependency-error-title" style="color: #ef4444; display: flex; align-items: center; gap: 8px;">
+        <div class="modal-title dependency-error-title-text" id="dependency-error-title">
           <svg aria-hidden="true" width="18" height="18"><use href="{{ asset('assets/icons/sprite.svg#circle-alert') }}"></use></svg>
           Acción Bloqueada
         </div>
-        <button class="modal-close" onclick="window.closeDependencyErrorModal()">
+        <button class="modal-close" data-action="close-dependency-error">
           <svg aria-hidden="true" width="16" height="16"><use href="{{ asset('assets/icons/sprite.svg#x') }}"></use></svg>
         </button>
       </div>
       <div class="modal-body">
-        <p style="font-size: 0.9em">
+        <p class="dependency-error-text">
           No puedes retroceder el estado de esta materia porque invalidaría tu progreso actual en las siguientes materias dependientes:
         </p>
-        <ul id="dependency-error-list" style="margin: 15px 0 15px 25px; list-style-type: disc;">
+        <ul id="dependency-error-list" class="dependency-error-list-styled">
           <!-- Items inyectados desde JS -->
         </ul>
-        <p style="font-size: 0.9em; opacity: 0.8;">
+        <p class="dependency-error-text-muted">
           Debes dar de baja estas materias avanzadas antes de poder deshacer esta.
         </p>
       </div>
       <div class="modal-foot">
-        <button class="btn-cancel" onclick="window.closeDependencyErrorModal()">Entendido</button>
+        <button class="btn-cancel" data-action="close-dependency-error">Entendido</button>
       </div>
     </div>
   </div>
