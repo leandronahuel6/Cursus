@@ -101,7 +101,7 @@ class DemoDataSeeder extends Seeder
         ]);
 
         // Nivel 2 (Cursando)
-        $cursandoIds = [9, 10, 11, 12, 13]; // Programación III, BD II, Metodología I, Inglés II, Programación IV
+        $cursandoIds = [9, 10, 11, 12]; // Programación III, BD II, Metodología I, Inglés II
         $cursandoMateriasUsuario = [];
         foreach ($cursandoIds as $materiaId) {
             $cursandoMateriasUsuario[$materiaId] = MateriaUsuario::create([
@@ -112,22 +112,6 @@ class DemoDataSeeder extends Seeder
         }
 
         // Agregar notas parciales para simular cursada activa
-        // Programación IV (materia_id: 13)
-        Nota::create([
-            'materia_usuario_id' => $cursandoMateriasUsuario[13]->id,
-            'tipo' => 'parcial',
-            'numero' => 1,
-            'valor' => 9,
-            'fecha' => now()->subDays(15)->toDateString()
-        ]);
-        Nota::create([
-            'materia_usuario_id' => $cursandoMateriasUsuario[13]->id,
-            'tipo' => 'tp',
-            'numero' => 1,
-            'valor' => 8.5,
-            'fecha' => now()->subDays(5)->toDateString()
-        ]);
-
         // Base de Datos II (materia_id: 10)
         Nota::create([
             'materia_usuario_id' => $cursandoMateriasUsuario[10]->id,
@@ -156,7 +140,7 @@ class DemoDataSeeder extends Seeder
         ]);
 
         // Nivel 2 (Pendientes/Bloqueadas por correlatividad)
-        $pendientesIds = [14, 15, 16, 17, 18];
+        $pendientesIds = [13, 14, 15, 16, 17, 18];
         foreach ($pendientesIds as $materiaId) {
             MateriaUsuario::create([
                 'usuario_id' => $user->id,
@@ -632,11 +616,10 @@ class DemoDataSeeder extends Seeder
         ]);
 
         // 6. Sesiones de Pomodoro para acumular estadísticas (semana actual + últimos 90 días)
-        $cursandoIds = [9, 10, 11, 12, 13];
+        $cursandoIds = [9, 10, 11, 12];
 
         // A) Asegurar estadísticas altas para la SEMANA ACTUAL (horas efectivas y perdidas)
         $semanaActualConfigs = [
-            13 => ['completadas' => 8, 'abandonadas' => 3], // Programación IV
             10 => ['completadas' => 6, 'abandonadas' => 2], // BD II
             9  => ['completadas' => 5, 'abandonadas' => 2], // Prog III
             11 => ['completadas' => 4, 'abandonadas' => 1], // Metodología I
@@ -671,7 +654,7 @@ class DemoDataSeeder extends Seeder
         for ($i = 0; $i < 5; $i++) {
             SesionPomodoro::create([
                 'usuario_id' => $user->id,
-                'materia_id' => 13,
+                'materia_id' => 9,
                 'duracion_segundos' => 1500,
                 'estado' => 'completada',
                 'completada_en' => now()->subDays($i)->setTime(14, 30, 0)
