@@ -144,6 +144,9 @@ function calculateAndRenderProjections() {
 
   document.getElementById('formula-text').textContent = buildFormulaText(real.sum, real.count, proj.simulatedSum, proj.simulatedCount);
 
+  const paceValEl = document.getElementById('pace-value');
+  if (paceValEl) paceValEl.textContent = state.pace;
+
   const improvementLabel = document.getElementById('improvement-label');
   if (imp.improved) {
     improvementLabel.textContent = `+${imp.diff.toFixed(2)} pts de mejora`;
