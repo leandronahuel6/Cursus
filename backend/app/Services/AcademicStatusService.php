@@ -171,7 +171,7 @@ class AcademicStatusService
                     return false;
                 }
             } elseif ($correlativa->condicion_requerida === 'aprobada') {
-                if ($materia->nombre === 'Trabajo Final Integrador') {
+                if ($materia->id === 18) { // Trabajo Final Integrador
                     // Para cursar el TFI, los requisitos 'aprobada' se degradan a requerir al menos 'regular'.
                     if (!in_array($estadoRequisito, ['regular', 'aprobada'])) {
                         return false;

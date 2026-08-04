@@ -47,7 +47,7 @@
         <div class="mat-info mat-dropdown-wrap" id="mat-dropdown-wrap">
           <div class="mat-hdr-name mat-dropdown-trigger" id="mat-dropdown-trigger" onclick="toggleMateriaDropdown(event)">
             <span id="mat-selector-name">—</span>
-            <span class="mat-dropdown-caret">▾</span>
+            <svg class="mat-dropdown-caret" width="16" height="16"><use href="/assets/icons/sprite.svg#chevron-down"></use></svg>
           </div>
           <div class="mat-meta" style="display: flex; align-items: center; gap: 6px; position: relative;">
             <span class="badge badge--warning" id="mat-selector-badge">Cursando</span>
@@ -591,14 +591,14 @@
     <div class="focus-bottom-actions">
       <!-- Botón de Música Lofi -->
       <button class="focus-theme-btn" id="lofi-panel-toggle" onclick="window.toggleLofiPanel()" title="Música Lofi">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg width="14" height="14"><use href="/assets/icons/sprite.svg#music"></use></svg>
         <span>Música Lofi</span>
       </button>
 
       <!-- Botón de Pantalla Completa -->
-      <button class="focus-theme-btn" id="focus-fullscreen-toggle" onclick="window.toggleFullscreen()" title="Pantalla Completa">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-        <span id="focus-fullscreen-text">Pantalla Completa</span>
+      <button class="focus-theme-btn" id="focus-fullscreen-toggle" onclick="window.toggleFullscreen()" title="Maximizar">
+        <svg width="14" height="14"><use href="/assets/icons/sprite.svg#maximize"></use></svg>
+        <span id="focus-fullscreen-text">Maximizar</span>
       </button>
     </div>
   </div>
@@ -606,7 +606,10 @@
   <!-- Panel de Música Lofi Lateral -->
   <div class="focus-lofi-panel" id="focus-lofi-panel">
     <div class="focus-lofi-header">
-      <span class="focus-lofi-title">🎵 Reproductor Lofi</span>
+      <span class="focus-lofi-title">
+        <svg width="16" height="16"><use href="/assets/icons/sprite.svg#music"></use></svg>
+        Reproductor Lofi
+      </span>
       <button class="focus-lofi-close" onclick="window.toggleLofiPanel()" title="Cerrar panel">✕</button>
     </div>
     

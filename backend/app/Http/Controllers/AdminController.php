@@ -261,12 +261,23 @@ class AdminController extends Controller
         // que se está anulando. monto_base se recalcula con el precio vigente
         // AL ARRANCAR el período de esta fila (no el de hoy), para que no
         // salte al precio de un mes posterior solo por haberse reabierto.
+        if ($pago->comprobante_path) {
+            Storage::disk('local')->delete($pago->comprobante_path);
+        }
+
         $carreraId = CuotaMensualService::carreraIdDeUsuario($pago->usuario_id);
         $pago->update([
             'estado'             => 'pendiente',
+            'medio_pago'         => null,
+            'fecha_pago'         => null,
             'monto_base'         => $carreraId ? CuotaMensualService::montoBaseParaPeriodo($carreraId, $pago->periodo) : null,
             'monto_exigible'     => null,
             'monto_declarado'    => null,
+            'comprobante_path'   => null,
+            'comprobante_mime'   => null,
+            'datos_extraidos_ia' => null,
+            'confirmado_por'     => null,
+            'confirmado_en'      => null,
             'eliminado_por'      => $request->user()->id,
             'motivo_eliminacion' => $request->input('motivo'),
         ]);

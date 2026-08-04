@@ -51,7 +51,7 @@
   </div>
 
   <!-- Selector de Subpestañas (Académico vs Productividad) -->
-  <div class="stabs" style="margin-bottom: 20px; margin-top: 10px;">
+  <div class="stabs">
     <div class="stab on" id="tab-academic" onclick="window.switchToTab('academic')">🎓 Rendimiento Académico</div>
     <div class="stab" id="tab-productivity" onclick="window.switchToTab('productivity')">⚡ Productividad de Estudio</div>
   </div>

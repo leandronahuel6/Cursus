@@ -214,11 +214,68 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Cerrar modal de detalle al hacer clic fuera o con Escape
   const subjectInfoModal = document.getElementById('subject-info-modal');
-  if (subjectInfoModal) {
-    subjectInfoModal.addEventListener('click', (e) => {
-      if (e.target === subjectInfoModal) window.closeSubjectInfoModal();
-    });
-  }
+  
+  // Event Delegation para todos los clics de la vista
+  document.addEventListener('click', (e) => {
+    // Cerrar modal si se hace clic en el overlay exterior
+    if (subjectInfoModal && e.target === subjectInfoModal) {
+      window.closeSubjectInfoModal();
+      return;
+    }
+
+    const actionEl = e.target.closest('[data-action]');
+    if (!actionEl) return;
+
+    const action = actionEl.getAttribute('data-action');
+    
+    switch (action) {
+      case 'switch-tab':
+        window.switchToTab(actionEl.getAttribute('data-tab'));
+        break;
+      case 'set-filter':
+        window.setFilter(actionEl.getAttribute('data-filter'));
+        break;
+      case 'close-subject-info':
+        window.closeSubjectInfoModal();
+        break;
+      case 'close-grade-modal':
+        window.closeGradeModal(actionEl.getAttribute('data-save') === 'true');
+        break;
+      case 'close-dependency-error':
+        window.closeDependencyErrorModal();
+        break;
+      case 'change-status':
+        window.changeSubjectStatus(parseInt(actionEl.getAttribute('data-id')), actionEl.getAttribute('data-status'));
+        break;
+      case 'change-status-aprobada':
+        if (actionEl.getAttribute('data-shake') === 'true') {
+          window.shakeApproveButton(actionEl);
+        } else {
+          window.changeSubjectStatus(parseInt(actionEl.getAttribute('data-id')), 'aprobada');
+        }
+        break;
+      case 'open-subject-info': {
+        const id = parseInt(actionEl.getAttribute('data-id'));
+        const sub = TUP_PLAN.find(s => s.id === id);
+        const subState = state.subjects[id];
+        if (sub && subState) window.openSubjectInfoModal(sub, subState);
+        break;
+      }
+      case 'toggle-list-level': {
+        const level = actionEl.getAttribute('data-level');
+        state.collapsedLevels[level] = !state.collapsedLevels[level];
+        renderListView();
+        break;
+      }
+      case 'toggle-tree-level': {
+        const level = actionEl.getAttribute('data-level');
+        state.collapsedLevels[level] = !state.collapsedLevels[level];
+        renderTreeView();
+        break;
+      }
+    }
+  });
+
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') window.closeSubjectInfoModal();
   });
@@ -246,6 +303,9 @@ window.changeSubjectStatus = function(id, newStatus) {
   const subState = state.subjects[id];
   if (!sub || !subState) return;
   
+  // Guarda Anti-Glitches: Rechazar peticiones redundantes o transiciones bloqueadas
+  if (subState.status === newStatus || (!subState.puede_cursar && newStatus === 'disponible')) return;
+
   if (newStatus === 'aprobada') {
     // Abrir modal de notas
     activeModalSubjectId = id;
@@ -337,13 +397,13 @@ window.switchToTab = function(tabName) {
   if (tabName === 'manage') {
     tabManage.classList.add('on');
     tabPlan.classList.remove('on');
-    panelManage.style.display = 'block';
-    panelPlan.style.display = 'none';
+    panelManage.classList.remove('hidden');
+    panelPlan.classList.add('hidden');
   } else {
     tabManage.classList.remove('on');
     tabPlan.classList.add('on');
-    panelManage.style.display = 'none';
-    panelPlan.style.display = 'block';
+    panelManage.classList.add('hidden');
+    panelPlan.classList.remove('hidden');
   }
   calculateStats();
   renderActiveTab();
@@ -458,18 +518,12 @@ function renderListView() {
       block.className = 'level-block';
 
       block.innerHTML = `
-        <div class="level-header-title">
+        <div class="level-header-title" data-action="toggle-list-level" data-level="${level}">
           <span class="level-header-arrow">${isCollapsed ? '▸' : '▾'}</span> ${levels[level]}
         </div>
-        <div class="subjects-layout-grid" id="grid-level-${level}" style="${isCollapsed ? 'display:none;' : ''}"></div>
+        <div class="subjects-layout-grid ${isCollapsed ? 'hidden' : ''}" id="grid-level-${level}"></div>
       `;
       container.appendChild(block);
-
-      // Click en el título: colapsar/expandir el nivel
-      block.querySelector('.level-header-title').onclick = () => {
-        state.collapsedLevels[level] = !isCollapsed;
-        renderListView();
-      };
 
       const grid = document.getElementById(`grid-level-${level}`);
       
@@ -567,25 +621,19 @@ function renderTreeView() {
       block.className = 'tree-level-block';
 
       block.innerHTML = `
-        <div class="tree-level-title">
+        <div class="tree-level-title" data-action="toggle-tree-level" data-level="${f.level}">
           <span class="tree-level-arrow">${isCollapsed ? '▸' : '▾'}</span> ${f.label}
         </div>
-        <div class="tree-nodes-list" id="tree-nodes-${f.level}" style="${isCollapsed ? 'display:none;' : ''}"></div>
+        <div class="tree-nodes-list ${isCollapsed ? 'hidden' : ''}" id="tree-nodes-${f.level}"></div>
       `;
       container.appendChild(block);
-
-      // Click en el título: colapsar/expandir el nivel
-      block.querySelector('.tree-level-title').onclick = () => {
-        state.collapsedLevels[f.level] = !isCollapsed;
-        renderTreeView();
-      };
 
       const nodesContainer = document.getElementById(`tree-nodes-${f.level}`);
       
       levelSubjects.forEach(sub => {
         const subState = state.subjects[sub.id];
         const isLocked = !subState.puede_cursar;
-        const lockedDisponible = false; // siempre se puede volver a "Disponible"
+        const lockedDisponible = !subState.puede_cursar; // Corrección Bug 2
         const lockedCursando = !subState.puede_cursar;
         const lockedRegular = !subState.puede_cursar;
         const lockedAprobada = !subState.puede_aprobar;
@@ -610,29 +658,24 @@ function renderTreeView() {
         }
         
         node.innerHTML = `
-          <div class="tree-node-info">
+          <div class="tree-node-info" data-action="open-subject-info" data-id="${sub.id}">
             <span class="tree-node-code">TUP${sub.id}</span>
             <span class="tree-node-name">${sub.name}</span>
             <span class="tree-node-meta">${metaText}</span>
           </div>
           <div class="status-buttons-row">
             <button id="btn-${sub.id}-disponible" class="btn-status-toggle ${!lockedDisponible && subState.status === 'disponible' ? 'active disponible' : ''}"
-                    ${lockedDisponible ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'disponible')">Disponible</button>
+                    ${lockedDisponible ? 'disabled' : ''} data-action="change-status" data-id="${sub.id}" data-status="disponible">Disponible</button>
             <button id="btn-${sub.id}-cursando" class="btn-status-toggle ${!lockedCursando && subState.status === 'cursando' ? 'active cursando' : ''}"
-                    ${lockedCursando ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'cursando')">Cursar</button>
+                    ${lockedCursando ? 'disabled' : ''} data-action="change-status" data-id="${sub.id}" data-status="cursando">Cursar</button>
             <button id="btn-${sub.id}-regular" class="btn-status-toggle ${!lockedRegular && subState.status === 'regular' ? 'active regular' : ''}"
-                    ${lockedRegular ? 'disabled' : ''} onclick="event.stopPropagation(); window.changeSubjectStatus(${sub.id}, 'regular')">Regular</button>
+                    ${lockedRegular ? 'disabled' : ''} data-action="change-status" data-id="${sub.id}" data-status="regular">Regular</button>
             <button id="btn-${sub.id}-aprobada" class="btn-status-toggle ${!lockedAprobada && subState.status === 'aprobada' ? 'active aprobada' : ''} ${aprobarBloqueadaParcial ? 'aprobar-bloqueada' : ''}"
                     ${lockedAprobada && !aprobarBloqueadaParcial ? 'disabled' : ''}
                     title="${aprobarBloqueadaParcial ? 'Podés regularizarla, pero todavía no podés aprobarla: faltan correlativas.' : ''}"
-                    onclick="event.stopPropagation(); ${aprobarBloqueadaParcial ? `window.shakeApproveButton(this)` : `window.changeSubjectStatus(${sub.id}, 'aprobada')`}">Aprobar</button>
+                    data-action="change-status-aprobada" data-id="${sub.id}" ${aprobarBloqueadaParcial ? 'data-shake="true"' : ''}>Aprobar</button>
           </div>
         `;
-
-        // Al hacer clic en la info del nodo (no en los botones), mostrar detalle en modal
-        node.querySelector('.tree-node-info').onclick = () => {
-          window.openSubjectInfoModal(sub, subState);
-        };
 
         nodesContainer.appendChild(node);
       });

@@ -1,7 +1,9 @@
 /* SECTION TABS */
 .stabs {
   display: flex; gap: 2px;
-  border-bottom: 1px solid var(--border); margin-bottom: 0;
+  border-bottom: 1px solid var(--border); 
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
 .stab {
   padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--t3);
