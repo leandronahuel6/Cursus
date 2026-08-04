@@ -1556,7 +1556,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.addEventListener('fullscreenchange', () => {
         const btn = document.getElementById('focus-fullscreen-toggle');
         if (!btn) return;
-        btn.innerHTML = document.fullscreenElement ? '🔍 Salir Completa' : '📺 Pantalla Completa';
+        const textEl = document.getElementById('focus-fullscreen-text');
+        const iconUseEl = btn.querySelector('svg use');
+        
+        if (document.fullscreenElement) {
+            btn.title = 'Minimizar';
+            if (textEl) textEl.textContent = 'Minimizar';
+            if (iconUseEl) iconUseEl.setAttribute('href', '/assets/icons/sprite.svg#minimize');
+        } else {
+            btn.title = 'Maximizar';
+            if (textEl) textEl.textContent = 'Maximizar';
+            if (iconUseEl) iconUseEl.setAttribute('href', '/assets/icons/sprite.svg#maximize');
+        }
     });
 
     // --- Cargar materias y estado inicial ---

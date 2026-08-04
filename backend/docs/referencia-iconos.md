@@ -7,7 +7,7 @@ Este documento contiene la especificación clara, mejorada y ordenada de dónde 
 - `chevron-right.svg`: Reemplaza el caracter "›" en los breadcrumbs: "Inicio › Mis Materias" (`/materias`), "Inicio › Área de Estudio › [materia]" (`/area-estudio`), "Inicio › Simulador de Horarios" (`/horarios`), "Inicio › Alertas" (`/alertas`), y "Inicio › Mi Progreso" (`/progreso`). También se usa en el botón siguiente mes del Calendario Mensual (`/alertas`).
 - `chevron-left.svg`: Se usa en el botón anterior mes en el Calendario Mensual (`/alertas`).
 - `chevron-up.svg`: Utilizado en la esquina derecha del bloque de perfil dentro del Sidebar.
-- `chevron-down.svg`: Sin uso definido actualmente (mantener disponible por si acaso).
+- `chevron-down.svg`: Utilizado como caret (flecha) desplegable en el selector de materias activas (`/area-estudio`).
 - `move-right.svg`: Se utiliza en los enlaces de navegación de bloques en `/dashboard`: "Materias este cuatrimestre", "Ver todas", "Ver Kanban", y en los bloques de "Estudiar otra Materia". _(Nota: Ha sido quitado del botón "Continuar estudiando" en /dashboard)_.
 - `x.svg`: Botón de cerrar en el menú/modal de perfil móvil en la cabecera. Esquina derecha en "Alerta próxima" (`/dashboard`). Esquina derecha en el Bloque superior en el Modal de tarea, botón Esquina Derecha al cliquear "Añadir una subtarea" en Modal de tarea, esquina derecha en Bloque superior en Modal de Ajustes Pomodoro Personalizado (`/area-estudio`). Esquina superior derecha en bloques de la grilla del simulador y en el bloque superior del Modal "Agregar a la grilla" (`/horarios`), y como el 2do botón en el extremo derecho en el Bloque de Aviso (`/alertas`). Se utiliza también para el estado de las sesiones 'Abandonada' en 'Sesiones Completadas Hoy' (`/area-estudio`).
 - `plus.svg`: Utilizado en el botón "Agregar tarea" en las Columnas del Tablero Kanban, y "Añadir una subtarea" en el Modal de tarea (`/area-estudio`). También en el botón "Agregar actividad" debajo de todas las tarjetas de Actividades Personales (`/horarios`). Reemplaza el caracter "+" en los botones de cada materia para sumar nota y en el botón derecho de aprobadas por cuatrimestre (`/progreso`).
@@ -57,6 +57,9 @@ Este documento contiene la especificación clara, mejorada y ordenada de dónde 
 - `coffee.svg`: Utilizado en los bloques de Estudiantes en "Estudiando ahora" si `estado` = 'descansando' en la tabla `presencia_activa` (`/area-estudio`).
 - `brush-cleaning.svg`: Utilizado en el botón "Limpiar Grilla" (`/horarios`).
 - `circle-alert.svg`: En alerta "Superposición horaria" (`/horarios`). Nueva Alerta / Vencimiento (`/alertas`).
+- `maximize.svg`: Botón de "Maximizar" en el overlay de Modo Concentración (`/area-estudio`).
+- `minimize.svg`: Botón de "Minimizar" en el overlay de Modo Concentración (`/area-estudio`).
+- `music.svg`: Botón de "Música Lofi" y título del "Reproductor Lofi" en el overlay de Modo Concentración (`/area-estudio`).
 
 ## Iconos Analíticos y de Gestión Académica
 

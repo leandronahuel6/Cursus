@@ -9,7 +9,7 @@
   box-sizing: border-box;
   box-shadow: var(--sh);
 }
-.mat-dropdown-caret { font-size: 11px; color: var(--t3); transition: transform .15s; }
+.mat-dropdown-caret { color: var(--t3); transition: transform .15s; }
 .mat-dropdown-trigger.open .mat-dropdown-caret { transform: rotate(180deg); }
 .mat-dropdown {
   position: absolute; top: calc(100% + 8px); left: 0;
