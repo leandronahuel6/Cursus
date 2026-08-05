@@ -3,12 +3,8 @@ function toggleAIHelpTooltip(event) {
     event.stopPropagation();
     const tooltip = document.getElementById("ai-help-tooltip-content");
     if (!tooltip) return;
-    const isVisible = tooltip.style.visibility === "visible";
-    tooltip.style.opacity = isVisible ? "0" : "1";
-    tooltip.style.visibility = isVisible ? "hidden" : "visible";
-    tooltip.style.transform = isVisible
-        ? "translateX(-50%) translateY(5px)"
-        : "translateX(-50%) translateY(0)";
+    
+    tooltip.classList.toggle("show");
 }
 
 // UX: Cerrar tooltip al hacer clic fuera
@@ -17,14 +13,12 @@ document.addEventListener("click", function (event) {
     const btn = document.getElementById("btn-ai-help");
     if (
         tooltip &&
-        tooltip.style.visibility === "visible" &&
+        tooltip.classList.contains("show") &&
         btn &&
         !btn.contains(event.target) &&
         !tooltip.contains(event.target)
     ) {
-        tooltip.style.opacity = "0";
-        tooltip.style.visibility = "hidden";
-        tooltip.style.transform = "translateX(-50%) translateY(5px)";
+        tooltip.classList.remove("show");
     }
 });
 // Variables de estado
@@ -57,9 +51,7 @@ function showCustomConfirm({
         const bodyEl = document.getElementById("confirm-modal-body-text");
         const btnCancel = document.getElementById("btn-confirm-cancel");
         const btnAccept = document.getElementById("btn-confirm-accept");
-        const iconContainer = document.getElementById(
-            "confirm-modal-icon-container",
-        );
+        const modalIcon = document.getElementById("confirm-modal-icon");
 
         titleEl.textContent = title;
         bodyEl.textContent = message;
@@ -70,13 +62,15 @@ function showCustomConfirm({
             btnAccept.style.background = "#dc2626";
             btnAccept.style.color = "#ffffff";
             btnAccept.style.boxShadow = "0 4px 12px rgba(220, 38, 38, 0.2)";
-            iconContainer.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>`;
+            modalIcon.style.color = "#dc2626";
+            modalIcon.innerHTML = `<use href="/assets/icons/sprite.svg#circle-alert"></use>`;
         } else {
             btnAccept.style.background =
                 "linear-gradient(135deg, #4f46e5, #06b6d4)";
             btnAccept.style.color = "#ffffff";
             btnAccept.style.boxShadow = "0 4px 12px rgba(79, 70, 229, 0.2)";
-            iconContainer.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`;
+            modalIcon.style.color = "var(--brand)";
+            modalIcon.innerHTML = `<use href="/assets/icons/sprite.svg#circle-alert"></use>`;
         }
 
         modal.style.display = "flex";
@@ -260,6 +254,7 @@ function toggleCategoryGroup(catId) {
             group.classList.remove("collapsed");
             const targetHeight = grid.scrollHeight;
 
+            grid.style.overflow = "hidden"; // Clip content only during animation
             grid.style.maxHeight = "0px";
             grid.style.opacity = "0";
             void grid.offsetHeight;
@@ -278,12 +273,14 @@ function toggleCategoryGroup(catId) {
                 anim.cancel();
                 grid.style.maxHeight = "";
                 grid.style.opacity = "";
+                grid.style.overflow = ""; // Allow content to pop out when fully expanded
             };
         };
         startExpand();
     } else {
         const startHeight = grid.scrollHeight;
 
+        grid.style.overflow = "hidden"; // Clip content only during animation
         grid.style.maxHeight = startHeight + "px";
         grid.style.opacity = "1";
         void grid.offsetHeight;
@@ -302,6 +299,7 @@ function toggleCategoryGroup(catId) {
             anim.cancel();
             grid.style.maxHeight = "0px";
             grid.style.opacity = "0";
+            grid.style.overflow = ""; // La clase .collapsed maneja el overflow: hidden en CSS
             group.classList.add("collapsed");
         };
         chevron.style.transform = "rotate(-180deg)";
@@ -314,11 +312,11 @@ function renderDecks(decks) {
     if (decks.length === 0 && materiasCursandoFlashcards.length === 0) {
         container.innerHTML = `
                 <div class="empty-state">
-                    <svg class="empty-state-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+                    <svg class="empty-state-icon" width="48" height="48" aria-hidden="true"><use href="/assets/icons/sprite.svg#cards"></use></svg>
                     <h3 class="empty-state-title">No tienes mazos aún</h3>
                     <p class="empty-state-desc">Crea tu primer mazo para agregar tarjetas de estudio y comenzar a repasar.</p>
                     <button class="btn-create-deck" style="margin: 0 auto;" onclick="openCreateDeckModal()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"/></svg>
+                        <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons/sprite.svg#plus"></use></svg>
                         Crear Primer Mazo
                     </button>
                 </div>
@@ -426,15 +424,11 @@ function renderDecks(decks) {
                 <div class="category-group ${isCollapsed ? "collapsed" : ""}" id="group-${catId}">
                     <div class="category-header" onclick="toggleCategoryGroup('${catId}')">
                         <div style="display:flex; align-items:center; gap:0.6rem;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.85;">
-                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-                            </svg>
+                            <svg width="18" height="18" aria-hidden="true" style="color: var(--brand); opacity:0.85;"><use href="/assets/icons/sprite.svg#folder"></use></svg>
                             <span style="font-weight:700; font-size:1.02rem; color:var(--t1);">${escapeHtml(cat)}</span>
                             <span style="font-size:0.75rem; font-weight:600; padding:0.15rem 0.5rem; background:var(--border); border-radius:9999px; color:var(--t3);">${catDecks.length}</span>
                         </div>
-                        <svg class="category-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="${isCollapsed ? "transform:rotate(-180deg);" : ""}">
-                            <path d="m6 9 6 6 6-6"/>
-                        </svg>
+                        <svg class="category-chevron" width="16" height="16" aria-hidden="true" style="${isCollapsed ? "transform:rotate(-180deg);" : ""}"><use href="/assets/icons/sprite.svg#chevron-down"></use></svg>
                     </div>
                     <div class="decks-grid" id="grid-${catId}">\n            `;
 
@@ -443,7 +437,7 @@ function renderDecks(decks) {
                     <div class="empty-state" style="grid-column: 1 / -1; padding: 1.5rem;">
                         <p class="empty-state-desc" style="margin: 0 0 0.8rem 0;">Todavía no tienes mazos para esta materia.</p>
                         <button class="btn-create-deck" style="margin: 0 auto;" onclick="openCreateDeckModalForMateria('${escapeJs(cat)}')">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"/></svg>
+                            <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons/sprite.svg#plus"></use></svg>
                             Crear Mazo
                         </button>
                     </div>
@@ -472,7 +466,7 @@ function renderDecks(decks) {
                             
                             <div class="deck-stats-row">
                                 <div class="deck-stat-item" title="Cantidad de tarjetas">
-                                    <svg class="deck-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+                                    <svg class="deck-stat-icon" aria-hidden="true"><use href="/assets/icons/sprite.svg#cards"></use></svg>
                                     <span>${deck.cards_count} ${deck.cards_count === 1 ? "tarjeta" : "tarjetas"}</span>
                                 </div>
                                 <span class="accuracy-badge ${accuracyClass}">
@@ -483,20 +477,20 @@ function renderDecks(decks) {
 
                         <div class="deck-actions">
                             <button class="btn-study" onclick="startStudySession(${deck.id})" ${!hasCards ? "disabled" : ""} title="${hasCards ? "Comenzar a estudiar" : "Agrega tarjetas primero para estudiar"}">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#play"></use></svg>
                                 Estudiar
                             </button>
                             <button class="btn-deck-icon" onclick="openEditDeckModal(${deck.id}, event)" title="Editar mazo">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#pen"></use></svg>
                             </button>
                             <button class="btn-deck-icon" onclick="handleExportDeck(${deck.id}, event)" title="Exportar mazo (JSON)">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M10 16l4-4-4-4M14 16V4"/></svg>
+                                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#file-braces-corner"></use></svg>
                             </button>
                             <button class="btn-deck-icon" onclick="openManageSection(${deck.id}, '${escapeJs(deck.nombre)}')" title="Gestionar tarjetas">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+                                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#cards"></use></svg>
                             </button>
                             <button class="btn-deck-icon delete-btn" onclick="handleDeleteDeck(${deck.id})" title="Eliminar mazo">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/></svg>
+                                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#trash-2"></use></svg>
                             </button>
                         </div>
                     </div>
@@ -896,8 +890,9 @@ function showStudyCard(index) {
         }
 
         // Ocultar botón continuar
-        document.getElementById("exam-next-action-wrapper").style.display =
-            "none";
+        const nextWrapper = document.getElementById("exam-next-action-wrapper");
+        nextWrapper.style.opacity = "0";
+        nextWrapper.style.pointerEvents = "none";
 
         // Construir opciones de respuesta (Correcta + distractores)
         const correctAnswer = card.respuesta;
@@ -1012,10 +1007,10 @@ function flipStudyCard() {
     const flipped = flipCard.classList.contains("flipped");
     if (flipped) {
         document.getElementById("study-controls").classList.add("visible");
-        document.getElementById("flip-hint-message").classList.add("hidden");
+        document.getElementById("flip-hint-message").classList.add("hint-hidden");
     } else {
         document.getElementById("study-controls").classList.remove("visible");
-        document.getElementById("flip-hint-message").classList.remove("hidden");
+        document.getElementById("flip-hint-message").classList.remove("hint-hidden");
     }
 }
 
@@ -1049,7 +1044,9 @@ function selectExamOption(selectedBtn, chosenAnswer, correctAnswer, cardId) {
     }
 
     // Mostrar botón de continuar
-    document.getElementById("exam-next-action-wrapper").style.display = "flex";
+    const nextWrapper = document.getElementById("exam-next-action-wrapper");
+    nextWrapper.style.opacity = "1";
+    nextWrapper.style.pointerEvents = "auto";
 }
 
 function submitCardResultBackground(cardId, outcome) {
@@ -1413,40 +1410,43 @@ function renderManageCards(cards) {
         html += `
                 <div class="card-list-item" id="card-item-${card.id}">
                     <div class="card-item-qa" id="card-display-${card.id}">
-                        <div class="qa-block">
-                            <div class="qa-label">Pregunta (Frente)</div>
-                            <div class="qa-content">${escapeHtml(card.pregunta)}</div>
-                        </div>
-                        <div class="qa-block">
-                            <div class="qa-label">Respuesta (Reverso)</div>
-                            <div class="qa-content">${escapeHtml(card.respuesta)}</div>
-                        </div>
-                        <div style="margin-top:0.4rem; display:flex; align-items:center; gap:0.5rem;">
-                            ${statsHtml}
+                        <div class="card-item-content">
+                            <div class="qa-block">
+                                <div class="qa-label">Pregunta (Frente)</div>
+                                <div class="qa-content">${escapeHtml(card.pregunta)}</div>
+                            </div>
+                            <div class="qa-block">
+                                <div class="qa-label">Respuesta (Reverso)</div>
+                                <div class="qa-content">${escapeHtml(card.respuesta)}</div>
+                            </div>
+                            <div style="margin-top:0.4rem; display:flex; align-items:center; gap:0.5rem;">
+                                ${statsHtml}
+                            </div>
                         </div>
                         <div class="card-item-actions">
                             <button class="btn-deck-icon" onclick="startEditCard(${card.id})" title="Editar tarjeta">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#pen"></use></svg>
                             </button>
                             <button class="btn-deck-icon delete-btn" onclick="handleDeleteCard(${card.id})" title="Eliminar tarjeta">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/></svg>
+                                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#trash-2"></use></svg>
                             </button>
                         </div>
                     </div>
                     <div class="card-edit-form" id="card-edit-form-${card.id}" style="display:none;">
                         <div class="form-group" style="margin-bottom: 0.5rem;">
-                            <label>Pregunta (Frente)</label>
-                            <textarea id="edit-textarea-q-${card.id}" class="fc-input fc-textarea" style="min-height:50px;" required>${escapeHtml(card.pregunta)}</textarea>
+                            <label for="edit-textarea-q-${card.id}">Pregunta (Frente)</label>
+                            <textarea id="edit-textarea-q-${card.id}" class="fc-input" style="min-height:50px;" required>${escapeHtml(card.pregunta)}</textarea>
                         </div>
                         <div class="form-group" style="margin-bottom: 0.5rem;">
-                            <label>Respuesta (Reverso)</label>
-                            <textarea id="edit-textarea-a-${card.id}" class="fc-input fc-textarea" style="min-height:50px;" required>${escapeHtml(card.respuesta)}</textarea>
+                            <label for="edit-textarea-a-${card.id}">Respuesta (Reverso)</label>
+                            <textarea id="edit-textarea-a-${card.id}" class="fc-input" style="min-height:50px;" required>${escapeHtml(card.respuesta)}</textarea>
                         </div>
                         <div style="margin-top: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
                                 <span style="font-size:0.8rem; font-weight:600; color:var(--t2);">Opciones incorrectas (Opcional)</span>
-                                <button type="button" id="btn-edit-suggest-${card.id}" onclick="handleEditSuggestDistractors(${card.id})" style="background:var(--border-light); border:1px solid var(--border); border-radius:4px; padding:0.15rem 0.4rem; font-size:0.7rem; font-weight:600; color:var(--brand); cursor:pointer; display:flex; align-items:center; gap:0.2rem; transition:all 0.2s;">
-                                    <span>Sugerir con IA ✨</span>
+                                <button type="button" id="btn-edit-suggest-${card.id}" class="btn-suggest-ai" onclick="handleEditSuggestDistractors(${card.id})">
+                                    <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#astroid"></use></svg>
+                                    <span>Sugerir con IA</span>
                                 </button>
                             </div>
                             <input type="text" id="edit-input-d1-${card.id}" class="fc-input" placeholder="Opción incorrecta 1" value="${escapeHtml(card.distractor_1 || "")}" style="font-size:0.75rem; padding:0.4rem; margin-bottom:0.4rem; width:100%;">

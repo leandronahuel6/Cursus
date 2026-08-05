@@ -34,6 +34,11 @@
   gap: 20px;
   align-items: start;
 }
+.alertas-grid .col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
 /* Alertas List / Agenda */
 .alert-list-container {

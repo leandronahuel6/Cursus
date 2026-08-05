@@ -260,7 +260,7 @@
         </div>
         <div class="contact-field">
           <label for="contact-body-msg">Descripción</label>
-          <textarea id="contact-body-msg" class="contact-input contact-textarea" placeholder="Describí el problema o tu sugerencia con detalle..." required></textarea>
+          <textarea id="contact-body-msg" class="contact-input" placeholder="Describí el problema o tu sugerencia con detalle..." required></textarea>
         </div>
         <div class="contact-footer">
           <button type="button" class="contact-btn-cancel" onclick="window.closeContactModal()">Cancelar</button>

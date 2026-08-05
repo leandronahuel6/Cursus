@@ -314,10 +314,6 @@ body.dark-mode .theme-toggle-btn .icon-moon {
     border-color: var(--brand);
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
-.form-textarea {
-    resize: vertical;
-    min-height: 120px;
-}
 .btn-submit {
     background: var(--brand-gradient);
     background-size: 200% 100%;
