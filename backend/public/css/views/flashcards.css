@@ -494,6 +494,13 @@ body.dark-mode .flip-card-back {
     font-family: var(--font-display);
 }
 
+.card-text code {
+    display: inline-block;
+    margin: 0 0.2rem;
+    line-height: 1.2;
+    vertical-align: middle;
+}
+
 /* Teclas de atajos estilizadas (Keycaps) */
 .key-hint {
     display: inline-flex;
