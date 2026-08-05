@@ -9,8 +9,8 @@
 
 .fc-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
+    gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
@@ -61,7 +61,7 @@
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
     margin-top: 1rem;
-    overflow: hidden;
+    /* Se remueve overflow: hidden para permitir que las tarjetas se eleven (translateY) al hacer :hover */
 }
 
 .category-group.collapsed .decks-grid {
@@ -615,7 +615,7 @@ body.dark-mode .key-hint {
     transition: opacity 0.3s;
 }
 
-.flip-instruction-hint.hidden {
+.flip-instruction-hint.hint-hidden {
     opacity: 0;
     pointer-events: none;
 }
@@ -635,10 +635,17 @@ body.dark-mode .key-hint {
     transition: all 0.2s ease;
     box-shadow: var(--sh);
     outline: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    display: block;
     width: 100%;
+    line-height: 1.7; /* Aumentar line-height para acomodar etiquetas code */
+}
+
+/* Fix para superposición de etiquetas code y espaciado horizontal */
+.btn-exam-option code {
+    display: inline-block;
+    margin: 0 0.25rem;
+    line-height: 1.2;
+    vertical-align: middle;
 }
 
 .btn-exam-option:hover:not(:disabled) {
@@ -1058,7 +1065,8 @@ body.dark-mode .key-hint {
     margin-bottom: 1.25rem;
 }
 
-.form-group label {
+.form-group label,
+.form-group .form-label {
     display: block;
     font-size: 0.8rem;
     font-weight: 600;
@@ -1078,7 +1086,7 @@ body.dark-mode .key-hint {
     font-size: 0.9rem;
     color: var(--t1);
     outline: none;
-    transition: all 0.2s;
+    transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
 
 .fc-input:focus {
@@ -1120,10 +1128,6 @@ body.dark-mode select optgroup {
     color: #f3f4f6;
 }
 
-.fc-textarea {
-    resize: vertical;
-    min-height: 80px;
-}
 
 .btn-add-card {
     width: 100%;
@@ -1169,9 +1173,18 @@ body.dark-mode select optgroup {
 
 .card-item-qa {
     display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.card-item-content {
+    display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    padding-right: 2.5rem;
+    flex: 1;
+    min-width: 0; /* Permite que el texto se trunque o haga wrap correctamente dentro de flex */
 }
 
 .qa-block {
@@ -1193,11 +1206,9 @@ body.dark-mode select optgroup {
 }
 
 .card-item-actions {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
     display: flex;
     gap: 0.25rem;
+    flex-shrink: 0;
 }
 
 /* Edición inline de tarjetas */
@@ -1224,6 +1235,15 @@ body.dark-mode select optgroup {
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-card-save:hover {
+    background: #15803d; /* Darker green */
+}
+
+body.dark-mode .btn-card-save:hover {
+    background: #16a34a; /* Slightly less bright green for dark mode */
 }
 
 .btn-card-cancel {
@@ -1235,6 +1255,45 @@ body.dark-mode select optgroup {
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-card-cancel:hover {
+    background: var(--border);
+    color: var(--t1);
+}
+
+body.dark-mode .btn-card-cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+/* Botones de sugerencias de IA */
+.btn-suggest-ai {
+    background: var(--border-light);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--brand);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.2s;
+}
+
+.btn-suggest-ai:hover {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #ffffff;
+}
+
+body.dark-mode .btn-suggest-ai:hover {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: var(--brand);
+    color: #ffffff;
 }
 
 /* ==========================================================================
@@ -1273,7 +1332,7 @@ body.dark-mode select optgroup {
         0 10px 10px -5px rgba(0, 0, 0, 0.04);
     transform: scale(0.95);
     transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    overflow: hidden;
+    /* overflow: hidden; Eliminado para que tooltips no se corten */
 }
 
 body.dark-mode .fc-modal-box {
@@ -1282,11 +1341,6 @@ body.dark-mode .fc-modal-box {
     box-shadow:
         0 20px 25px -5px rgba(0, 0, 0, 0.5),
         0 10px 10px -5px rgba(0, 0, 0, 0.3);
-}
-
-.category-header:hover {
-    background: var(--border) !important;
-    border-color: var(--brand-dim) !important;
 }
 
 .fc-overlay.open .fc-modal-box {
@@ -1491,7 +1545,7 @@ body.dark-mode .fc-modal-box {
     align-items: center;
     padding: 0.85rem 1.5rem;
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 1px solid transparent;
     border-radius: 0 12px 12px 12px;
     cursor: pointer;
     user-select: none;
@@ -1515,27 +1569,29 @@ body.dark-mode .fc-modal-box {
     border: 1px solid var(--border);
     border-bottom: none;
     border-radius: 8px 12px 0 0;
-    z-index: 1;
+    z-index: 2;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Ocultar borde superior del cuerpo de la carpeta debajo de la pestaña */
+/* Dibuja el borde exacto de la carpeta, omitiendo el espacio de la pestaña mediante clip-path */
 .category-header::after {
     content: "";
     position: absolute;
-    bottom: 100%;
-    left: 0;
-    width: 138px;
-    height: 4px;
-    background: var(--surface);
-    z-index: 2;
-    margin-bottom: -2px;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    border: 1px solid var(--border);
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 1;
+    clip-path: polygon(140px 0, 100% 0, 100% 100%, 0 100%, 0 1px, 140px 1px);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .category-header:hover {
     background: var(--border-light);
-    border-color: var(--brand-dim);
+    border-color: transparent;
     transform: translateY(-2px);
     box-shadow: var(--sh-md);
 }
@@ -1546,10 +1602,70 @@ body.dark-mode .fc-modal-box {
 }
 
 .category-header:hover::after {
-    background: var(--border-light);
+    border-color: var(--brand-dim);
 }
 
-/* Ajustes para el Modo Carpeta colapsada */
-.category-group.collapsed .category-header {
-    border-radius: 12px;
+/* 
+ * En modo oscuro, var(--surface) es semitransparente. 
+ * Para evitar "subpixel gaps" (líneas oscuras) o superposiciones (líneas claras),
+ * forzamos un color sólido equivalente y solapamos la pestaña 1px hacia abajo.
+ */
+body.dark-mode .category-header,
+body.dark-mode .category-header::before {
+    background: #1a2334;
+}
+
+body.dark-mode .category-header:hover,
+body.dark-mode .category-header:hover::before {
+    background: #1f2a40;
+}
+
+body.dark-mode .category-header::before {
+    bottom: calc(100% - 1px);
+}
+
+/* 
+ * Tooltip de Ayuda de IA
+ */
+.ai-help-tooltip-content {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    margin-bottom: 8px;
+    width: 280px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--t1);
+    line-height: 1.4;
+    box-shadow: var(--sh-md);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2000;
+    text-align: left;
+    backdrop-filter: blur(8px);
+}
+
+.ai-help-tooltip-content.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* En móviles, alineamos el tooltip por su extremo derecho para que no se salga de la pantalla */
+@media (max-width: 480px) {
+    .ai-help-tooltip-content {
+        left: auto;
+        right: 0; /* Exactamente alineado al extremo derecho del contenedor del botón */
+        transform: translateY(5px);
+        width: 270px;
+    }
+    
+    .ai-help-tooltip-content.show {
+        transform: translateY(0);
+    }
 }

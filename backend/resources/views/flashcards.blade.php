@@ -20,7 +20,7 @@
 @endsection
 
 @section('topbar-content')
-    <div class="topbar-title">Flashcards de Estudio</div>
+    <div class="topbar-title">Flashcards de Estudio 🧠</div>
 @endsection
 
 @section('content')
@@ -35,18 +35,18 @@
             </div>
             <div class="fc-header-actions">
                 <button class="btn-create-deck" style="background: var(--surface); color: var(--t1); border: 1px solid var(--border); box-shadow: var(--sh);" onclick="triggerImportSelector()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M14 12l-4 4-4-4M10 4v12"/></svg>
+                    <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons/sprite.svg#import"></use></svg>
                     Importar (.json)
                 </button>
                 <input type="file" id="import-deck-file-input" style="display: none;" accept=".json" onchange="handleImportDeckFile(event)">
                 
                 <button class="btn-create-deck" style="background: linear-gradient(135deg, #4f46e5, #06b6d4); color: white; border: none; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);" onclick="openAIDeckModal()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-                    Crear con IA ✨
+                    <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons/sprite.svg#astroid"></use></svg>
+                    Crear con IA
                 </button>
 
                 <button class="btn-create-deck" onclick="openCreateDeckModal()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"/></svg>
+                    <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons/sprite.svg#plus"></use></svg>
                     Nuevo Mazo
                 </button>
             </div>
@@ -66,7 +66,7 @@
         <div class="study-layout">
             <div class="study-bar-header">
                 <button class="btn-back-link" onclick="exitStudySession()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons/sprite.svg#chevron-left"></use></svg>
                     Volver a mazos
                 </button>
                 <div class="study-progress-info" id="study-progress-text">Tarjeta 0 de 0</div>
@@ -85,11 +85,11 @@
                                 <span class="card-side-tag" style="position:static;">Pregunta</span>
                             </div>
                             <button class="btn-card-tts" onclick="speakCardText(event, 'card-question-text')" title="Escuchar pregunta">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                                <svg width="15" height="15" aria-hidden="true"><use href="/assets/icons/sprite.svg#volume-2"></use></svg>
                             </button>
                             <div class="card-text" id="card-question-text">¿Cargando pregunta?</div>
                             <div class="card-action-hint">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#rotate-cw"></use></svg>
                                 Clic para ver la respuesta (o pulsa [Espacio])
                             </div>
                         </div>
@@ -98,12 +98,12 @@
                                 <span class="card-side-tag" style="position:static;">Respuesta</span>
                             </div>
                             <button class="btn-card-tts" onclick="speakCardText(event, 'card-answer-text')" title="Escuchar respuesta">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                                <svg width="15" height="15" aria-hidden="true"><use href="/assets/icons/sprite.svg#volume-2"></use></svg>
                             </button>
                             <div class="card-text" id="card-answer-text">¿Cargando respuesta?</div>
                             <div class="card-study-stats" id="card-study-stats">Sin repaso previo</div>
                             <div class="card-action-hint">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#rotate-cw"></use></svg>
                                 Clic para ver la pregunta
                             </div>
                         </div>
@@ -125,32 +125,34 @@
                         <!-- Botones inyectados dinámicamente -->
                     </div>
                     
-                    <div style="display: none; justify-content: flex-end; margin-top: 1.5rem;" id="exam-next-action-wrapper">
+                    <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;" id="exam-next-action-wrapper">
                         <button class="btn-create-deck" style="padding: 0.65rem 1.25rem; font-size: 0.85rem;" onclick="proceedToNextExamCard()">
                             Continuar
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons/sprite.svg#arrow-right"></use></svg>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="flip-instruction-hint" id="flip-hint-message">
-                💡 Haz clic o pulsa [Espacio] para revelarla antes de calificar.
-            </div>
+            <div class="study-actions-overlap-container" style="display: grid; grid-template-areas: 'overlap'; align-items: center; justify-items: center; margin: 1.5rem 0; min-height: 54px;">
+                <div class="flip-instruction-hint" id="flip-hint-message" style="grid-area: overlap; margin: 0;">
+                    💡 Haz clic o pulsa [Espacio] para revelarla antes de calificar.
+                </div>
 
-            <div class="study-controls" id="study-controls">
-                <button class="btn-outcome btn-outcome-incorrect" onclick="submitCardResult('incorrecto')">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
-                    <span>No lo sé</span>
-                    <kbd class="key-hint">1</kbd>
-                    <kbd class="key-hint">←</kbd>
-                </button>
-                <button class="btn-outcome btn-outcome-correct" onclick="submitCardResult('correcto')">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
-                    <span>Lo sé</span>
-                    <kbd class="key-hint">2</kbd>
-                    <kbd class="key-hint">→</kbd>
-                </button>
+                <div class="study-controls" id="study-controls" style="grid-area: overlap; width: 100%;">
+                    <button class="btn-outcome btn-outcome-incorrect" onclick="submitCardResult('incorrecto')">
+                        <svg width="18" height="18" aria-hidden="true"><use href="/assets/icons/sprite.svg#circle-alert"></use></svg>
+                        <span>No lo sé</span>
+                        <kbd class="key-hint">1</kbd>
+                        <kbd class="key-hint">←</kbd>
+                    </button>
+                    <button class="btn-outcome btn-outcome-correct" onclick="submitCardResult('correcto')">
+                        <svg width="18" height="18" aria-hidden="true"><use href="/assets/icons/sprite.svg#circle-check"></use></svg>
+                        <span>Lo sé</span>
+                        <kbd class="key-hint">2</kbd>
+                        <kbd class="key-hint">→</kbd>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -188,7 +190,7 @@
                 </div>
 
                 <div class="summary-feedback-box" id="summary-feedback-box">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                    <svg width="20" height="20" aria-hidden="true"><use href="/assets/icons/sprite.svg#info"></use></svg>
                     <span id="summary-feedback-text">¡Buen trabajo! Sigue practicando para consolidar tus conocimientos en este tema.</span>
                 </div>
 
@@ -211,7 +213,7 @@
             <div class="fc-header" style="margin-bottom: 1.5rem;">
                 <div class="fc-title-group">
                     <button class="btn-back-link" onclick="exitManageSection()" style="margin-bottom: 0.5rem;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                        <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons/sprite.svg#chevron-left"></use></svg>
                         Volver a mazos
                     </button>
                     <h1 id="manage-deck-name">Gestionar Mazo</h1>
@@ -226,17 +228,18 @@
                     <form id="add-card-form" onsubmit="handleCreateCard(event)">
                         <div class="form-group">
                             <label for="card-input-question">Pregunta (Frente)</label>
-                            <textarea id="card-input-question" class="fc-input fc-textarea" placeholder="Escribe la pregunta... Usa $x^2$ para fórmulas." required></textarea>
+                            <textarea id="card-input-question" class="fc-input" placeholder="Escribe la pregunta... Usa $x^2$ para fórmulas." required></textarea>
                         </div>
                         <div class="form-group">
                             <label for="card-input-answer">Respuesta (Reverso)</label>
-                            <textarea id="card-input-answer" class="fc-input fc-textarea" placeholder="Escribe la respuesta... Usa `código` para resaltar." required></textarea>
+                            <textarea id="card-input-answer" class="fc-input" placeholder="Escribe la respuesta... Usa `código` para resaltar." required></textarea>
                         </div>
                         <div style="margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem; margin-bottom: 1.25rem;">
                             <div class="distractors-header-row">
                                 <span style="font-size:0.85rem; font-weight:600; color:var(--t2);">Opciones incorrectas (Opcional)</span>
-                                <button type="button" id="btn-suggest-distractors" onclick="handleSuggestDistractors()" style="background:var(--border-light); border:1px solid var(--border); border-radius:var(--r-sm); padding:0.25rem 0.6rem; font-size:0.75rem; font-weight:600; color:var(--brand); cursor:pointer; display:flex; align-items:center; gap:0.25rem; transition:all 0.2s;">
-                                    <span>Sugerir con IA ✨</span>
+                                <button type="button" id="btn-suggest-distractors" class="btn-suggest-ai" onclick="handleSuggestDistractors()">
+                                    <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#astroid"></use></svg>
+                                    <span>Sugerir con IA</span>
                                 </button>
                             </div>
                             <div class="form-group" style="margin-bottom:0.5rem;">
@@ -276,10 +279,12 @@
     <div class="fc-modal-box">
         <div class="fc-modal-header">
             <div class="fc-modal-title" id="deck-modal-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+                <svg width="18" height="18" aria-hidden="true" style="color: var(--brand);"><use href="/assets/icons/sprite.svg#cards"></use></svg>
                 <span id="deck-modal-title-text">Nuevo Mazo de Estudio</span>
             </div>
-            <button class="fc-modal-close" onclick="closeCreateDeckModal()">✕</button>
+            <button class="fc-modal-close" onclick="closeCreateDeckModal()">
+                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#x"></use></svg>
+            </button>
         </div>
         <form id="create-deck-form" onsubmit="handleCreateDeck(event)">
             <input type="hidden" id="deck-edit-id" value="">
@@ -304,9 +309,9 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Estilo / Color de Mazo</label>
-                    <div class="color-picker-grid" id="color-picker-grid">
-                        <div class="color-option deck-color-indigo selected" data-color="indigo"></div>
+                    <div class="form-label" id="deck-color-label">Estilo / Color de Mazo</div>
+                    <div class="color-picker-grid" id="color-picker-grid" role="radiogroup" aria-labelledby="deck-color-label">
+                        <div class="color-option deck-color-indigo selected" data-color="indigo" role="radio" aria-checked="true" tabindex="0"></div>
                         <div class="color-option deck-color-emerald" data-color="emerald"></div>
                         <div class="color-option deck-color-rose" data-color="rose"></div>
                         <div class="color-option deck-color-amber" data-color="amber"></div>
@@ -328,10 +333,12 @@
     <div class="fc-modal-box" style="max-width: 440px;">
         <div class="fc-modal-header">
             <div class="fc-modal-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-                <span>Generar Mazo con IA ✨</span>
+                <svg width="18" height="18" aria-hidden="true" style="color: var(--brand);"><use href="/assets/icons/sprite.svg#astroid"></use></svg>
+                <span>Generar Mazo con IA</span>
             </div>
-            <button class="fc-modal-close" onclick="closeAIDeckModal()">✕</button>
+            <button class="fc-modal-close" onclick="closeAIDeckModal()">
+                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#x"></use></svg>
+            </button>
         </div>
         <form id="ai-deck-form" onsubmit="handleAICreateDeck(event)" enctype="multipart/form-data">
             <div class="fc-modal-body">
@@ -345,7 +352,7 @@
                             <button type="button" id="btn-ai-help" onclick="toggleAIHelpTooltip(event)" aria-label="Información sobre documentos escaneados" style="background: none; border: none; padding: 0; cursor: pointer; color: var(--brand); display: flex; align-items: center; justify-content: center; opacity: 0.8; transition: opacity 0.2s;">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="/assets/icons/sprite.svg#circle-question-mark"></use></svg>
                             </button>
-                            <div id="ai-help-tooltip-content" class="ai-help-tooltip-content" style="position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(5px); margin-bottom: 8px; width: 280px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 0.75rem; font-size: 0.75rem; color: var(--t1); line-height: 1.4; box-shadow: var(--sh-md); opacity: 0; visibility: hidden; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2000; text-align: left; backdrop-filter: blur(8px);">
+                            <div id="ai-help-tooltip-content" class="ai-help-tooltip-content">
                                 <strong style="display: block; margin-bottom: 0.25rem; color: var(--brand);">💡 Aviso sobre OCR</strong>
                                 Asegúrate de subir documentos con texto seleccionable. Si tus apuntes son fotos o PDF/PPTX escaneados, por favor súbelos en <strong>formato de imagen (JPG/PNG)</strong> para que la IA pueda procesarlos correctamente.
                             </div>
@@ -396,7 +403,7 @@
     <div class="fc-modal-box" style="max-width: 400px; transform: scale(0.9); opacity: 0; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);">
         <div class="fc-modal-header" style="border-bottom: none; padding: 1.5rem 1.5rem 0.5rem 1.5rem;">
             <div class="fc-modal-title" style="font-size: 1.2rem; font-weight: 700; color: var(--t1); display: flex; align-items: center; gap: 0.6rem;">
-                <span id="confirm-modal-icon-container"></span>
+                <svg id="confirm-modal-icon" width="20" height="20" aria-hidden="true"></svg>
                 <span id="confirm-modal-title-text">Confirmar acción</span>
             </div>
         </div>
@@ -415,17 +422,19 @@
     <div class="fc-modal-box" style="max-width: 420px;">
         <div class="fc-modal-header">
             <div class="fc-modal-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <svg width="18" height="18" aria-hidden="true" style="color: var(--brand);"><use href="/assets/icons/sprite.svg#book-open"></use></svg>
                 Modo de Estudio
             </div>
-            <button class="fc-modal-close" onclick="closeStudyModeModal()">✕</button>
+            <button class="fc-modal-close" onclick="closeStudyModeModal()">
+                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#x"></use></svg>
+            </button>
         </div>
         <div class="fc-modal-body">
             <p style="font-size: 0.9rem; color: var(--t3); margin: 0 0 1.25rem 0;">Elige cómo quieres repasar las tarjetas de este mazo.</p>
             
             <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <label style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1px solid var(--brand); border-radius: var(--r); cursor: pointer; background: var(--border-light); transition: all 0.2s;" id="label-mode-all">
-                    <input type="radio" name="study-mode-choice" value="all" checked style="margin-top: 0.25rem;">
+                <label for="mode-choice-all" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1px solid var(--brand); border-radius: var(--r); cursor: pointer; background: var(--border-light); transition: all 0.2s;" id="label-mode-all">
+                    <input type="radio" id="mode-choice-all" name="study-mode-choice" value="all" checked style="margin-top: 0.25rem;">
                     <div>
                         <strong style="display: block; font-size: 0.9rem; color: var(--t1); margin-bottom: 0.15rem;">Estudiar Todo</strong>
                         <span style="font-size: 0.8rem; color: var(--t3);">Repasa todas las tarjetas del mazo mezcladas aleatoriamente.</span>
@@ -433,8 +442,8 @@
                 </label>
 
 
-                <label style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1px solid var(--border); border-radius: var(--r); cursor: pointer; transition: all 0.2s;" id="label-mode-exam">
-                    <input type="radio" name="study-mode-choice" value="exam" style="margin-top: 0.25rem;">
+                <label for="mode-choice-exam" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1px solid var(--border); border-radius: var(--r); cursor: pointer; transition: all 0.2s;" id="label-mode-exam">
+                    <input type="radio" id="mode-choice-exam" name="study-mode-choice" value="exam" style="margin-top: 0.25rem;">
                     <div>
                         <strong style="display: block; font-size: 0.9rem; color: var(--t1); margin-bottom: 0.15rem;">Modo Examen (Quizlet-style)</strong>
                         <span style="font-size: 0.8rem; color: var(--t3);">Cuestionario de opción múltiple de 4 opciones generado automáticamente.</span>
