@@ -293,7 +293,7 @@
       <!-- Descripción -->
       <div class="modal-field">
         <label class="modal-label" for="task-modal-desc">Descripción</label>
-        <textarea id="task-modal-desc" class="modal-input modal-textarea" placeholder="Añadir una descripción más detallada..."></textarea>
+        <textarea id="task-modal-desc" class="modal-input" placeholder="Añadir una descripción más detallada..."></textarea>
       </div>
 
       <!-- Subtareas Checklist -->

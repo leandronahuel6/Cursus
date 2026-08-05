@@ -32,6 +32,12 @@ input,
 textarea {
     font-family: inherit;
 }
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+  max-height: 300px;
+}
 /* Asegurar legibilidad global de opciones de select en modo claro y oscuro */
 select option,
 select optgroup {
