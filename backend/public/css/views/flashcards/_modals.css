@@ -1,0 +1,602 @@
+/**
+ * Flashcards — Modales, Overlays y Tooltips
+ * Sistema de overlays con Focus Trap CSS, selector de color,
+ * modal de confirmación, overlay de carga de IA y tooltip de ayuda.
+ */
+
+/* ==========================================================================
+   OVERLAY BASE (FONDO OSCURO / BLUR)
+   ========================================================================== */
+.fc-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(7, 10, 19, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.fc-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ==========================================================================
+   CAJA DEL MODAL
+   ========================================================================== */
+.fc-modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    width: 100%;
+    max-width: 460px;
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: scale(0.95);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body.dark-mode .fc-modal-box {
+    background: #111827;
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.5),
+        0 10px 10px -5px rgba(0, 0, 0, 0.3);
+}
+
+.fc-overlay.open .fc-modal-box {
+    transform: scale(1);
+}
+
+/* Modal de modo estudio: un poco más ancho */
+.fc-modal-box--study-mode {
+    max-width: 520px;
+}
+
+/* ==========================================================================
+   SECCIONES DEL MODAL
+   ========================================================================== */
+.fc-modal-header {
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fc-modal-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--t1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.fc-modal-close {
+    background: transparent;
+    border: none;
+    color: var(--t3);
+    font-size: 1.25rem;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.fc-modal-close:hover {
+    background: var(--border-light);
+    color: var(--t1);
+}
+
+.fc-modal-close:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+/* Utilidad: color de ícono brand (SVG use) en modales */
+.modal-icon-brand {
+    color: var(--brand);
+}
+
+/* Botón de ayuda IA — ícono inline junto a label */
+.btn-ai-help-icon {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+}
+.btn-ai-help-icon:hover { opacity: 1; }
+.btn-ai-help-icon:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 50%;
+}
+
+/* Fila de label + botón de ayuda (en una sola línea) */
+.ai-file-label-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.4rem;
+    flex-wrap: wrap;
+}
+.ai-file-label-row .form-group__label {
+    margin-bottom: 0; /* el margen lo da ai-file-label-row */
+    flex: 1;
+}
+
+/* Input tipo file estilizado */
+.fc-input--file {
+    padding: 0.6rem;
+    border: 2px dashed var(--border);
+    border-radius: var(--r-sm);
+    background: var(--border-light);
+    font-size: 0.85rem;
+    cursor: pointer;
+    outline: none;
+}
+.fc-input--file:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* Descripción introductoria del modal de IA */
+.ai-modal-description {
+    font-size: 0.85rem;
+    color: var(--t3);
+    line-height: 1.45;
+    margin: 0 0 1.5rem 0; /* espacio generoso hacia el primer form-group */
+}
+
+.fc-modal-body {
+    padding: 1.5rem;
+}
+
+.fc-modal-footer {
+    /* Hereda el border-radius del fc-modal-box (la propiedad inherit funciona
+     * sobre el padre solo si el padre define la propiedad. Usamos border-radius
+     * explícito para garantizar que las esquinas inferiores estén redondeadas
+     * independientemente del z-stacking del footer.) */
+    border-bottom-left-radius: var(--r-lg);
+    border-bottom-right-radius: var(--r-lg);
+    padding: 1rem 1.5rem;
+    background: var(--border-light);
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    overflow: hidden; /* clip para que el background respete el border-radius */
+}
+
+/* ==========================================================================
+   BOTONES DE MODAL
+   ========================================================================== */
+.btn-modal-cancel {
+    background: transparent;
+    color: var(--t2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 0.55rem 1rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-modal-cancel:hover {
+    background: var(--surface);
+    color: var(--t1);
+}
+
+.btn-modal-cancel:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+.btn-modal-save {
+    background: var(--brand);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--r-sm);
+    padding: 0.55rem 1.25rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-modal-save:hover {
+    background: var(--brand-hover);
+}
+
+.btn-modal-save--destructive {
+    background: var(--red);
+}
+.btn-modal-save--destructive:hover {
+    background: #b91c1c;
+}
+
+.btn-modal-save:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+/* ==========================================================================
+   SELECTOR DE COLOR
+   ========================================================================== */
+.color-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    /* Accesible como radiogroup */
+}
+
+.color-option {
+    position: relative;
+    height: 38px;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    transition: transform 0.15s;
+    border: 2px solid transparent;
+    outline: none;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option:focus-visible {
+    box-shadow: 0 0 0 3px var(--brand);
+}
+
+.color-option.selected,
+.color-option[aria-checked="true"] {
+    border-color: var(--t1);
+    box-shadow: 0 0 0 2px var(--bg);
+}
+
+/* ==========================================================================
+   CAMPO DE NUEVA CATEGORÍA (SLIDE DOWN)
+   ========================================================================== */
+.new-category-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    overflow: hidden;
+    transition: grid-template-rows 0.3s ease;
+}
+
+.new-category-wrapper.is-visible {
+    grid-template-rows: 1fr;
+}
+
+.new-category-wrapper > div {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.new-category-input {
+    padding-top: 0.5rem;
+}
+
+/* ==========================================================================
+   MODAL DE MODO DE ESTUDIO
+   ========================================================================== */
+/* MODAL MODO DE ESTUDIO */
+.study-mode-intro {
+    font-size: 0.9rem;
+    color: var(--t3);
+    margin: 0 0 1.25rem 0;
+}
+
+.study-mode-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 0;
+    border: none;
+    padding: 0;
+}
+
+.study-mode-label {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 0.85rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: var(--r);
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.study-mode-label:hover {
+    border-color: var(--brand-dim);
+    background: var(--border-light);
+}
+
+.study-mode-label--active {
+    border-color: var(--brand);
+    background: var(--brand-light);
+}
+
+.study-mode-label__name {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--t1);
+    margin-bottom: 0.15rem;
+}
+
+.study-mode-label__desc {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--t3);
+    line-height: 1.4;
+}
+
+/* Ocultar radio nativo, mantener accesibilidad */
+.study-mode-label input[type="radio"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Selector de cantidad de preguntas para el examen */
+.exam-quantity-inner {
+    padding: 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    background: var(--border-light);
+    margin-top: 0.75rem;
+}
+
+/* Selector de cantidad de preguntas del examen */
+.exam-quantity-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    overflow: hidden;
+    transition: grid-template-rows 0.3s ease;
+}
+.exam-quantity-wrapper.is-visible {
+    grid-template-rows: 1fr;
+}
+.exam-quantity-wrapper > div {
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   MODAL DE CONFIRMACIÓN
+   ========================================================================== */
+/* MODAL DE CONFIRMACIÓN: Layout centrado y estilos correctos */
+.fc-modal-box--confirm .fc-modal-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem 1.5rem 0.75rem 1.5rem;
+    border-bottom: none;
+    gap: 0.5rem;
+}
+
+.fc-modal-body--centered {
+    padding-top: 0;
+    text-align: center;
+    text-wrap: balance;
+}
+
+.fc-modal-box--confirm .fc-modal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--t1);
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.confirm-modal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--t1);
+    margin: 0;
+}
+
+.confirm-icon-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+}
+
+.confirm-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirm-icon--destructive {
+    color: var(--red);
+}
+
+.confirm-icon--primary {
+    color: var(--brand);
+}
+
+#confirm-modal-body-text {
+    font-size: 0.9rem;
+    color: var(--t2);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* ==========================================================================
+   OVERLAY DE CARGA IA (AI LOADING)
+   ========================================================================== */
+.ai-loading-overlay {
+    background: rgba(7, 10, 19, 0.7);
+    backdrop-filter: blur(8px);
+    z-index: 2000;
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+}
+
+/* Spinner de IA animado */
+.ai-loader-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(99, 102, 241, 0.2);
+    border-top-color: var(--brand);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.ai-loading-overlay h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+.ai-loading-overlay p {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 320px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   TOOLTIP DE AYUDA IA
+   ========================================================================== */
+.ai-help-btn-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.ai-help-tooltip-content {
+    position: absolute;
+    /* Posicionado encima del botón de ayuda */
+    bottom: calc(100% + 6px);
+    right: 0;
+    width: 280px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--t1);
+    line-height: 1.5;
+    box-shadow: var(--sh-md);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2000;
+    text-align: left;
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+}
+
+/* Título del tooltip de ayuda IA */
+.ai-help-tooltip-content__heading {
+    display: block;
+    margin-bottom: 0.4rem;
+    color: var(--brand);   /* color morado via variable */
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.ai-help-tooltip-content.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+@media (max-width: 480px) {
+    .ai-help-tooltip-content {
+        width: 250px;
+        right: 0;
+    }
+}
+
+/* ==========================================================================
+   RESPONSIVO
+   ========================================================================== */
+@media (max-width: 576px) {
+    .fc-overlay {
+        padding: 1rem;
+    }
+
+    .fc-modal-box {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .fc-modal-body {
+        padding: 1.25rem;
+    }
+
+    .fc-modal-footer {
+        padding: 0.85rem 1.25rem;
+    }
+
+    .color-picker-grid {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 0.35rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fc-overlay,
+    .fc-modal-box,
+    .fc-modal-close,
+    .btn-modal-cancel,
+    .btn-modal-save,
+    .color-option,
+    .study-mode-label,
+    .new-category-wrapper,
+    .exam-quantity-wrapper,
+    .ai-help-tooltip-content {
+        transition: none;
+        animation: none;
+    }
+
+    .ai-loader-spinner {
+        animation: none;
+        border-top-color: var(--brand);
+        border-right-color: var(--brand);
+    }
+}

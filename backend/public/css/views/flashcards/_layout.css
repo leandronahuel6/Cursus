@@ -1,0 +1,162 @@
+/**
+ * Flashcards — Layout & Estructura de Página
+ * Contenedores principales, encabezados de sección y grilla de mazos.
+ *
+ * Nomenclatura: BEM estricto.
+ * Tokens: Se usan variables CSS del sistema de diseño global (variables.css).
+ */
+
+/* ==========================================================================
+   UTILIDADES Y ACCESIBILIDAD
+   ========================================================================== */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ==========================================================================
+   ESTILOS BASE DEL CONTENEDOR
+   ========================================================================== */
+.fc-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem 2rem 1rem;
+    font-family: var(--font-body);
+}
+
+/* ==========================================================================
+   ENCABEZADO DE SECCIÓN (MAZOS / GESTIÓN)
+   ========================================================================== */
+.fc-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.fc-title-group h1,
+.fc-title-group h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--t1);
+    margin: 0 0 0.25rem 0;
+}
+
+.fc-title-group p {
+    color: var(--t3);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.fc-header-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-left: auto;
+}
+
+/* ==========================================================================
+   LAYOUT DE ESTUDIO (CENTRADO / ESTRECHO)
+   ========================================================================== */
+.study-layout {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem 0;
+}
+
+/* ==========================================================================
+   LAYOUT DE GESTIÓN (GESTIONAR TARJETAS)
+   ========================================================================== */
+.manage-layout {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.manage-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+/* ==========================================================================
+   BOTÓN DE VOLVER ATRÁS (TEXTO + CHEVRON)
+   ========================================================================== */
+.btn-back-link {
+    background: transparent;
+    border: none;
+    color: var(--t2);
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.2s;
+    padding: 0;
+}
+
+.btn-back-link:hover {
+    color: var(--brand);
+}
+
+.btn-back-link:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+/* ==========================================================================
+   RESPONSIVO
+   ========================================================================== */
+@media (max-width: 768px) {
+    .fc-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .fc-title-group {
+        text-align: center;
+    }
+
+    .fc-header-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .manage-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .fc-container {
+        padding: 1rem 0;
+    }
+
+    .study-layout {
+        padding: 0.5rem 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fc-header *,
+    .btn-back-link {
+        transition: none;
+    }
+}

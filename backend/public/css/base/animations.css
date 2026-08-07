@@ -58,4 +58,9 @@
   100% { transform: scale(1.1) translateY(-6px); }
 }
 
+@keyframes pulse-glow {
+  from { transform: scale(1); filter: brightness(1); }
+  to { transform: scale(1.08); filter: brightness(1.1); }
+}
+
 
