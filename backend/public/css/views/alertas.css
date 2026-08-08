@@ -334,20 +334,7 @@
   color: var(--t2);
   margin-bottom: 4px;
 }
-.alert-form-input {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  padding: 8px 10px;
-  font-size: 13px;
-  color: var(--t1);
-  background: var(--surface);
-  outline: none;
-  transition: border-color .15s;
-}
-.alert-form-input:focus {
-  border-color: var(--brand);
-}
+
 .alert-color-palette {
   display: grid;
   grid-template-columns: repeat(10, minmax(0, 1fr));

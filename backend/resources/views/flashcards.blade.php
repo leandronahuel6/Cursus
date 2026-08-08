@@ -1,481 +1,743 @@
 @extends('layouts.app')
 
-@section('title', 'Cursus - Flashcards de Estudio')
+@section('title', 'Cursus — Flashcards de Estudio')
 
+{{-- ============================================================ --}}
+{{-- CSS: KaTeX + estilos del módulo                              --}}
+{{-- ============================================================ --}}
 @push('styles')
-<!-- KaTeX stylesheet para renderizado de ecuaciones matemáticas -->
+{{-- KaTeX: renderizado de ecuaciones matemáticas (LaTeX) --}}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+{{-- Estilos del módulo Flashcards (archivo índice con @import de sub-módulos) --}}
 <link rel="stylesheet" href="{{ asset('css/views/flashcards.css') }}">
 @endpush
 
-@section('mobile-header')
-<div class="mob-hdr">
-  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-    <div style="display: flex; flex-direction: column;">
-      <div class="mob-greet">Flashcards de Estudio 🧠</div>
-      <div class="mob-sub">Mis mazos y repaso</div>
+{{-- ============================================================ --}}
+{{-- ENCABEZADO MOBILE                                            --}}
+{{-- ============================================================ --}}
+@section('mobile-header-content')
+  <div class="mob-hdr__content">
+        <div class="mob-greet">Flashcards de Estudio 🧠</div>
+        <div class="mob-sub">Mis mazos y repaso</div>
     </div>
-  </div>
-</div>
 @endsection
 
+{{-- ============================================================ --}}
+{{-- TOPBAR                                                        --}}
+{{-- ============================================================ --}}
 @section('topbar-content')
-    <div class="topbar-title">Flashcards de Estudio 🧠</div>
+<div class="topbar-title">Flashcards de Estudio 🧠</div>
 @endsection
 
+{{-- ============================================================ --}}
+{{-- CONTENIDO PRINCIPAL                                          --}}
+{{-- ============================================================ --}}
 @section('content')
 <div class="fc-container">
 
-    <!-- ==================== SECCIÓN 1: VISTA DE MAZOS (DECKS) ==================== -->
-    <div id="section-decks" class="fade-in">
-        <div class="fc-header">
+    {{-- ========================================================== --}}
+    {{-- SECCIÓN 1: VISTA DE MAZOS (DECKS)                          --}}
+    {{-- ========================================================== --}}
+    <section id="section-decks" class="fade-in" aria-label="Mis mazos de estudio">
+        <header class="fc-header">
             <div class="fc-title-group">
                 <h1>Tus Mazos de Estudio</h1>
                 <p>Crea paquetes de preguntas y respuestas para entrenar tu memoria activa.</p>
             </div>
-            <div class="fc-header-actions">
-                <button class="btn-create-deck" style="background: var(--surface); color: var(--t1); border: 1px solid var(--border); box-shadow: var(--sh);" onclick="triggerImportSelector()">
-                    <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons/sprite.svg#import"></use></svg>
+
+            <div class="fc-header-actions" role="group" aria-label="Acciones de mazos">
+                {{-- Importar mazo JSON (dispara el input oculto vía data-action) --}}
+                <button class="btn-create-deck btn-create-deck--secondary" data-action="trigger-import-selector">
+                    <svg width="16" height="16" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#import"></use></svg>
                     Importar (.json)
                 </button>
-                <input type="file" id="import-deck-file-input" style="display: none;" accept=".json" onchange="handleImportDeckFile(event)">
-                
-                <button class="btn-create-deck" style="background: linear-gradient(135deg, #4f46e5, #06b6d4); color: white; border: none; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);" onclick="openAIDeckModal()">
-                    <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons/sprite.svg#astroid"></use></svg>
+                {{-- Input de archivo oculto para importación; change event delegado desde main.js --}}
+                <input
+                    type="file"
+                    id="import-deck-file-input"
+                    accept=".json"
+                    class="visually-hidden"
+                    data-action="import-deck-file"
+                    aria-label="Seleccionar archivo JSON para importar mazo"
+                >
+
+                {{-- Crear mazo con IA --}}
+                <button class="btn-create-deck btn-create-deck--ai" data-action="open-ai-deck-modal">
+                    <svg width="16" height="16" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#astroid"></use></svg>
                     Crear con IA
                 </button>
 
-                <button class="btn-create-deck" onclick="openCreateDeckModal()">
-                    <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons/sprite.svg#plus"></use></svg>
+                {{-- Crear mazo manualmente --}}
+                <button class="btn-create-deck" data-action="open-create-deck-modal">
+                    <svg width="16" height="16" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#plus"></use></svg>
                     Nuevo Mazo
                 </button>
             </div>
+        </header>
+
+        {{-- Contenedor dinámico: cargado y renderizado por ui/decks.js --}}
+        <div id="decks-container" role="status" aria-live="polite" aria-label="Lista de mazos">
+            <div class="decks-loader">Cargando tus mazos...</div>
         </div>
+    </section>
 
-        <div id="decks-container">
-            <!-- Cargado de mazos dinámicamente agrupados por categoría -->
-            <div style="text-align: center; padding: 3rem; color: var(--t3);" id="decks-loader">
-                Cargando tus mazos...
-            </div>
-        </div>
-    </div>
-
-
-    <!-- ==================== SECCIÓN 2: ESTUDIO ACTIVO (CARRUSEL 3D & EXAMEN) ==================== -->
-    <div id="section-study" class="fade-in" style="display: none;">
+    {{-- ========================================================== --}}
+    {{-- SECCIÓN 2: ESTUDIO ACTIVO (CARRUSEL 3D / EXAMEN)           --}}
+    {{-- ========================================================== --}}
+    <section id="section-study" class="fade-in" hidden aria-label="Sesión de estudio activa">
         <div class="study-layout">
+
+            {{-- Barra superior: botón atrás + contador de progreso --}}
             <div class="study-bar-header">
-                <button class="btn-back-link" onclick="exitStudySession()">
-                    <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons/sprite.svg#chevron-left"></use></svg>
+                <button class="btn-back-link" data-action="exit-study" aria-label="Volver a la lista de mazos">
+                    <svg width="16" height="16" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#chevron-left"></use></svg>
                     Volver a mazos
                 </button>
-                <div class="study-progress-info" id="study-progress-text">Tarjeta 0 de 0</div>
+                <div class="study-progress-info" id="study-progress-text" role="status" aria-live="polite">Tarjeta 0 de 0</div>
             </div>
 
-            <div class="study-progress-container">
+            {{-- Barra de progreso --}}
+            <div class="study-progress-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progreso de la sesión">
                 <div class="study-progress-bar" id="study-progress-bar"></div>
             </div>
 
-            <!-- Modo Tarjeta (3D Flip) -->
+            {{-- ──── MODO TARJETA (FLIP 3D) ──── --}}
             <div class="study-card-wrapper" id="card-mode-wrapper">
-                <div class="flip-card" id="flip-card" onclick="flipStudyCard()">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <div style="position: absolute; top: 1.25rem; left: 1.5rem; display: flex; gap: 0.5rem; align-items: center;">
-                                <span class="card-side-tag" style="position:static;">Pregunta</span>
+                <div
+                    class="flip-card"
+                    id="flip-card"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Tarjeta de estudio. Presiona para ver la respuesta."
+                    data-action="flip-card"
+                >
+                    <div class="flip-card-inner" aria-live="polite">
+                        {{-- FRENTE: PREGUNTA --}}
+                        <div class="flip-card-front" aria-label="Pregunta">
+                            <div class="card-side-tag-wrapper">
+                                <span class="card-side-tag">Pregunta</span>
                             </div>
-                            <button class="btn-card-tts" onclick="speakCardText(event, 'card-question-text')" title="Escuchar pregunta">
-                                <svg width="15" height="15" aria-hidden="true"><use href="/assets/icons/sprite.svg#volume-2"></use></svg>
+                            {{-- TTS: stopPropagation via data-action; no onclick --}}
+                            <button
+                                class="btn-card-tts"
+                                data-action="speak-card-text"
+                                data-target-id="card-question-text"
+                                title="Escuchar pregunta"
+                                aria-label="Leer pregunta en voz alta"
+                            >
+                                <svg width="15" height="15" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#volume-2"></use></svg>
                             </button>
-                            <div class="card-text" id="card-question-text">¿Cargando pregunta?</div>
-                            <div class="card-action-hint">
-                                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#rotate-cw"></use></svg>
-                                Clic para ver la respuesta (o pulsa [Espacio])
+                            <div class="card-text" id="card-question-text" aria-live="polite">¿Cargando pregunta?</div>
+                            <div class="card-action-hint" aria-hidden="true">
+                                <svg width="14" height="14" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#rotate-cw"></use></svg>
+                                Clic para ver la respuesta
+                                <kbd class="key-hint">Espacio</kbd>
                             </div>
                         </div>
-                        <div class="flip-card-back">
-                            <div style="position: absolute; top: 1.25rem; left: 1.5rem; display: flex; gap: 0.5rem; align-items: center;">
-                                <span class="card-side-tag" style="position:static;">Respuesta</span>
+
+                        {{-- REVERSO: RESPUESTA --}}
+                        <div class="flip-card-back" aria-label="Respuesta">
+                            <div class="card-side-tag-wrapper">
+                                <span class="card-side-tag">Respuesta</span>
                             </div>
-                            <button class="btn-card-tts" onclick="speakCardText(event, 'card-answer-text')" title="Escuchar respuesta">
-                                <svg width="15" height="15" aria-hidden="true"><use href="/assets/icons/sprite.svg#volume-2"></use></svg>
+                            <button
+                                class="btn-card-tts"
+                                data-action="speak-card-text"
+                                data-target-id="card-answer-text"
+                                title="Escuchar respuesta"
+                                aria-label="Leer respuesta en voz alta"
+                            >
+                                <svg width="15" height="15" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#volume-2"></use></svg>
                             </button>
-                            <div class="card-text" id="card-answer-text">¿Cargando respuesta?</div>
-                            <div class="card-study-stats" id="card-study-stats">Sin repaso previo</div>
-                            <div class="card-action-hint">
-                                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#rotate-cw"></use></svg>
+                            <div class="card-text" id="card-answer-text" aria-live="polite">¿Cargando respuesta?</div>
+                            <div class="card-study-stats" id="card-study-stats" aria-label="Historial de repasos de esta tarjeta">Sin repaso previo</div>
+                            <div class="card-action-hint" aria-hidden="true">
+                                <svg width="14" height="14" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#rotate-cw"></use></svg>
                                 Clic para ver la pregunta
+                                <kbd class="key-hint">Espacio</kbd>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Modo Examen (Múltiple Opción estilo Quizlet) -->
-            <div class="exam-card-wrapper" id="exam-mode-wrapper" style="display: none; width: 100%; min-height: 380px; margin-bottom: 2rem;">
-                <div class="summary-card" style="padding: 2.25rem; text-align: left; box-shadow: var(--sh-md); display: flex; flex-direction: column; justify-content: space-between; min-height: 380px; border-radius: var(--r-lg);">
+            {{-- ──── MODO EXAMEN (OPCIÓN MÚLTIPLE) ──── --}}
+            <div class="exam-card-wrapper" id="exam-mode-wrapper" hidden aria-label="Modo examen">
+                <div class="summary-card">
                     <div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                            <span class="card-side-tag" style="position:static; background: var(--brand-light); color: var(--brand); border-color: var(--brand-dim);">Examen</span>
+                        <div class="exam-card-header">
+                            <span class="card-side-tag card-side-tag--exam">Examen</span>
                         </div>
-                        <div class="card-text" id="exam-question-text" style="font-size: 1.25rem; margin-bottom: 1.5rem; max-height: 120px; overflow-y: auto; width: 100%; padding: 0;">¿Cargando pregunta?</div>
+                        <div class="card-text" id="exam-question-text" aria-live="polite">¿Cargando pregunta?</div>
                     </div>
-                    
-                    <div id="exam-options-grid">
-                        <!-- Botones inyectados dinámicamente -->
-                    </div>
-                    
-                    <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;" id="exam-next-action-wrapper">
-                        <button class="btn-create-deck" style="padding: 0.65rem 1.25rem; font-size: 0.85rem;" onclick="proceedToNextExamCard()">
+
+                    {{-- Opciones de respuesta inyectadas por study.js --}}
+                    <div
+                        id="exam-options-grid"
+                        role="group"
+                        aria-label="Opciones de respuesta"
+                        aria-live="polite"
+                    ></div>
+
+                    {{-- Botón Continuar (visible con clase is-visible) --}}
+                    <div class="exam-next-action-wrapper" id="exam-next-action-wrapper" aria-live="polite">
+                        <button class="btn-create-deck" data-action="proceed-next-exam">
                             Continuar
-                            <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons/sprite.svg#arrow-right"></use></svg>
+                            <svg width="16" height="16" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#arrow-right"></use></svg>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="study-actions-overlap-container" style="display: grid; grid-template-areas: 'overlap'; align-items: center; justify-items: center; margin: 1.5rem 0; min-height: 54px;">
-                <div class="flip-instruction-hint" id="flip-hint-message" style="grid-area: overlap; margin: 0;">
+            {{-- ──── CONTROLES DE RESULTADO (flip) y HINT ──── --}}
+            <div class="study-actions-overlap-container">
+                {{-- Hint: visible antes de voltear --}}
+                <div class="flip-instruction-hint" id="flip-hint-message" role="status" aria-live="polite">
                     💡 Haz clic o pulsa [Espacio] para revelarla antes de calificar.
                 </div>
 
-                <div class="study-controls" id="study-controls" style="grid-area: overlap; width: 100%;">
-                    <button class="btn-outcome btn-outcome-incorrect" onclick="submitCardResult('incorrecto')">
-                        <svg width="18" height="18" aria-hidden="true"><use href="/assets/icons/sprite.svg#circle-alert"></use></svg>
+                {{-- Controles correcto/incorrecto: visibles post-volteo --}}
+                <div
+                    class="study-controls"
+                    id="study-controls" role="group" aria-label="Calificar tarjeta"
+                >
+                    <button
+                        class="btn-outcome btn-outcome-incorrect"
+                        data-action="submit-incorrect"
+                        aria-label="No lo sabía (marcar como incorrecto). Atajo: tecla 1 o flecha izquierda"
+                    >
+                        <svg width="18" height="18" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#circle-alert"></use></svg>
                         <span>No lo sé</span>
                         <kbd class="key-hint">1</kbd>
                         <kbd class="key-hint">←</kbd>
                     </button>
-                    <button class="btn-outcome btn-outcome-correct" onclick="submitCardResult('correcto')">
-                        <svg width="18" height="18" aria-hidden="true"><use href="/assets/icons/sprite.svg#circle-check"></use></svg>
+                    <button
+                        class="btn-outcome btn-outcome-correct"
+                        data-action="submit-correct"
+                        aria-label="Lo sabía (marcar como correcto). Atajo: tecla 2 o flecha derecha"
+                    >
+                        <svg width="18" height="18" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#circle-check"></use></svg>
                         <span>Lo sé</span>
                         <kbd class="key-hint">2</kbd>
                         <kbd class="key-hint">→</kbd>
                     </button>
                 </div>
             </div>
+
         </div>
-    </div>
+    </section>
 
-
-    <!-- ==================== SECCIÓN 3: RESUMEN DE SESIÓN ==================== -->
-    <div id="section-summary" class="fade-in" style="display: none;">
+    {{-- ========================================================== --}}
+    {{-- SECCIÓN 3: RESUMEN DE SESIÓN                               --}}
+    {{-- ========================================================== --}}
+    <section id="section-summary" class="fade-in" hidden aria-label="Resumen de la sesión de estudio">
         <div class="study-layout">
             <div class="summary-card">
-                <div class="summary-icon-celebrate">🎉</div>
+                <div class="summary-icon-celebrate" aria-hidden="true">🎉</div>
                 <h2 id="summary-title">¡Mazo Completado!</h2>
                 <p>Has repasado todas las tarjetas disponibles en este mazo.</p>
 
-                <div class="circular-progress-wrapper">
-                    <svg class="circular-progress">
+                {{-- Progreso circular SVG --}}
+                <div class="circular-progress-wrapper" role="img" aria-labelledby="summary-percentage-text">
+                    <svg class="circular-progress" viewBox="0 0 150 150" aria-hidden="true">
                         <circle cx="75" cy="75" r="60" class="bg-circle"></circle>
                         <circle cx="75" cy="75" r="60" class="fg-circle" id="summary-circle-progress"></circle>
                     </svg>
-                    <div class="percentage" id="summary-percentage-text">0%</div>
+                    <div class="percentage" id="summary-percentage-text" aria-live="polite">0%</div>
                 </div>
 
-                <div class="summary-stats-grid">
+                {{-- Estadísticas numéricas --}}
+                <dl class="summary-stats-grid">
                     <div class="summary-stat-box">
-                        <div class="summary-stat-val val-correct" id="summary-stat-correct">0</div>
-                        <div class="summary-stat-lbl">Correctas</div>
+                        <dt class="summary-stat-lbl">Correctas</dt>
+                        <dd class="summary-stat-val val-correct" id="summary-stat-correct">0</dd>
                     </div>
                     <div class="summary-stat-box">
-                        <div class="summary-stat-val val-incorrect" id="summary-stat-incorrect">0</div>
-                        <div class="summary-stat-lbl">Incorrectas</div>
+                        <dt class="summary-stat-lbl">Incorrectas</dt>
+                        <dd class="summary-stat-val val-incorrect" id="summary-stat-incorrect">0</dd>
                     </div>
                     <div class="summary-stat-box">
-                        <div class="summary-stat-val val-total" id="summary-stat-total">0</div>
-                        <div class="summary-stat-lbl">Repasadas</div>
+                        <dt class="summary-stat-lbl">Repasadas</dt>
+                        <dd class="summary-stat-val val-total" id="summary-stat-total">0</dd>
                     </div>
+                </dl>
+
+                {{-- Feedback textual según resultado --}}
+                <div class="summary-feedback-box" id="summary-feedback-box" role="status" aria-live="polite">
+                    <svg width="20" height="20" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#info"></use></svg>
+                    <span id="summary-feedback-text">¡Buen trabajo! Sigue practicando para consolidar tus conocimientos.</span>
                 </div>
 
-                <div class="summary-feedback-box" id="summary-feedback-box">
-                    <svg width="20" height="20" aria-hidden="true"><use href="/assets/icons/sprite.svg#info"></use></svg>
-                    <span id="summary-feedback-text">¡Buen trabajo! Sigue practicando para consolidar tus conocimientos en este tema.</span>
-                </div>
-
+                {{-- Acciones del resumen --}}
                 <div class="summary-actions">
-                    <button class="btn-summary-restart" onclick="restartStudySession()">
+                    <button class="btn-summary-restart" data-action="restart-study">
                         Estudiar de nuevo
                     </button>
-                    <button class="btn-summary-back" onclick="exitSummaryToDecks()">
+                    <button class="btn-summary-back" data-action="exit-summary-to-decks">
                         Volver a mis mazos
                     </button>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-
-    <!-- ==================== SECCIÓN 4: GESTIÓN DE TARJETAS ==================== -->
-    <div id="section-manage" class="fade-in" style="display: none;">
+    {{-- ========================================================== --}}
+    {{-- SECCIÓN 4: GESTIÓN DE TARJETAS (MANAGE)                    --}}
+    {{-- ========================================================== --}}
+    <section id="section-manage" class="fade-in" hidden aria-label="Gestión de tarjetas del mazo">
         <div class="manage-layout">
-            <div class="fc-header" style="margin-bottom: 1.5rem;">
+            <header class="fc-header">
                 <div class="fc-title-group">
-                    <button class="btn-back-link" onclick="exitManageSection()" style="margin-bottom: 0.5rem;">
-                        <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons/sprite.svg#chevron-left"></use></svg>
+                    <button class="btn-back-link" data-action="exit-manage" aria-label="Volver a la lista de mazos">
+                        <svg width="16" height="16" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#chevron-left"></use></svg>
                         Volver a mazos
                     </button>
                     <h1 id="manage-deck-name">Gestionar Mazo</h1>
-                    <p>Agrega o elimina preguntas y respuestas rápidas. Soporta Markdown y fórmulas KaTeX con `$E=mc^2$` o `$$x^2$$`.</p>
+                    <p>Agrega o elimina preguntas y respuestas. Soporta Markdown y fórmulas KaTeX con <code>$E=mc^2$</code> o <code>$$x^2$$</code>.</p>
                 </div>
-            </div>
+            </header>
 
             <div class="manage-grid">
-                <!-- Formulario -->
+                {{-- ── Formulario de creación de tarjeta ── --}}
                 <div class="manage-form-card">
                     <h3>Añadir Tarjeta</h3>
-                    <form id="add-card-form" onsubmit="handleCreateCard(event)">
+                    {{-- data-action="add-card-form" usado por el delegador de submit en main.js --}}
+                    <form id="add-card-form" data-action="add-card-form" novalidate>
                         <div class="form-group">
-                            <label for="card-input-question">Pregunta (Frente)</label>
-                            <textarea id="card-input-question" class="fc-input" placeholder="Escribe la pregunta... Usa $x^2$ para fórmulas." required></textarea>
+                            <label class="form-group__label" for="card-input-question">Pregunta (Frente)</label>
+                            <textarea
+                                id="card-input-question"
+                                class="fc-input"
+                                placeholder="Escribe la pregunta... Usa $x^2$ para fórmulas."
+                                required
+                                aria-required="true"
+                            ></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="card-input-answer">Respuesta (Reverso)</label>
-                            <textarea id="card-input-answer" class="fc-input" placeholder="Escribe la respuesta... Usa `código` para resaltar." required></textarea>
+                            <label class="form-group__label" for="card-input-answer">Respuesta (Reverso)</label>
+                            <textarea
+                                id="card-input-answer"
+                                class="fc-input"
+                                placeholder="Escribe la respuesta... Usa `código` para resaltar."
+                                required
+                                aria-required="true"
+                            ></textarea>
                         </div>
-                        <div style="margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem; margin-bottom: 1.25rem;">
+
+                        {{-- Distractores para Modo Examen --}}
+                        <div class="card-edit-form__distractors">
                             <div class="distractors-header-row">
-                                <span style="font-size:0.85rem; font-weight:600; color:var(--t2);">Opciones incorrectas (Opcional)</span>
-                                <button type="button" id="btn-suggest-distractors" class="btn-suggest-ai" onclick="handleSuggestDistractors()">
-                                    <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#astroid"></use></svg>
+                                <span class="distractors-header-row__label">Opciones incorrectas (Opcional)</span>
+                                <button
+                                    type="button"
+                                    id="btn-suggest-distractors"
+                                    class="btn-suggest-ai"
+                                    data-action="suggest-distractors-new"
+                                    aria-label="Sugerir opciones incorrectas con IA"
+                                >
+                                    <svg width="14" height="14" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#astroid"></use></svg>
                                     <span>Sugerir con IA</span>
                                 </button>
                             </div>
-                            <div class="form-group" style="margin-bottom:0.5rem;">
-                                <input type="text" id="card-input-d1" class="fc-input" placeholder="Opción incorrecta 1" style="font-size:0.8rem; padding:0.5rem;">
-                            </div>
-                            <div class="form-group" style="margin-bottom:0.5rem;">
-                                <input type="text" id="card-input-d2" class="fc-input" placeholder="Opción incorrecta 2" style="font-size:0.8rem; padding:0.5rem;">
-                            </div>
-                            <div class="form-group" style="margin-bottom:0.5rem;">
-                                <input type="text" id="card-input-d3" class="fc-input" placeholder="Opción incorrecta 3" style="font-size:0.8rem; padding:0.5rem;">
-                            </div>
+                            <input type="text" id="card-input-d1" class="fc-input fc-input--distractor" placeholder="Opción incorrecta 1" aria-label="Opción incorrecta 1">
+                            <input type="text" id="card-input-d2" class="fc-input fc-input--distractor" placeholder="Opción incorrecta 2" aria-label="Opción incorrecta 2">
+                            <input type="text" id="card-input-d3" class="fc-input fc-input--distractor" placeholder="Opción incorrecta 3" aria-label="Opción incorrecta 3">
                         </div>
+
                         <button type="submit" class="btn-add-card">Guardar Tarjeta</button>
                     </form>
                 </div>
 
-                <!-- Lista de tarjetas -->
+                {{-- ── Lista de tarjetas del mazo ── --}}
                 <div>
-                    <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0 0 1rem 0; color: var(--t1);">
+                    <h3>
                         Tarjetas del Mazo (<span id="manage-cards-count">0</span>)
                     </h3>
-                    <div class="cards-list-container" id="manage-cards-list">
-                        <!-- Carga dinámica con AJAX -->
-                        <div style="text-align: center; padding: 2rem; color: var(--t3);">
-                            Cargando tarjetas...
-                        </div>
+                    <div
+                        class="cards-list-container"
+                        id="manage-cards-list"
+                        role="list"
+                        aria-label="Lista de tarjetas del mazo"
+                        aria-live="polite"
+                    >
+                        <div class="manage-loader">Cargando tarjetas...</div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-</div>
+</div>{{-- /.fc-container --}}
 
-<!-- ==================== OVERLAY MODAL: NUEVO/EDITAR MAZO ==================== -->
-<div class="fc-overlay" id="create-deck-modal" onclick="closeCreateDeckModalOnOverlay(event)">
+
+{{-- ============================================================ --}}
+{{-- MODAL: NUEVO / EDITAR MAZO                                   --}}
+{{-- ============================================================ --}}
+<div
+    class="fc-overlay"
+    id="create-deck-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="deck-modal-title"
+    aria-hidden="true"
+>
     <div class="fc-modal-box">
         <div class="fc-modal-header">
             <div class="fc-modal-title" id="deck-modal-title">
-                <svg width="18" height="18" aria-hidden="true" style="color: var(--brand);"><use href="/assets/icons/sprite.svg#cards"></use></svg>
+                <svg width="18" height="18" aria-hidden="true" class="modal-icon-brand"><use href="{{ asset('assets/icons/sprite.svg') }}#cards"></use></svg>
                 <span id="deck-modal-title-text">Nuevo Mazo de Estudio</span>
             </div>
-            <button class="fc-modal-close" onclick="closeCreateDeckModal()">
-                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#x"></use></svg>
+            <button class="fc-modal-close" data-action="close-create-deck-modal" aria-label="Cerrar modal">
+                <svg width="14" height="14" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#x"></use></svg>
             </button>
         </div>
-        <form id="create-deck-form" onsubmit="handleCreateDeck(event)">
+
+        {{-- data-action="create-deck-form" delegado por main.js en el evento submit --}}
+        <form id="create-deck-form" data-action="create-deck-form" novalidate>
             <input type="hidden" id="deck-edit-id" value="">
             <div class="fc-modal-body">
                 <div class="form-group">
-                    <label for="deck-input-name">Nombre del Mazo</label>
-                    <input type="text" id="deck-input-name" class="fc-input" placeholder="Ej: Anatomía I, SQL Joins, Historia..." required autocomplete="off">
+                    <label class="form-group__label" for="deck-input-name">Nombre del Mazo</label>
+                    <input
+                        type="text"
+                        id="deck-input-name"
+                        class="fc-input"
+                        placeholder="Ej: Anatomía I, SQL Joins, Historia..."
+                        required
+                        aria-required="true"
+                        autocomplete="off"
+                    >
                 </div>
                 <div class="form-group">
-                    <label for="deck-input-desc">Descripción (Opcional)</label>
-                    <input type="text" id="deck-input-desc" class="fc-input" placeholder="Ej: Repaso examen segundo parcial..." autocomplete="off">
+                    <label class="form-group__label" for="deck-input-desc">Descripción (Opcional)</label>
+                    <input
+                        type="text"
+                        id="deck-input-desc"
+                        class="fc-input"
+                        placeholder="Ej: Repaso examen segundo parcial..."
+                        autocomplete="off"
+                    >
                 </div>
                 <div class="form-group">
-                    <label for="deck-select-category">Contenedor / Carpeta</label>
-                    <select id="deck-select-category" class="fc-input" onchange="handleDeckSelectCategoryChange()">
+                    <label class="form-group__label" for="deck-select-category">Contenedor / Carpeta</label>
+                    <x-custom-select
+                        id="deck-select-category"
+                        data-action="deck-category-change"
+                    >
                         <option value="General">General (Sin contenedor)</option>
                         <option value="__NEW__">+ Crear nuevo contenedor...</option>
-                    </select>
-                    <div id="new-category-input-wrapper" style="display: none; margin-top: 0.75rem;">
-                        <label for="deck-input-category" style="font-size: 0.8rem; opacity: 0.85; margin-bottom: 0.25rem; display: block;">Nombre del nuevo contenedor</label>
-                        <input type="text" id="deck-input-category" class="fc-input" placeholder="Ej: Programación, Matemáticas, Legislación..." autocomplete="off">
+                    </x-custom-select>
+
+                    {{-- Campo de nombre del nuevo contenedor (slide CSS Grid) --}}
+                    <div class="new-category-wrapper" id="new-category-input-wrapper">
+                        <div>
+                            <div class="new-category-input">
+                                <label class="form-group__label" for="deck-input-category">Nombre del nuevo contenedor</label>
+                                <input
+                                    type="text"
+                                    id="deck-input-category"
+                                    class="fc-input"
+                                    placeholder="Ej: Programación, Matemáticas..."
+                                    autocomplete="off"
+                                >
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="form-label" id="deck-color-label">Estilo / Color de Mazo</div>
-                    <div class="color-picker-grid" id="color-picker-grid" role="radiogroup" aria-labelledby="deck-color-label">
-                        <div class="color-option deck-color-indigo selected" data-color="indigo" role="radio" aria-checked="true" tabindex="0"></div>
-                        <div class="color-option deck-color-emerald" data-color="emerald"></div>
-                        <div class="color-option deck-color-rose" data-color="rose"></div>
-                        <div class="color-option deck-color-amber" data-color="amber"></div>
-                        <div class="color-option deck-color-violet" data-color="violet"></div>
-                        <div class="color-option deck-color-cyan" data-color="cyan"></div>
+                    <div class="form-group__label" id="deck-color-label">Estilo / Color de Mazo</div>
+                    {{-- Radiogroup accesible para selección de color --}}
+                    <div
+                        class="color-picker-grid"
+                        id="color-picker-grid"
+                        role="radiogroup"
+                        aria-labelledby="deck-color-label"
+                    >
+                        <div class="color-option deck-color-indigo selected" data-color="indigo" role="radio" aria-checked="true"  tabindex="0"  aria-label="Índigo"></div>
+                        <div class="color-option deck-color-emerald"         data-color="emerald" role="radio" aria-checked="false" tabindex="-1" aria-label="Esmeralda"></div>
+                        <div class="color-option deck-color-rose"            data-color="rose"    role="radio" aria-checked="false" tabindex="-1" aria-label="Rosa"></div>
+                        <div class="color-option deck-color-amber"           data-color="amber"   role="radio" aria-checked="false" tabindex="-1" aria-label="Ámbar"></div>
+                        <div class="color-option deck-color-violet"          data-color="violet"  role="radio" aria-checked="false" tabindex="-1" aria-label="Violeta"></div>
+                        <div class="color-option deck-color-cyan"            data-color="cyan"    role="radio" aria-checked="false" tabindex="-1" aria-label="Cian"></div>
                     </div>
                 </div>
             </div>
             <div class="fc-modal-footer">
-                <button type="button" class="btn-modal-cancel" onclick="closeCreateDeckModal()">Cancelar</button>
+                <button type="button" class="btn-modal-cancel" data-action="close-create-deck-modal">Cancelar</button>
                 <button type="submit" class="btn-modal-save" id="btn-deck-submit">Crear Mazo</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- ==================== OVERLAY MODAL: CREAR MAZO CON IA ==================== -->
-<div class="fc-overlay" id="ai-deck-modal" onclick="closeAIDeckModalOnOverlay(event)">
-    <div class="fc-modal-box" style="max-width: 440px;">
+
+{{-- ============================================================ --}}
+{{-- MODAL: GENERAR MAZO CON IA                                   --}}
+{{-- ============================================================ --}}
+<div
+    class="fc-overlay"
+    id="ai-deck-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="ai-deck-modal-title"
+    aria-hidden="true"
+>
+    <div class="fc-modal-box">
         <div class="fc-modal-header">
-            <div class="fc-modal-title">
-                <svg width="18" height="18" aria-hidden="true" style="color: var(--brand);"><use href="/assets/icons/sprite.svg#astroid"></use></svg>
+            <div class="fc-modal-title" id="ai-deck-modal-title">
+                <svg width="18" height="18" aria-hidden="true" class="modal-icon-brand"><use href="{{ asset('assets/icons/sprite.svg') }}#astroid"></use></svg>
                 <span>Generar Mazo con IA</span>
             </div>
-            <button class="fc-modal-close" onclick="closeAIDeckModal()">
-                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#x"></use></svg>
+            <button class="fc-modal-close" data-action="close-ai-deck-modal" aria-label="Cerrar modal de IA">
+                <svg width="14" height="14" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#x"></use></svg>
             </button>
         </div>
-        <form id="ai-deck-form" onsubmit="handleAICreateDeck(event)" enctype="multipart/form-data">
+
+        {{-- data-action="ai-deck-form" delegado por main.js --}}
+        <form id="ai-deck-form" data-action="ai-deck-form" enctype="multipart/form-data" novalidate>
             <div class="fc-modal-body">
-                <p style="font-size: 0.85rem; color: var(--t3); margin: 0 0 1.2rem 0; line-height: 1.45;">
-                    Sube un archivo de estudio (**PDF, Word, PowerPoint, Texto, Markdown o Imagen**) y nuestra IA analizará el contenido para extraer y generar automáticamente un mazo completo de preguntas y respuestas.
+                <p class="ai-modal-description">
+                    Sube un archivo de estudio (<strong>PDF, Word, PowerPoint, Texto, Markdown o Imagen</strong>) y nuestra IA analizará el contenido para generar automáticamente un mazo completo de preguntas y respuestas.
                 </p>
+
                 <div class="form-group">
-                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem;">
-                        <label for="ai-deck-file" style="font-size: 0.85rem; font-weight: 600; color: var(--t2); margin: 0;">Seleccionar documento o imagen (.pdf, .docx, .pptx, .txt, .md, .jpg, .png)</label>
-                        <div class="ai-help-tooltip-container" style="position: relative; display: inline-flex; align-items: center;">
-                            <button type="button" id="btn-ai-help" onclick="toggleAIHelpTooltip(event)" aria-label="Información sobre documentos escaneados" style="background: none; border: none; padding: 0; cursor: pointer; color: var(--brand); display: flex; align-items: center; justify-content: center; opacity: 0.8; transition: opacity 0.2s;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="/assets/icons/sprite.svg#circle-question-mark"></use></svg>
+                    {{-- Etiqueta con botón de ayuda para tooltip OCR --}}
+                    <div class="ai-file-label-row">
+                        <label class="form-group__label" for="ai-deck-file">
+                            Seleccionar documento o imagen (.pdf, .docx, .pptx, .txt, .md, .jpg, .png)
+                        </label>
+                        {{-- Botón de ayuda con tooltip CSS (no JS) --}}
+                        <div class="ai-help-btn-wrapper">
+                            <button
+                                type="button"
+                                id="btn-ai-help"
+                                class="btn-ai-help-icon"
+                                data-action="toggle-ai-help-tooltip"
+                                aria-label="Información sobre documentos escaneados"
+                                aria-expanded="false"
+                                aria-controls="ai-help-tooltip-content"
+                            >
+                                <svg width="16" height="16" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#circle-question-mark"></use></svg>
                             </button>
-                            <div id="ai-help-tooltip-content" class="ai-help-tooltip-content">
-                                <strong style="display: block; margin-bottom: 0.25rem; color: var(--brand);">💡 Aviso sobre OCR</strong>
-                                Asegúrate de subir documentos con texto seleccionable. Si tus apuntes son fotos o PDF/PPTX escaneados, por favor súbelos en <strong>formato de imagen (JPG/PNG)</strong> para que la IA pueda procesarlos correctamente.
+                            <div id="ai-help-tooltip-content" class="ai-help-tooltip-content" role="tooltip">
+                                <strong class="ai-help-tooltip-content__heading">💡 Aviso sobre OCR</strong>
+                                Asegúrate de subir documentos con texto seleccionable. Si tus apuntes son fotos o PDF/PPTX escaneados, súbelos en <strong>formato de imagen (JPG/PNG)</strong> para que la IA pueda procesarlos correctamente.
                             </div>
                         </div>
                     </div>
-                    <input type="file" id="ai-deck-file" name="file" accept=".pdf,.docx,.pptx,.txt,.md,.jpg,.jpeg,.png" required style="width: 100%; padding: 0.6rem; border: 2px dashed var(--border); border-radius: var(--r-sm); background: var(--border-light); font-size: 0.85rem; outline: none; cursor: pointer;">
+                    <input
+                        type="file"
+                        id="ai-deck-file"
+                        name="file"
+                        accept=".pdf,.docx,.pptx,.txt,.md,.jpg,.jpeg,.png"
+                        required
+                        aria-required="true"
+                        class="fc-input fc-input--file"
+                    >
                 </div>
-                <div class="form-group" style="margin-top: 1.25rem;">
-                    <label for="ai-deck-cards-count" style="font-size: 0.85rem; font-weight: 600; color: var(--t2); display: block; margin-bottom: 0.4rem;">Cantidad de flashcards a generar</label>
-                    <select id="ai-deck-cards-count" name="cantidad" class="fc-select">
+
+                <div class="form-group">
+                    <label class="form-group__label" for="ai-deck-cards-count">Cantidad de flashcards a generar</label>
+                    <x-custom-select id="ai-deck-cards-count" name="cantidad">
                         <option value="5">5 tarjetas (Rápido)</option>
                         <option value="10" selected>10 tarjetas (Recomendado)</option>
                         <option value="15">15 tarjetas (Completo)</option>
                         <option value="20">20 tarjetas (Extenso)</option>
-                    </select>
+                    </x-custom-select>
                 </div>
-                <div class="form-group" style="margin-top: 1.25rem;">
-                    <label for="ai-deck-select-category" style="font-size: 0.85rem; font-weight: 600; color: var(--t2); display: block; margin-bottom: 0.4rem;">Contenedor / Carpeta de destino</label>
-                    <select id="ai-deck-select-category" class="fc-input" onchange="handleAIDeckSelectCategoryChange()" style="font-size: 0.85rem;">
+
+                <div class="form-group">
+                    <label class="form-group__label" for="ai-deck-select-category">Contenedor / Carpeta de destino</label>
+                    <x-custom-select
+                        id="ai-deck-select-category"
+                        data-action="ai-deck-category-change"
+                    >
                         <option value="__AUTO__">Auto-detectar con IA ✨</option>
                         <option value="General">General (Sin contenedor)</option>
-                    </select>
-                    <div id="ai-new-category-input-wrapper" style="display: none; margin-top: 0.75rem;">
-                        <label for="ai-deck-input-category" style="font-size: 0.8rem; opacity: 0.85; margin-bottom: 0.25rem; display: block;">Nombre del nuevo contenedor</label>
-                        <input type="text" id="ai-deck-input-category" class="fc-input" placeholder="Ej: Programación, Anatomía..." autocomplete="off">
+                    </x-custom-select>
+
+                    {{-- Campo de nuevo contenedor (slide CSS Grid) --}}
+                    <div class="new-category-wrapper" id="ai-new-category-input-wrapper">
+                        <div>
+                            <div class="new-category-input">
+                                <label class="form-group__label" for="ai-deck-input-category">Nombre del nuevo contenedor</label>
+                                <input
+                                    type="text"
+                                    id="ai-deck-input-category"
+                                    class="fc-input"
+                                    placeholder="Ej: Programación, Anatomía..."
+                                    autocomplete="off"
+                                >
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="fc-modal-footer" style="display: flex; justify-content: flex-end; gap: 0.5rem; padding: 1rem 1.5rem; background: var(--border-light);">
-                <button type="button" class="btn-modal-cancel" onclick="closeAIDeckModal()">Cancelar</button>
-                <button type="submit" class="btn-modal-save" id="btn-ai-submit" style="background: linear-gradient(135deg, #4f46e5, #06b6d4);">Generar Mazo</button>
+
+            <div class="fc-modal-footer">
+                <button type="button" class="btn-modal-cancel" data-action="close-ai-deck-modal">Cancelar</button>
+                <button type="submit" class="btn-modal-save btn-modal-save--ai" id="btn-ai-submit">Generar Mazo</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- ==================== OVERLAY: CARGANDO GENERACIÓN IA ==================== -->
-<div class="fc-overlay" id="ai-loading-overlay" style="display: none; align-items: center; justify-content: center; z-index: 2000; background: rgba(11, 15, 25, 0.85); backdrop-filter: blur(8px);">
-    <div style="text-align: center; color: white; max-width: 320px; padding: 2rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--r-lg); box-shadow: var(--sh-md);">
-        <div class="ai-loader-spinner" style="width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: #06b6d4; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1.5rem;"></div>
-        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 0.5rem;" id="ai-loading-title">Procesando archivo...</h3>
-        <p style="font-size: 13px; color: var(--tm); line-height: 1.45;" id="ai-loading-text">La IA de Cursus está analizando tu documento para generar las flashcards.</p>
+
+{{-- ============================================================ --}}
+{{-- OVERLAY: CARGANDO GENERACIÓN IA                              --}}
+{{-- ============================================================ --}}
+<div
+    class="fc-overlay ai-loading-overlay"
+    id="ai-loading-overlay"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="ai-loading-title"
+    aria-describedby="ai-loading-text"
+    aria-hidden="true"
+    aria-live="assertive"
+>
+    <div class="ai-loading-content">
+        <div class="ai-loader-spinner" aria-hidden="true"></div>
+        <h3 id="ai-loading-title">Procesando archivo...</h3>
+        <p id="ai-loading-text">La IA de Cursus está analizando tu documento para generar las flashcards.</p>
     </div>
 </div>
 
-<!-- ==================== OVERLAY MODAL: CONFIRMACIÓN PERSONALIZADA ==================== -->
-<div class="fc-overlay" id="custom-confirm-modal" style="display: none; align-items: center; justify-content: center; z-index: 3000;">
-    <div class="fc-modal-box" style="max-width: 400px; transform: scale(0.9); opacity: 0; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);">
-        <div class="fc-modal-header" style="border-bottom: none; padding: 1.5rem 1.5rem 0.5rem 1.5rem;">
-            <div class="fc-modal-title" style="font-size: 1.2rem; font-weight: 700; color: var(--t1); display: flex; align-items: center; gap: 0.6rem;">
-                <svg id="confirm-modal-icon" width="20" height="20" aria-hidden="true"></svg>
-                <span id="confirm-modal-title-text">Confirmar acción</span>
-            </div>
-        </div>
-        <div class="fc-modal-body" style="padding: 0.5rem 1.5rem 1.2rem 1.5rem;">
-            <p id="confirm-modal-body-text" style="font-size: 0.88rem; color: var(--t3); margin: 0; line-height: 1.5;"></p>
-        </div>
-        <div class="fc-modal-footer" style="background: var(--border-light); padding: 1rem 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--border-light);">
-            <button type="button" class="btn-modal-cancel" id="btn-confirm-cancel" style="padding: 0.55rem 1.25rem; font-size: 0.85rem; font-weight: 600;">Cancelar</button>
-            <button type="button" class="btn-modal-save" id="btn-confirm-accept" style="padding: 0.55rem 1.25rem; font-size: 0.85rem; font-weight: 600; border: none; border-radius: var(--r-sm); cursor: pointer; transition: all 0.2s;">Aceptar</button>
-        </div>
-    </div>
-</div>
 
-<!-- ==================== OVERLAY MODAL: SELECCIONAR MODO DE ESTUDIO ==================== -->
-<div class="fc-overlay" id="study-mode-modal" onclick="closeStudyModeModalOnOverlay(event)">
-    <div class="fc-modal-box" style="max-width: 420px;">
-        <div class="fc-modal-header">
-            <div class="fc-modal-title">
-                <svg width="18" height="18" aria-hidden="true" style="color: var(--brand);"><use href="/assets/icons/sprite.svg#book-open"></use></svg>
-                Modo de Estudio
+{{-- ============================================================ --}}
+{{-- MODAL: CONFIRMACIÓN PERSONALIZADA (Promise-based)            --}}
+{{-- ============================================================ --}}
+<div
+    class="fc-overlay"
+    id="custom-confirm-modal"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="confirm-modal-title-text"
+    aria-describedby="confirm-modal-body-text"
+    aria-hidden="true"
+>
+    <div class="fc-modal-box fc-modal-box--confirm">
+        <div class="fc-modal-header fc-modal-header--centered">
+            <div class="confirm-icon-wrapper">
+                <div class="confirm-icon" id="confirm-modal-icon-wrapper">
+                    <svg id="confirm-modal-icon" width="24" height="24" aria-hidden="true"></svg>
+                </div>
             </div>
-            <button class="fc-modal-close" onclick="closeStudyModeModal()">
-                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#x"></use></svg>
-            </button>
+            <p id="confirm-modal-title-text" class="confirm-modal-title">Confirmar acción</p>
         </div>
-        <div class="fc-modal-body">
-            <p style="font-size: 0.9rem; color: var(--t3); margin: 0 0 1.25rem 0;">Elige cómo quieres repasar las tarjetas de este mazo.</p>
-            
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <label for="mode-choice-all" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1px solid var(--brand); border-radius: var(--r); cursor: pointer; background: var(--border-light); transition: all 0.2s;" id="label-mode-all">
-                    <input type="radio" id="mode-choice-all" name="study-mode-choice" value="all" checked style="margin-top: 0.25rem;">
-                    <div>
-                        <strong style="display: block; font-size: 0.9rem; color: var(--t1); margin-bottom: 0.15rem;">Estudiar Todo</strong>
-                        <span style="font-size: 0.8rem; color: var(--t3);">Repasa todas las tarjetas del mazo mezcladas aleatoriamente.</span>
-                    </div>
-                </label>
-
-
-                <label for="mode-choice-exam" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1px solid var(--border); border-radius: var(--r); cursor: pointer; transition: all 0.2s;" id="label-mode-exam">
-                    <input type="radio" id="mode-choice-exam" name="study-mode-choice" value="exam" style="margin-top: 0.25rem;">
-                    <div>
-                        <strong style="display: block; font-size: 0.9rem; color: var(--t1); margin-bottom: 0.15rem;">Modo Examen (Quizlet-style)</strong>
-                        <span style="font-size: 0.8rem; color: var(--t3);">Cuestionario de opción múltiple de 4 opciones generado automáticamente.</span>
-                    </div>
-                </label>
-            </div>
-
-            <!-- Configuración de preguntas para Modo Examen -->
-            <div id="exam-quantity-wrapper" style="display: none; margin-top: 1.25rem; padding: 0.85rem; border: 1px solid var(--border); border-radius: var(--r); background: var(--border-light);">
-                <label for="exam-question-count" style="font-size: 0.85rem; font-weight: 600; color: var(--t2); display: block; margin-bottom: 0.4rem;">Cantidad de preguntas en el cuestionario</label>
-                <select id="exam-question-count" class="fc-select">
-                    <option value="all" selected>Todas las tarjetas del mazo</option>
-                    <option value="5">5 preguntas</option>
-                    <option value="10">10 preguntas</option>
-                    <option value="15">15 preguntas</option>
-                    <option value="20">20 preguntas</option>
-                </select>
-            </div>
+        <div class="fc-modal-body fc-modal-body--centered">
+            <p id="confirm-modal-body-text"></p>
         </div>
         <div class="fc-modal-footer">
-            <button type="button" class="btn-modal-cancel" onclick="closeStudyModeModal()">Cancelar</button>
-            <button type="button" class="btn-modal-save" onclick="confirmStudySessionStart()">Iniciar Estudio</button>
+            <button
+                type="button"
+                class="btn-modal-cancel"
+                id="btn-confirm-cancel"
+                data-action="confirm-cancel"
+            >Cancelar</button>
+            <button
+                type="button"
+                class="btn-modal-save"
+                id="btn-confirm-accept"
+                data-action="confirm-accept"
+            >Aceptar</button>
         </div>
     </div>
 </div>
+
+
+{{-- ============================================================ --}}
+{{-- MODAL: SELECCIONAR MODO DE ESTUDIO                           --}}
+{{-- ============================================================ --}}
+<div
+    class="fc-overlay"
+    id="study-mode-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="study-mode-modal-title"
+    aria-hidden="true"
+>
+    <div class="fc-modal-box fc-modal-box--study-mode">
+        <div class="fc-modal-header">
+            <div class="fc-modal-title" id="study-mode-modal-title">
+                <svg width="18" height="18" aria-hidden="true" class="modal-icon-brand"><use href="{{ asset('assets/icons/sprite.svg') }}#book-open"></use></svg>
+                Modo de Estudio
+            </div>
+            <button class="fc-modal-close" data-action="close-study-mode-modal" aria-label="Cerrar selector de modo de estudio">
+                <svg width="14" height="14" aria-hidden="true"><use href="{{ asset('assets/icons/sprite.svg') }}#x"></use></svg>
+            </button>
+        </div>
+
+        <div class="fc-modal-body">
+            <p class="study-mode-intro">Elige cómo quieres repasar las tarjetas de este mazo.</p>
+
+            {{-- Radiogroup de modo de estudio --}}
+            <fieldset class="study-mode-options" aria-label="Modo de estudio">
+                <legend class="visually-hidden">Seleccionar modo de estudio</legend>
+
+                <label
+                    for="mode-choice-all"
+                    class="study-mode-label study-mode-label--active"
+                    id="label-mode-all"
+                >
+                    <input type="radio" id="mode-choice-all" name="study-mode-choice" value="all" checked>
+                    <div>
+                        <strong class="study-mode-label__name">Estudiar Todo</strong>
+                        <span class="study-mode-label__desc">Repasa todas las tarjetas del mazo mezcladas aleatoriamente.</span>
+                    </div>
+                </label>
+
+                <label
+                    for="mode-choice-exam"
+                    class="study-mode-label"
+                    id="label-mode-exam"
+                >
+                    <input type="radio" id="mode-choice-exam" name="study-mode-choice" value="exam">
+                    <div>
+                        <strong class="study-mode-label__name">Modo Examen (Quizlet-style)</strong>
+                        <span class="study-mode-label__desc">Cuestionario de opción múltiple de 4 opciones generado automáticamente.</span>
+                    </div>
+                </label>
+            </fieldset>
+
+            {{-- Configuración de preguntas para Modo Examen (slide CSS Grid) --}}
+            <div class="exam-quantity-wrapper" id="exam-quantity-wrapper">
+                <div>
+                    <div class="exam-quantity-inner">
+                        <label class="form-group__label" for="exam-question-count">Cantidad de preguntas en el cuestionario</label>
+                        <x-custom-select id="exam-question-count">
+                            <option value="all" selected>Todas las tarjetas del mazo</option>
+                            <option value="5">5 preguntas</option>
+                            <option value="10">10 preguntas</option>
+                            <option value="15">15 preguntas</option>
+                            <option value="20">20 preguntas</option>
+                        </x-custom-select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="fc-modal-footer">
+            <button type="button" class="btn-modal-cancel" data-action="close-study-mode-modal">Cancelar</button>
+            <button type="button" class="btn-modal-save" data-action="confirm-study-start">Iniciar Estudio</button>
+        </div>
+    </div>
+</div>
+
 @endsection
 
+
+{{-- ============================================================ --}}
+{{-- SCRIPTS                                                       --}}
+{{-- ============================================================ --}}
 @push('scripts')
-<!-- KaTeX JavaScript para compilar fórmulas matemáticas en el cliente -->
+{{-- KaTeX: compilación de fórmulas matemáticas en el cliente --}}
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
-<!-- Canvas Confetti para celebrar al terminar el mazo -->
+{{-- Canvas Confetti: celebración al completar el mazo --}}
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-<script src="{{ asset('js/views/flashcards.js') }}"></script>
+{{-- Módulo principal Flashcards (ES6 module — orquestador, no script global) --}}
+<script type="module" src="{{ asset('js/views/flashcards/main.js') }}"></script>
 @endpush
+
+

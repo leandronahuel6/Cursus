@@ -6,15 +6,13 @@
 <link rel="stylesheet" href="{{ asset('css/views/progreso.css') }}">
 @endpush
 
-@section('mobile-header')
-<div class="mob-hdr">
+@section('mobile-header-content')
   <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
     <div style="display: flex; flex-direction: column;">
       <div class="mob-greet">Mi Progreso 📈</div>
       <div class="mob-sub">Estadísticas y rendimiento</div>
     </div>
   </div>
-</div>
 @endsection
 
 @section('topbar-content')
@@ -142,11 +140,9 @@
             </div>
 
             <!-- Botón de guardar progreso -->
-            <div style="margin-top: 16px; text-align: right;">
-              <button class="btn-primary btn-save-avg" id="btn-save-progress">
-                Guardar Simulación
-              </button>
-            </div>
+            <button class="btn btn--success" id="btn-save-progress">
+              Guardar Simulación
+            </button>
           </div>
         </div>
 

@@ -6,12 +6,10 @@
 <link rel="stylesheet" href="{{ asset('css/views/beneficios.css') }}">
 @endpush
 
-@section('mobile-header')
-  <!-- Mobile Header -->
-  <div class="mob-hdr">
+@section('mobile-header-content')
+<!-- Mobile Header -->
     <div class="mob-greet">Beneficios Estudiantiles 🎁</div>
     <div class="mob-sub">Tus herramientas y becas universitarias</div>
-  </div>
 @endsection
 
 @section('topbar-content')

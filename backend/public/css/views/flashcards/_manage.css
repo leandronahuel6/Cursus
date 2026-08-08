@@ -1,0 +1,434 @@
+/**
+ * Flashcards — Gestión de Tarjetas (Sección Manage)
+ * Formulario de creación, listado de tarjetas, edición inline
+ * y botones de acción relacionados con la gestión de contenido.
+ */
+
+/* ==========================================================================
+   GRID DE GESTIÓN
+   ========================================================================== */
+.manage-form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 1.5rem;
+    box-shadow: var(--sh);
+    align-self: start;
+    position: sticky;
+    top: 1rem;
+}
+
+.manage-form-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 1.25rem 0;
+    color: var(--t1);
+}
+
+/* H3 encabezado de la lista de tarjetas */
+.manage-cards-heading {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    color: var(--t1);
+}
+
+/* ==========================================================================
+   GRUPOS DE FORMULARIO
+   ========================================================================== */
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group--compact {
+    margin-bottom: 0.5rem;
+}
+
+.form-group__label,
+.form-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--t3);
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ==========================================================================
+   INPUTS Y SELECTS ESTILIZADOS
+   ========================================================================== */
+.fc-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 0.6rem 0.8rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--t1);
+    outline: none;
+    transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.fc-input:focus {
+    border-color: var(--brand);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.fc-input--textarea-compact {
+    resize: vertical;
+    min-height: 50px;
+}
+
+/* Distractores: más compactos, con espacio entre ellos */
+.fc-input--distractor {
+    font-size: 0.75rem;
+    padding: 0.4rem;
+    margin-bottom: 0.4rem;
+}
+.fc-input--distractor:last-child {
+    margin-bottom: 0;
+}
+
+.fc-select {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    color: var(--t1);
+    font-size: 0.85rem;
+    outline: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all 0.2s;
+}
+
+.fc-select:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* Adaptación de selects al modo oscuro */
+body.dark-mode select.fc-input,
+body.dark-mode select.fc-select {
+    background-color: #1f2937;
+    color: #f3f4f6;
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+body.dark-mode select option,
+body.dark-mode select optgroup {
+    background-color: #111827;
+    color: #f3f4f6;
+}
+
+/* ==========================================================================
+   BOTÓN DE AÑADIR TARJETA
+   ========================================================================== */
+.btn-add-card {
+    width: 100%;
+    background: var(--brand);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--r-sm);
+    padding: 0.65rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-add-card:hover {
+    background: var(--brand-hover);
+}
+
+.btn-add-card:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.btn-add-card:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 3px;
+}
+
+/* ==========================================================================
+   LISTADO DE TARJETAS EXISTENTES
+   ========================================================================== */
+.cards-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    margin-top: 0.75rem; /* Espacio entre el h3 y la lista */
+}
+
+.card-list-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1.25rem;
+    position: relative;
+    box-shadow: var(--sh);
+    transition: border-color 0.2s;
+}
+
+.card-list-item:hover {
+    border-color: var(--t3);
+}
+
+.card-item__display {
+    /* Contenedor de la vista de lectura */
+}
+
+.card-item__qa {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.card-item__content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.card-item__stats {
+    margin-top: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Estadísticas de la tarjeta en la lista de gestión */
+.card-stat {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.card-stat--high   { color: var(--green); }
+.card-stat--medium { color: var(--yellow); }
+.card-stat--low    { color: var(--red); }
+.card-stat--none   { color: var(--t3); }
+
+/* BLOQUES Q/A */
+.qa-block__label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--t3);
+    margin-bottom: 0.15rem;
+}
+
+.qa-block__content {
+    color: var(--t1);
+    font-weight: 500;
+    line-height: 1.4;
+    font-size: 0.9rem;
+    word-break: break-word;
+}
+
+/* ACCIONES DE CADA ITEM DE TARJETA */
+.card-item__actions {
+    display: flex;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   FORMULARIO DE EDICIÓN INLINE
+   ========================================================================== */
+.card-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+/* Sección de distractores dentro del formulario de edición */
+.card-edit-form__distractors {
+    margin-top: 0.75rem;
+    margin-bottom: 1rem; /* Espacio antes del btn-add-card */
+    border-top: 1px solid var(--border);
+    padding-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.card-edit-form__actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 0.25rem;
+}
+
+/* FILA DE HEADER DE DISTRACTORES */
+.distractors-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.distractors-header-row__label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--t2);
+}
+
+/* ==========================================================================
+   BOTONES DE EDICIÓN
+   ========================================================================== */
+.btn-card-save {
+    background: var(--green);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--r-sm);
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-card-save:hover {
+    background: #15803d;
+}
+
+body.dark-mode .btn-card-save:hover {
+    background: #16a34a;
+}
+
+.btn-card-save:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+}
+
+.btn-card-cancel {
+    background: transparent;
+    color: var(--t2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-card-cancel:hover {
+    background: var(--border);
+    color: var(--t1);
+}
+
+body.dark-mode .btn-card-cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.btn-card-cancel:focus-visible {
+    outline: 2px solid var(--border);
+    outline-offset: 2px;
+}
+
+/* ==========================================================================
+   BOTÓN DE SUGERENCIA CON IA
+   ========================================================================== */
+.btn-suggest-ai {
+    background: var(--border-light);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--brand);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.btn-suggest-ai:hover {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #ffffff;
+}
+
+.btn-suggest-ai:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-suggest-ai:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+/* ==========================================================================
+   LOADER Y ERROR DE LA LISTA
+   ========================================================================== */
+.manage-loader {
+    text-align: center;
+    padding: 2rem;
+    color: var(--t3);
+    font-size: 0.9rem;
+}
+
+.manage-error {
+    text-align: center;
+    padding: 2rem;
+    color: var(--red);
+    font-size: 0.9rem;
+}
+
+.empty-state--manage {
+    text-align: center;
+    padding: 3rem;
+    color: var(--t3);
+    border: 2px dashed var(--border);
+    border-radius: var(--r);
+}
+
+/* ==========================================================================
+   RESPONSIVO
+   ========================================================================== */
+@media (max-width: 480px) {
+    .distractors-header-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    #btn-suggest-distractors {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .cards-list-container {
+        max-height: 400px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fc-input,
+    .fc-select,
+    .btn-add-card,
+    .btn-card-save,
+    .btn-card-cancel,
+    .btn-suggest-ai,
+    .card-list-item {
+        transition: none;
+    }
+}

@@ -16,11 +16,6 @@
 }
 .mob-header-actions {
   display: none;
-  position: fixed;
-  right: 16px;
-  top: 37px;
-  transform: translateY(-50%);
-  z-index: 120;
   align-items: center;
   gap: 12px;
 }
@@ -237,7 +232,6 @@ body.dark-mode .bn.on .bn-ic {
   }
   .mob-header-actions {
     display: flex;
-    position: absolute;
   }
   .bnav-row {
     gap: 6px !important;
@@ -246,12 +240,18 @@ body.dark-mode .bn.on .bn-ic {
 
   .mob-hdr {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
     background: var(--sidebar-bg);
     height: 74px;
     padding: 0 16px;
     box-sizing: border-box;
+  }
+  .mob-hdr-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
   .mob-greet {
     font-size: 16px;

@@ -14,7 +14,9 @@ html {
 html,
 body {
     max-width: 100%;
-    overflow-x: hidden;
+    height: 100dvh;
+    overflow: hidden;
+    margin: 0;
 }
 html {
     font-size: 15px;
@@ -23,8 +25,6 @@ body {
     font-family: var(--font-body);
     color: var(--t1);
     background: var(--bg);
-    min-height: 100vh;
-    overflow-y: overlay;
 }
 button,
 select,
@@ -33,11 +33,6 @@ textarea {
     font-family: inherit;
 }
 
-textarea {
-  resize: vertical;
-  min-height: 80px;
-  max-height: 300px;
-}
 /* Asegurar legibilidad global de opciones de select en modo claro y oscuro */
 select option,
 select optgroup {

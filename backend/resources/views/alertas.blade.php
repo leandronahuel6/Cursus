@@ -6,18 +6,16 @@
 <link rel="stylesheet" href="{{ asset('css/views/alertas.css') }}">
 @endpush
 
-@section('mobile-header')
-  <!-- Mobile Header -->
-  <div class="mob-hdr">
+@section('mobile-header-content')
+<!-- Mobile Header -->
     <div class="mob-greet">Alertas y Vencimientos 🔔</div>
     <div class="mob-sub">
       UTN Haedo · Agenda académica
     </div>
-  </div>
 @endsection
 
 @section('topbar-content')
-  <div class="topbar-title">Alertas y Vencimientos <span>🔔</span></div>
+  <div class="topbar-title">Alertas y Vencimientos 🔔</div>
 @endsection
 
 @section('content')
@@ -97,7 +95,7 @@
           <label style="font-size: 11px; font-weight: 600; color: var(--t2);">Monto actual de la cuota</label>
           <div class="currency-input-wrap" style="pointer-events: none; opacity: 0.8;">
             <span class="currency-input-sign">$</span>
-            <input type="text" id="cuota-monto" class="alert-form-input currency-input" readonly tabindex="-1" placeholder="—">
+            <input type="text" id="cuota-monto" class="custom-input currency-input" readonly tabindex="-1" placeholder="—">
           </div>
         </div>
         <div id="cuota-proxima-notice" style="display:none; margin-bottom:10px; font-size:12px; color:#d97706; background:rgba(217,119,6,.08); border:1px solid rgba(217,119,6,.25); border-radius:6px; padding:6px 10px;"></div>
@@ -115,25 +113,25 @@
         <form id="alert-form" onsubmit="window.handleAlertSubmit(event)">
           <div class="alert-form-group">
             <label for="alert-title">Título del Vencimiento</label>
-            <input type="text" id="alert-title" class="alert-form-input" placeholder="Ej: Parcial de Laboratorio II" required>
+            <input type="text" id="alert-title" class="custom-input" placeholder="Ej: Parcial de Laboratorio II" required>
           </div>
 
           <div class="alert-form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
               <label for="alert-type">Categoría</label>
-              <select id="alert-type" class="alert-form-input" style="height: 35px;">
+              <x-custom-select id="alert-type" name="alert_type">
                 <option value="academic">Académica</option>
                 <option value="administrative">Administrativa</option>
                 <option value="personal">Personal</option>
-              </select>
+              </x-custom-select>
             </div>
             <div>
               <label for="alert-priority">Prioridad</label>
-              <select id="alert-priority" class="alert-form-input" style="height: 35px;">
+              <x-custom-select id="alert-priority" name="alert_priority">
                 <option value="baja">Baja</option>
                 <option value="media">Media</option>
                 <option value="alta" selected>Alta</option>
-              </select>
+              </x-custom-select>
             </div>
           </div>
 
@@ -156,7 +154,7 @@
 
           <div class="alert-form-group">
             <label for="alert-date">Fecha de Vencimiento</label>
-            <input type="date" id="alert-date" class="alert-form-input" required>
+            <input type="date" id="alert-date" class="custom-input" required>
           </div>
 
           <button type="submit" class="btn-alert-submit">
@@ -174,7 +172,8 @@
     <div class="cuota-historial-card">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
         <h3 style="margin-bottom:0;"><span>📋</span> Historial de cuotas</h3>
-        <select id="cuota-historial-anio" class="alert-form-input" style="width:auto; height:32px;" onchange="window.cambiarAnioHistorial(this.value)"></select>
+        <x-custom-select id="cuota-historial-anio" name="cuota_historial_anio" class="" style="width:auto;" onchange="window.cambiarAnioHistorial(this.value)">
+        </x-custom-select>
       </div>
       <div id="cuota-historial-list" class="cuota-historial-list" style="margin-top:12px;">
         <div class="chr-empty">Cargando historial…</div>
@@ -183,34 +182,35 @@
   </div>
 
   <!-- MODAL: REGISTRAR PAGO DE LA CUOTA -->
-  <div class="grade-modal-overlay" id="pago-cuota-modal">
-    <div class="grade-modal-box">
-      <div class="grade-modal-header">Registrar pago — <span id="pago-periodo-label"></span></div>
-      <div class="grade-modal-body">
-        <div class="pago-medio-tabs">
-          <button type="button" class="pago-medio-tab active" data-medio="transferencia" onclick="window.pagoSeleccionarMedio('transferencia')">Transferencia</button>
-          <button type="button" class="pago-medio-tab" data-medio="efectivo" onclick="window.pagoSeleccionarMedio('efectivo')">Efectivo en tesorería</button>
-        </div>
-
-        <div id="pago-monto-preview" class="pago-monto-preview"></div>
-
-        <div id="pago-transferencia-fields" class="pago-field">
-          <label for="pago-comprobante">Comprobante de transferencia (imagen o PDF)</label>
-          <input type="file" id="pago-comprobante" accept=".pdf,.jpg,.jpeg,.png">
-        </div>
-
-        <div id="pago-efectivo-fields" class="pago-field" hidden>
-          <label for="pago-recibo">Foto del recibo de tesorería</label>
-          <input type="file" id="pago-recibo" accept=".pdf,.jpg,.jpeg,.png">
-          <p class="pago-efectivo-note">El pago en efectivo queda pendiente de confirmación por la secretaría contra el informe de tesorería.</p>
-        </div>
+  <x-modal id="pago-cuota-modal" title="Registrar pago" max-width="500px">
+    <div class="grade-modal-body" style="padding: 16px;">
+      <div style="font-weight: 500; color: var(--t1); margin-bottom: 16px;">
+        Período: <span id="pago-periodo-label" style="font-weight: 600; color: var(--brand);"></span>
       </div>
-      <div class="grade-modal-footer">
-        <button class="btn-modal-action cancel" onclick="window.closePagoModal()">Cancelar</button>
-        <button class="btn-modal-action save" id="pago-btn-confirmar" onclick="window.confirmarPago()">Confirmar</button>
+
+      <div class="pago-medio-tabs">
+        <button type="button" class="pago-medio-tab active" data-medio="transferencia" onclick="window.pagoSeleccionarMedio('transferencia')">Transferencia</button>
+        <button type="button" class="pago-medio-tab" data-medio="efectivo" onclick="window.pagoSeleccionarMedio('efectivo')">Efectivo en tesorería</button>
+      </div>
+
+      <div id="pago-monto-preview" class="pago-monto-preview"></div>
+
+      <div id="pago-transferencia-fields" class="pago-field">
+        <label for="pago-comprobante">Comprobante de transferencia (imagen o PDF)</label>
+        <input type="file" id="pago-comprobante" class="custom-input" accept=".pdf,.jpg,.jpeg,.png">
+      </div>
+
+      <div id="pago-efectivo-fields" class="pago-field" hidden>
+        <label for="pago-recibo">Foto del recibo de tesorería</label>
+        <input type="file" id="pago-recibo" class="custom-input" accept=".pdf,.jpg,.jpeg,.png">
+        <p class="pago-efectivo-note">El pago en efectivo queda pendiente de confirmación por la secretaría contra el informe de tesorería.</p>
       </div>
     </div>
-  </div>
+    <div class="grade-modal-footer" style="padding: 16px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px;">
+      <button class="btn btn--cancel" onclick="window.closePagoModal()">Cancelar</button>
+      <button class="btn btn--primary" id="pago-btn-confirmar" onclick="window.confirmarPago()">Confirmar</button>
+    </div>
+  </x-modal>
 @endsection
 
 @push('scripts')

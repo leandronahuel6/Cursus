@@ -551,13 +551,6 @@
   color: var(--tm);
 }
 
-/* Boton guardar promedio */
-.btn-save-avg {
-  width: 100%;
-  padding: 11px;
-  font-weight: 700;
-  border-radius: var(--r-sm);
-}
 
 /* ==============================================
    DARK MODE OVERRIDES -- al final para respetar cascada

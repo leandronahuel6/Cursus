@@ -160,6 +160,7 @@
   color: var(--t1);
 }
 .sched-modal-body {
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 16px;

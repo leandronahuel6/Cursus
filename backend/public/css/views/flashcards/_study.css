@@ -1,0 +1,781 @@
+/**
+ * Flashcards — Sesión de Estudio Activo
+ * Flip Card 3D, Modo Examen, barra de progreso, controles de resultado
+ * y pantalla de Resumen Final.
+ */
+
+/* ==========================================================================
+   BARRA DE PROGRESO DE ESTUDIO
+   ========================================================================== */
+.study-bar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.study-progress-info {
+    font-size: 0.85rem;
+    color: var(--t3);
+    font-weight: 500;
+}
+
+.study-progress-container {
+    height: 6px;
+    background: var(--border-light);
+    border-radius: 999px;
+    margin-bottom: 2.5rem;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.study-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand), #06b6d4);
+    border-radius: 999px;
+    width: 0%;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================================================
+   FLIP CARD 3D
+   ========================================================================== */
+.study-card-wrapper {
+    perspective: 1200px;
+    width: 100%;
+    height: 360px;
+    margin-bottom: 2rem;
+}
+
+.flip-card {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.flip-card:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 4px;
+    border-radius: 16px;
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.flip-card.flipped .flip-card-inner {
+    transform: rotateY(180deg);
+}
+
+/* Animación de sacudida para respuestas incorrectas */
+@keyframes card-shake {
+    0%, 100% { transform: rotateY(180deg) translateX(0); }
+    20%, 60%  { transform: rotateY(180deg) translateX(-10px); }
+    40%, 80%  { transform: rotateY(180deg) translateX(10px); }
+}
+
+.flip-card.shake-incorrect .flip-card-inner {
+    animation: card-shake 0.4s ease;
+}
+
+/* CARAS DE LA TARJETA */
+.flip-card-front,
+.flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    padding: 3rem 2.5rem 3.5rem 3.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow:
+        0 10px 25px -5px rgba(0, 0, 0, 0.05),
+        0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border);
+    /* Efecto papel de índice rayado */
+    background-color: #fcfcfc;
+    background-image:
+        linear-gradient(90deg, transparent 2.75rem, rgba(239, 68, 68, 0.35) 2.75rem, rgba(239, 68, 68, 0.35) 2.85rem, transparent 2.85rem),
+        linear-gradient(rgba(59, 130, 246, 0.12) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 2.2rem;
+    background-position: 0 0, 0 1.2rem;
+    color: #1e293b;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+body.dark-mode .flip-card-front,
+body.dark-mode .flip-card-back {
+    background-color: #1e293b;
+    background-image:
+        linear-gradient(90deg, transparent 2.75rem, rgba(239, 68, 68, 0.25) 2.75rem, rgba(239, 68, 68, 0.25) 2.85rem, transparent 2.85rem),
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 2.2rem;
+    background-position: 0 0, 0 1.2rem;
+    color: #f8fafc;
+    border-color: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+.flip-card-back {
+    transform: rotateY(180deg);
+}
+
+.flip-card-front:hover,
+.flip-card-back:hover {
+    box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.12);
+    border-color: var(--brand-dim);
+}
+
+/* ETIQUETA LATERAL (PREGUNTA / RESPUESTA / EXAMEN) */
+.card-side-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--r-sm);
+    background: var(--border-light);
+    color: var(--t3);
+    border: 1px solid var(--border);
+}
+
+/* Posicionamiento del tag dentro de la carta */
+.flip-card-front .card-side-tag-wrapper,
+.flip-card-back .card-side-tag-wrapper {
+    position: absolute;
+    top: 1.25rem;
+    left: 1.5rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+/* TEXTO DE LA TARJETA */
+.card-text {
+    font-size: 1.45rem;
+    font-weight: 500;
+    line-height: 1.6;
+    text-align: center;
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 0 0.5rem;
+    margin: auto 0;
+    word-break: break-word;
+    width: 100%;
+    font-family: var(--font-display);
+}
+
+/* Bloques de código generados por parseCardText */
+.card-code-block {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 0.75rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    text-align: left;
+    font-family: monospace;
+    font-size: 0.82rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    width: 100%;
+    white-space: pre-wrap;
+    margin: 0.75rem 0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.card-code-inline {
+    background: rgba(99, 102, 241, 0.08);
+    color: var(--brand);
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    border: 1px solid var(--brand-dim);
+    font-weight: 600;
+    display: inline-block;
+    margin: 0 0.2rem;
+    line-height: 1.2;
+    vertical-align: middle;
+}
+
+/* Listas de la tarjeta */
+.card-list {
+    text-align: left;
+    margin: 0.5rem 0 0.5rem 1.5rem;
+    list-style-type: disc;
+    width: 100%;
+}
+
+.card-list__item {
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: inherit;
+}
+
+/* ESTADÍSTICAS DE LA TARJETA (historial de repasos) */
+.card-study-stats {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--t3);
+    background: var(--border-light);
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--border);
+}
+
+/* HINT DE ACCIÓN (instrucción de voltear) */
+.card-action-hint {
+    position: absolute;
+    bottom: 1.25rem;
+    font-size: 0.78rem;
+    color: var(--t3);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    opacity: 0.8;
+}
+
+/* TECLAS DE ATAJOS ESTILIZADAS (KEYCAPS) */
+.key-hint {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    padding: 0.15rem 0.35rem;
+    font-size: 0.72rem;
+    font-family: var(--font-display), monospace;
+    margin-left: 0.25rem;
+    color: rgba(0, 0, 0, 0.5);
+    font-weight: 700;
+    box-shadow: 0 1.5px 0 rgba(0, 0, 0, 0.08);
+}
+
+body.dark-mode .key-hint {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 1.5px 0 rgba(0, 0, 0, 0.3);
+}
+
+.btn-outcome .key-hint {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    box-shadow: 0 1.5px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* BOTÓN TTS (TEXT-TO-SPEECH) */
+.btn-card-tts {
+    position: absolute;
+    top: 1.15rem;
+    right: 1.25rem;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--t3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem;
+    border-radius: var(--r-sm);
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.btn-card-tts:hover {
+    color: var(--brand);
+    background: var(--border-light);
+    border-color: var(--border);
+    transform: scale(1.08);
+}
+
+.btn-card-tts:active {
+    transform: scale(0.95);
+}
+
+.btn-card-tts:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+/* ==========================================================================
+   HINT DE VOLTEAR + CONTROLES DE RESULTADO (OVERLAP CONTAINER)
+   ========================================================================== */
+.study-actions-overlap-container {
+    display: grid;
+    grid-template-areas: 'overlap';
+    align-items: center;
+    justify-items: center;
+    margin: 1.5rem 0;
+    min-height: 54px;
+}
+
+.flip-instruction-hint {
+    grid-area: overlap;
+    margin: 0;
+    text-align: center;
+    color: var(--brand);
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: opacity 0.3s;
+}
+
+.flip-instruction-hint.hint-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* CONTROLES DE RESULTADO (correcto / incorrecto) */
+.study-controls {
+    grid-area: overlap;
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.study-controls.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.btn-outcome {
+    flex: 1;
+    max-width: 220px;
+    border: none;
+    border-radius: var(--r);
+    padding: 0.85rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #ffffff;
+    transition: all 0.2s ease;
+    box-shadow: var(--sh);
+}
+
+.btn-outcome:focus-visible {
+    outline: 3px solid rgba(255, 255, 255, 0.8);
+    outline-offset: 2px;
+}
+
+.btn-outcome-incorrect {
+    background: var(--red);
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.15);
+}
+.btn-outcome-incorrect:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(220, 38, 38, 0.25);
+}
+
+.btn-outcome-correct {
+    background: var(--green);
+    box-shadow: 0 4px 10px rgba(5, 150, 105, 0.15);
+}
+.btn-outcome-correct:hover {
+    background: #047857;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(5, 150, 105, 0.25);
+}
+
+/* ==========================================================================
+   MODO EXAMEN (OPCIÓN MÚLTIPLE)
+   ========================================================================== */
+.exam-card-wrapper {
+    width: 100%;
+    /* Altura fija para evitar CLS (Cumulative Layout Shift) al cambiar preguntas.
+     * El contenido interno hace scroll si supera este espacio. */
+    min-height: 400px;
+    margin-bottom: 2rem;
+    /* Ancho 100% implícito por ser block, pero lo declaramos para evitar saltos */
+    box-sizing: border-box;
+}
+
+.exam-card-wrapper .summary-card {
+    padding: 2.25rem;
+    text-align: left;
+    box-shadow: var(--sh-md);
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
+    width: 100%; /* Evita CLS al cambiar preguntas */
+    box-sizing: border-box;
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.exam-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem; /* Espacio entre el tag y la pregunta */
+}
+
+.card-side-tag--exam {
+    background: var(--brand-light);
+    color: var(--brand);
+    border-color: var(--brand-dim);
+}
+
+.exam-card-wrapper .card-text {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    max-height: 120px;
+    overflow-y: auto;
+    width: 100%;
+    padding: 0;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+#exam-options-grid {
+    display: grid;
+    /* minmax(0, 1fr) asegura que la columna no crezca más allá de su espacio por culpa de una palabra muy larga */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.btn-exam-option {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1.1rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--t1);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--sh);
+    display: block;
+    width: 100%;
+    line-height: 1.7;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.btn-exam-option:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+.btn-exam-option code {
+    display: inline-block;
+    margin: 0 0.25rem;
+    line-height: 1.2;
+    vertical-align: middle;
+}
+
+.btn-exam-option:hover:not(:disabled) {
+    border-color: var(--brand);
+    background: var(--border-light);
+    transform: translateY(-2px);
+    box-shadow: var(--sh-md);
+}
+
+.btn-exam-option--correct {
+    background: rgba(5, 150, 105, 0.15) !important;
+    border-color: var(--green) !important;
+    color: var(--green) !important;
+    font-weight: 600;
+}
+
+.btn-exam-option--incorrect {
+    background: rgba(220, 38, 38, 0.15) !important;
+    border-color: var(--red) !important;
+    color: var(--red) !important;
+    font-weight: 600;
+}
+
+.btn-exam-option:disabled {
+    cursor: default;
+    opacity: 0.85;
+}
+
+/* Botón "Continuar" del examen */
+.exam-next-action-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.exam-next-action-wrapper.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ==========================================================================
+   RESUMEN FINAL DE SESIÓN
+   ========================================================================== */
+.summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: var(--sh-md);
+}
+
+.summary-icon-celebrate {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    animation: pulse-glow 1.5s infinite alternate ease-in-out;
+}
+
+.summary-card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--t1);
+    margin: 0 0 0.5rem 0;
+}
+
+.summary-card > p {
+    color: var(--t3);
+    font-size: 0.95rem;
+    margin: 0 0 2rem 0;
+}
+
+/* Progreso circular SVG */
+.circular-progress-wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 2rem auto;
+}
+
+.circular-progress {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+}
+
+.circular-progress .bg-circle {
+    fill: none;
+    stroke: var(--border-light);
+    stroke-width: 10;
+}
+
+.circular-progress .fg-circle {
+    fill: none;
+    stroke: var(--brand);
+    stroke-width: 10;
+    stroke-dasharray: 377;
+    stroke-dashoffset: 377;
+    transition: stroke-dashoffset 1s ease-out;
+}
+
+.circular-progress-wrapper .percentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--t1);
+}
+
+/* Grid de estadísticas del resumen */
+.summary-stats-grid {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+}
+
+.summary-stat-box {
+    background: var(--border-light);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 0.75rem 1.25rem;
+    min-width: 110px;
+}
+
+.summary-stat-val {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.15rem;
+}
+
+.val-correct   { color: var(--green); }
+.val-incorrect { color: var(--red); }
+.val-total     { color: var(--t1); }
+
+.summary-stat-lbl {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--t3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Caja de feedback textual */
+.summary-feedback-box {
+    background: var(--brand-light);
+    border: 1px solid var(--brand-dim);
+    border-radius: var(--r);
+    padding: 1rem;
+    font-size: 0.88rem;
+    color: var(--t2);
+    margin-bottom: 2.5rem;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: left;
+}
+
+/* Variantes de color por data-variant */
+.summary-feedback-box[data-variant="success"] {
+    background: rgba(5, 150, 105, 0.1);
+    border-color: rgba(5, 150, 105, 0.3);
+}
+.summary-feedback-box[data-variant="info"] {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+.summary-feedback-box[data-variant="warning"] {
+    background: rgba(217, 119, 6, 0.1);
+    border-color: rgba(217, 119, 6, 0.3);
+}
+
+.summary-feedback-box svg {
+    flex-shrink: 0;
+    color: var(--brand);
+}
+
+/* Botones de acción del resumen */
+.summary-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.btn-summary-restart {
+    background: var(--brand);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--r);
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+}
+
+.btn-summary-restart:hover {
+    background: var(--brand-hover);
+    transform: translateY(-2px);
+}
+
+.btn-summary-restart:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 3px;
+}
+
+.btn-summary-back {
+    background: transparent;
+    color: var(--t2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-summary-back:hover {
+    background: var(--border-light);
+    color: var(--t1);
+}
+
+.btn-summary-back:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 3px;
+}
+
+/* ==========================================================================
+   RESPONSIVO
+   ========================================================================== */
+@media (max-width: 576px) {
+    .study-card-wrapper { height: 280px; margin-bottom: 1.5rem; }
+    .flip-card-front, .flip-card-back { padding: 2rem 1.5rem 2.5rem 1.5rem; }
+    .card-text { font-size: 1.15rem; }
+    .card-action-hint { font-size: 0.72rem; bottom: 1rem; }
+    .btn-outcome .key-hint { display: none; }
+    .btn-outcome { padding: 0.75rem; font-size: 0.9rem; }
+    .exam-card-wrapper { min-height: auto; }
+    .exam-card-wrapper .summary-card { padding: 1.5rem; min-height: auto; }
+    .exam-card-wrapper #exam-options-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+    .summary-card { padding: 2rem 1rem; }
+    .summary-stats-grid { gap: 0.75rem; flex-wrap: wrap; }
+    .summary-stat-box { flex: 1; min-width: 80px; padding: 0.6rem 0.5rem; }
+    .summary-actions { flex-direction: column; gap: 0.75rem; width: 100%; }
+    .btn-summary-restart, .btn-summary-back { width: 100%; max-width: none; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .flip-card-inner,
+    .study-progress-bar,
+    .study-controls,
+    .btn-outcome,
+    .btn-exam-option,
+    .btn-summary-restart,
+    .btn-card-tts,
+    .summary-icon-celebrate,
+    .circular-progress .fg-circle,
+    .exam-next-action-wrapper {
+        transition: none;
+        animation: none;
+    }
+
+    /* En lugar del flip 3D, usar un fade simple */
+    .flip-card-inner {
+        transition: opacity 0.2s ease;
+    }
+
+    .flip-card.flipped .flip-card-inner {
+        transform: none;
+        opacity: 0.7; /* Visual indication without motion */
+    }
+
+    .flip-card.shake-incorrect .flip-card-inner {
+        animation: none;
+        outline: 2px solid var(--red);
+        outline-offset: 4px;
+    }
+}

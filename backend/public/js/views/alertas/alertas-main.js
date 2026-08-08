@@ -270,14 +270,14 @@ window.openPagoModal = function(periodo) {
 
   window.pagoSeleccionarMedio(existente?.medio_pago === 'efectivo' ? 'efectivo' : 'transferencia');
   window.pagoActualizarPreview();
-  document.getElementById('pago-cuota-modal').classList.add('open');
+  document.dispatchEvent(new CustomEvent('modal:open', { detail: { id: 'pago-cuota-modal' } }));
 };
 
 /**
  * Cierra el modal de pago de cuota.
  */
 window.closePagoModal = function() {
-  document.getElementById('pago-cuota-modal').classList.remove('open');
+  document.dispatchEvent(new CustomEvent('modal:close', { detail: { id: 'pago-cuota-modal' } }));
 };
 
 /**

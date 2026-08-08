@@ -6,12 +6,10 @@
   <link rel="stylesheet" href="{{ asset('css/views/materias.css') }}">
 @endpush
 
-@section('mobile-header')
-  <!-- Mobile Header -->
-  <div class="mob-hdr">
+@section('mobile-header-content')
+<!-- Mobile Header -->
     <div class="mob-greet">Mis Materias 📚</div>
     <div class="mob-sub">UTN Haedo · Plan 2024</div>
-  </div>
 @endsection
 
 @section('topbar-content')
@@ -110,13 +108,13 @@
         </p>
         <div class="grade-select-wrapper">
           <label for="grade-select" class="grade-modal-label">Calificación Final:</label>
-          <select id="grade-select" class="grade-input-select mt-5">
+          <x-custom-select id="grade-select" class="mt-5">
             <option value="6">6 (Seis)</option>
             <option value="7">7 (Siete)</option>
             <option value="8" selected>8 (Ocho)</option>
             <option value="9">9 (Nueve)</option>
             <option value="10">10 (Diez)</option>
-          </select>
+          </x-custom-select>
         </div>
       </div>
       <div class="grade-modal-footer">
@@ -150,7 +148,7 @@
         </p>
       </div>
       <div class="modal-foot">
-        <button class="btn-cancel" data-action="close-dependency-error">Entendido</button>
+        <button class="btn btn--cancel" data-action="close-dependency-error">Entendido</button>
       </div>
     </div>
   </div>

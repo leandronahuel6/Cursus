@@ -338,11 +338,15 @@ async function handleSaveSchedule() {
 
 window.openAddModal = function(itemId, tipo) {
   const modal = document.getElementById('add-block-modal');
-  modal.style.display = 'flex';
-  modal.querySelector('.sched-modal-title').textContent = 'Agregar a la grilla';
-  const submitBtn = modal.querySelector('.sched-modal-ft button.btn-primary');
-  submitBtn.textContent = 'Agregar a grilla';
-  submitBtn.onclick = submitAddModal;
+  document.dispatchEvent(new CustomEvent('modal:open', { detail: { id: 'add-block-modal' } }));
+  const titleEl = modal.querySelector('.modal-title');
+  if (titleEl) titleEl.textContent = 'Agregar a la grilla';
+  
+  const submitBtn = modal.querySelector('.sched-modal-ft button.btn--primary');
+  if (submitBtn) {
+    submitBtn.textContent = 'Agregar a grilla';
+    submitBtn.onclick = submitAddModal;
+  }
 
   document.getElementById('modal-item-id').value = itemId;
   document.getElementById('modal-item-type').value = tipo;
@@ -353,8 +357,7 @@ window.openAddModal = function(itemId, tipo) {
     nombre = sub ? sub.nombre : '';
     document.getElementById('modal-item-name').readOnly = true;
     document.getElementById('modal-item-name').className = 'modal-inp-readonly';
-    document.getElementById('modal-commission-select').style.display = 'block';
-    document.getElementById('modal-comm-lbl').style.display = 'block';
+    document.getElementById('modal-comm-field').classList.remove('hidden');
     // Por defecto, un bloque nuevo arrastrado manualmente no tiene comisión asignada.
     // El usuario debe seleccionarla explícitamente. Cero adivinanzas.
     document.getElementById('modal-commission-select').value = '';
@@ -363,8 +366,7 @@ window.openAddModal = function(itemId, tipo) {
     nombre = act ? act.nombre : '';
     document.getElementById('modal-item-name').readOnly = false;
     document.getElementById('modal-item-name').className = 'modal-input';
-    document.getElementById('modal-commission-select').style.display = 'none';
-    document.getElementById('modal-comm-lbl').style.display = 'none';
+    document.getElementById('modal-comm-field').classList.add('hidden');
   }
 
   document.getElementById('modal-item-name').value = nombre;
@@ -376,11 +378,15 @@ window.openEditModal = function(blockId) {
   if (!block) return;
 
   const modal = document.getElementById('add-block-modal');
-  modal.style.display = 'flex';
-  modal.querySelector('.sched-modal-title').textContent = 'Editar actividad en grilla';
-  const submitBtn = modal.querySelector('.sched-modal-ft button.btn-primary');
-  submitBtn.textContent = 'Guardar cambios';
-  submitBtn.onclick = function() { submitEditModal(blockId); };
+  document.dispatchEvent(new CustomEvent('modal:open', { detail: { id: 'add-block-modal' } }));
+  const titleEl = modal.querySelector('.modal-title');
+  if (titleEl) titleEl.textContent = 'Editar actividad en grilla';
+  
+  const submitBtn = modal.querySelector('.sched-modal-ft button.btn--primary');
+  if (submitBtn) {
+    submitBtn.textContent = 'Guardar cambios';
+    submitBtn.onclick = function() { submitEditModal(blockId); };
+  }
 
   document.getElementById('modal-item-id').value = block.id;
   document.getElementById('modal-item-type').value = block.tipo;
@@ -390,16 +396,14 @@ window.openEditModal = function(blockId) {
   if (block.tipo === 'materia') {
     document.getElementById('modal-item-name').readOnly = true;
     document.getElementById('modal-item-name').className = 'modal-inp-readonly';
-    document.getElementById('modal-commission-select').style.display = 'block';
-    document.getElementById('modal-comm-lbl').style.display = 'block';
+    document.getElementById('modal-comm-field').classList.remove('hidden');
     // Hidratamos el select con la comisión guardada en el estado del bloque.
     // Si es null (sin asignar), dejamos la opción vacía seleccionada. Cero adivinanzas.
     document.getElementById('modal-commission-select').value = block.comision ?? '';
   } else {
     document.getElementById('modal-item-name').readOnly = false;
     document.getElementById('modal-item-name').className = 'modal-input';
-    document.getElementById('modal-commission-select').style.display = 'none';
-    document.getElementById('modal-comm-lbl').style.display = 'none';
+    document.getElementById('modal-comm-field').classList.add('hidden');
   }
 
   populateTimeSelects();
@@ -408,7 +412,7 @@ window.openEditModal = function(blockId) {
 };
 
 window.closeAddModal = function() {
-  document.getElementById('add-block-modal').style.display = 'none';
+  document.dispatchEvent(new CustomEvent('modal:close', { detail: { id: 'add-block-modal' } }));
 };
 
 function submitAddModal() {

@@ -7,8 +7,7 @@
   <link rel="stylesheet" href="{{ asset('css/views/area-estudio-focus.css') }}?v={{ filemtime(public_path('css/views/area-estudio-focus.css')) }}">
 @endpush
 
-@section('mobile-header')
-<div class="mob-hdr">
+@section('mobile-header-content')
   <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
     <div style="display: flex; flex-direction: column;">
       <div class="mob-greet">Área de Estudio 🕑</div>
@@ -20,7 +19,6 @@
       </div>
     </div>
   </div>
-</div>
 @endsection
 
 @section('mobile-header-actions')
@@ -281,19 +279,19 @@
       <!-- Título de la tarea -->
       <div class="modal-field">
         <label class="modal-label" for="task-modal-title">Título de la Tarea</label>
-        <input type="text" id="task-modal-title" class="modal-input" placeholder="Título de la tarea">
+        <input type="text" id="task-modal-title" class="custom-input" placeholder="Título de la tarea">
       </div>
 
       <!-- Fecha de Vencimiento -->
       <div class="modal-field">
         <label class="modal-label" for="task-modal-due">Fecha de Vencimiento</label>
-        <input type="datetime-local" id="task-modal-due" class="modal-input" onblur="window.KanbanManager.handleDateAutocomplete(this)">
+        <input type="datetime-local" id="task-modal-due" class="custom-input" onblur="window.KanbanManager.handleDateAutocomplete(this)">
       </div>
 
       <!-- Descripción -->
       <div class="modal-field">
         <label class="modal-label" for="task-modal-desc">Descripción</label>
-        <textarea id="task-modal-desc" class="modal-input" placeholder="Añadir una descripción más detallada..."></textarea>
+        <textarea id="task-modal-desc" class="custom-textarea" placeholder="Añadir una descripción más detallada..."></textarea>
       </div>
 
       <!-- Subtareas Checklist -->
@@ -304,9 +302,9 @@
             <!-- Inyectado por JS -->
           </div>
           <div class="subtask-add-row" id="subtask-add-form" style="display:none;">
-            <input type="text" id="subtask-new-txt" class="modal-input" placeholder="Nombre de la subtarea" style="flex:1; padding: 4px 8px; font-size:12px;">
-            <button class="btn-save" onclick="window.KanbanManager.saveNewSubtask()" style="padding:4px 8px; font-size:11px;">Añadir</button>
-            <button class="btn-cancel" onclick="window.KanbanManager.hideSubtaskAddInput()" style="padding:4px 8px; font-size:11px;">✕</button>
+            <input type="text" id="subtask-new-txt" class="custom-input" placeholder="Nombre de la subtarea" style="flex:1; padding: 4px 8px; font-size:12px;">
+            <button class="btn btn--success" data-js="kanban-save-subtask" style="padding:4px 8px; font-size:11px;">Añadir</button>
+            <button class="btn btn--cancel" data-js="kanban-hide-subtask-input" style="padding:4px 8px; font-size:11px;">✕</button>
           </div>
           <button class="subtask-add-btn" id="btn-show-subtask-add" onclick="window.KanbanManager.showSubtaskAddInput()">+ Añadir una subtarea</button>
         </div>
@@ -314,9 +312,9 @@
 
     </div>
     <div class="modal-foot">
-      <button class="btn-danger" onclick="window.KanbanManager.deleteTaskFromModal()" style="margin-right:auto;">Eliminar Tarea</button>
-      <button class="btn-cancel" onclick="window.KanbanManager.closeTaskModal()">Cancelar</button>
-      <button class="btn-save" onclick="window.KanbanManager.saveTaskDetails()">Guardar</button>
+      <button class="btn btn--danger" data-js="kanban-delete-task" style="margin-right:auto;">Eliminar Tarea</button>
+      <button class="btn btn--cancel" data-js="kanban-close-task-modal">Cancelar</button>
+      <button class="btn btn--success" data-js="kanban-save-task-details">Guardar</button>
     </div>
   </div>
 </div>
@@ -337,11 +335,11 @@
         <div class="modal-field">
           <label class="modal-label" for="custom-pomo-sound">Sonido de Alarma</label>
           <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <select id="custom-pomo-sound" class="modal-input" style="flex: 1;">
+            <x-custom-select id="custom-pomo-sound" name="custom_pomo_sound" class="" style="flex: 1;">
               <option value="chime">Campana Clásica (Chime)</option>
               <option value="beep">Beep Digital (Retro)</option>
               <option value="zen">Campana Zen (Relajante)</option>
-            </select>
+            </x-custom-select>
             <button type="button" class="btn-cancel" id="btn-test-sound" onclick="testSelectedSound()" style="padding: 10px 14px; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.25rem; white-space: nowrap; border-radius: 6px;" title="Probar sonido">
               🔊 Probar
             </button>
@@ -389,25 +387,25 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
           <div class="modal-field">
             <label class="modal-label" for="custom-pomo-focus">Enfoque (minutos)</label>
-            <input type="number" id="custom-pomo-focus" class="modal-input" min="1" max="90" step="1" value="25" required>
+            <input type="number" id="custom-pomo-focus" class="custom-input" min="1" max="90" step="1" value="25" required>
           </div>
           <div class="modal-field">
             <label class="modal-label" for="custom-pomo-sessions">Sesiones por Ciclo</label>
-            <input type="number" id="custom-pomo-sessions" class="modal-input" min="1" max="8" step="1" value="4" required>
+            <input type="number" id="custom-pomo-sessions" class="custom-input" min="1" max="8" step="1" value="4" required>
           </div>
           <div class="modal-field">
             <label class="modal-label" for="custom-pomo-short">Descanso Corto (minutos)</label>
-            <input type="number" id="custom-pomo-short" class="modal-input" min="1" max="30" step="1" value="5" required>
+            <input type="number" id="custom-pomo-short" class="custom-input" min="1" max="30" step="1" value="5" required>
           </div>
           <div class="modal-field">
             <label class="modal-label" for="custom-pomo-long">Descanso Largo (minutos)</label>
-            <input type="number" id="custom-pomo-long" class="modal-input" min="5" max="60" step="1" value="20" required>
+            <input type="number" id="custom-pomo-long" class="custom-input" min="5" max="60" step="1" value="20" required>
           </div>
         </div>
 
         <div class="modal-field" style="margin-top: 1rem;">
           <label class="modal-label" for="custom-pomo-cycles">Ciclos Totales</label>
-          <select id="custom-pomo-cycles" class="modal-input">
+          <x-custom-select id="custom-pomo-cycles" name="custom_pomo_cycles">
             <option value="infinite">Bucle Infinito</option>
             <option value="1">1 Ciclo</option>
             <option value="2">2 Ciclos</option>
@@ -419,7 +417,7 @@
             <option value="8">8 Ciclos</option>
             <option value="9">9 Ciclos</option>
             <option value="10">10 Ciclos</option>
-          </select>
+          </x-custom-select>
         </div>
       </div>
 
@@ -427,8 +425,8 @@
 
     </div>
     <div class="modal-foot">
-      <button class="btn-cancel" onclick="closeCustomPomoModal()">Cancelar</button>
-      <button class="btn-save" onclick="saveCustomPomoSettings()" id="btn-save-pomo">Aplicar Ajustes</button>
+      <button class="btn btn--cancel" data-js="pomo-close-custom-modal">Cancelar</button>
+      <button class="btn btn--success" data-js="pomo-save-custom-settings" id="btn-save-pomo">Aplicar Ajustes</button>
     </div>
   </div>
 </div>
@@ -445,8 +443,8 @@
       <p id="confirm-text" style="font-size: 13px; color: var(--t2); line-height: 1.4;"></p>
     </div>
     <div class="modal-foot">
-      <button class="btn-cancel" onclick="closeConfirmModal()">Cancelar</button>
-      <button class="btn-danger" id="confirm-yes-btn">Confirmar</button>
+      <button class="btn btn--cancel" data-js="modal-close">Cancelar</button>
+      <button class="btn btn--danger" id="confirm-yes-btn">Confirmar</button>
     </div>
   </div>
 </div>
@@ -617,12 +615,12 @@
       <!-- Selector de canal/estación -->
       <div class="focus-lofi-select-wrapper">
         <label for="focus-lofi-select" class="focus-lofi-label">Estación:</label>
-        <select id="focus-lofi-select" class="focus-lofi-select" onchange="window.changeLofiChannel(this.value)">
+        <x-custom-select id="focus-lofi-select" onchange="window.changeLofiChannel(this.value)">
           <option value="3yH2Wo2SaIM">☕ Lofi Girl (Estudio)</option>
           <option value="Ru3rJJaqJl4">爵 Chillhop Radio (Jazz Beats)</option>
           <option value="jdIDQ1qGutE">🌌 Synthwave Radio (Retro)</option>
           <option value="DSmS_59twmU">☕ Cafe Music Bossa Nova</option>
-        </select>
+        </x-custom-select>
       </div>
 
       <!-- Iframe contenedor -->

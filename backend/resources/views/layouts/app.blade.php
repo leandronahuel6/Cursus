@@ -97,16 +97,20 @@
   <!-- ===================== MAIN ===================== -->
   <div class="main">
 
-    <!-- Mobile header (Optional: Page specific or fallback) -->
-    @yield('mobile-header')
-    <div class="mob-header-actions">
-      @yield('mobile-header-actions')
-      <button class="theme-toggle-btn theme-toggle-mobile" data-theme-toggle aria-label="Cambiar tema" title="Cambiar tema">
-        <svg class="icon-sun" width="15" height="15"><use href="{{ asset('assets/icons/sprite.svg#sun') }}"></use></svg>
-        <svg class="icon-moon" width="15" height="15"><use href="{{ asset('assets/icons/sprite.svg#moon') }}"></use></svg>
-      </button>
-      <div class="sb-av" id="bn-av" onclick="window.toggleMobileProfileMenu(event)" style="cursor:pointer;" title="Opciones de perfil">{{ $viewerInitials ?? '' }}</div>
-    </div>
+    <!-- Mobile header (Centralizado) -->
+    <header class="mob-hdr">
+      <div class="mob-hdr-content">
+        @yield('mobile-header-content')
+      </div>
+      <div class="mob-header-actions">
+        @yield('mobile-header-actions')
+        <button class="theme-toggle-btn theme-toggle-mobile" data-theme-toggle aria-label="Cambiar tema" title="Cambiar tema">
+          <svg class="icon-sun" width="15" height="15"><use href="{{ asset('assets/icons/sprite.svg#sun') }}"></use></svg>
+          <svg class="icon-moon" width="15" height="15"><use href="{{ asset('assets/icons/sprite.svg#moon') }}"></use></svg>
+        </button>
+        <div class="sb-av" id="bn-av" onclick="window.toggleMobileProfileMenu(event)" style="cursor:pointer;" title="Opciones de perfil">{{ $viewerInitials ?? '' }}</div>
+      </div>
+    </header>
 
     <!-- Topbar (desktop) -->
     <header class="topbar">
@@ -248,11 +252,11 @@
       <form id="contact-form" onsubmit="window.handleContactSubmit(event)">
         <div class="contact-field">
           <label for="contact-type">Tipo</label>
-          <select id="contact-type" class="contact-input">
+          <x-custom-select id="contact-type">
             <option value="bug">🐛 Bug / Error</option>
             <option value="mejora">💡 Sugerencia de mejora</option>
             <option value="otro">💬 Otro</option>
-          </select>
+          </x-custom-select>
         </div>
         <div class="contact-field">
           <label for="contact-subject">Asunto</label>
@@ -317,7 +321,7 @@
         
         <div class="contact-field">
           <label for="profile-bg-preset">Fondo de Pantalla</label>
-          <select id="profile-bg-preset" class="contact-input" onchange="window.handleBgPresetChange(this.value)">
+          <x-custom-select id="profile-bg-preset" onchange="window.handleBgPresetChange(this.value)">
             <option value="none">Sin imagen (Fondo plano)</option>
             <option value="utn-haedo">Fondo UTN Haedo (Fachada - Defecto)</option>
             <option value="utn-building">Fondo UTN Haedo (Edificio)</option>
@@ -325,7 +329,7 @@
             <option value="minecraft">Minecraft (Relajante)</option>
             <option value="lofi-room">Habitación Lo-Fi (Estilo de estudio)</option>
             <option value="custom">Subir imagen propia...</option>
-          </select>
+          </x-custom-select>
         </div>
 
         <div class="contact-field" id="profile-bg-upload-container" style="display: none; margin-top: 10px;">
@@ -434,6 +438,7 @@
 <script src="{{ asset('js/views/onboarding.js') }}?v={{ filemtime(public_path('js/views/onboarding.js')) }}"></script>
 @endif
 <script src="{{ asset('js/shared/app-init.js') }}"></script>
+<script type="module" src="{{ asset('js/components/modal.js') }}"></script>
 @stack('scripts')
 
 </body>
