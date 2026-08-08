@@ -38,12 +38,12 @@ public/
 │   │   ├── topbar.css      # Barra superior (breadcrumb, acciones rápidas)
 │   │   └── mobile-nav.css  # Barra de navegación inferior para móviles
 │   ├── components/         # Elementos de UI reutilizables
-│   │   ├── buttons.css     # Estilos base de todos los botones
+│   │   ├── buttons.css     # Sistema BEM: .btn base + .btn--primary/success/danger/cancel
 │   │   ├── cards.css       # Tarjetas de contenido, estadísticas
-│   │   ├── modals.css      # Estilos compartidos para modales/overlays
+│   │   ├── modals.css      # Modal Base (<x-modal>), .modal-confirm-* y sistemas legacy (grade, contact)
 │   │   ├── tabs.css        # Sistema de pestañas
 │   │   ├── toast.css       # Notificaciones flotantes (sistema centralizado)
-│   │   ├── forms.css       # Switches, inputs, textareas
+│   │   ├── forms.css       # .custom-input, .custom-textarea, .custom-select-wrapper, switches
 │   │   └── pomo-float.css  # Widget flotante Pomodoro minimizable
 │   └── views/              # Estilos ESPECÍFICOS para cada página
 │       ├── welcome.css     # Estilos exclusivos de la landing page
@@ -81,6 +81,8 @@ public/
 │   │   ├── celebracion.js  # Efectos de celebración (confeti, animaciones)
 │   │   ├── animations.js   # Animaciones compartidas (landing, transiciones)
 │   │   └── pomo-audio-player.js # Módulo de UI puro: sintetiza alarmas con Web Audio API. Importado por area-estudio.js y pomo-float.js.
+│   ├── components/         # Módulos transversales de UI (ES6, sin lógica de vista)
+│   │   └── modal.js        # Focus Trap, Escape, overlay-click, retorno de foco. API: modal:open / modal:close events
 │   └── views/              # Lógica específica por página (orquestadores)
 │       ├── welcome.js      # Animaciones de la landing
 │       ├── dashboard.js    # Lógica del panel de inicio
@@ -157,6 +159,10 @@ resources/views/
 │   └── topbar/
 │       ├── breadcrumb.blade.php
 │       └── career-selector.blade.php
+├── components/                 # Componentes Blade reutilizables (<x-*>)
+│   ├── custom-select.blade.php # <x-custom-select> — Select estilizado con chevron SVG
+│   ├── modal.blade.php         # <x-modal> — Modal Base: overlay, box, header condicional, slot
+│   └── modal-confirm.blade.php # <x-modal-confirm> — Modal de confirmación que extiende <x-modal>
 ├── welcome/                    # La landing page descompuesta
 │   ├── welcome.blade.php       # Layout principal de la landing + Hero
 │   ├── _header.blade.php       # Barra superior de la landing
