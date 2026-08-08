@@ -17,20 +17,18 @@
   $formattedDate = ucfirst($dashboardNow->translatedFormat('l j \\d\\e F'));
 @endphp
 
-@section('mobile-header')
-  <!-- Mobile header -->
-  <div class="mob-hdr">
+@section('mobile-header-content')
+<!-- Mobile header -->
     <div class="mob-greet"><span id="greet-text-mob">{{ $greeting }}</span>, <span class="greeting-name">{{ $userName }}</span> 👋</div>
     <div class="mob-sub">
       {{ $formattedDate }}
       <span class="mob-stk skel" id="mob-racha">🔥 0 días</span>
     </div>
-  </div>
 @endsection
 
 @section('topbar-content')
   <div class="topbar-title"><span id="greet-text-topbar">{{ $greeting }}</span>, <span class="greeting-name">{{ $userName }}</span> <span>👋</span></div>
-  <button class="btn-primary" onclick="location.href='{{ route('area-estudio') }}'">▶ Empezar sesión</button>
+  <a href="{{ route('area-estudio') }}" class="btn btn--primary">▶ Empezar sesión</a>
 @endsection
 
 @section('content')

@@ -7,8 +7,7 @@
 <link rel="stylesheet" href="{{ asset('css/admin/alumnos.css') }}">
 @endpush
 
-@section('mobile-header')
-<div class="mob-hdr">
+@section('mobile-header-content')
   <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
     <div style="display: flex; flex-direction: column;">
       <div class="mob-greet" style="display: flex; align-items: center; gap: 8px;">
@@ -20,7 +19,6 @@
       <div class="mob-sub">Administración de cursada</div>
     </div>
   </div>
-</div>
 @endsection
 
 @section('topbar-content')

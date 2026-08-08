@@ -10,15 +10,13 @@
 @endpush
 
 
-@section('mobile-header')
-<div class="mob-hdr">
+@section('mobile-header-content')
   <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
     <div style="display: flex; flex-direction: column;">
       <div class="mob-greet">Simulador de Horarios 📅</div>
       <div class="mob-sub">Planificación del cuatrimestre</div>
     </div>
   </div>
-</div>
 @endsection
 
 
@@ -31,10 +29,10 @@
     </div>
   </div>
   <div class="tb-actions">
-    <button class="btn-secondary" id="btn-export-ical" onclick="exportToICS()">📅 Exportar iCal</button>
-    <button class="btn-secondary" id="btn-print-pdf" onclick="printSchedule()">🖨️ PDF / Imprimir</button>
-    <button class="btn-secondary" id="btn-clear-grid">♻ Limpiar Grilla</button>
-    <button class="btn-primary" id="btn-save-schedule">💾 Guardar Horario</button>
+    <button class="btn btn--cancel" id="btn-export-ical" onclick="window.exportToICS()">📅 Exportar iCal</button>
+    <button class="btn btn--cancel" id="btn-print-pdf" onclick="window.printSchedule()">🖨️ PDF / Imprimir</button>
+    <button class="btn btn--cancel" id="btn-clear-grid">♻ Limpiar Grilla</button>
+    <button class="btn btn--success" id="btn-save-schedule">💾 Guardar Horario</button>
   </div>
 @endsection
 
@@ -69,7 +67,7 @@
           <span>Plantillas Oficiales UTN 🏫</span>
         </div>
         <div class="sched-compare-box">
-          <select id="utn-presets-select" onchange="loadUTNPresetSchedule()">
+          <x-custom-select id="utn-presets-select" onchange="loadUTNPresetSchedule()">
             <option value="">📅 Elegir curso oficial...</option>
             <optgroup label="1° Cuatrimestre (Mañana)">
               <option value="M1A_1">1° Año M1A (1° Cuat.)</option>
@@ -93,7 +91,7 @@
               <option value="N1_2">1° Año N1 (2° Cuat. - Rotativo)</option>
               <option value="N3_2">3° Año N3 (2° Cuat. - Rotativo)</option>
             </optgroup>
-          </select>
+          </x-custom-select>
         </div>
       </div>
 
@@ -229,74 +227,68 @@
   </div><!-- /sched-main-split -->
 
   <!-- Modal emergente para añadir bloque con precisión (cuando se hace clic en "+") -->
-  <div class="sched-modal-backdrop" id="add-block-modal" style="display: none;">
-    <div class="sched-modal-card">
-      <div class="sched-modal-hd">
-        <span class="sched-modal-title">Añadir a Horarios</span>
-        <button class="sched-modal-close" onclick="closeAddModal()">✕</button>
+  <x-modal id="add-block-modal" title="Añadir a Horarios" max-width="500px">
+    <div class="sched-modal-body">
+      <input type="hidden" id="modal-item-id">
+      <input type="hidden" id="modal-item-type">
+      
+      <div class="modal-field">
+        <label class="modal-label">Asignatura / Actividad:</label>
+        <input type="text" class="modal-inp-readonly" id="modal-item-name" readonly>
       </div>
-      <div class="sched-modal-body">
-        <input type="hidden" id="modal-item-id">
-        <input type="hidden" id="modal-item-type">
-        
+
+      <div class="modal-field-row">
         <div class="modal-field">
-          <label class="modal-label">Asignatura / Actividad:</label>
-          <input type="text" class="modal-inp-readonly" id="modal-item-name" readonly>
+          <label class="modal-label">Día:</label>
+          <x-custom-select id="modal-day-select" name="modal_day">
+            <option value="1">Lunes</option>
+            <option value="2">Martes</option>
+            <option value="3">Miércoles</option>
+            <option value="4">Jueves</option>
+            <option value="5">Viernes</option>
+            <option value="6">Sábado</option>
+          </x-custom-select>
         </div>
+        <div class="modal-field" id="modal-comm-field">
+          <label class="modal-label" id="modal-comm-lbl">Comisión:</label>
+          <x-custom-select id="modal-commission-select" name="modal_commission">
+            <option value="">Sin comisión / No seleccionar</option>
+            <optgroup label="Madrugada">
+              <option value="M1A">M1A &mdash; 1° Año Mañana A</option>
+              <option value="M1B">M1B &mdash; 1° Año Mañana B</option>
+              <option value="M2">M2 &mdash; 2° Año Mañana</option>
+              <option value="M3">M3 &mdash; 3° Año Mañana</option>
+              <option value="M4">M4 &mdash; 4° Año Mañana</option>
+            </optgroup>
+            <optgroup label="Noche">
+              <option value="N1">N1 &mdash; 1° Año Noche</option>
+              <option value="N3">N3 &mdash; 3° Año Noche</option>
+            </optgroup>
+          </x-custom-select>
+        </div>
+      </div>
 
-        <div class="modal-field-row">
-          <div class="modal-field">
-            <label class="modal-label">Día:</label>
-            <select class="modal-select" id="modal-day-select">
-              <option value="1">Lunes</option>
-              <option value="2">Martes</option>
-              <option value="3">Miércoles</option>
-              <option value="4">Jueves</option>
-              <option value="5">Viernes</option>
-              <option value="6">Sábado</option>
-            </select>
-          </div>
-          <div class="modal-field">
-            <label class="modal-label" id="modal-comm-lbl">Comisión:</label>
-            <select class="modal-select" id="modal-commission-select">
-              <option value="">Sin comisión / No seleccionar</option>
-              <optgroup label="Madrugada">
-                <option value="M1A">M1A &mdash; 1° Año Mañana A</option>
-                <option value="M1B">M1B &mdash; 1° Año Mañana B</option>
-                <option value="M2">M2 &mdash; 2° Año Mañana</option>
-                <option value="M3">M3 &mdash; 3° Año Mañana</option>
-                <option value="M4">M4 &mdash; 4° Año Mañana</option>
-              </optgroup>
-              <optgroup label="Noche">
-                <option value="N1">N1 &mdash; 1° Año Noche</option>
-                <option value="N3">N3 &mdash; 3° Año Noche</option>
-              </optgroup>
-            </select>
-          </div>
+      <div class="modal-field-row">
+        <div class="modal-field">
+          <label class="modal-label">Hora Inicio:</label>
+          <x-custom-select id="modal-start-time-select" name="modal_start_time">
+            {{-- Se poblará con JS --}}
+          </x-custom-select>
         </div>
+        <div class="modal-field">
+          <label class="modal-label">Hora Fin:</label>
+          <x-custom-select id="modal-end-time-select" name="modal_end_time">
+            {{-- Se poblará con JS --}}
+          </x-custom-select>
+        </div>
+      </div>
 
-        <div class="modal-field-row">
-          <div class="modal-field">
-            <label class="modal-label">Hora Inicio:</label>
-            <select class="modal-select" id="modal-start-time-select">
-              <!-- Se poblará con JS -->
-            </select>
-          </div>
-          <div class="modal-field">
-            <label class="modal-label">Hora Fin:</label>
-            <select class="modal-select" id="modal-end-time-select">
-              <!-- Se poblará con JS -->
-            </select>
-          </div>
-        </div>
-
-        <div class="sched-modal-ft">
-          <button class="btn-secondary" onclick="closeAddModal()">Cancelar</button>
-          <button class="btn-primary" onclick="submitAddModal()">Agregar a grilla</button>
-        </div>
+      <div class="sched-modal-ft" style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+        <button class="btn btn--cancel" onclick="window.closeAddModal()">Cancelar</button>
+        <button class="btn btn--primary" onclick="window.submitAddModal()">Agregar a grilla</button>
       </div>
     </div>
-  </div>
+  </x-modal>
 @endsection
 
 @push('scripts')

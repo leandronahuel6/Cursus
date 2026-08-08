@@ -15,13 +15,11 @@
 {{-- ============================================================ --}}
 {{-- ENCABEZADO MOBILE                                            --}}
 {{-- ============================================================ --}}
-@section('mobile-header')
-<div class="mob-hdr">
-    <div class="mob-hdr__content">
+@section('mobile-header-content')
+  <div class="mob-hdr__content">
         <div class="mob-greet">Flashcards de Estudio 🧠</div>
         <div class="mob-sub">Mis mazos y repaso</div>
     </div>
-</div>
 @endsection
 
 {{-- ============================================================ --}}
@@ -422,14 +420,13 @@
                 </div>
                 <div class="form-group">
                     <label class="form-group__label" for="deck-select-category">Contenedor / Carpeta</label>
-                    <select
+                    <x-custom-select
                         id="deck-select-category"
-                        class="fc-input"
                         data-action="deck-category-change"
                     >
                         <option value="General">General (Sin contenedor)</option>
                         <option value="__NEW__">+ Crear nuevo contenedor...</option>
-                    </select>
+                    </x-custom-select>
 
                     {{-- Campo de nombre del nuevo contenedor (slide CSS Grid) --}}
                     <div class="new-category-wrapper" id="new-category-input-wrapper">
@@ -541,24 +538,23 @@
 
                 <div class="form-group">
                     <label class="form-group__label" for="ai-deck-cards-count">Cantidad de flashcards a generar</label>
-                    <select id="ai-deck-cards-count" name="cantidad" class="fc-select">
+                    <x-custom-select id="ai-deck-cards-count" name="cantidad">
                         <option value="5">5 tarjetas (Rápido)</option>
                         <option value="10" selected>10 tarjetas (Recomendado)</option>
                         <option value="15">15 tarjetas (Completo)</option>
                         <option value="20">20 tarjetas (Extenso)</option>
-                    </select>
+                    </x-custom-select>
                 </div>
 
                 <div class="form-group">
                     <label class="form-group__label" for="ai-deck-select-category">Contenedor / Carpeta de destino</label>
-                    <select
+                    <x-custom-select
                         id="ai-deck-select-category"
-                        class="fc-input"
                         data-action="ai-deck-category-change"
                     >
                         <option value="__AUTO__">Auto-detectar con IA ✨</option>
                         <option value="General">General (Sin contenedor)</option>
-                    </select>
+                    </x-custom-select>
 
                     {{-- Campo de nuevo contenedor (slide CSS Grid) --}}
                     <div class="new-category-wrapper" id="ai-new-category-input-wrapper">
@@ -709,13 +705,13 @@
                 <div>
                     <div class="exam-quantity-inner">
                         <label class="form-group__label" for="exam-question-count">Cantidad de preguntas en el cuestionario</label>
-                        <select id="exam-question-count" class="fc-select">
+                        <x-custom-select id="exam-question-count">
                             <option value="all" selected>Todas las tarjetas del mazo</option>
                             <option value="5">5 preguntas</option>
                             <option value="10">10 preguntas</option>
                             <option value="15">15 preguntas</option>
                             <option value="20">20 preguntas</option>
-                        </select>
+                        </x-custom-select>
                     </div>
                 </div>
             </div>

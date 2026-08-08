@@ -102,12 +102,12 @@
 
                 <div class="form-group">
                     <label class="form-label" for="contact-subject">Tipo de consulta</label>
-                    <select id="contact-subject" class="form-select">
+                    <x-custom-select id="contact-subject" name="contact_subject" class="">
                         <option value="academica">Consulta Académica</option>
                         <option value="soporte">Soporte Técnico / Problemas</option>
                         <option value="arancel">Consulta Administrativa (Aranceles)</option>
                         <option value="sugerencia" selected>Sugerencia / Feedback</option>
-                    </select>
+                    </x-custom-select>
                 </div>
 
                 <div class="form-group">
