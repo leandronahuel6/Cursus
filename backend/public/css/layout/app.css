@@ -1,10 +1,11 @@
-.app { display: flex; min-height: 100vh; }
+.app { display: flex; height: 100%; overflow: hidden; }
 
 .main {
   flex: 1;
   margin-left: var(--sidebar-w);
   display: flex; flex-direction: column;
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
   min-width: 0;
   max-width: calc(100% - var(--sidebar-w));
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -15,7 +16,13 @@ body.sidebar-collapsed .main {
   max-width: calc(100% - var(--sidebar-w-collapsed));
 }
 
-.page { flex: 1; padding: 20px 24px 36px; display: flex; flex-direction: column; gap: 16px; }
+.page { flex: 1; padding: 20px 24px 36px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+
+@media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
+  .page {
+    scrollbar-gutter: stable;
+  }
+}
 
 .dashboard-bg {
   position: fixed;
