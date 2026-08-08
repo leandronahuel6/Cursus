@@ -1670,3 +1670,41 @@ window.toggleFocusSubtasksDrawer = toggleFocusSubtasksDrawer;
 window.renderFocusSubtasks     = renderFocusSubtasks;
 window.toggleFocusSubtaskStatus = toggleFocusSubtaskStatus;
 window.toggleFullscreen        = toggleFullscreen;
+
+/* ==========================================================================
+   DELEGACIÓN DE EVENTOS — data-js (reemplaza inline onclick en Blade)
+   Solo maneja eventos del propio Área de Estudio (kanban + pomo).
+   ========================================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('click', (event) => {
+        const target = event.target.closest('[data-js]');
+        if (!target) return;
+
+        switch (target.dataset.js) {
+            // Kanban: subtarea inline
+            case 'kanban-save-subtask':
+                window.KanbanManager?.saveNewSubtask();
+                break;
+            case 'kanban-hide-subtask-input':
+                window.KanbanManager?.hideSubtaskAddInput();
+                break;
+            // Kanban: modal de tarea
+            case 'kanban-delete-task':
+                window.KanbanManager?.deleteTaskFromModal();
+                break;
+            case 'kanban-close-task-modal':
+                window.KanbanManager?.closeTaskModal();
+                break;
+            case 'kanban-save-task-details':
+                window.KanbanManager?.saveTaskDetails();
+                break;
+            // Pomodoro: modal de configuración
+            case 'pomo-close-custom-modal':
+                closeCustomPomoModal();
+                break;
+            case 'pomo-save-custom-settings':
+                saveCustomPomoSettings();
+                break;
+        }
+    });
+});
