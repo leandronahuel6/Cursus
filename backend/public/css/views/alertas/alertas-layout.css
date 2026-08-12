@@ -1,0 +1,144 @@
+/* =============================================================================
+   ALERTAS — LAYOUT
+   Estructura de la grilla principal, columnas y contenedores macro.
+   BEM: .alertas-grid, .col-left, .col-right
+   Vista incluida en: alertas.blade.php
+   ============================================================================= */
+
+/**
+ * @fileoverview Estilos de layout y estructura general de la página de Alertas.
+ * Contiene la grilla principal de dos columnas, el switcher de vista
+ * (Lista / Calendario) y los wrappers de contenedor de primer nivel.
+ */
+
+/* ── Grilla de dos columnas ────────────────────────────────────────────────── */
+.alertas-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.alertas-grid .col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Switcher de Vista (Lista / Calendario) ─────────────────────────────────── */
+.view-switcher {
+  display: flex;
+  background: var(--border-light);
+  padding: 4px;
+  border-radius: var(--r-sm);
+  margin-bottom: 15px;
+  width: fit-content;
+}
+
+.view-btn {
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 500;
+  border-radius: var(--r-sm);
+  color: var(--t3);
+  transition: all .2s;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.view-btn.active {
+  background: var(--surface);
+  color: var(--brand);
+  box-shadow: var(--sh);
+}
+
+/* ── Banner de alerta de cuota ──────────────────────────────────────────────── */
+/**
+ * El banner de cuota impaga se muestra/oculta via la clase `.is-visible`.
+ * La clase `.alert--urgent` aplica colores de urgencia (rojo).
+ * La clase `.alert--warn` aplica colores de advertencia (naranja).
+ * JS añade/quita estas clases en lugar de manipular estilos inline.
+ */
+.cuota-pago-alert {
+  display: none; /* Oculto por defecto; JS agrega .is-visible para mostrarlo */
+  align-items: center;
+  gap: 10px;
+  border: 1px solid transparent;
+  border-left-width: 4px;
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+}
+
+.cuota-pago-alert.is-visible {
+  display: flex;
+}
+
+.cuota-pago-alert.alert--warn {
+  background: #fff7ed;
+  border-color: #fcd9a0;
+  border-left-color: #f97316;
+}
+
+.cuota-pago-alert.alert--urgent {
+  background: #fef2f2;
+  border-color: #fecaca;
+  border-left-color: var(--red);
+}
+
+.cuota-pago-alert__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cuota-pago-alert.alert--warn  .cuota-pago-alert__dot { background: #f97316; }
+.cuota-pago-alert.alert--urgent .cuota-pago-alert__dot { background: var(--red); }
+
+.cuota-pago-alert__text {
+  flex: 1;
+  font-size: 12.5px;
+}
+
+.cuota-pago-alert__title {
+  font-weight: 700;
+}
+
+.cuota-pago-alert.alert--warn  .cuota-pago-alert__title { color: #92400e; }
+.cuota-pago-alert.alert--urgent .cuota-pago-alert__title { color: var(--red); }
+
+.cuota-pago-alert__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  color: var(--t3);
+  cursor: pointer;
+  font-size: 12px;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+
+.cuota-pago-alert__close:hover {
+  background: var(--border-light);
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .alertas-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view-btn,
+  .cuota-pago-alert__close {
+    transition: none;
+  }
+}

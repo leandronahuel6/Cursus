@@ -1,0 +1,181 @@
+/* =============================================================================
+   ALERTAS — FORMULARIO
+   Formulario de carga de alerta, paleta de colores, inputs y card de cuota.
+   BEM: .alert-form-card, .alert-form-group, .alert-color-palette, .btn-alert-submit
+   Vista incluida en: alertas.blade.php
+   ============================================================================= */
+
+/**
+ * @fileoverview Estilos del formulario de creación de alertas y la tarjeta
+ * de cuota universitaria de la columna derecha.
+ * Contiene la paleta de swatches de color, el input de moneda y el botón
+ * de envío principal.
+ */
+
+/* ── Card contenedora del formulario ────────────────────────────────────────── */
+.alert-form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 18px;
+  box-shadow: var(--sh);
+}
+
+/* ── Título de la card ──────────────────────────────────────────────────────── */
+.alert-form-card__title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--t1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alert-form-card__title svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--brand);
+}
+
+/* Variante con más margen inferior para la card del formulario de alerta */
+.alert-form-card__title--spaced {
+  margin-bottom: 14px;
+}
+
+/* ── Subtítulo/descripción de la card ───────────────────────────────────────── */
+.alert-form-card__subtitle {
+  font-size: 11.5px;
+  color: var(--t3);
+  margin-bottom: 14px;
+}
+
+/* ── Grupo de campo del formulario ──────────────────────────────────────────── */
+.alert-form-group {
+  margin-bottom: 12px;
+}
+
+.alert-form-group label,
+.alert-form-group .fake-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--t2);
+  margin-bottom: 6px;
+}
+
+/* ── Grid de dos columnas para campos de formulario ─────────────────────────── */
+.alert-form-group--grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ── Input de moneda ────────────────────────────────────────────────────────── */
+.currency-input-wrap {
+  position: relative;
+}
+
+.currency-input-wrap--readonly {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.currency-input-sign {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t3);
+  pointer-events: none;
+}
+
+.currency-input-wrap .currency-input {
+  padding-left: 24px;
+}
+
+/* ── Aviso de próxima cuota (inline notice) ─────────────────────────────────── */
+.cuota-proxima-notice {
+  display: none; /* JS agrega la clase .is-visible */
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: var(--yellow);
+  background: rgba(217, 119, 6, .08);
+  border: 1px solid rgba(217, 119, 6, .25);
+  border-radius: var(--r-sm);
+  padding: 6px 10px;
+}
+
+.cuota-proxima-notice.is-visible {
+  display: block;
+}
+
+/* ── Info de pago del mes actual ────────────────────────────────────────────── */
+.cuota-pago-info {
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--t3);
+}
+
+/* ── Paleta de swatches de color ────────────────────────────────────────────── */
+.alert-color-palette {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.alert-color-swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.14);
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.alert-color-swatch:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.2), 0 2px 6px rgba(15, 23, 42, 0.14);
+}
+
+.alert-color-swatch.selected {
+  box-shadow: 0 0 0 2px var(--brand), 0 2px 6px rgba(15, 23, 42, 0.14);
+}
+
+.alert-color-swatch:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Colores de cada swatch */
+.alert-color-swatch[data-color="#2563eb"] { background: #2563eb; }
+.alert-color-swatch[data-color="#0ea5e9"] { background: #0ea5e9; }
+.alert-color-swatch[data-color="#14b8a6"] { background: #14b8a6; }
+.alert-color-swatch[data-color="#22c55e"] { background: #22c55e; }
+.alert-color-swatch[data-color="#84cc16"] { background: #84cc16; }
+.alert-color-swatch[data-color="#eab308"] { background: #eab308; }
+.alert-color-swatch[data-color="#f97316"] { background: #f97316; }
+.alert-color-swatch[data-color="#ef4444"] { background: #ef4444; }
+.alert-color-swatch[data-color="#ec4899"] { background: #ec4899; }
+.alert-color-swatch[data-color="#8b5cf6"] { background: #8b5cf6; }
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .alert-form-group--grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .alert-color-palette {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alert-color-swatch {
+    transition: none;
+  }
+}
