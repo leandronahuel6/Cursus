@@ -68,22 +68,24 @@ export function resolveAlertColor(alerta) {
   return alerta.color || CATEGORY_DEFAULT_COLOR[alerta.categoria] || '#2563eb';
 }
 
-export function categoriaIcon(categoria) {
-  if (categoria === 'academic') return '📝';
-  if (categoria === 'administrative') return '💼';
-  if (categoria === 'personal') return '🎯';
-  return '📌';
-}
-
+/**
+ * Genera el texto y la clase CSS para el badge de fecha de una alerta.
+ * Devuelve un objeto con el texto a mostrar y una clase CSS modificadora
+ * (en lugar de un string de estilo inline).
+ *
+ * @param {number} diffDays - Días de diferencia desde hoy (negativo = vencida).
+ * @param {string} fecha - Fecha de la alerta en formato YYYY-MM-DD.
+ * @returns {{ text: string, cssClass: string }} Texto y clase CSS para el badge.
+ */
 export function getAlertDateText(diffDays, fecha) {
   if (diffDays < 0) {
-    return { text: `Vencido hace ${Math.abs(diffDays)} días`, cls: 'style="color: var(--red); font-weight: 600;"' };
+    return { text: `Vencida hace ${Math.abs(diffDays)} días`, cssClass: 'alert-date-badge--overdue' };
   } else if (diffDays === 0) {
-    return { text: 'Vence hoy 📅', cls: 'style="color: var(--red); font-weight: 600;"' };
+    return { text: 'Vence hoy', cssClass: 'alert-date-badge--today' };
   } else if (diffDays === 1) {
-    return { text: 'Vence mañana ⏰', cls: 'style="color: var(--orange); font-weight: 600;"' };
+    return { text: 'Vence mañana', cssClass: 'alert-date-badge--soon' };
   }
-  return { text: `En ${diffDays} días (${formatDateStr(fecha)})`, cls: 'style="color: var(--t2);"' };
+  return { text: `En ${diffDays} días (${formatDateStr(fecha)})`, cssClass: '' };
 }
 
 // ── Debounce / Throttle ─────────────────────────────────────────────────────
@@ -138,7 +140,6 @@ window.CursusUtils = {
   CATEGORY_DEFAULT_COLOR,
   ALERT_COLOR_PALETTE,
   resolveAlertColor,
-  categoriaIcon,
   getAlertDateText,
   debounce,
   throttle,
