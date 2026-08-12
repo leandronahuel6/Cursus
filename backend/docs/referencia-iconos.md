@@ -9,13 +9,13 @@ Este documento contiene la especificación clara, mejorada y ordenada de dónde 
 - `chevron-up.svg`: Utilizado en la esquina derecha del bloque de perfil dentro del Sidebar.
 - `chevron-down.svg`: Utilizado como caret (flecha) desplegable en el selector de materias activas (`/area-estudio`) y para desplegar/contraer materias (`/flashcards`).
 - `move-right.svg`: Se utiliza en los enlaces de navegación de bloques en `/dashboard`: "Materias este cuatrimestre", "Ver todas", "Ver Kanban", y en los bloques de "Estudiar otra Materia". _(Nota: Ha sido quitado del botón "Continuar estudiando" en /dashboard)_.
-- `x.svg`: Botón de cerrar en el menú/modal de perfil móvil en la cabecera. Esquina derecha en "Alerta próxima" (`/dashboard`). Esquina derecha en el Bloque superior en el Modal de tarea, botón Esquina Derecha al cliquear "Añadir una subtarea" en Modal de tarea, esquina derecha en Bloque superior en Modal de Ajustes Pomodoro Personalizado (`/area-estudio`). Esquina superior derecha en bloques de la grilla del simulador y en el bloque superior del Modal "Agregar a la grilla" (`/horarios`), y como el 2do botón en el extremo derecho en el Bloque de Aviso (`/alertas`). Se utiliza también para el estado de las sesiones 'Abandonada' en 'Sesiones Completadas Hoy' (`/area-estudio`) y para cerrar modales de edición/creación (`/flashcards`).
+- `x.svg`: Botón de cerrar en el menú/modal de perfil móvil en la cabecera. Esquina derecha en "Alerta próxima" (`/dashboard`). Esquina derecha en el Bloque superior en el Modal de tarea, botón Esquina Derecha al cliquear "Añadir una subtarea" en Modal de tarea, esquina derecha en Bloque superior en Modal de Ajustes Pomodoro Personalizado (`/area-estudio`). Esquina superior derecha en bloques de la grilla del simulador y en el bloque superior del Modal "Agregar a la grilla" (`/horarios`). Se utiliza también para el estado de las sesiones 'Abandonada' en 'Sesiones Completadas Hoy' (`/area-estudio`) y para cerrar modales de edición/creación (`/flashcards`).
 - `plus.svg`: Utilizado en el botón "Agregar tarea" en las Columnas del Tablero Kanban, y "Añadir una subtarea" en el Modal de tarea (`/area-estudio`). También en el botón "Agregar actividad" debajo de todas las tarjetas de Actividades Personales (`/horarios`). Reemplaza el caracter "+" en los botones de cada materia para sumar nota y en el botón derecho de aprobadas por cuatrimestre (`/progreso`), y en los botones "Nuevo Mazo" y "Crear Mazo" (`/flashcards`).
 - `minus.svg`: Reemplaza el caracter "-" en los botones de cada materia para restar nota y en el botón izquierdo de aprobadas por cuatrimestre (`/progreso`).
-- `check.svg`: Utilizado para indicar Materias Aprobadas (`/materias`), como el 1er botón en el extremo derecho en el Bloque de Aviso (`/alertas`), y para el estado de las sesiones 'Parcial' en 'Sesiones Completadas Hoy' (`/area-estudio`).
+- `check.svg`: Utilizado para indicar Materias Aprobadas (`/materias`), como el botón "Marcar como Completado" en una alerta (`/alertas`), y para el estado de las sesiones 'Parcial' en 'Sesiones Completadas Hoy' (`/area-estudio`).
 - `check-check.svg`: Utilizado para el estado de las sesiones 'Completada' en 'Sesiones Completadas Hoy' (`/area-estudio`).
 - `cloud-alert.svg`: Utilizado como indicador de sesiones no sincronizadas con el servidor ('Offline') en 'Sesiones Completadas Hoy' y en el header del Área de Estudio cuando hay sincronización pendiente (`/area-estudio`).
-- `trash-2.svg`: Icono de eliminación. Se muestra en la esquina superior derecha al hacer `:hover` sobre una tarjeta de tarea, en la esquina derecha en cada subtarea en "Subtareas (Checklist)" en el Modal de tarea, y al hacer `:hover` en la tarjeta de Marcador (en la esquina derecha, siendo el 3er botón de izquierda a derecha) (`/area-estudio`). Además, aparece en el extremo derecho al hacer `:hover` sobre los Bloques de Mis Actividades Personales, y en el botón "Eliminar" en el bloque que aparece al cliquear una tarjeta en la grilla (`/horarios`), y al eliminar mazos o tarjetas (`/flashcards`).
+- `trash-2.svg`: Icono de eliminación. Se muestra en la esquina superior derecha al hacer `:hover` sobre una tarjeta de tarea, en la esquina derecha en cada subtarea en "Subtareas (Checklist)" en el Modal de tarea, y al hacer `:hover` en la tarjeta de Marcador (en la esquina derecha, siendo el 3er botón de izquierda a derecha) (`/area-estudio`). Además, aparece en el extremo derecho al hacer `:hover` sobre los Bloques de Mis Actividades Personales, y en el botón "Eliminar" en el bloque que aparece al cliquear una tarjeta en la grilla (`/horarios`), y al eliminar mazos o tarjetas (`/flashcards`). Botón "Eliminar Alerta" (`/alertas`).
 - `pen.svg`: Icono de edición. Al hacer `:hover` en una tarjeta de Marcador, se ubica en la esquina derecha como el 2do botón de izquierda a derecha (`/area-estudio`). También se usa para editar mazos y tarjetas (`/flashcards`).
 - `settings.svg`: Botón de Ajustes para Pomodoro Personalizado, ubicado en la esquina derecha del bloque superior del Temporizador pomodoro (`/area-estudio`).
 - `sun.svg`: Botón de cambio de tema (modo claro) en la cabecera superior (escritorio y móvil).
@@ -35,7 +35,7 @@ Este documento contiene la especificación clara, mejorada y ordenada de dónde 
 - `panel-left-open.svg`: Al hacer `:hover` sobre el botón con `cursus-logo.svg` cuando el sidebar está cerrado.
 - `layout-dashboard.svg`: Icono para enlace "Inicio" (Sidebar).
 - `library.svg`: Icono para enlace "Mis Materias" (Sidebar).
-- `clock.svg`: Icono para enlace "Área de Estudio" (Sidebar) y para el "Historial de Pagos" (`/alertas`).
+- `clock.svg`: Icono para enlace "Área de Estudio" (Sidebar).
 - `calendar.svg`: Icono para enlace "Simulador de Horarios" (Sidebar) y para indicador "Vence [fecha]" (`/area-estudio`).
 - `gift.svg`: Icono para enlace "Beneficios" (Sidebar).
 - `bell.svg`: Icono para enlace "Alertas" (Sidebar) y en el título "Alertas y Vencimientos" (`/alertas`).
@@ -79,8 +79,9 @@ Este documento contiene la especificación clara, mejorada y ordenada de dónde 
 - `map.svg`: "Plan de Estudios" (`/materias`).
 - `chart-column.svg`: "Promedio Proyectado" (`/progreso`).
 - `zap.svg`: "Productividad de Estudio" (`/progreso`).
-- `wallet.svg`: Icono específico para Alerta categoría "Pago" (`/alertas`).
 - `briefcase-business.svg`: Icono específico para Alerta categoría "Administrativa" (`/alertas`).
+- `clipboard-clock.svg`: Título de la sección "Historial de cuotas" en la columna inferior de la página de alertas (`/alertas`). Se muestra en el `<h3>` de la card `.cuota-historial-card`.
+- `banknote.svg`: Título de la card "Cuota de la Universidad" en la columna derecha del formulario de alertas (`/alertas`). Se muestra en el `<h3>` de la card `.alert-form-card` correspondiente al monto vigente de cuota.
 
 ---
 
@@ -88,18 +89,18 @@ Este documento contiene la especificación clara, mejorada y ordenada de dónde 
 
 El sistema global de toasts (`js/shared/toast.js`) utiliza exclusivamente íconos del sprite SVG local. Cada tipo tiene su propio ícono semánticamente apropiado:
 
-| Estado (`type`) | Ícono Sprite | ID en Sprite | Color aplicado |
-|----------------|--------------|-------------|----------------|
-| `success` | `circle-check.svg` | `#circle-check` | `var(--green)` (borde izquierdo) |
-| `error` | `circle-x.svg` | `#circle-x` | `var(--red)` (borde izquierdo) |
-| `warn` | `circle-alert.svg` | `#circle-alert` | `var(--orange)` (borde izquierdo) |
-| `info` | `info.svg` | `#info` | `var(--brand)` (borde izquierdo) |
+| Estado (`type`) | Ícono Sprite       | ID en Sprite    | Color aplicado                    |
+| --------------- | ------------------ | --------------- | --------------------------------- |
+| `success`       | `circle-check.svg` | `#circle-check` | `var(--green)` (borde izquierdo)  |
+| `error`         | `circle-x.svg`     | `#circle-x`     | `var(--red)` (borde izquierdo)    |
+| `warn`          | `circle-alert.svg` | `#circle-alert` | `var(--orange)` (borde izquierdo) |
+| `info`          | `info.svg`         | `#info`         | `var(--brand)` (borde izquierdo)  |
 
 El botón de cierre de cada toast utiliza:
 
-| Elemento | Ícono Sprite | ID en Sprite |
-|----------|-------------|-------------|
-| Botón "cerrar" | `x.svg` | `#x` |
+| Elemento       | Ícono Sprite | ID en Sprite |
+| -------------- | ------------ | ------------ |
+| Botón "cerrar" | `x.svg`      | `#x`         |
 
 ### Uso en HTML generado
 
