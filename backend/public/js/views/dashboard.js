@@ -1,5 +1,7 @@
 // Cursus - Inicio: materias del cuatrimestre traídas desde la base de datos
 
+import { SystemBanner } from '../components/banners.js';
+
 const ESTADO_BADGE = {
   cursando: { label: 'Cursando', clase: 'badge--info' },
   regular: { label: 'Regular', clase: 'badge--warning' },
@@ -381,8 +383,7 @@ async function loadAlertaDestacada() {
       : dias === 1 ? 'vence mañana'
       : `vence en ${dias} días`;
 
-    document.getElementById('js-alert-text').textContent = `${masUrgente.titulo} (${cuando}).`;
-    banner.style.display = 'flex';
+    SystemBanner.show('js-alert', 'urgent', null, `${masUrgente.titulo} (${cuando}).`);
   } catch (e) {
     console.error('No se pudo cargar la alerta destacada', e);
   }

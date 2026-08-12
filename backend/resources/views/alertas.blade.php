@@ -3,6 +3,7 @@
 @section('title', 'Cursus - Alertas y Vencimientos')
 
 @push('styles')
+  <link rel="stylesheet" href="{{ asset('css/components/banners.css') }}">
   <link rel="stylesheet" href="{{ asset('css/views/alertas/alertas-layout.css') }}">
   <link rel="stylesheet" href="{{ asset('css/views/alertas/alertas-list.css') }}">
   <link rel="stylesheet" href="{{ asset('css/views/alertas/alertas-calendar.css') }}">
@@ -24,26 +25,9 @@
 
   {{-- ── AVISO DE CUOTA SIN PAGAR ─────────────────────────────────────────── --}}
   {{-- Visible a partir del 1° de cada mes hasta que se registre el pago.      --}}
-  {{-- JS añade la clase .is-visible y .alert--urgent / .alert--warn.           --}}
-  <div class="cuota-pago-alert"
-       id="cuota-pago-alert"
-       role="alert"
-       aria-live="polite"
-       aria-atomic="true">
-    <div class="cuota-pago-alert__dot" id="cuota-pago-alert-dot" aria-hidden="true"></div>
-    <div class="cuota-pago-alert__text">
-      <strong class="cuota-pago-alert__title" id="cuota-pago-alert-title">Alerta de pago:</strong>
-      <span id="cuota-pago-alert-text"></span>
-    </div>
-    <button class="cuota-pago-alert__close"
-            id="cuota-pago-alert-close"
-            type="button"
-            aria-label="Cerrar aviso de cuota">
-      <svg width="14" height="14" aria-hidden="true" focusable="false">
-        <use href="{{ asset('assets/icons/sprite.svg#x') }}"></use>
-      </svg>
-    </button>
-  </div>
+  <x-system-banner id="cuota-pago-alert" title="Alerta de pago:">
+    <span class="system-banner__dynamic-text" id="cuota-pago-alert-text"></span>
+  </x-system-banner>
 
   {{-- ── GRILLA PRINCIPAL (Izquierda: Lista/Calendario | Derecha: Formulario) ─ --}}
   <div class="alertas-grid">

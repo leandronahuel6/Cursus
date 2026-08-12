@@ -29,6 +29,8 @@ import { spriteIcon } from '../../shared/sprite.js';
 
 import { formatPeriodoCuota } from './alertas-data.js';
 
+import { SystemBanner } from '../../components/banners.js';
+
 // ── Constantes ───────────────────────────────────────────────────────────────
 
 /**
@@ -245,16 +247,11 @@ function _priorityBadgeClass(prioridad) {
  * @returns {void}
  */
 export function renderEstadoPagoCuota(estado, cuotaMontoVigente = null) {
-  const banner      = document.getElementById('cuota-pago-alert');
-  const bannerTitle = document.getElementById('cuota-pago-alert-title');
-  const bannerText  = document.getElementById('cuota-pago-alert-text');
   const info        = document.getElementById('cuota-pago-info');
   const btnPagar    = document.getElementById('btn-abrir-pago');
 
-  if (!banner) return;
-
   if (estado.pagado) {
-    banner.classList.remove('is-visible', 'alert--urgent', 'alert--warn');
+    SystemBanner.hide('cuota-pago-alert');
     if (info)     info.textContent = `✓ Cuota de este mes pagada el ${formatDateStr(estado.fecha_pago)}.`;
     if (btnPagar) btnPagar.disabled = true;
     return;
@@ -264,20 +261,18 @@ export function renderEstadoPagoCuota(estado, cuotaMontoVigente = null) {
   if (info) info.textContent = 'Todavía no registraste el pago de este mes.';
 
   const urgente = estado.dias_para_vencimiento <= 3;
-
-  banner.classList.remove('alert--urgent', 'alert--warn');
-  banner.classList.add('is-visible', urgente ? 'alert--urgent' : 'alert--warn');
-
-  if (bannerTitle) bannerTitle.textContent = urgente ? '¡Atención!' : 'Alerta de pago:';
-
-  if (bannerText) {
-    if (cuotaMontoVigente != null) {
-      const montoConRecargo = (cuotaMontoVigente * 1.10).toLocaleString('es-AR', { minimumFractionDigits: 2 });
-      bannerText.textContent = `Recordá que si el pago es luego del día 15 se debe pagar un 10% de recargo: $${montoConRecargo}.`;
-    } else {
-      bannerText.textContent = 'Recordá que si el pago es luego del día 15 se debe pagar un 10% de recargo.';
-    }
+  const bannerType = urgente ? 'urgent' : 'warn';
+  const bannerTitle = urgente ? '¡Atención!' : 'Alerta de pago:';
+  
+  let bannerText = '';
+  if (cuotaMontoVigente != null) {
+    const montoConRecargo = (cuotaMontoVigente * 1.10).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+    bannerText = `Recordá que si el pago es luego del día 15 se debe pagar un 10% de recargo: $${montoConRecargo}.`;
+  } else {
+    bannerText = 'Recordá que si el pago es luego del día 15 se debe pagar un 10% de recargo.';
   }
+
+  SystemBanner.show('cuota-pago-alert', bannerType, bannerTitle, bannerText);
 }
 
 /**

@@ -178,11 +178,7 @@ function _setupEventDelegation() {
     }
 
     // ── Cierre del banner de cuota ────────────────────────────────────────
-    if (target.closest('#cuota-pago-alert-close')) {
-      const banner = document.getElementById('cuota-pago-alert');
-      if (banner) banner.classList.remove('is-visible', 'alert--urgent', 'alert--warn');
-      return;
-    }
+    // Manejado por Event Delegation en banners.js
   });
 
   // ── Selector de año del historial (change event) ─────────────────────────

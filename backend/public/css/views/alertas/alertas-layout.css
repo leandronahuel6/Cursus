@@ -53,80 +53,7 @@
   box-shadow: var(--sh);
 }
 
-/* ── Banner de alerta de cuota ──────────────────────────────────────────────── */
-/**
- * El banner de cuota impaga se muestra/oculta via la clase `.is-visible`.
- * La clase `.alert--urgent` aplica colores de urgencia (rojo).
- * La clase `.alert--warn` aplica colores de advertencia (naranja).
- * JS añade/quita estas clases en lugar de manipular estilos inline.
- */
-.cuota-pago-alert {
-  display: none; /* Oculto por defecto; JS agrega .is-visible para mostrarlo */
-  align-items: center;
-  gap: 10px;
-  border: 1px solid transparent;
-  border-left-width: 4px;
-  border-radius: var(--r-sm);
-  padding: 10px 14px;
-}
 
-.cuota-pago-alert.is-visible {
-  display: flex;
-}
-
-.cuota-pago-alert.alert--warn {
-  background: #fff7ed;
-  border-color: #fcd9a0;
-  border-left-color: #f97316;
-}
-
-.cuota-pago-alert.alert--urgent {
-  background: #fef2f2;
-  border-color: #fecaca;
-  border-left-color: var(--red);
-}
-
-.cuota-pago-alert__dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.cuota-pago-alert.alert--warn  .cuota-pago-alert__dot { background: #f97316; }
-.cuota-pago-alert.alert--urgent .cuota-pago-alert__dot { background: var(--red); }
-
-.cuota-pago-alert__text {
-  flex: 1;
-  font-size: 12.5px;
-}
-
-.cuota-pago-alert__title {
-  font-weight: 700;
-}
-
-.cuota-pago-alert.alert--warn  .cuota-pago-alert__title { color: #92400e; }
-.cuota-pago-alert.alert--urgent .cuota-pago-alert__title { color: var(--red); }
-
-.cuota-pago-alert__close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: none;
-  background: none;
-  color: var(--t3);
-  cursor: pointer;
-  font-size: 12px;
-  transition: background .15s;
-  flex-shrink: 0;
-}
-
-.cuota-pago-alert__close:hover {
-  background: var(--border-light);
-}
 
 /* ── Responsive ─────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
@@ -137,8 +64,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .view-btn,
-  .cuota-pago-alert__close {
+  .view-btn {
     transition: none;
   }
 }
