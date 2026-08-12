@@ -1,0 +1,112 @@
+/* =============================================================================
+   COMPONENTS — SYSTEM BANNER
+   Banner de alerta global reutilizable (Dashboard, Alertas, etc.)
+   ============================================================================= */
+
+.system-banner {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid transparent;
+  border-left-width: 4px;
+  border-radius: var(--r, 10px);
+  padding: 10px 14px;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.system-banner.is-visible {
+  display: flex;
+}
+
+/* ── Modificadores de Severidad ── */
+.system-banner--info {
+  --banner-title: #1e40af;
+  --banner-text: #1e3a8a;
+  --banner-close: #93c5fd;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  border-left-color: var(--brand, #3b82f6);
+}
+
+.system-banner--warn {
+  --banner-title: #9a3412;
+  --banner-text: #7c2d12;
+  --banner-close: #fdba74;
+  background: #fff7ed;
+  border-color: #fcd9a0;
+  border-left-color: var(--orange, #f97316);
+}
+
+.system-banner--urgent {
+  --banner-title: #991b1b;
+  --banner-text: #7f1d1d;
+  --banner-close: #fca5a5;
+  background: #fef2f2;
+  border-color: #fecaca;
+  border-left-color: var(--red, #ef4444);
+}
+
+/* ── Elementos Interiores ── */
+.system-banner__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.system-banner--info   .system-banner__dot { background: var(--brand, #3b82f6); }
+.system-banner--warn   .system-banner__dot { background: var(--orange, #f97316); }
+.system-banner--urgent .system-banner__dot { background: var(--red, #ef4444); animation: blink 2s infinite; }
+
+.system-banner__text {
+  flex: 1;
+  font-size: 12.5px;
+  color: var(--banner-text);
+}
+
+.system-banner__title {
+  font-weight: 700;
+  margin-right: 4px;
+  color: var(--banner-title);
+}
+
+.system-banner a {
+  color: var(--banner-title);
+  text-decoration: underline;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+
+.system-banner a:hover {
+  opacity: 0.8;
+}
+
+.system-banner__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  color: var(--banner-close);
+  cursor: pointer;
+  font-size: 12px;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.system-banner__close:hover {
+  color: var(--banner-title);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .system-banner__close,
+  .system-banner {
+    transition: none;
+  }
+  .system-banner--urgent .system-banner__dot {
+    animation: none;
+  }
+}
