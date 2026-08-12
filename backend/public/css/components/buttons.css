@@ -63,6 +63,16 @@
   transform: translateY(-1px);
 }
 
+/* --- Variante: Pago (brand light) --- */
+.btn--pay {
+  background: var(--brand-light);
+  border-color: var(--brand-dim);
+  color: var(--brand);
+}
+.btn--pay:hover {
+  background: var(--brand-dim);
+}
+
 /* --- Variante: Cancelar / Neutro --- */
 .btn--cancel {
   background: var(--surface);
@@ -82,6 +92,24 @@
 .btn--secondary:hover {
   background: var(--border-light);
   color: var(--t1);
+}
+
+/* --- Modificador: Bloque (ancho completo) --- */
+.btn--block {
+  width: 100%;
+  justify-content: center;
+}
+
+/* --- Modificador: Pequeño (sm) --- */
+.btn--sm {
+  padding: 5px 12px;
+  font-size: 12px;
+}
+@media (max-width: 768px) {
+  .btn--sm {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
 }
 
 /* Dark mode — variantes neutras */
@@ -179,3 +207,15 @@ body.dark-mode .theme-toggle-btn .icon-sun  { display: block; }
 body.dark-mode .theme-toggle-btn .icon-moon { display: none;  }
 
 .theme-toggle-desktop { margin-left: auto; }
+
+/* ==============================
+   ACCESIBILIDAD
+============================== */
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .theme-toggle-btn {
+    transition: none !important;
+  }
+}
