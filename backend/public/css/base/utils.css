@@ -43,3 +43,9 @@
 /* Visibility */
 .hidden { display: none !important; }
 .overflow-hidden { overflow: hidden !important; }
+
+/* Responsive text helpers */
+/** Oculta el elemento en viewports móviles (≤ 600px). */
+@media (max-width: 600px) {
+  .u-hidden-mobile { display: none !important; }
+}

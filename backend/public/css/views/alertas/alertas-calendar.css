@@ -1,0 +1,282 @@
+/* =============================================================================
+   ALERTAS — CALENDARIO
+   Grilla mensual, celdas de día, dots de alertas y popover de detalle.
+   BEM: .calendar-card-wrap, .calendar-day-cell, .calendar-day-popover
+   Vista incluida en: alertas.blade.php
+   ============================================================================= */
+
+/**
+ * @fileoverview Estilos del componente de calendario mensual de la página de Alertas.
+ * Incluye la grilla de días, encabezado de navegación, dots de alertas y
+ * el popover anclado a la celda.
+ *
+ * NOTAS DE IMPLEMENTACIÓN:
+ * - El gradiente de fondo de una celda con alertas se inyecta vía la
+ *   custom property `--day-bg` desde JS (alertas-calendar.js) para
+ *   pasar datos dinámicos sin estilos inline directos.
+ * - La selección de celda usa `outline`, sin modificar `background`,
+ *   para preservar el gradiente original y el texto "HOY".
+ * - La clase modificadora `.calendar-day-popover--flipped-left` (o `--flipped-top`)
+ *   es aplicada por JS (getBoundingClientRect) para reposicionar el popover
+ *   cuando choca con los bordes del viewport.
+ */
+
+/* ── Contenedor principal del calendario ────────────────────────────────────── */
+.calendar-card-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 14px;
+  box-shadow: var(--sh);
+}
+
+/* ── Navegación de mes ──────────────────────────────────────────────────────── */
+.calendar-nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.calendar-month-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--t1);
+}
+
+.calendar-nav-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--t2);
+  transition: background .15s;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.calendar-nav-btn svg {
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.calendar-nav-btn:hover {
+  background: var(--border-light);
+}
+
+.calendar-nav-btn:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* ── Grilla de días de la semana (cabecera) ──────────────────────────────────── */
+.calendar-weekdays-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--tm);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* ── Grilla de celdas de días ───────────────────────────────────────────────── */
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+/* ── Celda individual de día ────────────────────────────────────────────────── */
+.calendar-day-cell {
+  aspect-ratio: 1.5;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t2);
+  cursor: pointer;
+  position: relative;
+  transition: background .15s;
+  /* El fondo de gradiente dinámico (alertas) se aplica vía var(--day-bg) desde JS */
+  background-image: var(--day-bg, none);
+}
+
+.calendar-day-cell:hover {
+  background-color: var(--border-light);
+}
+
+.calendar-day-cell.other-month {
+  color: var(--tm);
+  opacity: .5;
+}
+
+/* ── Estado: Hoy ────────────────────────────────────────────────────────────── */
+.calendar-day-cell.today {
+  border-color: var(--brand);
+  color: var(--brand);
+  font-weight: 700;
+}
+
+.calendar-day-today-tag {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  line-height: 1;
+}
+
+/* ── Estado: Seleccionada ───────────────────────────────────────────────────── */
+/**
+ * La selección usa únicamente `outline` para NO sobreescribir el color de fondo
+ * (gradiente de alertas) ni el color de texto de la celda "HOY".
+ * El modificador `!important` de la regla `.selected` original ha sido eliminado.
+ */
+.calendar-day-cell.selected {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+}
+
+/* ── Estado: Tiene alertas ──────────────────────────────────────────────────── */
+.calendar-day-cell.has-alerts {
+  color: var(--t1);
+  font-weight: 700;
+}
+
+/* ── Dots de alertas ────────────────────────────────────────────────────────── */
+.calendar-dots-row {
+  display: flex;
+  gap: 3px;
+  position: absolute;
+  bottom: 3px;
+}
+
+.calendar-dots-row .dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+}
+
+/* ── Popover de detalle del día ─────────────────────────────────────────────── */
+/**
+ * Posición por defecto: debajo de la celda, centrado.
+ * CSS Grid se encarga de reubicar los extremos (domingos y sábados)
+ * para evitar colisiones con los bordes laterales del viewport.
+ */
+.calendar-day-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 230px;
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--sh-md);
+  padding: 8px;
+  z-index: 9999;  /* Supera sidebar y topbar */
+  cursor: default;
+  text-align: left;
+  white-space: normal;
+}
+
+/* Ajuste específico para domingos (primera columna) para evitar desbordamiento por la izquierda */
+.calendar-day-cell:nth-child(7n+1) .calendar-day-popover {
+  left: 0;
+  transform: none;
+}
+
+/* Ajuste específico para sábados (última columna) para evitar desbordamiento por la derecha */
+.calendar-day-cell:nth-child(7n) .calendar-day-popover {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.calendar-day-popover__title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--t1);
+  margin-bottom: 6px;
+  padding: 0 2px;
+}
+
+.calendar-day-popover__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  border-radius: var(--r-sm);
+}
+
+.calendar-day-popover__item:hover {
+  background: var(--border-light);
+}
+
+.calendar-day-popover__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.calendar-day-popover__titulo {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--t1);
+  white-space: normal;
+  word-break: break-word;
+  margin-bottom: 3px;
+}
+
+/** Ícono dentro del popover (versión reducida del .alert-icon-wrap) */
+.calendar-day-popover .alert-icon-wrap {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.calendar-day-popover .alert-icon-wrap svg {
+  width: 14px;
+  height: 14px;
+}
+
+/** Badge de prioridad dentro del popover (versión compacta) */
+.calendar-day-popover .alert-priority-badge {
+  font-size: 8.5px;
+  padding: 1px 5px;
+}
+
+/** Botón de completar dentro del popover */
+.calendar-day-popover .btn-alert-action {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.calendar-day-popover .btn-alert-action svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .calendar-day-popover {
+    width: 200px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calendar-nav-btn,
+  .calendar-day-cell {
+    transition: none;
+  }
+}

@@ -1,7 +1,18 @@
 /**
  * @fileoverview Renderizado DOM para la página de Alertas y Vencimientos.
- * Funciones puras que reciben datos y construyen HTML o manipulan el DOM.
- * No realiza fetching de datos.
+ *
+ * Responsabilidades de este módulo:
+ * - Renderizar la vista de lista/agenda de alertas clasificadas en grupos.
+ * - Renderizar el banner de estado de cuota (usando clases CSS, sin inline styles).
+ * - Renderizar el campo de monto de cuota vigente y el aviso de próxima cuota.
+ * - Renderizar el historial de cuotas con sus acciones.
+ * - Actualizar el badge de conteo de alertas en la navegación.
+ * - Actualizar el estado visual de los botones del switcher de vista.
+ * - Inicializar la paleta de swatches de color del formulario.
+ *
+ * Este módulo NO realiza fetching de datos. Recibe datos como parámetros
+ * y manipula el DOM exclusivamente mediante clases CSS (Zero Inline Styles).
+ *
  * @module views/alertas/alertas-render
  */
 
@@ -11,164 +22,267 @@ import {
   formatDateStr,
   getDaysDifference,
   resolveAlertColor,
-  categoriaIcon,
-  getAlertDateText
+  getAlertDateText,
 } from '../../shared/utils.js';
+
+import { spriteIcon } from '../../shared/sprite.js';
 
 import { formatPeriodoCuota } from './alertas-data.js';
 
-// ── Badge de navegación ─────────────────────────────────────────────────────
+import { SystemBanner } from '../../components/banners.js';
+
+// ── Constantes ───────────────────────────────────────────────────────────────
+
+/**
+ * Mapa de categoría de alerta a ID de ícono en el sprite SVG.
+ * @type {Record<string, string>}
+ */
+const CATEGORIA_ICON = {
+  academic:       'graduation-cap',
+  administrative: 'briefcase-business',
+  personal:       'user',
+  payment:        'banknote',
+};
+
+/**
+ * Umbral de días para el grupo "Este mes / Próximos 30 días".
+ * Las alertas con diffDays > 30 van al grupo "Más adelante".
+ * @type {number}
+ */
+const SOON_THRESHOLD_DAYS = 30;
+
+// ── Badge de navegación ──────────────────────────────────────────────────────
 
 /**
  * Actualiza los badges de conteo en la barra de navegación
  * con la cantidad de alertas que vencen en los próximos 7 días.
- * @param {Array} activeAlerts - Alertas activas (no completadas).
+ *
+ * @param {Array<Object>} activeAlerts - Alertas activas (no completadas).
+ * @returns {void}
  */
 export function renderNavBadge(activeAlerts) {
   const badgeCount = activeAlerts.filter(a => getDaysDifference(a.fecha) <= 7).length;
-  const navBadge = document.getElementById('nav-badge-count');
+  const navBadge  = document.getElementById('nav-badge-count');
   const bnavBadge = document.getElementById('bnav-badge-count');
-  if (navBadge) navBadge.innerText = badgeCount;
-  if (bnavBadge) bnavBadge.innerText = badgeCount;
+  if (navBadge)  navBadge.textContent  = badgeCount;
+  if (bnavBadge) bnavBadge.textContent = badgeCount;
 }
 
-// ── List View ───────────────────────────────────────────────────────────────
+// ── List View ────────────────────────────────────────────────────────────────
 
 /**
  * Renderiza la vista de lista/agenda clasificando alertas en tres grupos:
- * urgentes (≤7 días), próximas (≤20 días) y más adelante.
- * @param {Array} activeAlerts - Alertas activas (no completadas).
+ * - Urgentes: ≤ 7 días.
+ * - Próximas: entre 8 y 30 días ("Este mes / Próximos 30 días").
+ * - Más adelante: > 30 días.
+ *
+ * @param {Array<Object>} activeAlerts - Alertas activas (no completadas).
+ * @returns {void}
  */
 export function renderListView(activeAlerts) {
   const listUrgent = document.getElementById('list-urgent');
-  const listSoon = document.getElementById('list-soon');
-  const listLater = document.getElementById('list-later');
+  const listSoon   = document.getElementById('list-soon');
+  const listLater  = document.getElementById('list-later');
+
+  if (!listUrgent || !listSoon || !listLater) return;
 
   listUrgent.innerHTML = '';
-  listSoon.innerHTML = '';
-  listLater.innerHTML = '';
+  listSoon.innerHTML   = '';
+  listLater.innerHTML  = '';
 
   activeAlerts.forEach(alerta => {
     const diffDays = getDaysDifference(alerta.fecha);
-    const card = createAlertCardHTML(alerta, diffDays);
+    const card     = _createAlertCard(alerta, diffDays);
 
     if (diffDays <= 7) {
       listUrgent.appendChild(card);
-    } else if (diffDays <= 20) {
+    } else if (diffDays <= SOON_THRESHOLD_DAYS) {
       listSoon.appendChild(card);
     } else {
       listLater.appendChild(card);
     }
   });
 
-  checkGroupEmpty(listUrgent, 'No tienes alertas críticas para esta semana.');
-  checkGroupEmpty(listSoon, 'No hay vencimientos programados a mediano plazo.');
-  checkGroupEmpty(listLater, 'Sin vencimientos lejanos programados.');
+  _checkGroupEmpty(listUrgent, 'No tienes alertas críticas para esta semana.');
+  _checkGroupEmpty(listSoon,   'No hay vencimientos programados en los próximos 30 días.');
+  _checkGroupEmpty(listLater,  'Sin vencimientos lejanos programados.');
 }
 
 /**
- * Muestra un mensaje vacío en un contenedor de grupo si no tiene hijos.
- * @param {HTMLElement} container - El contenedor del grupo.
- * @param {string} message - Mensaje a mostrar cuando está vacío.
+ * Muestra un mensaje vacío en un contenedor de grupo si no tiene tarjetas hijas.
+ *
+ * @param {HTMLElement} container - El contenedor del grupo de alertas.
+ * @param {string} message - Mensaje a mostrar cuando el grupo está vacío.
+ * @returns {void}
  */
-function checkGroupEmpty(container, message) {
+function _checkGroupEmpty(container, message) {
   if (container.children.length === 0) {
     const empty = document.createElement('div');
-    empty.style.fontSize = '12px';
-    empty.style.color = 'var(--tm)';
-    empty.style.fontStyle = 'italic';
-    empty.style.padding = '8px 14px';
-    empty.innerText = message;
+    empty.className   = 'alert-group__empty';
+    empty.textContent = message;
     container.appendChild(empty);
   }
 }
 
 /**
  * Crea un elemento DOM con la tarjeta visual de una alerta.
+ * Los botones de acción usan atributos `data-js-action` y `data-alert-id`
+ * para que el Event Delegation en `alertas-main.js` capture los eventos.
+ *
  * @param {Object} alerta - Objeto de alerta con id, titulo, categoria, prioridad, fecha, color.
  * @param {number} diffDays - Días de diferencia desde hoy.
  * @returns {HTMLElement} El elemento div de la tarjeta.
  */
-function createAlertCardHTML(alerta, diffDays) {
-  const card = document.createElement('div');
+function _createAlertCard(alerta, diffDays) {
+  const card = document.createElement('article');
   card.className = 'alert-item-card';
 
   const resolvedColor = resolveAlertColor(alerta);
-  const dateInfo = getAlertDateText(diffDays, alerta.fecha);
+  const dateInfo      = getAlertDateText(diffDays, alerta.fecha);
+  const iconId        = CATEGORIA_ICON[alerta.categoria] || 'circle-alert';
 
-  card.innerHTML = `
-    <div class="alert-icon-wrap alert-icon-${alerta.categoria}">
-      ${categoriaIcon(alerta.categoria)}
-    </div>
-    <div class="alert-item-info">
-      <div class="alert-item-title">${alerta.titulo}</div>
-      <div class="alert-item-desc">${alerta.descripcion || ''}</div>
-      <div class="alert-item-meta">
-        <span class="alert-color-chip" style="background: ${resolvedColor};" title="Color de la alerta"></span>
-        <span class="badge ${alerta.prioridad === 'alta' ? 'badge--danger' : (alerta.prioridad === 'media' ? 'badge--warning' : 'badge--neutral')}">${alerta.prioridad}</span>
-        <span class="alert-date-badge" ${dateInfo.cls}>
-          ⏱️ ${dateInfo.text}
-        </span>
-      </div>
-    </div>
-    <div class="alert-item-actions">
-      <button class="btn-alert-action btn-complete" title="Marcar como Completado" onclick="window.completeAlert(${alerta.id})">✓</button>
-      <button class="btn-alert-action btn-delete" title="Eliminar Alerta" onclick="window.deleteAlert(${alerta.id})">✕</button>
-    </div>
-  `;
+  // ── Ícono de categoría
+  const iconWrap = document.createElement('div');
+  iconWrap.className = `alert-icon-wrap alert-icon-${alerta.categoria}`;
+  iconWrap.setAttribute('aria-hidden', 'true');
+  iconWrap.innerHTML = spriteIcon(iconId, { width: 20, height: 20 });
+
+  // ── Información
+  const info = document.createElement('div');
+  info.className = 'alert-item-info';
+
+  const titleEl = document.createElement('div');
+  titleEl.className   = 'alert-item-card__title';
+  titleEl.textContent = alerta.titulo;
+
+  const descEl = document.createElement('div');
+  descEl.className   = 'alert-item-card__desc';
+  descEl.textContent = alerta.descripcion || '';
+
+  // ── Meta (chip de color, badge de prioridad, badge de fecha)
+  const meta = document.createElement('div');
+  meta.className = 'alert-item-meta';
+
+  const chip = document.createElement('span');
+  chip.className = 'alert-color-chip';
+  chip.setAttribute('aria-hidden', 'true');
+  chip.setAttribute('title', 'Color de la alerta');
+  // Inyectamos el color vía Custom Property (excepción válida para datos dinámicos)
+  chip.style.setProperty('--chip-color', resolvedColor);
+
+  const priorityBadge = document.createElement('span');
+  priorityBadge.className   = `badge ${_priorityBadgeClass(alerta.prioridad)}`;
+  priorityBadge.textContent = alerta.prioridad;
+
+  // Badge de fecha con ícono SVG y clase modificadora según urgencia
+  const dateBadge = document.createElement('span');
+  dateBadge.className = `alert-date-badge ${dateInfo.cssClass}`;
+  dateBadge.innerHTML = spriteIcon('timer', { width: 13, height: 13 }) + ` ${dateInfo.text}`;
+
+  meta.appendChild(chip);
+  meta.appendChild(priorityBadge);
+  meta.appendChild(dateBadge);
+
+  info.appendChild(titleEl);
+  info.appendChild(descEl);
+  info.appendChild(meta);
+
+  // ── Acciones (completar / eliminar)
+  const actions = document.createElement('div');
+  actions.className = 'alert-item-actions';
+
+  const btnComplete = document.createElement('button');
+  btnComplete.type      = 'button';
+  btnComplete.className = 'btn-alert-action btn-complete';
+  btnComplete.title     = 'Marcar como Completado';
+  btnComplete.setAttribute('aria-label', `Marcar "${alerta.titulo}" como completado`);
+  btnComplete.dataset.jsAction = 'complete-alert';
+  btnComplete.dataset.alertId  = alerta.id;
+  btnComplete.innerHTML        = spriteIcon('check', { width: 15, height: 15 });
+
+  const btnDelete = document.createElement('button');
+  btnDelete.type      = 'button';
+  btnDelete.className = 'btn-alert-action btn-delete';
+  btnDelete.title     = 'Eliminar Alerta';
+  btnDelete.setAttribute('aria-label', `Eliminar alerta "${alerta.titulo}"`);
+  btnDelete.dataset.jsAction = 'delete-alert';
+  btnDelete.dataset.alertId  = alerta.id;
+  btnDelete.innerHTML        = spriteIcon('trash-2', { width: 15, height: 15 });
+
+  actions.appendChild(btnComplete);
+  actions.appendChild(btnDelete);
+
+  card.appendChild(iconWrap);
+  card.appendChild(info);
+  card.appendChild(actions);
+
   return card;
 }
 
-// ── Cuota / Estado de Pago ──────────────────────────────────────────────────
+/**
+ * Devuelve la clase BEM del badge de prioridad correspondiente al nivel dado.
+ *
+ * @param {string} prioridad - Nivel de prioridad ('alta', 'media', 'baja').
+ * @returns {string} Clase CSS del badge.
+ */
+function _priorityBadgeClass(prioridad) {
+  if (prioridad === 'alta')  return 'badge--danger';
+  if (prioridad === 'media') return 'badge--warning';
+  return 'badge--neutral';
+}
+
+// ── Cuota / Estado de Pago ───────────────────────────────────────────────────
 
 /**
  * Renderiza el banner de estado de pago de la cuota del mes actual.
- * Adapta el color y el mensaje según urgencia y si ya está pagada.
- * @param {Object} estado - { pagado, fecha_pago, dias_para_vencimiento, periodo }.
- * @param {number|null} cuotaMontoVigente - Monto vigente de la cuota (puede ser null).
+ * Aplica clases CSS modificadoras (`.alert--urgent`, `.alert--warn`, `.is-visible`)
+ * en lugar de manipular estilos inline.
+ *
+ * @param {Object} estado - Estado de la cuota.
+ * @param {boolean} estado.pagado - Si la cuota del mes ya fue pagada.
+ * @param {string|null} estado.fecha_pago - Fecha del pago registrado.
+ * @param {number} estado.dias_para_vencimiento - Días restantes hasta el día 15.
+ * @param {string} estado.periodo - Período en formato YYYY-MM.
+ * @param {number|null} [cuotaMontoVigente=null] - Monto vigente de la cuota.
+ * @returns {void}
  */
 export function renderEstadoPagoCuota(estado, cuotaMontoVigente = null) {
-  const banner = document.getElementById('cuota-pago-alert');
-  const bannerTitle = document.getElementById('cuota-pago-alert-title');
-  const bannerText = document.getElementById('cuota-pago-alert-text');
-  const info = document.getElementById('cuota-pago-info');
-  const btnPagar = document.getElementById('btn-abrir-pago');
+  const info        = document.getElementById('cuota-pago-info');
+  const btnPagar    = document.getElementById('btn-abrir-pago');
 
   if (estado.pagado) {
-    banner.style.display = 'none';
-    if (info) info.textContent = `✓ Cuota de este mes pagada el ${formatDateStr(estado.fecha_pago)}.`;
-    if (btnPagar) { btnPagar.disabled = true; btnPagar.style.opacity = '0.6'; }
+    SystemBanner.hide('cuota-pago-alert');
+    if (info)     info.textContent = `✓ Cuota de este mes pagada el ${formatDateStr(estado.fecha_pago)}.`;
+    if (btnPagar) btnPagar.disabled = true;
     return;
   }
 
-  if (btnPagar) { btnPagar.disabled = false; btnPagar.style.opacity = '1'; }
+  if (btnPagar) btnPagar.disabled = false;
   if (info) info.textContent = 'Todavía no registraste el pago de este mes.';
 
-  const dias = estado.dias_para_vencimiento;
-  const urgente = dias <= 3; // vencido o a 3 días o menos del límite (día 15)
-
-  banner.style.display = 'flex';
-  banner.style.background = urgente ? '#fef2f2' : '#fff7ed';
-  banner.style.borderColor = urgente ? '#fecaca' : '#fcd9a0';
-  banner.style.borderLeftColor = urgente ? 'var(--red)' : '#f97316';
-  bannerTitle.textContent = urgente ? '⚠️ ¡Atención!' : 'Alerta de pago:';
-  bannerTitle.style.color = urgente ? 'var(--red)' : '#92400e';
-
-  const dot = document.getElementById('cuota-pago-alert-dot');
-  if (dot) dot.style.background = urgente ? 'var(--red)' : '#f97316';
-
-  // Mensaje con recargo calculado si hay monto vigente disponible
+  const urgente = estado.dias_para_vencimiento <= 3;
+  const bannerType = urgente ? 'urgent' : 'warn';
+  const bannerTitle = urgente ? '¡Atención!' : 'Alerta de pago:';
+  
+  let bannerText = '';
   if (cuotaMontoVigente != null) {
     const montoConRecargo = (cuotaMontoVigente * 1.10).toLocaleString('es-AR', { minimumFractionDigits: 2 });
-    bannerText.textContent = `Recordá que si el pago es luego del día 15 se debe pagar un 10% de recargo: $${montoConRecargo}.`;
+    bannerText = `Recordá que si el pago es luego del día 15 se debe pagar un 10% de recargo: $${montoConRecargo}.`;
   } else {
-    bannerText.textContent = `Recordá que si el pago es luego del día 15 se debe pagar un 10% de recargo.`;
+    bannerText = 'Recordá que si el pago es luego del día 15 se debe pagar un 10% de recargo.';
   }
+
+  SystemBanner.show('cuota-pago-alert', bannerType, bannerTitle, bannerText);
 }
 
 /**
  * Renderiza el campo de monto vigente de cuota y el aviso de próxima cuota.
- * @param {Object} data - Respuesta de GET /api/cuotas { valor_mensual, cuota_proxima }.
+ * Usa la clase `.is-visible` para mostrar/ocultar el aviso en vez de `style.display`.
+ *
+ * @param {Object} data - Respuesta de GET /api/cuotas.
+ * @param {number|null} data.valor_mensual - Monto mensual vigente.
+ * @param {Object|null} data.cuota_proxima - Próxima cuota programada (o null).
+ * @returns {void}
  */
 export function renderCuotaRecordatorio(data) {
   const input = document.getElementById('cuota-monto');
@@ -179,25 +293,26 @@ export function renderCuotaRecordatorio(data) {
   }
 
   const proximaEl = document.getElementById('cuota-proxima-notice');
-  if (proximaEl) {
-    if (data.cuota_proxima) {
-      const monto = parseFloat(data.cuota_proxima.valor_mensual).toLocaleString('es-AR', { minimumFractionDigits: 2 });
-      const partes = data.cuota_proxima.vigente_desde.split('T')[0].split('-');
-      const fecha = `${partes[2]}/${partes[1]}/${partes[0]}`;
-      proximaEl.textContent = `A partir del ${fecha} la cuota será $${monto}`;
-      proximaEl.style.display = 'block';
-    } else {
-      proximaEl.style.display = 'none';
-    }
+  if (!proximaEl) return;
+
+  if (data.cuota_proxima) {
+    const monto  = parseFloat(data.cuota_proxima.valor_mensual).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+    const partes = data.cuota_proxima.vigente_desde.split('T')[0].split('-');
+    const fecha  = `${partes[2]}/${partes[1]}/${partes[0]}`;
+    proximaEl.textContent = `A partir del ${fecha} la cuota será $${monto}`;
+    proximaEl.classList.add('is-visible');
+  } else {
+    proximaEl.classList.remove('is-visible');
   }
 }
 
-// ── Historial de Cuotas ─────────────────────────────────────────────────────
+// ── Historial de Cuotas ──────────────────────────────────────────────────────
 
 /**
- * Genera el badge de estado de un pago de cuota.
- * @param {Object} pago - Objeto de pago con estado y medio_pago.
- * @returns {string} HTML del badge.
+ * Genera el badge HTML de estado de un pago de cuota.
+ *
+ * @param {Object} pago - Objeto de pago con `estado` y `medio_pago`.
+ * @returns {string} HTML del badge de estado.
  */
 export function cuotaBadge(pago) {
   if (pago.estado === 'pagado') {
@@ -212,8 +327,10 @@ export function cuotaBadge(pago) {
 
 /**
  * Popula el selector de año del historial de cuotas.
+ *
  * @param {number|string} anioActual - Año seleccionado actualmente.
  * @param {Array<number|string>} aniosDisponibles - Lista de años disponibles.
+ * @returns {void}
  */
 export function renderSelectorAnioHistorial(anioActual, aniosDisponibles) {
   const select = document.getElementById('cuota-historial-anio');
@@ -222,7 +339,7 @@ export function renderSelectorAnioHistorial(anioActual, aniosDisponibles) {
   select.innerHTML = '';
   (aniosDisponibles || [anioActual]).forEach(a => {
     const opt = document.createElement('option');
-    opt.value = a;
+    opt.value       = a;
     opt.textContent = `Ciclo ${a}`;
     select.appendChild(opt);
   });
@@ -230,8 +347,12 @@ export function renderSelectorAnioHistorial(anioActual, aniosDisponibles) {
 }
 
 /**
- * Renderiza la lista de filas del historial de cuotas con acciones por período.
- * @param {Array} historialCuotas - Array de objetos de pago de cuota.
+ * Renderiza la lista de filas del historial de cuotas con sus acciones.
+ * Los botones de acción usan atributos `data-js-action` y `data-periodo` / `data-id`
+ * para que el Event Delegation en `alertas-main.js` procese los eventos.
+ *
+ * @param {Array<Object>} historialCuotas - Array de objetos de pago de cuota.
+ * @returns {void}
  */
 export function renderHistorialCuotas(historialCuotas) {
   const list = document.getElementById('cuota-historial-list');
@@ -243,112 +364,140 @@ export function renderHistorialCuotas(historialCuotas) {
   }
 
   list.innerHTML = '';
+
   historialCuotas.forEach(pago => {
     const row = document.createElement('div');
     row.className = 'chr-row';
 
     const montoExigible = pago.monto_exigible != null ? pago.monto_exigible : pago.monto_base;
-    const fmtMonto = (v) => '$' + parseFloat(v).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+    const fmtMonto      = (v) => '$' + parseFloat(v).toLocaleString('es-AR', { minimumFractionDigits: 2 });
 
-    // Si ya declaró un pago (comprobante leído por IA), mostrar lo que
-    // efectivamente declaró haber pagado, con indicador de si coincide con
-    // lo exigido — no lo exigido, que puede diferir de lo realmente pagado.
-    let monto;
+    // Calcular el monto a mostrar (con indicadores de discrepancia)
+    let montoHtml;
     if (pago.monto_declarado != null && pago.estado !== 'pendiente') {
       const declarado = fmtMonto(pago.monto_declarado);
       if (pago.coincide_monto === false) {
-        monto = `<span class="chr-monto-discrepancia" title="Lo exigido era ${montoExigible != null ? fmtMonto(montoExigible) : '—'}">${declarado} ✗</span>`;
+        const exigidoLabel = montoExigible != null ? fmtMonto(montoExigible) : '—';
+        montoHtml = `<span class="chr-monto-discrepancia" title="Lo exigido era ${exigidoLabel}">${declarado} ✗</span>`;
       } else if (pago.coincide_monto === true) {
-        monto = `${declarado} ✓`;
+        montoHtml = `${declarado} ✓`;
       } else {
-        monto = declarado;
+        montoHtml = declarado;
       }
     } else {
-      monto = montoExigible != null ? fmtMonto(montoExigible) : '—';
+      montoHtml = montoExigible != null ? fmtMonto(montoExigible) : '—';
     }
 
-    let acciones = '';
+    // Construir botones de acción sin onclick
+    const actionsWrap = document.createElement('div');
+    actionsWrap.className = 'chr-actions';
+
     if (pago.estado === 'pendiente') {
-      acciones += `<button class="chr-btn-pagar" onclick="window.openPagoModal('${pago.periodo}')">Pagar</button>`;
+      const btnPagar = document.createElement('button');
+      btnPagar.type      = 'button';
+      btnPagar.className = 'btn btn--pay btn--sm';
+      btnPagar.innerHTML = '<span>Registrar <span class="u-hidden-mobile">Pago</span></span>';
+      btnPagar.dataset.jsAction = 'open-pago-modal';
+      btnPagar.dataset.periodo  = pago.periodo;
+      actionsWrap.appendChild(btnPagar);
     } else {
-      // Ya declaró el pago (transferencia o efectivo): permitir corregirlo
-      acciones += `<button onclick="window.openPagoModal('${pago.periodo}')">Editar</button>`;
+      const btnEditar = document.createElement('button');
+      btnEditar.type        = 'button';
+      btnEditar.className   = 'btn btn--secondary btn--sm';
+      btnEditar.textContent = 'Editar';
+      btnEditar.dataset.jsAction = 'open-pago-modal';
+      btnEditar.dataset.periodo  = pago.periodo;
+      actionsWrap.appendChild(btnEditar);
     }
+
     if (pago.tiene_comprobante) {
-      acciones += `<button onclick="window.verMiComprobante(${pago.id})">Ver comprobante</button>`;
+      const btnVer = document.createElement('button');
+      btnVer.type        = 'button';
+      btnVer.className   = 'btn btn--secondary btn--sm';
+      btnVer.textContent = 'Ver comprobante';
+      btnVer.dataset.jsAction = 'ver-comprobante';
+      btnVer.dataset.pagoId   = pago.id;
+      actionsWrap.appendChild(btnVer);
     }
 
     row.innerHTML = `
       <div class="chr-periodo">${formatPeriodoCuota(pago.periodo)}</div>
       ${cuotaBadge(pago)}
-      <div class="chr-monto">${monto}</div>
-      <div class="chr-actions">${acciones}</div>
+      <div class="chr-monto">${montoHtml}</div>
     `;
+    row.appendChild(actionsWrap);
     list.appendChild(row);
   });
 }
 
-// ── View Toggle ─────────────────────────────────────────────────────────────
+// ── View Toggle ──────────────────────────────────────────────────────────────
 
 /**
  * Actualiza el estado visual de los botones y paneles de vista (lista/calendario).
+ * Usa la clase `.hidden` del sistema global de utilidades en vez de `style.display`.
+ *
  * @param {'list'|'calendar'} view - Vista activa.
+ * @returns {void}
  */
 export function updateViewToggle(view) {
-  const btnList = document.getElementById('btn-view-list');
-  const btnCal = document.getElementById('btn-view-calendar');
+  const btnList  = document.getElementById('btn-view-list');
+  const btnCal   = document.getElementById('btn-view-calendar');
   const viewList = document.getElementById('view-list');
-  const viewCal = document.getElementById('view-calendar');
+  const viewCal  = document.getElementById('view-calendar');
 
-  if (view === 'list') {
-    btnList.classList.add('active');
-    btnCal.classList.remove('active');
-    viewList.style.display = 'flex';
-    viewCal.style.display = 'none';
-  } else {
-    btnList.classList.remove('active');
-    btnCal.classList.add('active');
-    viewList.style.display = 'none';
-    viewCal.style.display = 'block';
-  }
+  if (!btnList || !btnCal || !viewList || !viewCal) return;
+
+  const isList = view === 'list';
+
+  btnList.classList.toggle('active', isList);
+  btnList.setAttribute('aria-selected', String(isList));
+  btnCal.classList.toggle('active',  !isList);
+  btnCal.setAttribute('aria-selected', String(!isList));
+
+  viewList.classList.toggle('hidden', !isList);
+  viewCal.classList.toggle('hidden',  isList);
 }
 
-// ── Paleta de colores ───────────────────────────────────────────────────────
+// ── Paleta de colores ────────────────────────────────────────────────────────
 
 /**
  * Inicializa la paleta de swatches de color para el formulario de alertas.
- * Asigna roles ARIA y listeners de selección.
+ * Asigna roles ARIA y listeners de selección. Los colores de fondo de cada swatch
+ * están definidos en CSS por selector de atributo (`data-color`).
+ *
  * @param {string} defaultColor - Color hexadecimal a pre-seleccionar.
+ * @returns {void}
  */
 export function setupColorPalette(defaultColor) {
   const colorInput = document.getElementById('alert-color');
-  const swatches = Array.from(document.querySelectorAll('.alert-color-swatch'));
+  const swatches   = Array.from(document.querySelectorAll('.alert-color-swatch'));
   if (!colorInput || swatches.length === 0) return;
 
+  /**
+   * Selecciona un color: actualiza el input oculto y los estados ARIA/CSS de los swatches.
+   * @param {string} color - Color hexadecimal a seleccionar.
+   */
   const selectColor = (color) => {
     const normalized = (color || '').toLowerCase();
     colorInput.value = normalized;
 
-    swatches.forEach((swatch) => {
+    swatches.forEach(swatch => {
       const isSelected = swatch.dataset.color.toLowerCase() === normalized;
       swatch.classList.toggle('selected', isSelected);
       swatch.setAttribute('aria-checked', isSelected ? 'true' : 'false');
     });
   };
 
-  swatches.forEach((swatch) => {
-    swatch.setAttribute('role', 'radio');
+  swatches.forEach(swatch => {
+    swatch.setAttribute('role',         'radio');
     swatch.setAttribute('aria-checked', 'false');
-
-    swatch.addEventListener('click', () => {
-      selectColor(swatch.dataset.color);
-    });
+    swatch.addEventListener('click', () => selectColor(swatch.dataset.color));
   });
 
   selectColor(colorInput.value || defaultColor);
 }
 
-// ── Legacy Global Export ────────────────────────────────────────────────────
+// ── Legacy Global Export ─────────────────────────────────────────────────────
 
 window.AlertasRender = {
   renderNavBadge,
@@ -359,5 +508,5 @@ window.AlertasRender = {
   renderSelectorAnioHistorial,
   renderHistorialCuotas,
   updateViewToggle,
-  setupColorPalette
+  setupColorPalette,
 };

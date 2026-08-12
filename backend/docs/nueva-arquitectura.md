@@ -51,7 +51,12 @@ public/
 │       ├── area-estudio.css# Pomodoro, Kanban
 │       ├── area-estudio-focus.css  # Modo concentración (Zen Mode)
 │       ├── materias.css    # Árbol de correlatividades
-│       ├── alertas.css     # Lista y calendario de alertas
+│       ├── alertas/                # Estilos de la página de alertas (sub-modularizados)
+│       │   ├── alertas-layout.css  # Grilla principal, switcher de vista, banner de cuota
+│       │   ├── alertas-list.css    # Tarjetas de alerta, íconos, badges, botones de acción
+│       │   ├── alertas-calendar.css # Calendario mensual, celdas, popover de detalle
+│       │   ├── alertas-form.css    # Formulario, paleta de colores, botón de envío
+│       │   └── alertas-cuotas.css  # Historial de cuotas, modal de pago
 │       ├── horarios/               # Simulador de Horarios (sub-modularizado)
 │       │   ├── horarios-grid.css   # Canvas, grilla semanal, time-blocks, colores de tema, DM overrides
 │       │   ├── horarios-drag.css   # Panel lateral, drag cards, responsividad tablets/móviles
@@ -76,6 +81,7 @@ public/
 │   │   ├── toast.js        # ★ Sistema centralizado de notificaciones (window.showToast)
 │   │   ├── sidebar.js      # Lógica del menú lateral: colapso, tooltips y navegación activa
 │   │   ├── utils.js        # Funciones auxiliares reutilizables: formato de fechas, cálculo de alertas próximas
+│   │   ├── sprite.js       # Helper centralizado para generar markup <svg><use> del sprite SVG
 │   │   ├── profile.js      # Menú de perfil de usuario: cambio de carrera, modal de contraseña, cierre de sesión
 │   │   ├── theme.js        # Alternancia modo claro/oscuro
 │   │   ├── celebracion.js  # Efectos de celebración (confeti, animaciones)

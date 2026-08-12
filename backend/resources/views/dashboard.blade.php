@@ -3,6 +3,7 @@
 @section('title', 'Cursus - Inicio')
 
 @push('styles')
+<link rel="stylesheet" href="{{ asset('css/components/banners.css') }}">
 <link rel="stylesheet" href="{{ asset('css/views/dashboard.css') }}">
 @endpush
 
@@ -33,13 +34,9 @@
 
 @section('content')
   <!-- Alert -->
-  <div class="alert" id="js-alert" style="display:none;">
-    <div class="alert-dot"></div>
-    <div class="alert-txt">
-      <strong>Alerta próxima:</strong> <span id="js-alert-text"></span> <a href="{{ route('alertas') }}" style="text-decoration: underline; font-weight: 600;">Ver alertas</a>
-    </div>
-    <button class="alert-x" onclick="document.getElementById('js-alert').remove()">✕</button>
-  </div>
+  <x-system-banner id="js-alert" title="Alerta próxima:">
+    <span class="system-banner__dynamic-text" id="js-alert-text"></span> <a href="{{ route('alertas') }}">Ver alertas</a>
+  </x-system-banner>
 
   <!-- Stats Grid -->
   <div class="stats">
@@ -168,5 +165,5 @@
 @endsection
 
 @push('scripts')
-  <script src="{{ asset('js/views/dashboard.js') }}"></script>
+  <script type="module" src="{{ asset('js/views/dashboard.js') }}"></script>
 @endpush
