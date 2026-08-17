@@ -322,3 +322,22 @@ body.dark-mode .bn.on .bn-ic {
     line-height: 26px;
   }
 }
+
+/* ==============================
+   UTILITIES & EXTRACTED INLINE STYLES
+============================== */
+#bn-av {
+  cursor: pointer;
+}
+
+.bnav-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#student-menu-caret {
+  transform: rotate(0deg);
+  transition: transform 0.2s;
+}

@@ -25,6 +25,9 @@ body.sidebar-collapsed .main {
 }
 
 .dashboard-bg {
+  --bg-url: none;
+  --bg-opacity: 0.10;
+  --bg-blur: 1.8px;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background-image: var(--bg-url);
