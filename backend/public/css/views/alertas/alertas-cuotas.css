@@ -184,22 +184,6 @@
   margin-top: 4px;
 }
 
-/* ── Modal footer / header (contenidos dentro del x-modal) ──────────────────── */
-.pago-modal-body {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.pago-modal-footer {
-  padding: 16px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
 .pago-periodo-label {
   font-weight: 600;
   color: var(--brand);

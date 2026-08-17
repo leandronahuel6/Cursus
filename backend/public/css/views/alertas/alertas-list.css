@@ -33,6 +33,14 @@
   color: var(--tm);
 }
 
+.alert-group__title--overdue {
+  color: var(--red);
+}
+
+.alert-group__title--completed {
+  color: var(--t3);
+}
+
 .alert-group__content {
   display: flex;
   flex-direction: column;
@@ -57,11 +65,21 @@
   padding: 14px;
   box-shadow: var(--sh);
   transition: transform .2s, box-shadow .2s;
+  cursor: pointer;
 }
 
 .alert-item-card:hover {
   transform: translateY(-1px);
   box-shadow: var(--sh-md);
+}
+
+.alert-item-card--completed {
+  opacity: 0.6;
+}
+
+.alert-item-card--completed .alert-item-card__title {
+  text-decoration: line-through;
+  color: var(--t3);
 }
 
 /* ── Ícono de categoría ─────────────────────────────────────────────────────── */
@@ -198,21 +216,16 @@
   border-color: #fca5a5;
 }
 
-/* ── Badges de prioridad ────────────────────────────────────────────────────── */
-.alert-priority-badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 12px;
-  text-transform: uppercase;
+.btn-alert-action.btn-edit:hover {
+  background: var(--blue-light);
+  color: var(--blue);
+  border-color: var(--blue-dim);
 }
 
-.alert-priority-alta  { background: #fee2e2; color: var(--red); }
-.alert-priority-media { background: #ffedd5; color: var(--orange); }
-.alert-priority-baja  { background: #f3f4f6; color: var(--t2); }
-
-body.dark-mode .alert-priority-baja {
-  background: rgba(255, 255, 255, .08);
+.btn-alert-action.btn-undo:hover {
+  background: var(--orange-light);
+  color: var(--orange);
+  border-color: var(--orange-dim);
 }
 
 /* ── Responsive ─────────────────────────────────────────────────────────────── */

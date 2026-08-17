@@ -72,6 +72,8 @@ export const state = {
   historialCuotas:   [],
   pagoPeriodo:       null,
   pagoMedio:         'transferencia',
+  alertToDelete:     null,
+  alertToEdit:       null,
 };
 
 // ── Inicialización ───────────────────────────────────────────────────────────
@@ -89,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Valor por defecto de la paleta de color
   const colorInput = document.getElementById('alert-color');
   if (colorInput) colorInput.value = ALERT_COLOR_PALETTE[0];
-  setupColorPalette(ALERT_COLOR_PALETTE[0]);
+  setupColorPalette('alert-form', ALERT_COLOR_PALETTE[0]);
 
   // Refrescar info de cuota al volver al foco de la pestaña
   document.addEventListener('visibilitychange', () => {
@@ -120,13 +122,18 @@ function _setupEventDelegation() {
       const action = actionEl.dataset.jsAction;
 
       if (action === 'complete-alert') {
-        e.stopPropagation();
         _completeAlert(parseInt(actionEl.dataset.alertId, 10));
         return;
       }
 
       if (action === 'delete-alert') {
-        _deleteAlert(parseInt(actionEl.dataset.alertId, 10));
+        state.alertToDelete = parseInt(actionEl.dataset.alertId, 10);
+        document.dispatchEvent(new CustomEvent('modal:open', { detail: { id: 'confirm-delete-alerta' } }));
+        return;
+      }
+
+      if (action === 'edit-alert') {
+        _openEditModal(parseInt(actionEl.dataset.alertId, 10));
         return;
       }
 
@@ -177,6 +184,16 @@ function _setupEventDelegation() {
       }
     }
 
+    // ── Confirmar eliminación de alerta ──────────────────────────────────
+    if (target.closest('#btn-confirm-delete-alerta')) {
+      if (state.alertToDelete) {
+        _deleteAlert(state.alertToDelete);
+        document.dispatchEvent(new CustomEvent('modal:close', { detail: { id: 'confirm-delete-alerta' } }));
+        state.alertToDelete = null;
+      }
+      return;
+    }
+
     // ── Cierre del banner de cuota ────────────────────────────────────────
     // Manejado por Event Delegation en banners.js
   });
@@ -197,6 +214,11 @@ function _setupFormListeners() {
   const formAlerta = document.getElementById('alert-form');
   if (formAlerta) {
     formAlerta.addEventListener('submit', _handleAlertSubmit);
+  }
+
+  const formEditAlerta = document.getElementById('edit-alert-form');
+  if (formEditAlerta) {
+    formEditAlerta.addEventListener('submit', _handleEditSubmit);
   }
 }
 
@@ -269,13 +291,14 @@ async function _loadHistorialCuotasView(anio) {
  * @returns {void}
  */
 function _updateUI() {
-  const activeAlerts = state.alerts.filter(a => !a.completada);
+  // Ordenamiento optimista por fecha ascendente
+  state.alerts.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 
-  renderNavBadge(activeAlerts);
+  renderNavBadge(state.alerts.filter(a => !a.completada));
   updateViewToggle(state.view);
 
   if (state.view === 'list') {
-    renderListView(activeAlerts);
+    renderListView(state.alerts);
   } else {
     renderCalendar(state, state.alerts);
   }
@@ -295,22 +318,28 @@ function _switchView(viewType) {
 }
 
 /**
- * Marca una alerta como completada de forma optimista y persiste en la API.
+ * Marca una alerta como completada o la restaura de forma optimista y persiste en la API.
  *
  * @param {number} id - ID de la alerta.
  * @returns {Promise<void>}
  */
 async function _completeAlert(id) {
   const alerta = state.alerts.find(a => a.id === id);
-  if (alerta) alerta.completada = true;
+  if (!alerta) return;
+
+  const newState = !alerta.completada;
+  alerta.completada = newState;
   _updateUI();
 
   try {
-    await updateAlerta(id, { completada: true });
-    window.showToast('Alerta marcada como completada.', 'success');
+    await updateAlerta(id, { completada: newState });
+    const msg = newState ? 'Alerta completada.' : 'Alerta restaurada.';
+    window.showToast(msg, 'success');
   } catch (e) {
-    console.error('[alertas-main] Error al completar alerta:', e);
-    window.showToast('No se pudo completar la alerta.', 'error');
+    console.error('[alertas-main] Error al togglear alerta:', e);
+    window.showToast('No se pudo actualizar el estado de la alerta.', 'error');
+    alerta.completada = !newState; // rollback
+    _updateUI();
   }
 }
 
@@ -343,6 +372,7 @@ async function _handleAlertSubmit(event) {
   event.preventDefault();
 
   const titulo    = document.getElementById('alert-title').value.trim();
+  const descripcion = document.getElementById('alert-desc').value.trim();
   const categoria = document.getElementById('alert-type').value;
   const prioridad = document.getElementById('alert-priority').value;
   const fecha     = document.getElementById('alert-date').value;
@@ -357,7 +387,7 @@ async function _handleAlertSubmit(event) {
       prioridad,
       fecha,
       color,
-      descripcion: `Cargada manualmente para la fecha límite ${formatDateStr(fecha)}.`,
+      descripcion: descripcion || `Cargada manualmente para la fecha límite ${formatDateStr(fecha)}.`,
     });
 
     state.alerts.push(nuevaAlerta);
@@ -365,17 +395,87 @@ async function _handleAlertSubmit(event) {
 
     // Resetear formulario
     document.getElementById('alert-title').value    = '';
+    document.getElementById('alert-desc').value     = '';
     document.getElementById('alert-type').value     = 'academic';
     document.getElementById('alert-priority').value = 'alta';
     document.getElementById('alert-date').value     = todayDateStr();
     const colorInput = document.getElementById('alert-color');
     if (colorInput) colorInput.value = ALERT_COLOR_PALETTE[0];
-    setupColorPalette(ALERT_COLOR_PALETTE[0]);
+    setupColorPalette('alert-form', ALERT_COLOR_PALETTE[0]);
 
     window.showToast('Alerta creada con éxito.', 'success');
   } catch (e) {
     console.error('[alertas-main] Error al crear alerta:', e);
     window.showToast('No se pudo guardar la alerta. Intentá de nuevo.', 'error');
+  }
+}
+
+/**
+ * Abre el modal de edición poblado con los datos de la alerta.
+ *
+ * @param {number} id - ID de la alerta a editar.
+ * @returns {void}
+ */
+function _openEditModal(id) {
+  const alerta = state.alerts.find(a => a.id === id);
+  if (!alerta) return;
+
+  state.alertToEdit = id;
+
+  document.getElementById('edit-alert-title').value = alerta.titulo;
+  document.getElementById('edit-alert-desc').value = alerta.descripcion || '';
+  document.getElementById('edit-alert-type').value = alerta.categoria;
+  document.getElementById('edit-alert-priority').value = alerta.prioridad;
+  document.getElementById('edit-alert-date').value = alerta.fecha;
+  
+  // Setear color
+  const colorToSet = alerta.color || ALERT_COLOR_PALETTE[0];
+  setupColorPalette('edit-alert-form', colorToSet);
+
+  document.dispatchEvent(new CustomEvent('modal:open', { detail: { id: 'edit-alerta-modal' } }));
+}
+
+/**
+ * Maneja el envío del formulario de edición.
+ *
+ * @param {Event} event - El evento submit del formulario.
+ * @returns {Promise<void>}
+ */
+async function _handleEditSubmit(event) {
+  event.preventDefault();
+
+  if (!state.alertToEdit) return;
+
+  const id = state.alertToEdit;
+  const titulo    = document.getElementById('edit-alert-title').value.trim();
+  const descripcion = document.getElementById('edit-alert-desc').value.trim();
+  const categoria = document.getElementById('edit-alert-type').value;
+  const prioridad = document.getElementById('edit-alert-priority').value;
+  const fecha     = document.getElementById('edit-alert-date').value;
+  const color     = (document.getElementById('edit-alert-color').value || '').trim();
+
+  if (!titulo || !fecha) return;
+
+  const data = { titulo, descripcion, categoria, prioridad, fecha, color };
+
+  // Actualización optimista local
+  const index = state.alerts.findIndex(a => a.id === id);
+  if (index !== -1) {
+    state.alerts[index] = { ...state.alerts[index], ...data };
+    _updateUI();
+  }
+
+  document.dispatchEvent(new CustomEvent('modal:close', { detail: { id: 'edit-alerta-modal' } }));
+
+  try {
+    await updateAlerta(id, data);
+    window.showToast('Alerta actualizada con éxito.', 'success');
+  } catch (e) {
+    console.error('[alertas-main] Error al editar alerta:', e);
+    window.showToast('No se pudo actualizar la alerta.', 'error');
+    // En caso de error, podríamos recargar las alertas completas
+    await _loadAlertas();
+    _updateUI();
   }
 }
 
