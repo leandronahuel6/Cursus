@@ -1,0 +1,763 @@
+/**
+ * @fileoverview Estilos compartidos exclusivos del subsistema de landing pages
+ * (welcome y contacto). Centraliza el layout `.page` con scroll independiente,
+ * los estilos del header, footer, navegación y utilitarios de sección.
+ *
+ * IMPORTANTE:
+ * - Este archivo NO debe contener tokens globales que ya existan en variables.css.
+ * - Las variables landing-exclusivas (--bg-color, --header-bg, --mock-bg, etc.)
+ *   se definen aquí ya que solo aplican a este subsistema.
+ * - La clase `.page` gestiona TODO el scroll de la página. El header queda
+ *   fijo fuera del flujo de scroll y NO necesita clase `.scrolled` ni JS adicional.
+ *
+ * Cargado desde: resources/views/layouts/landing.blade.php
+ */
+
+/* ==========================================================================
+   TOKENS EXCLUSIVOS DE LANDING (NO presentes en variables.css global)
+   ========================================================================== */
+:root {
+    /* Fondo y superficie */
+    --bg-color:         #f5f7fc;
+    --text-main:        #1e293b;
+    --text-heading:     #0f172a;
+    --text-desc:        #334155;
+    --text-muted:       #475569;
+
+    /* Tarjetas landing */
+    --card-bg:          rgba(255, 255, 255, 0.7);
+    --card-bg-hover:    #ffffff;
+    --card-border:      rgba(226, 232, 240, 0.8);
+    --card-shadow:      rgba(0, 0, 0, 0.01);
+
+    /* Header */
+    --header-bg:        rgba(245, 247, 252, 0.8);
+    --header-border:    rgba(226, 232, 240, 0.8);
+    --header-h:         75px;
+
+    /* Inputs (landing) */
+    --bg-input:         #ffffff;
+
+    /* Fondo global de imagen */
+    --global-bg-opacity: 0.07;
+
+    /* Gradientes de marca landing */
+    --brand-gradient:       linear-gradient(135deg, #5c4fe5 0%, #06b6d4 100%);
+    --brand-gradient-hover: linear-gradient(135deg, #4f46e5 0%, #0891b2 100%);
+    --text-gradient:        linear-gradient(135deg, #5c4fe5 0%, #0891b2 100%);
+
+    /* Aurora background */
+    --bg-gradient-aurora:
+        radial-gradient(at 0% 0%,   rgba(99, 102, 241, 0.18) 0px, transparent 50%),
+        radial-gradient(at 100% 0%,  rgba(6, 182, 212, 0.15)  0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
+        radial-gradient(at 0% 100%,  rgba(99, 102, 241, 0.12) 0px, transparent 50%);
+
+    /* Cards grises (steps, stats) */
+    --gray-card-bg:      rgba(241, 245, 249, 0.75);
+    --gray-card-border:  rgba(226, 232, 240, 0.9);
+    --gray-card-bg-hover: rgba(226, 232, 240, 0.85);
+
+    /* Tabla comparativa */
+    --table-th-bg:          rgba(241, 245, 249, 0.5);
+    --table-td-bg-siu:      rgba(241, 245, 249, 0.5);
+    --table-td-bg-cursus:   rgba(99, 102, 241, 0.05);
+
+    /* FAQ */
+    --faq-answer-bg: rgba(255, 255, 255, 0.3);
+    
+    /* Overlay claro para fondos */
+    --page-overlay-bg: rgba(255, 255, 255, 0.6);
+
+    /* Mock Dashboard */
+    --mock-bg:          #ffffff;
+    --mock-border:      #cbd5e1;
+    --mock-hdr-bg:      #f8fafc;
+    --mock-sidebar-bg:  #0f172a;
+    --mock-main-bg:     #fafbfc;
+    --mock-widget-bg:   #ffffff;
+}
+
+body.dark-mode {
+    --bg-color:         #070a13;
+    --text-main:        #f1f5f9;
+    --text-heading:     #f8fafc;
+    --text-desc:        #e2e8f0;
+    --text-muted:       #cbd5e1;
+
+    --card-bg:          rgba(17, 24, 39, 0.75);
+    --card-bg-hover:    rgba(30, 41, 59, 0.9);
+    --card-border:      rgba(30, 41, 59, 0.8);
+    --card-shadow:      rgba(0, 0, 0, 0.15);
+
+    --header-bg:        rgba(7, 10, 19, 0.85);
+    --header-border:    rgba(30, 41, 59, 0.8);
+    --bg-input:         #1e293b;
+    --global-bg-opacity: 0.05;
+
+    --table-th-bg:          rgba(15, 23, 42, 0.6);
+    --table-td-bg-siu:      rgba(15, 23, 42, 0.6);
+    --table-td-bg-cursus:   rgba(99, 102, 241, 0.15);
+    --faq-answer-bg:        rgba(0, 0, 0, 0.2);
+
+    /* Overlay oscuro reactivo */
+    --page-overlay-bg: rgba(7, 10, 19, 0.75);
+
+    --mock-bg:          #0f172a;
+    --mock-border:      #1e293b;
+    --mock-hdr-bg:      #1e293b;
+    --mock-sidebar-bg:  #070a13;
+    --mock-main-bg:     #111827;
+    --mock-widget-bg:   #1e293b;
+
+    --gray-card-bg:      rgba(30, 41, 59, 0.65);
+    --gray-card-border:  rgba(51, 65, 85, 0.65);
+    --gray-card-bg-hover: rgba(30, 41, 59, 0.8);
+
+    --brand-gradient:       linear-gradient(135deg, #818cf8 0%, #22d3ee 100%);
+    --brand-gradient-hover: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+    --text-gradient:        linear-gradient(135deg, #a5b4fc 0%, #22d3ee 100%);
+    --bg-gradient-aurora:
+        radial-gradient(at 0% 0%,    rgba(99, 102, 241, 0.18) 0px, transparent 50%),
+        radial-gradient(at 100% 0%,  rgba(6, 182, 212, 0.15)  0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.08) 0px, transparent 50%),
+        radial-gradient(at 0% 100%,  rgba(99, 102, 241, 0.08) 0px, transparent 50%);
+
+    background-image: var(--bg-gradient-aurora);
+}
+
+/* ==========================================================================
+   LAYOUT GLOBAL DEL BODY
+   ========================================================================== */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* El scroll ocurre en .page, no en body */
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    position: relative;
+    background-image: var(--bg-gradient-aurora);
+    background-size: 200% 200%;
+    animation: aurora 15s infinite alternate ease-in-out;
+    transition:
+        background-color 0.3s,
+        color 0.3s,
+        background-image 0.3s;
+}
+
+@keyframes aurora {
+    0%   { background-position: 0% 0%; }
+    50%  { background-position: 100% 100%; }
+    100% { background-position: 0% 100%; }
+}
+
+/* ==========================================================================
+   CLASE .page — CONTENEDOR PRINCIPAL CON SCROLL INDEPENDIENTE
+   IMPORTANTE: Se usa `100dvh` en lugar de `100vh` para manejar correctamente
+   el alto en navegadores móviles donde la barra de URL retráctil recorta el
+   viewport. `100vh` en móviles causa desborde. `100dvh` se adapta dinámicamente.
+   ========================================================================== */
+.page {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    background-color: var(--bg-color);
+    background-image: var(--bg-url, none);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    z-index: 0; /* Crea un contexto de apilamiento independiente */
+}
+
+/* Overlay global responsivo para la landing (oscurecimiento y blur) */
+.page::before {
+    content: "";
+    display: block;
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100dvh;
+    margin-bottom: -100dvh; /* Evita empujar el contenido hacia abajo */
+    background: var(--page-overlay-bg);
+    transition: background 0.3s ease; /* Transición fluida al cambiar el tema */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/**
+ * Previene el CLS (Cumulative Layout Shift) producido por la aparición
+ * del scrollbar en páginas con contenido largo en escritorio.
+ * Solo aplica en dispositivos con puntero fino (mouse), no en touch.
+ */
+@media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
+    .page {
+        scrollbar-gutter: stable;
+    }
+}
+
+/* ==========================================================================
+   BLOBS FLOTANTES DE FONDO
+   ========================================================================== */
+.blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    -webkit-filter: blur(80px);
+    z-index: -1;
+    opacity: 0.12;
+    animation: float 14s infinite alternate ease-in-out;
+    pointer-events: none;
+}
+.blob-1 {
+    width: 350px;
+    height: 350px;
+    background: rgba(99, 102, 241, 0.15);
+    top: 5%;
+    left: -5%;
+}
+.blob-2 {
+    width: 320px;
+    height: 320px;
+    background: rgba(16, 185, 129, 0.15);
+    top: 40%;
+    right: -5%;
+    animation-delay: -5s;
+}
+.blob-3 {
+    width: 350px;
+    height: 350px;
+    background: rgba(236, 72, 153, 0.12);
+    bottom: 15%;
+    left: 5%;
+    animation-delay: -3s;
+}
+
+/* ==========================================================================
+   HEADER STICKY
+   El header es position:fixed fuera del flujo de .page.
+   Ya NO necesita clase .scrolled ni JS para detectar scroll global,
+   ya que el scroll ocurre en .page y el header siempre queda visible arriba.
+   ========================================================================== */
+.landing-header {
+    position: sticky;
+    top: 0;
+    z-index: 1050; 
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    background: var(--header-bg);
+    border-bottom: 1px solid var(--header-border);
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease;
+}
+
+/* ---- Logo ---- */
+.logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+}
+.logo-wrap img {
+    height: 38px;
+    width: auto;
+    border-radius: 8px;
+}
+body.dark-mode .logo-wrap img {
+    filter: brightness(0.9);
+}
+.logo-tx {
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--text-heading);
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+.logo-tx small {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-desc);
+}
+
+/* ==========================================================================
+   NAVEGACIÓN (DESKTOP)
+   ========================================================================== */
+.landing-nav {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+}
+.landing-nav__close {
+    display: none;
+}
+.landing-nav a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 14px;
+    position: relative;
+    transition: color 0.2s;
+}
+.landing-nav a::after {
+    content: attr(data-text);
+    display: block;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    font-weight: 700;
+    pointer-events: none;
+    user-select: none;
+}
+.landing-nav a:hover,
+.landing-nav a.active-link {
+    color: var(--brand);
+    font-weight: 700;
+}
+.landing-nav a:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 3px;
+    border-radius: 3px;
+}
+
+/* ---- Acciones del header ---- */
+.landing-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.btn-login {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 20px;
+    transition: color 0.2s;
+}
+.btn-login:hover {
+    color: var(--brand);
+}
+.btn-login:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+.btn-register {
+    text-decoration: none;
+    background: var(--brand-gradient);
+    background-size: 200% 100%;
+    background-position: left center;
+    color: #ffffff !important;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 22px;
+    border-radius: 30px;
+    box-shadow:
+        0 4px 14px rgba(99, 102, 241, 0.25),
+        0 2px 5px rgba(6, 182, 212, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-block;
+}
+.btn-register:hover {
+    background-position: right center;
+    transform: translateY(-2px);
+    box-shadow:
+        0 8px 25px rgba(99, 102, 241, 0.35),
+        0 4px 10px rgba(6, 182, 212, 0.25);
+}
+.btn-register:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 3px;
+}
+
+/* ---- Theme Toggle ---- */
+.theme-toggle-btn {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+.theme-toggle-btn:hover {
+    background: #ffffff;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border-color: var(--brand);
+}
+.theme-toggle-btn:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 3px;
+}
+body.dark-mode .theme-toggle-btn {
+    background: rgba(17, 24, 39, 0.5);
+    border-color: rgba(30, 41, 59, 0.8);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+body.dark-mode .theme-toggle-btn:hover {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: var(--brand);
+}
+/* Iconos sol/luna: visibilidad controlada por CSS, sin JS de estilo */
+.theme-toggle-btn .icon-sun {
+    display: none;
+    color: #f59e0b;
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.25;
+}
+.theme-toggle-btn .icon-moon {
+    display: block;
+    color: #6366f1;
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.25;
+}
+body.dark-mode .theme-toggle-btn .icon-sun  { display: block; }
+body.dark-mode .theme-toggle-btn .icon-moon { display: none; }
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.landing-footer {
+    background: #0f172a;
+    color: #94a3b8;
+    padding: 60px 5% 40px 5%;
+    border-top: 1px solid #1e293b;
+}
+.footer-layout {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid #1e293b;
+}
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    text-decoration: none;
+}
+.footer-logo img {
+    height: 30px;
+    width: auto;
+    border-radius: 6px;
+}
+.footer-logo-tx {
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1.1;
+    display: flex;
+    flex-direction: column;
+}
+.footer-logo-tx small {
+    font-size: 9px;
+    color: #64748b;
+    font-weight: 500;
+}
+.footer-nav {
+    display: grid;
+    gap: 16px 24px;
+    width: 100%;
+    /* Por defecto para móviles: 2 columnas equitativas para prevenir overflow */
+    grid-template-columns: repeat(2, 1fr);
+}
+.footer-nav a {
+    text-decoration: none;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+.footer-nav a:hover {
+    color: #ffffff;
+}
+.footer-nav a:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 3px;
+    border-radius: 3px;
+}
+.footer-bottom {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #64748b;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+/* ==========================================================================
+   UTILITARIOS DE SECCIÓN
+   ========================================================================== */
+.section {
+    padding: 100px 5%;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+.section-header {
+    text-align: center;
+    max-width: 650px;
+    margin: 0 auto 60px auto;
+}
+.section-lbl {
+    color: var(--brand);
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+    display: block;
+}
+.section-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-heading);
+    margin: 0 0 16px 0;
+    line-height: 1.2;
+}
+.section-desc {
+    font-size: 15px;
+    color: var(--text-desc);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ==========================================================================
+   ANIMACIÓN REVEAL AL SCROLL
+   ========================================================================== */
+.reveal {
+    opacity: 0;
+    transform: translateY(35px);
+    transition:
+        opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+.reveal.active:nth-child(1) { transition-delay: 0s; }
+.reveal.active:nth-child(2) { transition-delay: 0.1s; }
+.reveal.active:nth-child(3) { transition-delay: 0.2s; }
+.reveal.active:nth-child(4) { transition-delay: 0.3s; }
+
+/* ==========================================================================
+   ACCESIBILIDAD — REDUCCIÓN DE MOVIMIENTO
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    body,
+    .blob,
+    .reveal,
+    .landing-header,
+    .btn-register,
+    .btn-hero-primary,
+    .step-card,
+    .benefit-card,
+    .testimonial-card,
+    .scroll-top-btn {
+        animation: none !important;
+        transition: none !important;
+    }
+    .reveal {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ==========================================================================
+   NAVEGACIÓN MÓVIL (OFF-CANVAS)
+   ========================================================================== */
+.landing-header__toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--text-heading);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r-sm);
+    transition: background 0.3s;
+}
+/* Evita que el SVG intercepte/robe el evento de clic en algunos navegadores */
+.landing-header__toggle svg {
+    pointer-events: none;
+}
+.landing-header__toggle:hover {
+    background: var(--gray-card-bg);
+}
+.landing-nav-overlay {
+    position: fixed;
+    top: 0;
+    left: -100vw;
+    width: 200vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1040;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.landing-nav-overlay--active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ==========================================================================
+   RESPONSIVO COMPARTIDO
+   ========================================================================== */
+@media (max-width: 1248px) {
+    .landing-header__toggle {
+        display: flex;
+    }
+    .landing-nav {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        height: 100dvh;
+        width: 320px;
+        max-width: 85vw;
+        background: var(--surface, var(--gray-card-bg));
+        border-left: 1px solid var(--header-border);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 100px 32px 32px;
+        gap: 24px;
+        z-index: 1045; /* Sobre el overlay, bajo el header */
+        transform: translateX(100%);
+        /* Se quita transition general para que no haya glitch en el resize */
+    }
+    .landing-nav--open {
+        transform: translateX(0);
+        box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .landing-nav a {
+        font-size: 18px;
+        width: 100%;
+        border-bottom: 1px solid var(--gray-card-border);
+        padding-bottom: 16px;
+    }
+    .landing-nav__close {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        width: 44px;
+        height: 44px;
+        border-radius: var(--r-sm);
+        background: transparent;
+        border: none;
+        color: var(--text-heading);
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    .landing-nav__close svg {
+        pointer-events: none;
+    }
+    .landing-nav__close:hover {
+        background: var(--gray-card-border);
+    }
+    .landing-nav a::after {
+        display: none; /* Desactiva el hack CLS inline en vertical */
+    }
+}
+@media (max-width: 600px) {
+    .landing-header {
+        padding: 0 12px;
+        height: 60px;
+    }
+    .landing-nav--open {
+        width: 100%;
+        max-width: none;
+    }
+    /* Estructura del Footer en Móvil */
+    .footer-layout {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 32px;
+    }
+    .footer-nav {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    .logo-wrap img {
+        height: 30px;
+    }
+    .logo-tx {
+        font-size: 15px;
+    }
+    .logo-tx small {
+        display: none;
+    }
+    .theme-toggle-btn {
+        width: 32px;
+        height: 32px;
+    }
+    .landing-actions {
+        gap: 4px;
+    }
+    .btn-login {
+        padding: 6px 8px;
+        font-size: 12.5px;
+    }
+    .btn-register {
+        padding: 6px 12px;
+        font-size: 12.5px;
+    }
+}
+
+/* Ocultar texto del logo en pantallas muy pequeñas (iPhone SE, etc.) */
+@media (max-width: 380px) {
+    .logo-tx {
+        display: none;
+    }
+}
+/* ==========================================================================
+   FOOTER (DESKTOP)
+   ========================================================================== */
+@media (min-width: 601px) {
+    .footer-nav {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: auto;
+        flex: 1;
+        justify-content: center;
+        gap: 32px 48px;
+    }
+}

@@ -1,108 +1,127 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contacto — Cursus UTN Haedo</title>
-    <link rel="icon" href="{{ asset('assets/icons/cursus-logo.svg') }}" type="image/svg+xml">
+{{--
+    @fileoverview Vista de la página de Contacto de Cursus.
+    Extiende el layout base de landing (layouts/landing). No contiene
+    etiquetas <html>, <head>, <body>, ni imports de scripts o CSS globales:
+    todo eso es responsabilidad del layout.
 
-    <!-- Google Fonts: Outfit -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    Reglas aplicadas:
+    - Sin atributos style="" en el HTML.
+    - Sin eventos inline (onsubmit, onclick). El JS usa addEventListener.
+    - Clases de formulario de forms.css (.custom-input, .custom-textarea, .form-field, etc.)
+    - ARIA completo en el modal (role, aria-modal, aria-labelledby, aria-describedby).
+    - La variable --bg-url y el overlay de imagen están en contacto.css.
+--}}
+@extends('layouts.landing')
 
-    <!-- CSS / Estilos Premium -->
-    <link rel="stylesheet" href="{{ asset('css/base/reset.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/base/animations.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/views/contacto.css') }}">
-</head>
-<body>
+@section('title', 'Contacto — Cursus UTN Haedo')
+@section('meta-description', 'Contactá al equipo de Cursus. Dudas académicas, soporte técnico o sugerencias: estamos acá para ayudarte.')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/components/forms.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/views/landing/contacto.css') }}">
+@endpush
 
+@section('content')
 
-    <!-- HEADER / NAVBAR sticky -->
-    <header class="landing-header">
-        <a href="{{ route('welcome') }}" class="logo-wrap">
-            <img src="{{ asset('assets/icons/cursus-logo.svg') }}" alt="Cursus Logo">
-            <div class="logo-tx">
-                Cursus
-                <small>UTN Haedo</small>
-            </div>
-        </a>
-
-        <nav class="landing-nav">
-            <a href="{{ route('welcome') }}#que-es">Qué es</a>
-            <a href="{{ route('welcome') }}#como-funciona">Cómo funciona</a>
-            <a href="{{ route('welcome') }}#beneficios">Beneficios</a>
-            <a href="{{ route('welcome') }}#faq">Preguntas</a>
-            <a href="#" class="active">Contacto</a>
-        </nav>
-
-        <div class="landing-actions">
-            <button data-theme-toggle class="theme-toggle-btn" aria-label="Cambiar tema">
-                <i data-lucide="sun" class="icon-sun" style="width: 18px; height: 18px; stroke-width: 2.25;"></i>
-                <i data-lucide="moon" class="icon-moon" style="width: 18px; height: 18px; stroke-width: 2.25;"></i>
-            </button>
-            @if (Route::has('login'))
-                @auth
-                    <a href="{{ url('/dashboard') }}" class="btn-register">Ir al Dashboard</a>
-                @else
-                    <a href="{{ route('login') }}" class="btn-login">Ingresar</a>
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="btn-register">Registrarse</a>
-                    @endif
-                @endauth
-            @endif
-        </div>
-    </header>
-
-    <!-- CONTAINER PRINCIPAL DE LA PÁGINA DE CONTACTO -->
-    <main class="contact-page" style="--hero-bg-url: url('{{ asset('assets/img/contact_bg_page.png') }}');">
+    <div class="contact-page-wrapper">
         <div class="contact-layout">
-                <div class="contact-info">
-                    <div>
-                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; color: var(--brand); display: block; margin-bottom: 12px;">Contacto</span>
-                        <h1 class="contact-title">¿Tenés alguna consulta?</h1>
-                        <p class="contact-desc">
-                            Estamos acá para ayudarte. Si tenés dudas sobre el funcionamiento de la plataforma o sugerencias para mejorar Cursus, envianos un mensaje.
-                        </p>
-                    </div>
 
-                <div class="contact-details">
+            {{-- ── INFORMACIÓN DE CONTACTO ── --}}
+            <div class="contact-info">
+                <div>
+                    <span class="contact-section-lbl">Contacto</span>
+                    <h1 class="contact-title">¿Tenés alguna consulta?</h1>
+                    <p class="contact-desc">
+                        Estamos acá para ayudarte. Si tenés dudas sobre el funcionamiento
+                        de la plataforma o sugerencias para mejorar Cursus, envianos un mensaje.
+                    </p>
+                </div>
+
+                <address class="contact-details" aria-label="Datos de contacto">
                     <div class="contact-item">
-                        <i data-lucide="map-pin" style="width: 20px; height: 20px; stroke-width: 2; color: var(--brand); flex-shrink: 0;"></i>
+                        <i data-lucide="map-pin" class="contact-item__icon" aria-hidden="true"></i>
                         <span>UTN Regional Haedo — Haedo, Bs. As.</span>
                     </div>
                     <div class="contact-item">
-                        <i data-lucide="mail" style="width: 20px; height: 20px; stroke-width: 2; color: var(--brand); flex-shrink: 0;"></i>
-                        <span>soporte@cursus.utn.edu.ar</span>
+                        <i data-lucide="mail" class="contact-item__icon" aria-hidden="true"></i>
+                        <a href="mailto:soporte@cursus.utn.edu.ar">soporte@cursus.utn.edu.ar</a>
                     </div>
+                </address>
 
-                    <!-- Mapa de Google (Requisito examen) -->
-                    <div style="margin-top: 25px; border-radius: var(--r); overflow: hidden; border: 1px solid var(--card-border); box-shadow: var(--card-shadow); height: 220px; width: 100%;">
-                        <iframe src="https://maps.google.com/maps?q=UTN%20Facultad%20Regional%20Haedo,%20Par%C3%ADs%20532,%20Haedo&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                    </div>
+                {{-- Mapa de Google --}}
+                <div class="contact-map">
+                    <iframe
+                        src="https://maps.google.com/maps?q=UTN%20Facultad%20Regional%20Haedo,%20Par%C3%ADs%20532,%20Haedo&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                        title="Mapa de ubicación de UTN Regional Haedo"
+                        allowfullscreen
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        aria-label="Mapa de Google con la ubicación de UTN Regional Haedo"
+                    ></iframe>
                 </div>
             </div>
 
-            <!-- Formulario de Contacto -->
-            <form class="contact-form" id="js-contact-form" onsubmit="event.preventDefault(); handleContactSubmit();">
-                <div class="form-row">
-                    <div class="form-group">
+            {{-- ── FORMULARIO DE CONTACTO ── --}}
+            {{--
+                Sin atributo onsubmit. El evento submit es interceptado por
+                contacto.js con addEventListener('submit', handleSubmit).
+                aria-live="polite" en el contenedor de errores informa a
+                lectores de pantalla cuando aparecen mensajes de error.
+            --}}
+            <form
+                class="contact-form"
+                id="js-contact-form"
+                novalidate
+                aria-label="Formulario de consulta"
+            >
+                <div class="form-field-row">
+                    {{-- Nombre --}}
+                    <div class="form-field">
                         <label class="form-label" for="contact-name">Nombre completo</label>
-                        <input type="text" id="contact-name" class="form-input" placeholder="Juan Pérez">
-                        <span class="error-lbl" id="err-name">Este campo es obligatorio</span>
+                        <input
+                            type="text"
+                            id="contact-name"
+                            name="contact_name"
+                            class="custom-input"
+                            placeholder="Juan Pérez"
+                            autocomplete="name"
+                            aria-required="true"
+                            aria-describedby="err-name"
+                        >
+                        <span
+                            class="error-message"
+                            id="err-name"
+                            role="alert"
+                            aria-live="polite"
+                        ></span>
                     </div>
-                    <div class="form-group">
+
+                    {{-- Email --}}
+                    <div class="form-field">
                         <label class="form-label" for="contact-email">Correo institucional</label>
-                        <input type="email" id="contact-email" class="form-input" placeholder="usuario@alumnos.frh.utn.edu.ar">
-                        <span class="error-lbl" id="err-email">Ingresá un correo institucional válido</span>
+                        <input
+                            type="email"
+                            id="contact-email"
+                            name="contact_email"
+                            class="custom-input"
+                            placeholder="usuario@alumnos.frh.utn.edu.ar"
+                            autocomplete="email"
+                            aria-required="true"
+                            aria-describedby="err-email"
+                        >
+                        <span
+                            class="error-message"
+                            id="err-email"
+                            role="alert"
+                            aria-live="polite"
+                        ></span>
                     </div>
                 </div>
 
-                <div class="form-group">
+                {{-- Tipo de consulta (Blade Component x-custom-select) --}}
+                <div class="form-field">
                     <label class="form-label" for="contact-subject">Tipo de consulta</label>
-                    <x-custom-select id="contact-subject" name="contact_subject" class="">
+                    <x-custom-select id="contact-subject" name="contact_subject">
                         <option value="academica">Consulta Académica</option>
                         <option value="soporte">Soporte Técnico / Problemas</option>
                         <option value="arancel">Consulta Administrativa (Aranceles)</option>
@@ -110,57 +129,75 @@
                     </x-custom-select>
                 </div>
 
-                <div class="form-group">
+                {{-- Mensaje --}}
+                <div class="form-field">
                     <label class="form-label" for="contact-msg">Mensaje</label>
-                    <textarea id="contact-msg" class="form-textarea" placeholder="Escribí tu consulta aquí..."></textarea>
-                    <span class="error-lbl" id="err-msg">Escribí un mensaje válido (mínimo 10 caracteres)</span>
+                    <textarea
+                        id="contact-msg"
+                        name="contact_msg"
+                        class="custom-textarea"
+                        placeholder="Escribí tu consulta aquí..."
+                        aria-required="true"
+                        aria-describedby="err-msg"
+                        rows="5"
+                    ></textarea>
+                    <span
+                        class="error-message"
+                        id="err-msg"
+                        role="alert"
+                        aria-live="polite"
+                    ></span>
                 </div>
 
-                <button type="submit" class="btn-submit">Enviar consulta</button>
+                <button type="submit" class="btn-submit">
+                    <i data-lucide="send" aria-hidden="true"></i>
+                    Enviar consulta
+                </button>
             </form>
-        </div>
-    </main>
 
-    <!-- FOOTER -->
-    <footer class="landing-footer">
-        <div class="footer-layout">
-            <a href="{{ route('welcome') }}" class="footer-logo">
-                <img src="{{ asset('assets/icons/cursus-logo.svg') }}" alt="Cursus" style="height: 30px; width: auto; border-radius: 6px;">
-                <div class="footer-logo-tx">
-                    Cursus
-                    <small>UTN Haedo</small>
-                </div>
-            </a>
-            <nav class="footer-nav">
-                <a href="{{ route('welcome') }}#que-es">Qué es</a>
-                <a href="{{ route('welcome') }}#como-funciona">Cómo funciona</a>
-                <a href="{{ route('welcome') }}#beneficios">Beneficios</a>
-                <a href="#">Contacto</a>
-            </nav>
-        </div>
-        <div class="footer-bottom">
-            <span>&copy; 2026 Cursus. Creado por alumnos para la comunidad de la UTN FRH.</span>
-            <span>Tecnicatura Universitaria en Programación</span>
-        </div>
-    </footer>
-
-    <!-- MODAL DE ÉXITO -->
-    <div class="modal-overlay" id="js-success-modal">
-        <div class="modal-box">
-            <div class="modal-icon" style="display: flex; align-items: center; justify-content: center; color: var(--brand); margin-bottom: 16px;">
-                <i data-lucide="mail-check" style="width: 50px; height: 50px; stroke-width: 1.5;"></i>
-            </div>
-            <h3 class="modal-title">¡Mensaje Enviado!</h3>
-            <p class="modal-desc" id="js-modal-feedback-desc">
-                Gracias por contactarte con Cursus. Hemos recibido tu sugerencia y nos pondremos en contacto a la brevedad en tu correo institucional.
-            </p>
-            <button class="btn-modal-close" onclick="closeSuccessModal()">Cerrar</button>
         </div>
     </div>
 
-    <!-- Scripts de Lucide, theme compartido y lógica de contacto -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="{{ asset('js/shared/theme.js') }}"></script>
-    <script src="{{ asset('js/views/contacto.js') }}"></script>
-</body>
-</html>
+    {{-- ── MODAL DE ÉXITO ──
+        Atributos ARIA requeridos para el patrón modal accesible:
+        - role="dialog"       → indica que es un cuadro de diálogo
+        - aria-modal="true"   → informa a AT que el contenido de fondo no es interactivo
+        - aria-labelledby     → asocia el título del modal
+        - aria-describedby    → asocia la descripción del modal
+        Sin onclick. El cierre es manejado por contacto.js con data-js="modal-close".
+    --}}
+    <div
+        class="modal-overlay"
+        id="js-success-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-success-title"
+        aria-describedby="modal-success-desc"
+        hidden
+    >
+        <div class="modal-box">
+            <div class="modal-icon" aria-hidden="true">
+                <i data-lucide="mail-check"></i>
+            </div>
+            <h2 class="modal-title" id="modal-success-title">¡Mensaje Enviado!</h2>
+            <p class="modal-desc" id="modal-success-desc">
+                Gracias por contactarte con Cursus. Hemos recibido tu sugerencia
+                y nos pondremos en contacto a la brevedad en tu correo institucional.
+            </p>
+            <p class="modal-desc" id="js-modal-feedback-desc" aria-live="polite"></p>
+            <button
+                type="button"
+                class="btn-modal-close"
+                data-js="modal-close"
+                aria-label="Cerrar este diálogo"
+            >
+                Cerrar
+            </button>
+        </div>
+    </div>
+
+@endsection
+
+@push('scripts')
+    <script type="module" src="{{ asset('js/views/landing/contacto.js') }}"></script>
+@endpush
