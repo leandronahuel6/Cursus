@@ -71,6 +71,7 @@
 }
 .btn--pay:hover {
   background: var(--brand-dim);
+  border-color: var(--brand);
 }
 
 /* --- Variante: Cancelar / Neutro --- */

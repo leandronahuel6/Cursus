@@ -6,6 +6,11 @@
   text-transform: uppercase; letter-spacing: .02em;
 }
 
+.badge--pill {
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
 .badge--info    { background: var(--brand-light); color: var(--brand); }
 .badge--success { background: var(--green-light); color: var(--green); }
 .badge--warning { background: #ffedd5; color: var(--orange); }
