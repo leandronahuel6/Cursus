@@ -642,8 +642,8 @@ body.dark-mode .custom-confirm-card {
     flex: 1 !important;
   }
 
-  /* .modal-field-row responsive override — keeps layout */
-  .modal-field-row {
+  /* .form-field-row responsive override — keeps layout */
+  .form-field-row {
     flex-direction: column !important;
     gap: 10px !important;
   }

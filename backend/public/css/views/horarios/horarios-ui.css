@@ -165,9 +165,7 @@
   flex-direction: column;
   gap: 16px;
 }
-/* .modal-field / .modal-field-row / .modal-field-row .modal-field -> components/forms.css */
-/* .modal-lbl -> renamed to .modal-label in components/forms.css */
-/* .modal-inp-readonly / .modal-select -> components/forms.css */
+
 .sched-modal-ft {
   display: flex;
   justify-content: flex-end;

@@ -356,7 +356,6 @@ window.openAddModal = function(itemId, tipo) {
     const sub = AVAILABLE_SUBJECTS.find(s => String(s.id) === String(itemId));
     nombre = sub ? sub.nombre : '';
     document.getElementById('modal-item-name').readOnly = true;
-    document.getElementById('modal-item-name').className = 'modal-inp-readonly';
     document.getElementById('modal-comm-field').classList.remove('hidden');
     // Por defecto, un bloque nuevo arrastrado manualmente no tiene comisión asignada.
     // El usuario debe seleccionarla explícitamente. Cero adivinanzas.
@@ -365,7 +364,6 @@ window.openAddModal = function(itemId, tipo) {
     const act = schedState.personalActivities.find(a => a.id === itemId);
     nombre = act ? act.nombre : '';
     document.getElementById('modal-item-name').readOnly = false;
-    document.getElementById('modal-item-name').className = 'modal-input';
     document.getElementById('modal-comm-field').classList.add('hidden');
   }
 
@@ -395,14 +393,12 @@ window.openEditModal = function(blockId) {
 
   if (block.tipo === 'materia') {
     document.getElementById('modal-item-name').readOnly = true;
-    document.getElementById('modal-item-name').className = 'modal-inp-readonly';
     document.getElementById('modal-comm-field').classList.remove('hidden');
     // Hidratamos el select con la comisión guardada en el estado del bloque.
     // Si es null (sin asignar), dejamos la opción vacía seleccionada. Cero adivinanzas.
     document.getElementById('modal-commission-select').value = block.comision ?? '';
   } else {
     document.getElementById('modal-item-name').readOnly = false;
-    document.getElementById('modal-item-name').className = 'modal-input';
     document.getElementById('modal-comm-field').classList.add('hidden');
   }
 
