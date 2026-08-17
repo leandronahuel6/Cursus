@@ -253,7 +253,7 @@ function _buildDeckCardElement(deck) {
                 data-deck-id="${deck.id}"
                 title="Editar mazo"
                 aria-label="Editar mazo ${escapeHtml(deck.nombre)}">
-                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#pen"></use></svg>
+                <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#square-pen"></use></svg>
             </button>
             <button class="btn-deck-icon"
                 data-action="export-deck"

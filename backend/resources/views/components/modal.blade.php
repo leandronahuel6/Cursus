@@ -28,6 +28,7 @@
 @props([
     'id'        => 'modal',
     'title'     => null,
+    'icon'      => null,
     'maxWidth'  => '500px',
     'ariaLabel' => null,
 ])
@@ -55,7 +56,14 @@
         {{-- Header: Flexbox. Si hay título → left; X siempre → right. Si no hay título → solo X. --}}
         <header class="modal-hdr">
             @if($title)
-                <h2 class="modal-title" id="{{ $labelId }}">{{ $title }}</h2>
+                <h2 class="modal-title" id="{{ $labelId }}">
+                    @if($icon)
+                        <svg class="modal-title-icon" width="16" height="16" aria-hidden="true" focusable="false">
+                            <use href="{{ asset('assets/icons/sprite.svg') }}#{{ $icon }}"></use>
+                        </svg>
+                    @endif
+                    {{ $title }}
+                </h2>
             @endif
 
             <button

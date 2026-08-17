@@ -46,7 +46,10 @@ public/
 │   │   ├── forms.css       # .custom-input, .custom-textarea, .custom-select-wrapper, switches
 │   │   └── pomo-float.css  # Widget flotante Pomodoro minimizable
 │   └── views/              # Estilos ESPECÍFICOS para cada página
-│       ├── welcome.css     # Estilos exclusivos de la landing page
+│       ├── landing/        # Subsistema de Landing Pages
+│       │   ├── shared.css  # Layout, Header, Footer y tokens globales de la landing
+│       │   ├── welcome.css # Animaciones y BEM Mock Dashboard del Home
+│       │   └── contacto.css# UI y modal del formulario de Contacto
 │       ├── dashboard.css   # Panel principal (Inicio)
 │       ├── area-estudio.css# Pomodoro, Kanban
 │       ├── area-estudio-focus.css  # Modo concentración (Zen Mode)
@@ -75,22 +78,33 @@ public/
 │   │   └── PomodoroStates.js # State Pattern: FaseEnfoque, FaseDescansoCorto, FaseDescansoLargo
 │   ├── services/           # Servicios desacoplados de la UI (ES6 Modules)
 │   │   ├── ApiService.js     # Repository Pattern: abstrae TODOS los fetch de la app
+│   │   ├── AuthService.js    # Autenticación: token, sesión, logout, perfil base
+│   │   ├── ProfileService.js # CRUD de perfil: datos, avatar, fondo, contraseña, contacto
 │   │   ├── PomodoroStateService.js # Observer/SSOT: estado canónico del Pomodoro + motor Time Deltas
 │   │   └── PomodoroSyncQueue.js # Cola Offline: Sincronización en segundo plano de sesiones Pomodoro
 │   ├── shared/             # Scripts transversales a toda la app
 │   │   ├── toast.js        # ★ Sistema centralizado de notificaciones (window.showToast)
-│   │   ├── sidebar.js      # Lógica del menú lateral: colapso, tooltips y navegación activa
+│   │   ├── sidebar.js      # Lógica del menú lateral: colapso, tooltips, navegación activa y toggleVistaAlumno
+│   │   ├── workspace-bg.js # Hidratación visual global: nombre, avatar, rol, fondo de pantalla
+│   │   ├── alerts-badge.js # Badge de alertas próximas (7 días) en sidebar y nav inferior
+│   │   ├── profile-menu.js # Toggle del popup de menú de usuario (desktop y mobile)
 │   │   ├── utils.js        # Funciones auxiliares reutilizables: formato de fechas, cálculo de alertas próximas
 │   │   ├── sprite.js       # Helper centralizado para generar markup <svg><use> del sprite SVG
-│   │   ├── profile.js      # Menú de perfil de usuario: cambio de carrera, modal de contraseña, cierre de sesión
+│   │   ├── profile.js      # ⚠️ @deprecated — Vaciado. Pendiente borrado definitivo tras verificación.
 │   │   ├── theme.js        # Alternancia modo claro/oscuro
 │   │   ├── celebracion.js  # Efectos de celebración (confeti, animaciones)
 │   │   ├── animations.js   # Animaciones compartidas (landing, transiciones)
 │   │   └── pomo-audio-player.js # Módulo de UI puro: sintetiza alarmas con Web Audio API. Importado por area-estudio.js y pomo-float.js.
 │   ├── components/         # Módulos transversales de UI (ES6, sin lógica de vista)
-│   │   └── modal.js        # Focus Trap, Escape, overlay-click, retorno de foco. API: modal:open / modal:close events
+│   │   ├── modal.js            # Focus Trap, Escape, overlay-click, retorno de foco. API: modal:open / modal:close events
+│   │   ├── profile-modal.js    # Modal de edición de perfil: datos, avatar, fondo de pantalla
+│   │   ├── contact-modal.js    # Modal de contacto / feedback
+│   │   └── change-password-modal.js # Modal de cambio de contraseña
 │   └── views/              # Lógica específica por página (orquestadores)
-│       ├── welcome.js      # Animaciones de la landing
+│       ├── landing/        # Scripts del subsistema de Landing Pages
+│       │   ├── shared.js   # Intersections, ScrollTop, Smooth Scroll, Tema
+│       │   ├── welcome.js  # Lógica del Mock Dashboard y Animaciones
+│       │   └── contacto.js # Manejo del formulario y modales
 │       ├── dashboard.js    # Lógica del panel de inicio
 │       ├── area-estudio.js # Orquestador principal del Área de Estudio
 │       ├── kanban.js       # Lógica separada del Tablero Kanban y Modal de Tareas
@@ -157,8 +171,12 @@ resources/views/
 │   ├── contact.blade.php
 │   └── welcome.blade.php
 ├── layouts/
-│   └── app.blade.php           # Plantilla base. Orquesta la carga de CSS modular y partials.
+│   ├── app.blade.php           # Plantilla base. Orquesta la carga de CSS modular y partials.
+│   └── landing.blade.php       # Plantilla exclusiva para las vistas del subsistema Landing.
 ├── partials/                   # Fragmentos reutilizables de UI general
+│   ├── landing/                # Partials exclusivos de la landing
+│   │   ├── header.blade.php
+│   │   └── footer.blade.php
 │   ├── sidebar.blade.php       # Navegación izquierda
 │   ├── mobile-nav.blade.php    # Navegación inferior
 │   ├── contact-modal.blade.php # Formulario de feedback

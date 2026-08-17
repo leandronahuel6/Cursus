@@ -227,19 +227,19 @@
   </div><!-- /sched-main-split -->
 
   <!-- Modal emergente para añadir bloque con precisión (cuando se hace clic en "+") -->
-  <x-modal id="add-block-modal" title="Añadir a Horarios" max-width="500px">
+  <x-modal id="add-block-modal" title="Añadir a Horarios">
     <div class="sched-modal-body">
       <input type="hidden" id="modal-item-id">
       <input type="hidden" id="modal-item-type">
       
-      <div class="modal-field">
-        <label class="modal-label">Asignatura / Actividad:</label>
-        <input type="text" class="modal-inp-readonly" id="modal-item-name" readonly>
+      <div class="form-field">
+        <label class="form-label">Asignatura / Actividad:</label>
+        <input type="text" class="custom-input" id="modal-item-name" readonly>
       </div>
 
-      <div class="modal-field-row">
-        <div class="modal-field">
-          <label class="modal-label">Día:</label>
+      <div class="form-field-row">
+        <div class="form-field">
+          <label class="form-label">Día:</label>
           <x-custom-select id="modal-day-select" name="modal_day">
             <option value="1">Lunes</option>
             <option value="2">Martes</option>
@@ -249,8 +249,8 @@
             <option value="6">Sábado</option>
           </x-custom-select>
         </div>
-        <div class="modal-field" id="modal-comm-field">
-          <label class="modal-label" id="modal-comm-lbl">Comisión:</label>
+        <div class="form-field" id="modal-comm-field">
+          <label class="form-label" id="modal-comm-lbl">Comisión:</label>
           <x-custom-select id="modal-commission-select" name="modal_commission">
             <option value="">Sin comisión / No seleccionar</option>
             <optgroup label="Madrugada">
@@ -268,15 +268,15 @@
         </div>
       </div>
 
-      <div class="modal-field-row">
-        <div class="modal-field">
-          <label class="modal-label">Hora Inicio:</label>
+      <div class="form-field-row">
+        <div class="form-field">
+          <label class="form-label">Hora Inicio:</label>
           <x-custom-select id="modal-start-time-select" name="modal_start_time">
             {{-- Se poblará con JS --}}
           </x-custom-select>
         </div>
-        <div class="modal-field">
-          <label class="modal-label">Hora Fin:</label>
+        <div class="form-field">
+          <label class="form-label">Hora Fin:</label>
           <x-custom-select id="modal-end-time-select" name="modal_end_time">
             {{-- Se poblará con JS --}}
           </x-custom-select>

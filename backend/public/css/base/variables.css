@@ -33,9 +33,17 @@
   --green:       #059669;
   --green-hover: #15803d;
   --orange:      #ea580c;
+  --orange-hover:#c2410c;
+  --orange-light:#ffedd5;
+  --orange-dim:  #fed7aa;
   --yellow:      #d97706;
   --red:         #dc2626;
   --red-hover:   #b91c1c;
+
+  --blue:        #2563eb;
+  --blue-hover:  #1d4ed8;
+  --blue-light:  #eff6ff;
+  --blue-dim:    #bfdbfe;
 
   --brand-ring: rgba(99, 102, 241, 0.15);
 
@@ -44,6 +52,17 @@
   --r-sm: 6px;
   --r-lg: 14px;
   --topbar-h: 60px;
+
+  --space-1: 4px;
+  --space-2: 6px;
+  --space-3: 8px;
+  --space-4: 10px;
+  --space-5: 12px;
+  --space-6: 14px;
+  --space-7: 16px;
+  --space-8: 18px;
+  --space-9: 20px;
+  --space-10: 24px;
 
   --sh:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
   --sh-md: 0 4px 14px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.05);
@@ -74,6 +93,14 @@ body.dark-mode {
   --brand-light: rgba(99, 102, 241, 0.18);
   --brand-dim: rgba(129, 140, 248, 0.45);
   --green-light: rgba(16, 185, 129, 0.18);
+  
+  --orange-light: rgba(234, 88, 12, 0.18);
+  --orange-hover: #f97316;
+  --orange-dim: rgba(234, 88, 12, 0.45);
+  --blue: #3b82f6;
+  --blue-hover: #60a5fa;
+  --blue-light: rgba(59, 130, 246, 0.18);
+  --blue-dim: rgba(59, 130, 246, 0.45);
 
   --sh:    0 1px 3px rgba(0,0,0,.5), 0 1px 2px rgba(0,0,0,.35);
   --sh-md: 0 4px 14px rgba(0,0,0,.5), 0 2px 4px rgba(0,0,0,.4);

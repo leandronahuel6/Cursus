@@ -79,22 +79,30 @@ export function renderNavBadge(activeAlerts) {
  * @param {Array<Object>} activeAlerts - Alertas activas (no completadas).
  * @returns {void}
  */
-export function renderListView(activeAlerts) {
-  const listUrgent = document.getElementById('list-urgent');
-  const listSoon   = document.getElementById('list-soon');
-  const listLater  = document.getElementById('list-later');
+export function renderListView(allAlerts) {
+  const listOverdue  = document.getElementById('list-overdue');
+  const listUrgent   = document.getElementById('list-urgent');
+  const listSoon     = document.getElementById('list-soon');
+  const listLater    = document.getElementById('list-later');
+  const listCompleted = document.getElementById('list-completed');
 
-  if (!listUrgent || !listSoon || !listLater) return;
+  if (!listUrgent || !listSoon || !listLater || !listOverdue || !listCompleted) return;
 
-  listUrgent.innerHTML = '';
-  listSoon.innerHTML   = '';
-  listLater.innerHTML  = '';
+  listOverdue.innerHTML  = '';
+  listUrgent.innerHTML   = '';
+  listSoon.innerHTML     = '';
+  listLater.innerHTML    = '';
+  listCompleted.innerHTML = '';
 
-  activeAlerts.forEach(alerta => {
+  allAlerts.forEach(alerta => {
     const diffDays = getDaysDifference(alerta.fecha);
     const card     = _createAlertCard(alerta, diffDays);
 
-    if (diffDays <= 7) {
+    if (alerta.completada) {
+      listCompleted.appendChild(card);
+    } else if (diffDays < 0) {
+      listOverdue.appendChild(card);
+    } else if (diffDays <= 7) {
       listUrgent.appendChild(card);
     } else if (diffDays <= SOON_THRESHOLD_DAYS) {
       listSoon.appendChild(card);
@@ -103,9 +111,11 @@ export function renderListView(activeAlerts) {
     }
   });
 
-  _checkGroupEmpty(listUrgent, 'No tienes alertas críticas para esta semana.');
-  _checkGroupEmpty(listSoon,   'No hay vencimientos programados en los próximos 30 días.');
-  _checkGroupEmpty(listLater,  'Sin vencimientos lejanos programados.');
+  _checkGroupEmpty(listOverdue, 'No hay alertas vencidas.');
+  _checkGroupEmpty(listUrgent,  'No tienes alertas críticas para esta semana.');
+  _checkGroupEmpty(listSoon,    'No hay vencimientos programados en los próximos 30 días.');
+  _checkGroupEmpty(listLater,   'Sin vencimientos lejanos programados.');
+  _checkGroupEmpty(listCompleted, 'No hay alertas completadas.');
 }
 
 /**
@@ -136,6 +146,13 @@ function _checkGroupEmpty(container, message) {
 function _createAlertCard(alerta, diffDays) {
   const card = document.createElement('article');
   card.className = 'alert-item-card';
+  if (alerta.completada) {
+    card.classList.add('alert-item-card--completed');
+  }
+
+  // Hacer que la tarjeta entera abra la edición
+  card.dataset.jsAction = 'edit-alert';
+  card.dataset.alertId  = alerta.id;
 
   const resolvedColor = resolveAlertColor(alerta);
   const dateInfo      = getAlertDateText(diffDays, alerta.fecha);
@@ -187,18 +204,35 @@ function _createAlertCard(alerta, diffDays) {
   info.appendChild(descEl);
   info.appendChild(meta);
 
-  // ── Acciones (completar / eliminar)
+  // ── Acciones (editar / completar / eliminar)
   const actions = document.createElement('div');
   actions.className = 'alert-item-actions';
 
+  const btnEdit = document.createElement('button');
+  btnEdit.type      = 'button';
+  btnEdit.className = 'btn-alert-action btn-edit';
+  btnEdit.title     = 'Editar Alerta';
+  btnEdit.setAttribute('aria-label', `Editar alerta "${alerta.titulo}"`);
+  btnEdit.dataset.jsAction = 'edit-alert';
+  btnEdit.dataset.alertId  = alerta.id;
+  btnEdit.innerHTML        = spriteIcon('square-pen', { width: 15, height: 15 });
+
   const btnComplete = document.createElement('button');
   btnComplete.type      = 'button';
-  btnComplete.className = 'btn-alert-action btn-complete';
-  btnComplete.title     = 'Marcar como Completado';
-  btnComplete.setAttribute('aria-label', `Marcar "${alerta.titulo}" como completado`);
   btnComplete.dataset.jsAction = 'complete-alert';
   btnComplete.dataset.alertId  = alerta.id;
-  btnComplete.innerHTML        = spriteIcon('check', { width: 15, height: 15 });
+  
+  if (alerta.completada) {
+    btnComplete.className = 'btn-alert-action btn-undo';
+    btnComplete.title     = 'Desmarcar como Completada';
+    btnComplete.setAttribute('aria-label', `Desmarcar "${alerta.titulo}" como completada`);
+    btnComplete.innerHTML = spriteIcon('undo-2', { width: 15, height: 15 });
+  } else {
+    btnComplete.className = 'btn-alert-action btn-complete';
+    btnComplete.title     = 'Marcar como Completada';
+    btnComplete.setAttribute('aria-label', `Marcar "${alerta.titulo}" como completada`);
+    btnComplete.innerHTML = spriteIcon('check', { width: 15, height: 15 });
+  }
 
   const btnDelete = document.createElement('button');
   btnDelete.type      = 'button';
@@ -209,6 +243,7 @@ function _createAlertCard(alerta, diffDays) {
   btnDelete.dataset.alertId  = alerta.id;
   btnDelete.innerHTML        = spriteIcon('trash-2', { width: 15, height: 15 });
 
+  actions.appendChild(btnEdit);
   actions.appendChild(btnComplete);
   actions.appendChild(btnDelete);
 
@@ -226,9 +261,9 @@ function _createAlertCard(alerta, diffDays) {
  * @returns {string} Clase CSS del badge.
  */
 function _priorityBadgeClass(prioridad) {
-  if (prioridad === 'alta')  return 'badge--danger';
-  if (prioridad === 'media') return 'badge--warning';
-  return 'badge--neutral';
+  if (prioridad === 'alta')  return 'badge--danger badge--pill';
+  if (prioridad === 'media') return 'badge--warning badge--pill';
+  return 'badge--neutral badge--pill';
 }
 
 // ── Cuota / Estado de Pago ───────────────────────────────────────────────────
@@ -285,11 +320,11 @@ export function renderEstadoPagoCuota(estado, cuotaMontoVigente = null) {
  * @returns {void}
  */
 export function renderCuotaRecordatorio(data) {
-  const input = document.getElementById('cuota-monto');
-  if (!input) return;
+  const montoEl = document.getElementById('cuota-monto');
+  if (!montoEl) return;
 
   if (data.valor_mensual != null) {
-    input.value = parseFloat(data.valor_mensual).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+    montoEl.textContent = parseFloat(data.valor_mensual).toLocaleString('es-AR', { minimumFractionDigits: 2 });
   }
 
   const proximaEl = document.getElementById('cuota-proxima-notice');
@@ -461,16 +496,19 @@ export function updateViewToggle(view) {
 // ── Paleta de colores ────────────────────────────────────────────────────────
 
 /**
- * Inicializa la paleta de swatches de color para el formulario de alertas.
- * Asigna roles ARIA y listeners de selección. Los colores de fondo de cada swatch
- * están definidos en CSS por selector de atributo (`data-color`).
+ * Inicializa la paleta de swatches de color para un formulario específico.
+ * Asigna roles ARIA y listeners de selección.
  *
+ * @param {string} containerId - ID del contenedor/formulario.
  * @param {string} defaultColor - Color hexadecimal a pre-seleccionar.
  * @returns {void}
  */
-export function setupColorPalette(defaultColor) {
-  const colorInput = document.getElementById('alert-color');
-  const swatches   = Array.from(document.querySelectorAll('.alert-color-swatch'));
+export function setupColorPalette(containerId, defaultColor) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const colorInput = container.querySelector('input[type="hidden"]');
+  const swatches   = Array.from(container.querySelectorAll('.alert-color-swatch'));
   if (!colorInput || swatches.length === 0) return;
 
   /**

@@ -14,7 +14,7 @@
 
 'use strict'
 
-import { formatDateStr, resolveAlertColor } from '../../shared/utils.js'
+import { formatDateStr, resolveAlertColor, getDaysDifference } from '../../shared/utils.js'
 
 import { spriteIcon } from '../../shared/sprite.js'
 
@@ -103,9 +103,10 @@ export function renderCalendar(state, alerts) {
     )
 
     cell.addEventListener('click', (e) => {
-      e.stopPropagation()
-      _handleDayCellClick(cell, dateStr, dayAlerts, state, container)
-    })
+      if (e.target.closest('[data-js-action]')) return;
+      e.stopPropagation();
+      _handleDayCellClick(cell, dateStr, dayAlerts, state, container);
+    });
 
     container.appendChild(cell)
   }
@@ -273,13 +274,10 @@ function _openDayPopover(cell, dateStr, dayAlerts) {
   popover.setAttribute('role', 'dialog')
   popover.setAttribute('aria-label', `Alertas del ${formatDateStr(dateStr)}`)
 
-  // Evitar que el clic dentro del popover propague al document y lo cierre
-  popover.addEventListener('click', (e) => e.stopPropagation())
-
-  const title = document.createElement('div')
-  title.className = 'calendar-day-popover__title'
-  title.textContent = formatDateStr(dateStr)
-  popover.appendChild(title)
+  const dateEl = document.createElement('div')
+  dateEl.className = 'calendar-day-popover__date'
+  dateEl.textContent = formatDateStr(dateStr)
+  popover.appendChild(dateEl)
 
   dayAlerts.forEach((alerta) => {
     popover.appendChild(_buildPopoverItem(alerta))
@@ -308,24 +306,37 @@ function _buildPopoverItem(alerta) {
   const info = document.createElement('div')
   info.className = 'calendar-day-popover__info'
 
-  const tituloEl = document.createElement('div')
-  tituloEl.className = 'calendar-day-popover__titulo'
-  tituloEl.textContent = alerta.titulo
+  const titleEl = document.createElement('div')
+  titleEl.className = 'calendar-day-popover__title'
+  titleEl.textContent = alerta.titulo
+
+  const badgesWrap = document.createElement('div')
+  badgesWrap.className = 'calendar-day-popover__badges'
 
   const badge = document.createElement('span')
-  badge.className = `alert-priority-badge alert-priority-${alerta.prioridad}`
+  const priorityClass = alerta.prioridad === 'alta' ? 'badge--danger' : alerta.prioridad === 'media' ? 'badge--warning' : 'badge--neutral';
+  badge.className = `badge ${priorityClass} badge--pill`
   badge.textContent = alerta.prioridad
+  badgesWrap.appendChild(badge)
 
-  info.appendChild(tituloEl)
-  info.appendChild(badge)
+  const diffDays = getDaysDifference(alerta.fecha)
+  if (diffDays < 0 && !alerta.completada) {
+    const overdueBadge = document.createElement('span')
+    overdueBadge.className = 'badge badge--danger badge--pill'
+    overdueBadge.textContent = 'VENCIDA'
+    badgesWrap.appendChild(overdueBadge)
+  }
+
+  info.appendChild(titleEl)
+  info.appendChild(badgesWrap)
 
   const btnComplete = document.createElement('button')
   btnComplete.type = 'button'
   btnComplete.className = 'btn-alert-action btn-complete'
-  btnComplete.title = 'Marcar como Completado'
+  btnComplete.title = 'Marcar como Completada'
   btnComplete.setAttribute(
     'aria-label',
-    `Marcar "${alerta.titulo}" como completado`,
+    `Marcar "${alerta.titulo}" como completada`,
   )
   btnComplete.dataset.jsAction = 'complete-alert'
   btnComplete.dataset.alertId = alerta.id

@@ -277,26 +277,26 @@
     <div class="modal-body">
       
       <!-- Título de la tarea -->
-      <div class="modal-field">
-        <label class="modal-label" for="task-modal-title">Título de la Tarea</label>
+      <div class="form-field">
+        <label class="form-label" for="task-modal-title">Título de la Tarea</label>
         <input type="text" id="task-modal-title" class="custom-input" placeholder="Título de la tarea">
       </div>
 
       <!-- Fecha de Vencimiento -->
-      <div class="modal-field">
-        <label class="modal-label" for="task-modal-due">Fecha de Vencimiento</label>
+      <div class="form-field">
+        <label class="form-label" for="task-modal-due">Fecha de Vencimiento</label>
         <input type="datetime-local" id="task-modal-due" class="custom-input" onblur="window.KanbanManager.handleDateAutocomplete(this)">
       </div>
 
       <!-- Descripción -->
-      <div class="modal-field">
-        <label class="modal-label" for="task-modal-desc">Descripción</label>
+      <div class="form-field">
+        <label class="form-label" for="task-modal-desc">Descripción</label>
         <textarea id="task-modal-desc" class="custom-textarea" placeholder="Añadir una descripción más detallada..."></textarea>
       </div>
 
       <!-- Subtareas Checklist -->
-      <div class="modal-field">
-        <label class="modal-label">Subtareas (Checklist)</label>
+      <div class="form-field">
+        <label class="form-label">Subtareas (Checklist)</label>
         <div class="subtasks-wrap">
           <div class="subtasks-list" id="task-modal-subtasks-list">
             <!-- Inyectado por JS -->
@@ -332,8 +332,8 @@
       <div>
         <h4 style="margin: 0 0 0.75rem 0; font-size: 14px; color: var(--t1); border-bottom: 1px solid var(--border); padding-bottom: 0.25rem;">Configuraciones Generales</h4>
         
-        <div class="modal-field">
-          <label class="modal-label" for="custom-pomo-sound">Sonido de Alarma</label>
+        <div class="form-field">
+          <label class="form-label" for="custom-pomo-sound">Sonido de Alarma</label>
           <div style="display: flex; gap: 0.5rem; align-items: center;">
             <x-custom-select id="custom-pomo-sound" name="custom_pomo_sound" class="" style="flex: 1;">
               <option value="chime">Campana Clásica (Chime)</option>
@@ -347,8 +347,8 @@
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
-          <div class="modal-field">
-            <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
+          <div class="form-field">
+            <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
               <div class="ios-switch">
                 <input type="checkbox" id="pomo-play-alarm-toggle">
                 <span class="slider"></span>
@@ -357,8 +357,8 @@
             </label>
           </div>
 
-          <div class="modal-field">
-            <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
+          <div class="form-field">
+            <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
               <div class="ios-switch">
                 <input type="checkbox" id="pomo-auto-play-toggle">
                 <span class="slider"></span>
@@ -367,8 +367,8 @@
             </label>
           </div>
 
-          <div class="modal-field">
-            <label class="modal-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
+          <div class="form-field">
+            <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
               <div class="ios-switch">
                 <input type="checkbox" id="pomo-strict-toggle">
                 <span class="slider"></span>
@@ -385,26 +385,26 @@
         <p style="font-size: 12px; color: var(--t2); margin-top: -0.25rem; margin-bottom: 1rem;">Estos tiempos solo aplican al seleccionar el preset "P".</p>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-          <div class="modal-field">
-            <label class="modal-label" for="custom-pomo-focus">Enfoque (minutos)</label>
+          <div class="form-field">
+            <label class="form-label" for="custom-pomo-focus">Enfoque (minutos)</label>
             <input type="number" id="custom-pomo-focus" class="custom-input" min="1" max="90" step="1" value="25" required>
           </div>
-          <div class="modal-field">
-            <label class="modal-label" for="custom-pomo-sessions">Sesiones por Ciclo</label>
+          <div class="form-field">
+            <label class="form-label" for="custom-pomo-sessions">Sesiones por Ciclo</label>
             <input type="number" id="custom-pomo-sessions" class="custom-input" min="1" max="8" step="1" value="4" required>
           </div>
-          <div class="modal-field">
-            <label class="modal-label" for="custom-pomo-short">Descanso Corto (minutos)</label>
+          <div class="form-field">
+            <label class="form-label" for="custom-pomo-short">Descanso Corto (minutos)</label>
             <input type="number" id="custom-pomo-short" class="custom-input" min="1" max="30" step="1" value="5" required>
           </div>
-          <div class="modal-field">
-            <label class="modal-label" for="custom-pomo-long">Descanso Largo (minutos)</label>
+          <div class="form-field">
+            <label class="form-label" for="custom-pomo-long">Descanso Largo (minutos)</label>
             <input type="number" id="custom-pomo-long" class="custom-input" min="5" max="60" step="1" value="20" required>
           </div>
         </div>
 
-        <div class="modal-field" style="margin-top: 1rem;">
-          <label class="modal-label" for="custom-pomo-cycles">Ciclos Totales</label>
+        <div class="form-field" style="margin-top: 1rem;">
+          <label class="form-label" for="custom-pomo-cycles">Ciclos Totales</label>
           <x-custom-select id="custom-pomo-cycles" name="custom_pomo_cycles">
             <option value="infinite">Bucle Infinito</option>
             <option value="1">1 Ciclo</option>
@@ -637,3 +637,4 @@
   <script src="{{ asset('js/views/pomo-focus-canvas.js') }}"></script>
   <script src="{{ asset('js/views/area-estudio.js') }}?v={{ filemtime(public_path('js/views/area-estudio.js')) }}" type="module"></script>
 @endpush
+

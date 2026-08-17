@@ -60,6 +60,12 @@
            class="alert-list-container"
            role="tabpanel"
            aria-labelledby="btn-view-list">
+        
+        <section class="alert-group" id="group-overdue">
+          <h2 class="alert-group__title alert-group__title--overdue">Vencidas</h2>
+          <div id="list-overdue" class="alert-group__content"></div>
+        </section>
+
         <section class="alert-group" id="group-urgent">
           <h2 class="alert-group__title">Esta Semana / Próximos 7 días</h2>
           <div id="list-urgent" class="alert-group__content"></div>
@@ -73,6 +79,11 @@
         <section class="alert-group" id="group-later">
           <h2 class="alert-group__title">Más adelante</h2>
           <div id="list-later" class="alert-group__content"></div>
+        </section>
+
+        <section class="alert-group" id="group-completed">
+          <h2 class="alert-group__title alert-group__title--completed">Completadas</h2>
+          <div id="list-completed" class="alert-group__content"></div>
         </section>
       </div>
 
@@ -126,52 +137,53 @@
     <aside class="col-right" aria-label="Gestión de cuota y nueva alerta">
 
       {{-- RECORDATORIO DE CUOTA UNIVERSITARIA --}}
-      <div class="alert-form-card">
-        <h3 class="alert-form-card__title">
-          <svg aria-hidden="true" focusable="false">
-            <use href="{{ asset('assets/icons/sprite.svg#banknote') }}"></use>
-          </svg>
-          Cuota de la Universidad
-        </h3>
-        <p class="alert-form-card__subtitle">Monto vigente fijado por la institución.</p>
+      <article class="alert-form-card">
+        <header class="alert-form-card__header">
+          <h3 class="alert-form-card__title">
+            <svg aria-hidden="true" focusable="false">
+              <use href="{{ asset('assets/icons/sprite.svg#banknote') }}"></use>
+            </svg>
+            Cuota de la Universidad
+          </h3>
+          <p class="alert-form-card__subtitle">Monto vigente fijado por la institución.</p>
+        </header>
 
-        <div class="alert-form-group">
-          <label for="cuota-monto">Monto actual de la cuota</label>
-          <div class="currency-input-wrap currency-input-wrap--readonly">
-            <span class="currency-input-sign" aria-hidden="true">$</span>
-            <input type="text"
-                   id="cuota-monto"
-                   class="custom-input currency-input"
-                   readonly
-                   tabindex="-1"
-                   placeholder="—"
-                   aria-label="Monto actual de la cuota universitaria">
+        <div class="form-body">
+          <div class="data-display">
+            <span class="form-label">Monto actual de la cuota</span>
+            <div class="data-display__value-wrap">
+              <span class="data-display__sign" aria-hidden="true">$</span>
+              <strong class="data-display__value" id="cuota-monto">—</strong>
+            </div>
           </div>
+
+          {{-- Notice de próxima cuota (se controla desde JS) --}}
+          <div id="cuota-proxima-notice" class="cuota-proxima-notice" role="status"></div>
+
+          <button type="button"
+                  class="btn btn--success btn--block"
+                  id="btn-abrir-pago"
+                  data-js="open-pago-modal">
+            <span>Registrar <span class="u-hidden-mobile">Pago</span></span>
+          </button>
+
+          <p class="cuota-pago-info" id="cuota-pago-info" aria-live="polite"></p>
         </div>
-
-        <div id="cuota-proxima-notice" class="cuota-proxima-notice" role="status"></div>
-
-        <button type="button"
-                class="btn btn--success btn--block"
-                id="btn-abrir-pago"
-                data-js="open-pago-modal">
-          <span>Registrar <span class="u-hidden-mobile">Pago</span></span>
-        </button>
-
-        <p class="cuota-pago-info" id="cuota-pago-info" aria-live="polite"></p>
-      </div>
+      </article>
 
       {{-- FORMULARIO DE CARGA DE ALERTA --}}
-      <div class="alert-form-card">
-        <h3 class="alert-form-card__title alert-form-card__title--spaced">
-          <svg aria-hidden="true" focusable="false">
-            <use href="{{ asset('assets/icons/sprite.svg#circle-alert') }}"></use>
-          </svg>
-          Nueva Alerta / Vencimiento
-        </h3>
-        <form id="alert-form" data-js="form-alerta" novalidate>
-          <div class="alert-form-group">
-            <label for="alert-title">Título del Vencimiento</label>
+      <article class="alert-form-card">
+        <header class="alert-form-card__header">
+          <h3 class="alert-form-card__title">
+            <svg aria-hidden="true" focusable="false">
+              <use href="{{ asset('assets/icons/sprite.svg#circle-alert') }}"></use>
+            </svg>
+            Nueva Alerta / Vencimiento
+          </h3>
+        </header>
+        <form id="alert-form" data-js="form-alerta" class="form-body" novalidate>
+          <div class="form-field">
+            <label for="alert-title" class="form-label">Título del Vencimiento</label>
             <input type="text"
                    id="alert-title"
                    class="custom-input"
@@ -180,17 +192,26 @@
                    autocomplete="off">
           </div>
 
-          <div class="alert-form-group alert-form-group--grid-2">
-            <div>
-              <label for="alert-type">Categoría</label>
+          <div class="form-field">
+            <label for="alert-desc" class="form-label">Descripción (opcional)</label>
+            <textarea id="alert-desc"
+                      name="alert_desc"
+                      class="custom-textarea"
+                      rows="3"
+                      placeholder="Agregá detalles o recordatorios extra..."></textarea>
+          </div>
+
+          <div class="form-field-row">
+            <div class="form-field">
+              <label for="alert-type" class="form-label">Categoría</label>
               <x-custom-select id="alert-type" name="alert_type">
                 <option value="academic">Académica</option>
                 <option value="administrative">Administrativa</option>
                 <option value="personal">Personal</option>
               </x-custom-select>
             </div>
-            <div>
-              <label for="alert-priority">Prioridad</label>
+            <div class="form-field">
+              <label for="alert-priority" class="form-label">Prioridad</label>
               <x-custom-select id="alert-priority" name="alert_priority">
                 <option value="baja">Baja</option>
                 <option value="media">Media</option>
@@ -199,8 +220,8 @@
             </div>
           </div>
 
-          <div class="alert-form-group">
-            <legend class="fake-label">Color para pintar el día en calendario</legend>
+          <div class="form-field">
+            <legend class="form-label">Color para pintar el día en calendario</legend>
             {{-- El input hidden almacena el valor HEX seleccionado --}}
             <input type="hidden" id="alert-color" value="#2563eb">
             <fieldset class="alert-color-palette" id="alert-color-palette">
@@ -217,14 +238,14 @@
             </fieldset>
           </div>
 
-          <div class="alert-form-group">
-            <label for="alert-date">Fecha de Vencimiento</label>
+          <div class="form-field">
+            <label for="alert-date" class="form-label">Fecha de Vencimiento</label>
             <input type="date" id="alert-date" class="custom-input" required>
           </div>
 
           <button type="submit" class="btn btn--primary btn--block"><span>Programar <span class="u-hidden-mobile">Alerta</span></span></button>
         </form>
-      </div>
+      </article>
 
     </aside>
   </div>
@@ -252,8 +273,8 @@
   </div>
 
   {{-- ── MODAL: REGISTRAR PAGO DE LA CUOTA ──────────────────────────────── --}}
-  <x-modal id="pago-cuota-modal" title="Registrar pago" max-width="500px">
-    <div class="pago-modal-body">
+  <x-modal id="pago-cuota-modal" title="Registrar pago" icon="clipboard-clock">
+    <div class="modal-body">
       <div>
         Período:
         <span id="pago-periodo-label" class="pago-periodo-label"></span>
@@ -306,7 +327,7 @@
       </div>
     </div>
 
-    <div class="pago-modal-footer">
+    <div class="modal-foot">
       <button class="btn btn--cancel"
               type="button"
               id="btn-cancelar-pago"
@@ -315,6 +336,76 @@
               type="button"
               id="pago-btn-confirmar"
               data-js="confirmar-pago">Confirmar</button>
+    </div>
+  </x-modal>
+
+  {{-- ── MODAL: ELIMINAR ALERTA ──────────────────────────────────────────── --}}
+  <x-modal-confirm 
+      id="confirm-delete-alerta" 
+      title="¿Eliminar alerta?" 
+      description="Esta acción no se puede deshacer." 
+      type="danger" 
+      confirm-id="btn-confirm-delete-alerta" 
+  />
+
+  {{-- ── MODAL: EDITAR ALERTA ──────────────────────────────────────────── --}}
+  <x-modal id="edit-alerta-modal" title="Editar Alerta" icon="pen">
+    <form id="edit-alert-form" data-js="form-edit-alerta" class="modal-body" novalidate>
+      <div class="form-field">
+        <label for="edit-alert-title" class="form-label">Título del Vencimiento</label>
+        <input type="text" id="edit-alert-title" class="custom-input" required autocomplete="off">
+      </div>
+
+      <div class="form-field">
+        <label for="edit-alert-desc" class="form-label">Descripción (opcional)</label>
+        <textarea id="edit-alert-desc" name="edit_alert_desc" class="custom-textarea" rows="3"></textarea>
+      </div>
+
+      <div class="form-field-row">
+        <div class="form-field">
+          <label for="edit-alert-type" class="form-label">Categoría</label>
+          <x-custom-select id="edit-alert-type" name="edit_alert_type">
+            <option value="academic">Académica</option>
+            <option value="administrative">Administrativa</option>
+            <option value="personal">Personal</option>
+          </x-custom-select>
+        </div>
+        <div class="form-field">
+          <label for="edit-alert-priority" class="form-label">Prioridad</label>
+          <x-custom-select id="edit-alert-priority" name="edit_alert_priority">
+            <option value="baja">Baja</option>
+            <option value="media">Media</option>
+            <option value="alta">Alta</option>
+          </x-custom-select>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <legend class="form-label">Color para pintar el día en calendario</legend>
+        <input type="hidden" id="edit-alert-color" value="#2563eb">
+        <fieldset class="alert-color-palette" id="edit-alert-color-palette">
+          <button type="button" class="alert-color-swatch" data-color="#2563eb" aria-label="Azul" title="Azul"></button>
+          <button type="button" class="alert-color-swatch" data-color="#0ea5e9" aria-label="Celeste" title="Celeste"></button>
+          <button type="button" class="alert-color-swatch" data-color="#14b8a6" aria-label="Turquesa" title="Turquesa"></button>
+          <button type="button" class="alert-color-swatch" data-color="#22c55e" aria-label="Verde" title="Verde"></button>
+          <button type="button" class="alert-color-swatch" data-color="#84cc16" aria-label="Lima" title="Lima"></button>
+          <button type="button" class="alert-color-swatch" data-color="#eab308" aria-label="Amarillo" title="Amarillo"></button>
+          <button type="button" class="alert-color-swatch" data-color="#f97316" aria-label="Naranja" title="Naranja"></button>
+          <button type="button" class="alert-color-swatch" data-color="#ef4444" aria-label="Rojo" title="Rojo"></button>
+          <button type="button" class="alert-color-swatch" data-color="#ec4899" aria-label="Rosa" title="Rosa"></button>
+          <button type="button" class="alert-color-swatch" data-color="#8b5cf6" aria-label="Violeta" title="Violeta"></button>
+        </fieldset>
+      </div>
+
+      <div class="form-field">
+        <label for="edit-alert-date" class="form-label">Fecha de Vencimiento</label>
+        <input type="date" id="edit-alert-date" class="custom-input" required>
+      </div>
+    </form>
+    
+    <div class="modal-foot">
+      <button type="button" class="btn btn--cancel" data-js="modal-close">Cancelar</button>
+      <button type="submit" form="edit-alert-form" class="btn btn--primary"><span>Guardar <span class="u-hidden-mobile">Cambios</span></span></button>
     </div>
   </x-modal>
 

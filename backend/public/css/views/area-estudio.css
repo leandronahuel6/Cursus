@@ -530,14 +530,12 @@ transition: border-color .15s;
 .tb-right { display: flex; align-items: center; gap: 12px; }
 
 /* dark-mode .modal-box / .modal-foot / .btn-cancel → components/modals.css */
-/* dark-mode .modal-input / .modal-input:focus / select.modal-input → components/forms.css */
+
 /* Formulario inline para agregar tarea (modo oscuro) */
 body.dark-mode .kb-add-inp {
   background: transparent;
   color: var(--t1);
 }
-
-/* select.modal-input dark mode → components/forms.css */
 
 /* -----------------------------------------------------------------------------
  * Tooltip / Popover (Estudio Independiente)

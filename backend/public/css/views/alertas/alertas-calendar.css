@@ -179,6 +179,9 @@
   width: 230px;
   max-height: 220px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r);
@@ -203,19 +206,18 @@
   transform: none;
 }
 
-.calendar-day-popover__title {
+.calendar-day-popover__date {
   font-size: 11px;
   font-weight: 700;
   color: var(--t1);
-  margin-bottom: 6px;
   padding: 0 2px;
 }
 
 .calendar-day-popover__item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 4px;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
   border-radius: var(--r-sm);
 }
 
@@ -226,15 +228,22 @@
 .calendar-day-popover__info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }
 
-.calendar-day-popover__titulo {
+.calendar-day-popover__title {
   font-size: 12px;
   font-weight: 600;
   color: var(--t1);
   white-space: normal;
   word-break: break-word;
-  margin-bottom: 3px;
+}
+
+.calendar-day-popover__badges {
+  display: flex;
+  gap: var(--space-2);
 }
 
 /** Ícono dentro del popover (versión reducida del .alert-icon-wrap) */
@@ -250,9 +259,9 @@
 }
 
 /** Badge de prioridad dentro del popover (versión compacta) */
-.calendar-day-popover .alert-priority-badge {
+.calendar-day-popover .badge {
   font-size: 8.5px;
-  padding: 1px 5px;
+  padding: 1px 6px;
 }
 
 /** Botón de completar dentro del popover */
