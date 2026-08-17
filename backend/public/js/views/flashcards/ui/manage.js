@@ -181,7 +181,7 @@ function _buildCardListItem(card) {
                     data-card-id="${card.id}"
                     title="Editar tarjeta"
                     aria-label="Editar tarjeta">
-                    <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#pen"></use></svg>
+                    <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons/sprite.svg#square-pen"></use></svg>
                 </button>
                 <button class="btn-deck-icon btn-deck-icon--delete"
                     data-action="delete-card"
