@@ -240,6 +240,7 @@ export const KanbanManager = {
         const btnAdd    = document.getElementById(`btn-add-${col}`);
         if (!container || !btnAdd) return;
         btnAdd.style.display = 'none';
+        container.removeAttribute('hidden');
 
         const form = document.createElement('div');
         form.className = 'kb-add-form';
@@ -273,6 +274,8 @@ export const KanbanManager = {
     cancelInlineAddCard(col) {
         const form = document.getElementById(`inline-form-${col}`);
         if (form) form.remove();
+        const container = document.getElementById(`add-form-container-${col}`);
+        if (container) container.setAttribute('hidden', '');
         const btn = document.getElementById(`btn-add-${col}`);
         if (btn) btn.style.display = 'block';
     },

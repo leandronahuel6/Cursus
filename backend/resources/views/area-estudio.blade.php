@@ -113,7 +113,7 @@
                   <span class="kbcnt" id="cnt-pending">0</span>
                 </div>
                 <div class="kbcards" id="cards-pending"></div>
-                <div id="add-form-container-pending"></div>
+                <div id="add-form-container-pending" hidden></div>
                 <button class="kb-add" id="btn-add-pending" onclick="window.KanbanManager.showInlineAddCardForm('pending')">+ Agregar tarea</button>
               </div>
 
@@ -127,7 +127,7 @@
                   <span class="kbcnt" id="cnt-progress">0</span>
                 </div>
                 <div class="kbcards" id="cards-progress"></div>
-                <div id="add-form-container-progress"></div>
+                <div id="add-form-container-progress" hidden></div>
                 <button class="kb-add" id="btn-add-progress" onclick="window.KanbanManager.showInlineAddCardForm('progress')">+ Agregar tarea</button>
               </div>
 
@@ -141,7 +141,7 @@
                   <span class="kbcnt" id="cnt-done">0</span>
                 </div>
                 <div class="kbcards" id="cards-done"></div>
-                <div id="add-form-container-done"></div>
+                <div id="add-form-container-done" hidden></div>
                 <button class="kb-add" id="btn-add-done" onclick="window.KanbanManager.showInlineAddCardForm('done')">+ Agregar tarea</button>
               </div>
 

@@ -114,17 +114,20 @@
     .sec-ttl { font-size: 14px; font-weight: 700; color: var(--t1); display: flex; align-items: center; gap: 8px; }
     .sec-ttl-ic { font-size: 16px; }
 
+    .kanban-section {
+      --kbcard-height: 58px;
+    }
+
     .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
     .kbcol {
       background: var(--bg); border: 1px solid var(--border);
       border-radius: var(--r); padding: 12px;
-      display: flex; flex-direction: column;
-      /* Se redujo aún más la altura para mantener el tablero compacto */
-      min-height: 220px; max-height: 340px;
+      display: flex; flex-direction: column; gap: var(--space-4);
+      min-height: 220px;
       transition: background .2s, border-color .2s;
     }
     .kbcol.over { background: var(--brand-light); border-color: var(--brand-dim); }
-    .kbcol-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .kbcol-hd { display: flex; align-items: center; justify-content: space-between; }
     .kbcol-name { font-size: 12px; font-weight: 600; color: var(--t2); display: flex; align-items: center; gap: 6px; }
     
     .kbdot { width: 7px; height: 7px; border-radius: 50%; }
@@ -133,12 +136,14 @@
     .kd-f { background: #10b981; }
     
     .kbcnt { font-size: 11px; font-weight: 600; color: var(--tm); background: var(--surface); border: 1px solid var(--border); padding: 0 6px; border-radius: 10px; }
-    .kbcards { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; overflow-x: hidden; min-height: 50px; margin-bottom: 8px; padding: 0 8px; margin: 0 -8px; }
+    .kbcards { flex: 1; display: flex; flex-direction: column; gap: var(--space-3); overflow-y: auto; overflow-x: hidden; min-height: 50px; max-height: calc((var(--kbcard-height) * 4) + (var(--space-3) * 3) + var(--space-1)); padding: 0 8px; margin: 0 -8px; }
     
     /* Kanban Card UI */
     .kbcard {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--r-sm); padding: 10px 12px;
+      min-height: var(--kbcard-height);
+      flex-shrink: 0; /* IMPIDE QUE SE APLASTEN SI HAY MUCHAS Y EL TEXTO HACE WRAP */
       cursor: grab; position: relative;
       box-shadow: var(--sh);
       transition: box-shadow .15s, opacity .15s, border-color .15s;
@@ -176,7 +181,7 @@
     .kb-add-form {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--r-sm); padding: 8px 10px;
-      box-shadow: var(--sh); margin-bottom: 8px;
+      box-shadow: var(--sh);
       display: flex; flex-direction: column; gap: 8px;
     }
     .kb-add-inp {
