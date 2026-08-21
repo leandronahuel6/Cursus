@@ -349,7 +349,7 @@
   />
 
   {{-- ── MODAL: EDITAR ALERTA ──────────────────────────────────────────── --}}
-  <x-modal id="edit-alerta-modal" title="Editar Alerta" icon="pen">
+  <x-modal id="edit-alerta-modal" title="Editar Alerta" icon="square-pen">
     <form id="edit-alert-form" data-js="form-edit-alerta" class="modal-body" novalidate>
       <div class="form-field">
         <label for="edit-alert-title" class="form-label">Título del Vencimiento</label>
