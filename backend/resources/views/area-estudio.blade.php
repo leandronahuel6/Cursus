@@ -520,7 +520,7 @@
       <!-- Controles de reproducción -->
       <div class="focus-controls-row">
         <button class="focus-ctrl-btn" onclick="window.resetPomo()" title="Reiniciar">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
         </button>
         <button class="focus-ctrl-btn play-pause" id="focus-play-btn" onclick="window.togglePomo()" title="Pausar/Reanudar">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="focus-play-icon"><polygon points="5 3 19 12 5 21 5 3"/></svg>

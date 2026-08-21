@@ -679,7 +679,7 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
     border: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    color: rgba(255, 255, 255, 0.6);
+    color: #ffffff;
     width: 44px;
     height: 44px;
     border-radius: 50%;
@@ -690,12 +690,19 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     outline: none;
 }
+.focus-card-close-btn svg {
+    opacity: 0.6;
+    transition: opacity 0.3s;
+}
 
 .focus-card-close-btn:hover {
     background: rgba(239, 68, 68, 0.15);
     border-color: rgba(239, 68, 68, 0.3);
     color: #f87171;
     transform: rotate(90deg) scale(1.08);
+}
+.focus-card-close-btn:hover svg {
+    opacity: 1;
 }
 
 @media (max-width: 768px) {
