@@ -473,62 +473,66 @@
       </div>
     </div>
     
-    <!-- Banner de Meta / Tarea Activa -->
-    <div class="focus-goal-banner" id="focus-goal-banner">
-      <span class="focus-goal-label">Enfocándote en:</span>
-      <div class="focus-goal-title-wrapper" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center; width: 100%;">
-        <button class="focus-goal-nav-btn" id="focus-goal-prev-btn" onclick="window.prevFocusTask()" title="Tarea anterior" style="display: none;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <span class="focus-goal-title" id="focus-goal-title">Ninguna tarea en curso</span>
-        <button class="focus-goal-nav-btn" id="focus-goal-next-btn" onclick="window.nextFocusTask()" title="Siguiente tarea" style="display: none;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button class="focus-goal-complete-btn" id="focus-goal-complete-btn" onclick="window.completeFocusActiveTask()" title="Marcar tarea como completada" style="display: none;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </button>
-        <button class="focus-goal-complete-btn" id="focus-subtasks-toggle" onclick="window.toggleFocusSubtasksDrawer()" title="Ver checklist de subtareas" style="display: none; background: rgba(255,255,255,0.15); margin-left: 0.35rem;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        </button>
+    <div class="focus-central-card__goal-section">
+      <!-- Banner de Meta / Tarea Activa -->
+      <div class="focus-goal-banner" id="focus-goal-banner">
+        <span class="focus-goal-label">Enfocándote en:</span>
+        <div class="focus-goal-title-wrapper" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center; width: 100%;">
+          <button class="focus-goal-nav-btn" id="focus-goal-prev-btn" onclick="window.prevFocusTask()" title="Tarea anterior" style="display: none;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <span class="focus-goal-title" id="focus-goal-title">Ninguna tarea en curso</span>
+          <button class="focus-goal-nav-btn" id="focus-goal-next-btn" onclick="window.nextFocusTask()" title="Siguiente tarea" style="display: none;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <button class="focus-goal-action-btn" id="focus-goal-complete-btn" onclick="window.completeFocusActiveTask()" title="Marcar tarea como completada" style="display: none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+          <button class="focus-goal-action-btn" id="focus-subtasks-toggle" onclick="window.toggleFocusSubtasksDrawer()" title="Ver checklist de subtareas" style="display: none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+        </div>
       </div>
-    </div>
-
-    <!-- Cajón de Subtareas colapsable -->
-    <div id="focus-subtasks-drawer" class="focus-subtasks-drawer">
-      <div class="focus-subtasks-header">Checklist de Subtareas</div>
-      <div id="focus-subtasks-list" class="focus-subtasks-list">
-        <!-- Se inyecta por JS -->
+  
+      <!-- Cajón de Subtareas colapsable -->
+      <div id="focus-subtasks-drawer" class="focus-subtasks-drawer">
+        <div class="focus-subtasks-header">Checklist de Subtareas</div>
+        <div id="focus-subtasks-list" class="focus-subtasks-list">
+          <!-- Se inyecta por JS -->
+        </div>
       </div>
     </div>
     
-    <!-- Anillo de progreso circular -->
-    <div class="focus-timer-ring-wrapper">
-      <svg width="220" height="220" viewBox="0 0 220 220">
-        <circle class="focus-timer-ring-bg" cx="110" cy="110" r="102"/>
-        <circle class="focus-timer-ring-progress enfoque" cx="110" cy="110" r="102" id="focus-ring-progress" stroke-dasharray="640.88" stroke-dashoffset="0"/>
-      </svg>
-      <div class="focus-timer-clock">
-        <span class="focus-time-display" id="focus-time-display">25:00</span>
-        <span class="focus-phase-display" id="focus-phase-display">Enfoque</span>
-        <span class="focus-session-display" id="focus-session-display">Sesión 1 de 4</span>
+    <div class="focus-central-card__timer-section">
+      <!-- Anillo de progreso circular -->
+      <div class="focus-timer-ring-wrapper">
+        <svg width="220" height="220" viewBox="0 0 220 220">
+          <circle class="focus-timer-ring-bg" cx="110" cy="110" r="102"/>
+          <circle class="focus-timer-ring-progress enfoque" cx="110" cy="110" r="102" id="focus-ring-progress" stroke-dasharray="640.88" stroke-dashoffset="0"/>
+        </svg>
+        <div class="focus-timer-clock">
+          <span class="focus-time-display" id="focus-time-display">25:00</span>
+          <span class="focus-phase-display" id="focus-phase-display">Enfoque</span>
+          <span class="focus-session-display" id="focus-session-display">Sesión 1 de 4</span>
+        </div>
       </div>
+  
+      <!-- Controles de reproducción -->
+      <div class="focus-controls-row">
+        <button class="focus-ctrl-btn" onclick="window.resetPomo()" title="Reiniciar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        </button>
+        <button class="focus-ctrl-btn play-pause" id="focus-play-btn" onclick="window.togglePomo()" title="Pausar/Reanudar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="focus-play-icon"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </button>
+        <button class="focus-ctrl-btn" onclick="window.skipPomo()" title="Saltear fase">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+        </button>
+      </div>
+  
+      <!-- Puntos de progreso de sesión -->
+      <div class="focus-dots-row" id="focus-dots"></div>
     </div>
-
-    <!-- Controles de reproducción -->
-    <div class="focus-controls-row">
-      <button class="focus-ctrl-btn" onclick="window.resetPomo()" title="Reiniciar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-      </button>
-      <button class="focus-ctrl-btn play-pause" id="focus-play-btn" onclick="window.togglePomo()" title="Pausar/Reanudar">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="focus-play-icon"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      </button>
-      <button class="focus-ctrl-btn" onclick="window.skipPomo()" title="Saltear fase">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
-      </button>
-    </div>
-
-    <!-- Puntos de progreso de sesión -->
-    <div class="focus-dots-row" id="focus-dots"></div>
   </div>
 
   <!-- Barra flotante inferior de ajustes (Mixer & Themes) -->
