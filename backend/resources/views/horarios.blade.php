@@ -70,26 +70,26 @@
           <x-custom-select id="utn-presets-select" onchange="loadUTNPresetSchedule()">
             <option value="">📅 Elegir curso oficial...</option>
             <optgroup label="1° Cuatrimestre (Mañana)">
-              <option value="M1A_1">1° Año M1A (1° Cuat.)</option>
-              <option value="M1B_1">1° Año M1B (1° Cuat.)</option>
-              <option value="M2_1">2° Año M2 (1° Cuat.)</option>
-              <option value="M3_1">3° Año M3 (1° Cuat.)</option>
-              <option value="M4_1">4° Año M4 (1° Cuat.)</option>
+              <option value="M1A_1">Comisión M1A (Marzo-Julio)</option>
+              <option value="M1B_1">Comisión M1B (Marzo-Julio)</option>
+              <option value="M2_1">Comisión M2 (Marzo-Julio)</option>
+              <option value="M3_1">Comisión M3 (Marzo-Julio)</option>
+              <option value="M4_1">Comisión M4 (Marzo-Julio)</option>
             </optgroup>
             <optgroup label="1° Cuatrimestre (Noche)">
-              <option value="N1_1">1° Año N1 (1° Cuat.)</option>
-              <option value="N3_1">3° Año N3 (1° Cuat.)</option>
+              <option value="N1_1">Comisión N1 (Marzo-Julio)</option>
+              <option value="N3_1">Comisión N3 (Marzo-Julio)</option>
             </optgroup>
             <optgroup label="2° Cuatrimestre (Mañana)">
-              <option value="M1A_2">1° Año M1A (2° Cuat.)</option>
-              <option value="M1B_2">1° Año M1B (2° Cuat.)</option>
-              <option value="M2_2">2° Año M2 (2° Cuat.)</option>
-              <option value="M3_2">3° Año M3 (2° Cuat.)</option>
-              <option value="M4_2">4° Año M4 (2° Cuat.)</option>
+              <option value="M1A_2">Comisión M1A (Agosto-Noviembre)</option>
+              <option value="M1B_2">Comisión M1B (Agosto-Noviembre)</option>
+              <option value="M2_2">Comisión M2 (Agosto-Noviembre)</option>
+              <option value="M3_2">Comisión M3 (Agosto-Noviembre)</option>
+              <option value="M4_2">Comisión M4 (Agosto-Noviembre)</option>
             </optgroup>
             <optgroup label="2° Cuatrimestre (Noche - Rotativo)">
-              <option value="N1_2">1° Año N1 (2° Cuat. - Rotativo)</option>
-              <option value="N3_2">3° Año N3 (2° Cuat. - Rotativo)</option>
+              <option value="N1_2">Comisión N1 (Agosto-Noviembre)</option>
+              <option value="N3_2">Comisión N3 (Agosto-Noviembre)</option>
             </optgroup>
           </x-custom-select>
         </div>
@@ -197,11 +197,73 @@
         <div class="editor-center" style="gap: 12px;">
           <label class="editor-time-lbl">
             Inicio:
-            <input type="time" class="editor-time-input" id="editor-start-time">
+            <select class="editor-time-input" id="editor-start-time">
+              <option value="08:00">08:00</option>
+              <option value="08:30">08:30</option>
+              <option value="09:00">09:00</option>
+              <option value="09:30">09:30</option>
+              <option value="10:00">10:00</option>
+              <option value="10:30">10:30</option>
+              <option value="11:00">11:00</option>
+              <option value="11:30">11:30</option>
+              <option value="12:00">12:00</option>
+              <option value="12:30">12:30</option>
+              <option value="13:00">13:00</option>
+              <option value="13:30">13:30</option>
+              <option value="14:00">14:00</option>
+              <option value="14:30">14:30</option>
+              <option value="15:00">15:00</option>
+              <option value="15:30">15:30</option>
+              <option value="16:00">16:00</option>
+              <option value="16:30">16:30</option>
+              <option value="17:00">17:00</option>
+              <option value="17:30">17:30</option>
+              <option value="18:00">18:00</option>
+              <option value="18:30">18:30</option>
+              <option value="19:00">19:00</option>
+              <option value="19:30">19:30</option>
+              <option value="20:00">20:00</option>
+              <option value="20:30">20:30</option>
+              <option value="21:00">21:00</option>
+              <option value="21:30">21:30</option>
+              <option value="22:00">22:00</option>
+              <option value="22:30">22:30</option>
+            </select>
           </label>
           <label class="editor-time-lbl">
             Fin:
-            <input type="time" class="editor-time-input" id="editor-end-time">
+            <select class="editor-time-input" id="editor-end-time">
+              <option value="08:30">08:30</option>
+              <option value="09:00">09:00</option>
+              <option value="09:30">09:30</option>
+              <option value="10:00">10:00</option>
+              <option value="10:30">10:30</option>
+              <option value="11:00">11:00</option>
+              <option value="11:30">11:30</option>
+              <option value="12:00">12:00</option>
+              <option value="12:30">12:30</option>
+              <option value="13:00">13:00</option>
+              <option value="13:30">13:30</option>
+              <option value="14:00">14:00</option>
+              <option value="14:30">14:30</option>
+              <option value="15:00">15:00</option>
+              <option value="15:30">15:30</option>
+              <option value="16:00">16:00</option>
+              <option value="16:30">16:30</option>
+              <option value="17:00">17:00</option>
+              <option value="17:30">17:30</option>
+              <option value="18:00">18:00</option>
+              <option value="18:30">18:30</option>
+              <option value="19:00">19:00</option>
+              <option value="19:30">19:30</option>
+              <option value="20:00">20:00</option>
+              <option value="20:30">20:30</option>
+              <option value="21:00">21:00</option>
+              <option value="21:30">21:30</option>
+              <option value="22:00">22:00</option>
+              <option value="22:30">22:30</option>
+              <option value="23:00">23:00</option>
+            </select>
           </label>
 
           <!-- Paleta de colores: data-color usa strings semánticos (ej. 'emerald')
@@ -253,16 +315,16 @@
           <label class="form-label" id="modal-comm-lbl">Comisión:</label>
           <x-custom-select id="modal-commission-select" name="modal_commission">
             <option value="">Sin comisión / No seleccionar</option>
-            <optgroup label="Madrugada">
-              <option value="M1A">M1A &mdash; 1° Año Mañana A</option>
-              <option value="M1B">M1B &mdash; 1° Año Mañana B</option>
-              <option value="M2">M2 &mdash; 2° Año Mañana</option>
-              <option value="M3">M3 &mdash; 3° Año Mañana</option>
-              <option value="M4">M4 &mdash; 4° Año Mañana</option>
+            <optgroup label="Mañana">
+              <option value="M1A">M1A &mdash; 1° Cuatrimestre A</option>
+              <option value="M1B">M1B &mdash; 1° Cuatrimestre B</option>
+              <option value="M2">M2 &mdash; 2° Cuatrimestre</option>
+              <option value="M3">M3 &mdash; 3° Cuatrimestre</option>
+              <option value="M4">M4 &mdash; 4° Cuatrimestre</option>
             </optgroup>
             <optgroup label="Noche">
-              <option value="N1">N1 &mdash; 1° Año Noche</option>
-              <option value="N3">N3 &mdash; 3° Año Noche</option>
+              <option value="N1">N1 &mdash; 1° Cuatrimestre</option>
+              <option value="N3">N3 &mdash; 3° Cuatrimestre</option>
             </optgroup>
           </x-custom-select>
         </div>

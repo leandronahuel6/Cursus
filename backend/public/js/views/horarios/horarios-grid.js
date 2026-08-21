@@ -372,7 +372,7 @@ export function populateTimeSelects() {
     startSelect.innerHTML += `<option value="${timeStr}">${timeStr}</option>`;
   }
 
-  for (let min = (START_HOUR + 1) * 60; min <= END_HOUR * 60; min += 30) {
+  for (let min = START_HOUR * 60 + 30; min <= END_HOUR * 60; min += 30) {
     const timeStr = minToTime(min);
     endSelect.innerHTML += `<option value="${timeStr}">${timeStr}</option>`;
   }
