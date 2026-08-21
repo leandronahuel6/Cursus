@@ -1376,14 +1376,17 @@ function toggleFocusSubtaskStatus(index) {
     KanbanManager.renderKanban();
     renderFocusSubtasks();
 
-    ApiService.updateSubtareas(activeTask.id, activeTask.subtasks)
-        .catch(() => {
-            activeTask.subtasks[index].completed = !activeTask.subtasks[index].completed;
-            KanbanManager.saveTasksToLocal();
-            KanbanManager.renderKanban();
-            renderFocusSubtasks();
-            showToast('Error sincronizando subtareas', 'error');
-        });
+    const sub = activeTask.subtasks[index];
+    if (sub.id && !String(sub.id).startsWith('s_')) {
+        ApiService.updateSubtarea(sub.id, { descripcion: sub.text, completado: sub.completed })
+            .catch(() => {
+                activeTask.subtasks[index].completed = !activeTask.subtasks[index].completed;
+                KanbanManager.saveTasksToLocal();
+                KanbanManager.renderKanban();
+                renderFocusSubtasks();
+                showToast('Error sincronizando subtareas', 'error');
+            });
+    }
 }
 
 /** Alterna el modo de pantalla completa del navegador. */
