@@ -331,13 +331,11 @@ function resetPomo() {
             'Vas a reiniciar tu sesión de enfoque actual. El tiempo acumulado se guardará en tu historial como sesión abandonada. ¿Deseas continuar?',
             () => {
                 pomodoroService.reiniciarFase();
-                showToast('Sesión de enfoque reiniciada', 'success');
             }
         );
     } else {
         // En descanso, reiniciar no tiene riesgo de pérdida de datos productivos
         pomodoroService.reiniciarFase();
-        showToast('Descanso reiniciado', 'success');
     }
 }
 
@@ -355,7 +353,6 @@ function restartPomoCycle() {
         
     openConfirm(msg, () => {
         pomodoroService.reiniciarCiclo();
-        showToast('Ciclo de sesiones reiniciado', 'success');
     });
 }
 
@@ -371,13 +368,11 @@ function skipPomo() {
             'Vas a saltar el resto de tu sesión de enfoque. El tiempo acumulado se guardará en tu historial como sesión completada parcialmente. ¿Deseas continuar?', 
             () => {
                 pomodoroService.saltarFase();
-                showToast('Fase de enfoque salteada', 'success');
             }
         );
     } else {
         // En descanso es común querer saltar la pausa si ya se quiere volver a estudiar
         pomodoroService.saltarFase();
-        showToast('Descanso salteado', 'success');
     }
 }
 
@@ -400,14 +395,12 @@ function setPreset(type) {
             `Atención: El preset que seleccionaste tiene un límite de 4 sesiones por ciclo, pero actualmente te encuentras en la sesión ${cicloActual}. Al aplicar este cambio, tu progreso del ciclo se reiniciará a la sesión 1. ¿Deseas continuar?`,
             () => {
                 const aplicado = pomodoroService.aplicarPreset(type);
-                if (aplicado) showToast(`Preset aplicado: ${type.toUpperCase()}`, 'success');
             }
         );
         return;
     }
 
     const aplicado = pomodoroService.aplicarPreset(type);
-    if (aplicado) showToast(`Preset aplicado: ${type.toUpperCase()}`, 'success');
 }
 
 /**
@@ -1101,8 +1094,6 @@ function enterFocusMode() {
 
     // Forzar render inmediato del reloj sin esperar al próximo tick del servicio
     renderFocusMode(pomodoroService.obtenerSnapshot());
-
-    showToast('Entrando en Modo Concentración ✨', 'success');
 }
 
 /**
@@ -1148,7 +1139,6 @@ function performExitFocusMode() {
         if (lofiPanel)  lofiPanel.classList.remove('show');
         if (lofiBtn)    lofiBtn.classList.remove('active');
         if (lofiIframe) lofiIframe.src = '';
-        showToast('Saliste del Modo Concentración', 'success');
     }, 400);
 }
 
@@ -1275,7 +1265,6 @@ function updateMixerIcon(type, volume) {
 function changeFocusPhase(phase) {
     pomodoroService.forzarFase(phase);
     const labels = { enfoque: 'Pomodoro', descanso_corto: 'Recreo Corto', descanso_largo: 'Recreo Largo' };
-    showToast(`Cambiado a fase: ${labels[phase] || phase}`, 'success');
 }
 
 /* Lofi player extraido a lofi-panel.js */
