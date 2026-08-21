@@ -550,7 +550,6 @@ window.switchVersion = function(version) {
 
   renderBlocksOnTracks(schedState.blocks, schedState.comparisonBlocks, schedState.currentVersion, schedState.selectedBlockId);
   checkOverlaps(schedState.blocks, schedState.currentVersion);
-  window.showToast(`Cargada la Versión ${version}`, 'success');
 };
 
 // ── Color change ────────────────────────────────────────────────────────────
