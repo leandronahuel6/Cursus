@@ -598,8 +598,10 @@
 >
     <div class="ai-loading-content">
         <div class="ai-loader-spinner" aria-hidden="true"></div>
-        <h3 id="ai-loading-title">Procesando archivo...</h3>
-        <p id="ai-loading-text">La IA de Cursus está analizando tu documento para generar las flashcards.</p>
+        <div class="ai-loading-content__text-group">
+            <h3 id="ai-loading-title">Procesando archivo...</h3>
+            <p id="ai-loading-text">La IA de Cursus está analizando tu documento para generar las flashcards.</p>
+        </div>
     </div>
 </div>
 

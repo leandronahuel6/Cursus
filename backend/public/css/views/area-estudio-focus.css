@@ -235,10 +235,26 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: var(--space-10);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     text-align: center;
 }
 
+.focus-central-card__goal-section,
+.focus-central-card__timer-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.focus-central-card__goal-section {
+    gap: var(--space-6);
+}
+
+.focus-central-card__timer-section {
+    gap: var(--space-8);
+}
 
 /* Anillo de Progreso y Reloj */
 .focus-timer-ring-wrapper {
@@ -248,7 +264,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 2rem;
 }
 
 .focus-timer-ring-wrapper svg {
@@ -609,7 +624,6 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
     flex-direction: column;
     align-items: center;
     gap: 0.25rem;
-    margin-bottom: 1.5rem;
     max-width: 90%;
 }
 
@@ -625,11 +639,11 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
     font-size: 1.15rem;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.9);
-    text-align: center;
+    text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 320px;
+    width: 320px;
     border-bottom: 1px dashed rgba(255, 255, 255, 0.18);
     padding-bottom: 0.3rem;
 }
@@ -644,7 +658,6 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
     justify-content: center;
     width: 100%;
     gap: 0.75rem;
-    margin-bottom: 1.5rem;
 }
 
 .focus-phase-tabs {
@@ -666,7 +679,7 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
     border: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    color: rgba(255, 255, 255, 0.6);
+    color: #ffffff;
     width: 44px;
     height: 44px;
     border-radius: 50%;
@@ -677,12 +690,19 @@ body:not(.dark-mode) .btn-focus-mode-trigger:hover {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     outline: none;
 }
+.focus-card-close-btn svg {
+    opacity: 0.6;
+    transition: opacity 0.3s;
+}
 
 .focus-card-close-btn:hover {
     background: rgba(239, 68, 68, 0.15);
     border-color: rgba(239, 68, 68, 0.3);
     color: #f87171;
     transform: rotate(90deg) scale(1.08);
+}
+.focus-card-close-btn:hover svg {
+    opacity: 1;
 }
 
 @media (max-width: 768px) {
@@ -931,7 +951,6 @@ cursor: pointer;
     .focus-timer-ring-wrapper {
         width: 110px;
         height: 110px;
-        margin-bottom: 0.6rem;
     }
     .focus-time-display {
         font-size: 1.6rem;
@@ -1001,12 +1020,12 @@ cursor: pointer;
    MEJORAS ADICIONALES: BOTÓN COMPLETAR META Y PUNTOS DE SESIÓN
    ========================================================================== */
 
-.focus-goal-complete-btn {
+.focus-goal-action-btn {
     background: rgba(16, 185, 129, 0.12);
     border: 1px solid rgba(16, 185, 129, 0.25);
     color: #6ee7b7;
-    width: 24px;
-    height: 24px;
+    padding: var(--space-2);
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
@@ -1014,10 +1033,10 @@ cursor: pointer;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     outline: none;
-    padding: 0;
+    flex-shrink: 0;
 }
 
-.focus-goal-complete-btn:hover {
+.focus-goal-action-btn:hover {
     background: rgba(16, 185, 129, 0.25);
     border-color: rgba(16, 185, 129, 0.45);
     color: #ffffff;
@@ -1029,7 +1048,6 @@ cursor: pointer;
     display: flex;
     justify-content: center;
     gap: 0.6rem;
-    margin-top: 1.8rem;
 }
 
 .focus-dot {
@@ -1051,8 +1069,8 @@ cursor: pointer;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: rgba(255, 255, 255, 0.6);
-    width: 20px;
-    height: 20px;
+    padding: var(--space-2);
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
@@ -1060,7 +1078,7 @@ cursor: pointer;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     outline: none;
-    padding: 0;
+    flex-shrink: 0;
 }
 
 .focus-goal-nav-btn:hover {
@@ -1094,7 +1112,6 @@ cursor: pointer;
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 18px;
     padding: 1rem 1.5rem;
-    margin-top: 1rem;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     z-index: 11;
     display: none;
@@ -1124,7 +1141,7 @@ cursor: pointer;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    max-height: 140px;
+    height: 140px;
     overflow-y: auto;
     padding-right: 4px;
 }
